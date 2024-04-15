@@ -9,15 +9,15 @@ const App = () => {
   return <>
     <BrowserRouter>
       <Shoppinessmart />
-
       <Routes>
-
         <Route path='/' element={<Home />} />
         <Route path='/login' element={<Login />} />
         <Route path='/signup' element={<Signup />} />
-
       </Routes>
     </BrowserRouter>
+
+
+
   </>
 }
 

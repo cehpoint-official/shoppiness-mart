@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { AuthApi } from "../api/AuthApi";
+import { authapi } from "../api/AuthApi";
+
 
 
 const authSlice = createSlice({
@@ -13,14 +14,14 @@ const authSlice = createSlice({
         }
     },
     extraReducers: builder => builder
-        .addMatcher(AuthApi.endpoints.continueWithGoogle.matchPending, (state, { payload }) => {
+        .addMatcher(authapi.endpoints.continueWithGoogle.matchPending, (state, { payload }) => {
             state.loading = true
         })
-        .addMatcher(AuthApi.endpoints.continueWithGoogle.matchFulfilled, (state, { payload }) => {
+        .addMatcher(authapi.endpoints.continueWithGoogle.matchFulfilled, (state, { payload }) => {
             state.loading = false
             state.auth = payload
         })
-        .addMatcher(AuthApi.endpoints.continueWithGoogle.matchRejected, (state, { payload }) => {
+        .addMatcher(authapi.endpoints.continueWithGoogle.matchRejected, (state, { payload }) => {
             state.loading = false
             state.error = payload
         })

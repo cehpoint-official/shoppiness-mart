@@ -1,8 +1,10 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
-import { auth, google } from "../../config/firebase";
+import { auth, google } from "../../config/Firebase";
 
-export const AuthApi = createApi({
+
+
+export const authapi = createApi({
     reducerPath: "authapi",
     baseQuery: fetchBaseQuery(),
     tagTypes: ["auth"],
@@ -56,4 +58,4 @@ export const AuthApi = createApi({
     }
 })
 
-export const { useRegisterMutation, useLazyLoginQuery, useContinueWithGoogleMutation } = AuthApi
+export const { useRegisterMutation, useLazyLoginQuery, useContinueWithGoogleMutation } = authapi

@@ -8,8 +8,7 @@ import OnlineP5 from "../assets/onlinep5.png"
 import Shopmart1 from "../assets/shopmart1.png"
 import Shopmart2 from "../assets/shopmart2.png"
 import Shopmart3 from "../assets/shopmart3.png"
-
-// import Backimg4 from "../assets/backimg4.png"
+//import Backimg4 from "../assets/backimg4.png"
 import Card1 from "../assets/card1.png"
 import Card2 from "../assets/card2.png"
 import Card3 from "../assets/card3.png"
@@ -23,8 +22,10 @@ import Logo2 from "../assets/logo2.png"
 import Logo3 from "../assets/logo3.png"
 import Logo4 from "../assets/logo4.png"
 import Logo5 from "../assets/logo5.png"
+import Blog1 from "../assets/blog1.png"
+import Blog2 from "../assets/blog2.png"
+import Blog3 from "../assets/blog3.png"
 import Backimg9 from "../assets/backimg9.png"
-
 const Home = () => {
     return <div div className='px-12 overflow-hidden'>
 
@@ -144,7 +145,7 @@ const Home = () => {
 
 
         {/* 5th page */}
-        <div className="mt-auto mx-auto px-4 md:px-40  pt-8 pb-6 ">
+        <div className="mt-auto mx-auto px-4 md:px-40   pb-6 ">
             <p className="font-bold text-4xl text-center">Why use this platform</p>
             <p className="text-gray-500 text-lg text-center mx-auto  mt-8">Lorem ipsum dolor sit amet consectetur adipisicing elit.   </p>
             <p className="text-gray-500 text-lg   text-center mx-auto  ">Blanditiis,commodi tempora mollitia voluptatem</p>
@@ -188,7 +189,7 @@ const Home = () => {
         </div>
 
         {/* 6th page  */}
-        <div className="grid grid-cols-12 gap-8  bg-[#EAEFF2] px-12 ">
+        <div className="grid grid-cols-12 gap-8  mt-20 bg-[#EAEFF2] px-12 ">
             <div className="col-span-12 md:col-span-5 lg:col-span-5">
                 <img src={Imgpage6} alt="" className="w-72 md:w-full" />
             </div>
@@ -262,14 +263,14 @@ const Home = () => {
 
         {/* 8th page */}
 
-        <div className="mt-10 mx-auto px-4 md:px-40 bg-amber-50 pt-8 pb-6 ">
+        <div className="mt-10 mx-auto px-4 md:px-40 bg-amber-50 pt-10 pb-6 ">
             <p className="font-bold text-4xl text-center">Raise funds for your cause/NGOs/ charity</p>
             <p className="text-gray-600 text-lg text-center mx-auto  mt-8">Lorem ipsum dolor sit amet consectetur adipisicing elit. </p>
             <p className="text-gray-600 text-lg   text-center mx-auto  "> Blanditiis,commodi tempora mollitia voluptatem  </p>
 
             <div className=''>
 
-                <div className='flex justify-center gap-9'>
+                <div className='flex justify-center space-x-20 mt-4'>
                     <div className='mt-10  md:flex-row'>
                         <img src={Logo1} alt="" className='' />
                     </div>
@@ -291,11 +292,12 @@ const Home = () => {
                         </button>
                     </div>
                 </div>
-                <div className="relative  mt-10">
-                    <input type="search" className=" px-4  py-2 w-full  text-sm text-gray-900 bg-amber-50 border-2 text-center" placeholder="Search name of the cause or NGO you want to support.." required />
-                    <button type="submit" className="absolute top-0 end-0 p-2.5 text-sm font-medium  ">
-                        <i class="bi bi-search"></i>
-                    </button>
+                <div className='md:mx-20 mx-10 '>
+
+                    <div className=" flex justify-center items-center mt-16   w-full">
+                        <input type="search" className=" py-2 px-10 w-full    text-gray-900 bg-amber-50 border-2 " placeholder="Search name of the cause or NGO you want to support.." required />
+                        <i className='bi bi-search text-2xl px-2 py-1 border-2'></i>
+                    </div>
                 </div>
                 <div class="mt-10 text-center pb-5">
                     <p class="m bg-[#FFD705] rounded-lg w-full md:w-72 py-2 inline-block">
@@ -307,43 +309,70 @@ const Home = () => {
         </div >
 
         {/* 9th page */}
-        {/* <div className="mt-10 mx-auto px-4 md:px-40 pt-8 pb-6 ">
+        <div className="mt-10 mx-auto px-12 md:px-40 pt-8 pb-6 ">
             <p className="font-bold text-4xl text-center">Recently Posted Blog</p>
             <p className="text-gray-600 text-lg text-center mx-auto  mt-8">Lorem ipsum dolor sit amet consectetur adipisicing elit. </p>
             <p className="text-gray-600 text-lg   text-center mx-auto  "> Blanditiis,commodi tempora mollitia voluptatem  </p>
-
-            <div className=' mt-6'>
-                <div>
-                    <img src={Blog1} alt="" />
-                    <p className='font-medium text-lg'>Blog title 1</p>
-                    <p className='text-gray-500 text-lg text'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Iste consequatur nobis omnis! Tenetur, ex, repudiandae nostrum soluta eos debitis ratione facilis perferendis eligendi sequi officia ducimus fugit expedita temporibus molestias <span>Read More...</span></p>
+            <div className='grid grid-cols-12 gap-2 mt-5'>
+                <div className='lg:col-span-5 col-span-12'>
+                    <div>
+                        <img src={Blog1} alt="" />
+                        <p className='font-medium text-xl mt-4'>Blog title 1</p>
+                        <p className='text-gray-500 text-lg mt-5'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis,commodi tempora <span className='text-[#049D8E] font-medium'>Read More...</span></p>
+                        <p className='text-gray-400 mt-4'>By Tithi Mondal, 10 Mar.2024</p>
+                    </div>
                 </div>
-
+                <div className='lg:col-span-7 col-span-12 mx-5  '>
+                    <div className='lg:flex '>
+                        <img src={Blog2} alt=" " className='h-full w-full' />
+                        <div className='mx-4'>
+                            <p className='font-medium text-xl'>Blog title 2</p>
+                            <p className='text-gray-500 text-lg'>Lorem ipsum dolor sit amet consectetur Blanditiis,commodi tem<span className='text-[#049D8E] font-medium'>Read More...</span></p>
+                            <p className='text-gray-400 mt-4'>By Tithi Mondal, 10 Mar.2024</p>
+                        </div>
+                    </div>
+                    <div className='lg:flex mt-3 '>
+                        <img src={Blog3} alt="" className='h-full w-full' />
+                        <div className='mx-4'>
+                            <p className='font-medium  text-xl'>Blog title 3</p>
+                            <p className='text-gray-500 text-lg'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis,commodi tempora <span className='text-[#049D8E] font-medium'>Read More...</span></p>
+                            <p className='text-gray-400 mt-4'>By Tithi Mondal, 10 Mar.2024</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-
-        </div > */}
+        </div >
 
         {/* 10th page */}
 
-        {/* <div className="mt-10  mx-auto px-4  pt-8 mb-9 ">
-            <div className='absolute w-full'>
-                <img src={Backimg9} alt="" className='' />
+        <div className="mt-44 mx-auto px-12  flex flex-col justify-center items-center">
+            <div className="absolute">
+                <img src={Backimg9} alt="" className="w-full h-[20rem ]" />
             </div>
-            <div className='relative mt-5 '>
-                <p className="font-bold text-4xl text-center">Subscribe to Our Newsletter</p>
-                <p className="text-gray-600 text-lg text-center mx-auto  mt-7">Improving your small business's growth through  </p>
-                <p className="text-gray-600 text-lg   text-center mx-auto  ">Onir app. It also </p>
+            <div className="relative  text-center">
+                <p className="font-bold text-4xl">Subscribe to Our Newsletter</p>
+                <p className="text-gray-600 text-lg mx-auto mt-5">Improving your small business's growth through Onir app. It also</p>
+                <div className='md:mx-20 mx-10 '>
+                    <div className=" flex justify-center items-center mt-16   w-full">
+                        <input type="search" className=" px-24 w-full    text-gray-900 bg-white border-2 py-3 " placeholder="Enter your Email here" required />
+                        <button className=' text-lg px-4   py-3 border-2 text-white bg-[#049D8E]'>Subscribe</button>
+                    </div>
+
+                </div>
             </div>
-
-
-
-        </div > */}
-
-        {/* 11th page */}
-        <div>
 
         </div>
+        {/* 11th page */}
 
+        <div className="mt-40 mx-auto px-12 md:px-40 pt-8 pb-6 bg-[#EEFAF9] ">
+            <p className="font-bold text-4xl text-center">Frequently Asked Questions</p>
+            <p className="text-gray-600 text-lg text-center mx-auto  mt-8">An establishment created to offer assistance and generate funds for individuals facing  </p>
+            <p className="text-gray-600 text-lg   text-center mx-auto  "> challenges and hardships </p>
+            <div>
+                <p className='text-3xl font-semibold'>Frequently Asked Questions 1</p>
+
+            </div>
+        </div >
 
 
 
