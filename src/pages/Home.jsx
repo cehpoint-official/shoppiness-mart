@@ -1,11 +1,11 @@
 import React from 'react'
 import Home1 from "../assets/home1.png"
-import OnlineP1 from "../assets/onlinep1.png"
-import OnlineP2 from "../assets/onlinep2.png"
-import OnlineP3 from "../assets/onlinep3.png"
-import OnlineP4 from "../assets/onlinep4.png"
-import OnlineP5 from "../assets/onlinep5.png"
-import Shopmart1 from "../assets/shopmart1.png"
+import OnlineP1 from "../assets/onlineP1.png"
+import OnlineP2 from "../assets/onlineP2.png"
+import OnlineP3 from "../assets/onlineP3.png"
+import OnlineP4 from "../assets/onlineP4.png"
+import OnlineP5 from "../assets/onlineP5.png"
+import Shopmart1 from "../assets/Shopmart1.png"
 import Shopmart2 from "../assets/shopmart2.png"
 import Shopmart3 from "../assets/shopmart3.png"
 //import Backimg4 from "../assets/backimg4.png"
@@ -26,6 +26,7 @@ import Blog1 from "../assets/blog1.png"
 import Blog2 from "../assets/blog2.png"
 import Blog3 from "../assets/blog3.png"
 import Backimg9 from "../assets/backimg9.png"
+import ShoppingBag from "../assets/ShoppingBag.png"
 const Home = () => {
     return <div div className='px-12 overflow-hidden'>
 
@@ -365,18 +366,135 @@ const Home = () => {
         {/* 11th page */}
 
         <div className="mt-40 mx-auto px-12 md:px-40 pt-8 pb-6 bg-[#EEFAF9] ">
-            <p className="font-bold text-4xl text-center">Frequently Asked Questions</p>
-            <p className="text-gray-600 text-lg text-center mx-auto  mt-8">An establishment created to offer assistance and generate funds for individuals facing  </p>
-            <p className="text-gray-600 text-lg   text-center mx-auto  "> challenges and hardships </p>
             <div>
-                <p className='text-3xl font-semibold'>Frequently Asked Questions 1</p>
-
+                <p className="font-bold text-4xl text-center">Frequently Asked Questions</p>
+                <p className="text-gray-600 text-lg text-center mx-auto  mt-8">An establishment created to offer assistance and generate funds for individuals facing  </p>
+                <p className="text-gray-600 text-lg   text-center mx-auto  "> challenges and hardships </p>
             </div>
+            <div className='mt-4 lg:flex lg:justify-center lg:items-center gap-10 '>
+                <p className='text-2xl font-semibold text-gray-700 '>Frequently Asked Questions 1</p>
+                <div>
+                    <i className="bi bi-caret-down-fill"></i>
+
+                </div>
+            </div>
+
         </div >
 
+        {/* 12th page */}
 
+        <div className=" mx-auto bg-[#049D8E] py-20 z-10 overflow-hidden lg:justify-center items-center ">
+            <div className=' w-44 hidden md:block lg:block    '></div>
 
+            <div class="mx-4 flex flex-wrap ">
+                <div class="w-full   px-4 sm:w-2/3 lg:w-3/12">
 
+                    <div className=" mb-10 mt-3 w-full">
+                        <a href="" class="mb-6 inline-block w-full">
+                            <img src={ShoppingBag} alt="" className='' />
+                        </a>
+                        <p className="mb-7 text-lg text-white">
+                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis,commodi tempora mollitia voluptatem
+                        </p>
+                        <p className="flex items-center text-lg  text-white">
+                            <span class="mr-3 text-[#FFD705]">
+                                Call Us
+                            </span>
+                            <span> +91 6368900045</span>
+                        </p>
+                        <p className="flex items-center text-lg mt-4  text-white">
+                            <span class="mr-3 text-[#FFD705]">
+                                Email Us
+                            </span>
+                            <span> email@gmail.com</span>
+                        </p>
+                    </div>
+                </div>
+                <div className="w-full px-4 sm:w-1/2 lg:w-2/12">
+                    <div className="mb-10 w-full mt-4">
+                        <h4 className="mb-9 text-3xl font-semibold text-white">Latest Posts</h4>
+                        <ul>
+                            <li>
+                                <a href="" className="mb-2 inline-block text-xl  text-white ">
+                                    New post 1
+                                </a>
+                                <p className='text-[#FFD705]'>12 feb,2024</p>
+                            </li>
+                            <li>
+                                <a href="" className="mb-2 inline-block text-base  text-white ">
+                                    Our Products
+                                </a>
+                            </li>
+                            <li>
+                                <a href="" className="mb-2 inline-block text-base  text-white ">
+                                    User Flow
+                                </a>
+                            </li>
+                            <li>
+                                <a href="" className="mb-2 inline-block text-base  text-white ">
+                                    User Strategy
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div className="w-full px-4 sm:w-1/2 lg:w-2/12">
+                    <div class="mb-10 w-full mt-4">
+                        <h4 class="mb-9 text-lg font-semibold text-white">Company</h4>
+                        <ul>
+                            <li>
+                                <a href="" class="mb-2 inline-block text-base  text-white ">
+                                    About Matic UI
+                                </a>
+                            </li>
+                            <li>
+                                <a href="" class="mb-2 inline-block text-base text-white ">
+                                    Contact Support
+                                </a>
+                            </li>
+                            <li>
+                                <a href="" class="mb-2 inline-block text-base  text-white ">
+                                    Success History
+                                </a>
+                            </li>
+                            <li>
+                                <a href="" class="mb-2 inline-block text-base  text-white ">
+                                    Setting Privacy
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="w-full px-4 sm:w-1/2 lg:w-2/12">
+                    <div class="mb-10 w-full mt-4">
+                        <h4 class="mb-9 text-lg font-semibold text-white">Quick Links</h4>
+                        <ul>
+                            <li>
+                                <a href="" class="mb-2 inline-block text-base leading-loose text-white ">
+                                    Premium Support
+                                </a>
+                            </li>
+                            <li>
+                                <a href="" class="mb-2 inline-block text-base leading-loose text-white ">
+                                    Our Services
+                                </a>
+                            </li>
+                            <li>
+                                <a href="" class="mb-2 inline-block text-base leading-loose text-white ">
+                                    Know Our Team
+                                </a>
+                            </li>
+                            <li>
+                                <a href="" class="mb-2 inline-block text-base leading-loose text-white ">
+                                    Download App
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
     </div >
 }
 
