@@ -27,6 +27,7 @@ import Blog2 from "../assets/blog2.png"
 import Blog3 from "../assets/blog3.png"
 import Backimg9 from "../assets/backimg9.png"
 import ShoppingBag from "../assets/ShoppingBag.png"
+import Backimg13 from "../assets/backimg13.png"
 const Home = () => {
     return <div div className='px-12 overflow-hidden'>
 
@@ -365,29 +366,131 @@ const Home = () => {
         </div>
         {/* 11th page */}
 
-        <div className="mt-40 mx-auto px-12 md:px-40 pt-8 pb-6 bg-[#EEFAF9] ">
+        <div className="mt-40 mx-auto px-12 md:px-40 pt-8 pb-10 bg-[#EEFAF9] ">
             <div>
                 <p className="font-bold text-4xl text-center">Frequently Asked Questions</p>
                 <p className="text-gray-600 text-lg text-center mx-auto  mt-8">An establishment created to offer assistance and generate funds for individuals facing  </p>
                 <p className="text-gray-600 text-lg   text-center mx-auto  "> challenges and hardships </p>
             </div>
-            <div className='mt-4 lg:flex lg:justify-center lg:items-center gap-10 '>
-                <p className='text-2xl font-semibold text-gray-700 '>Frequently Asked Questions 1</p>
-                <div>
-                    <i className="bi bi-caret-down-fill"></i>
-
+            <div className='mt-8 flex justify-between'>
+                <p className='text-3xl font-semibold text-gray-600 mx-4  '>Frequently Asked Questions 1</p>
+                <div className="mt-2 ">
+                    <i className="bi bi-caret-down-fill  "></i>
                 </div>
             </div>
+            <div className='border-b-2 border-gray-300 w-full mr-1  mt-3'> </div>
+            <div className='mt-8 flex justify-between'>
+                <p className='text-3xl font-semibold text-gray-600 mx-4  '>Frequently Asked Questions 2</p>
+                <div className="mt-2 ">
+                    <i className="bi bi-caret-down-fill  "></i>
+                </div>
+            </div>
+            <div className='border-b-2 border-gray-300 w-full mr-1  mt-3'> </div>
+            <div className='mt-8 flex justify-between'>
+                <p className='text-3xl font-semibold text-gray-600 mx-4  '>Frequently Asked Questions 3</p>
+                <div className="mt-2 ">
+                    <i className="bi bi-caret-down-fill  "></i>
+                </div>
+            </div>
+            <div className='border-b-2 border-gray-300 w-full mr-1  mt-3'> </div>
+            <div className='mt-8 flex justify-between'>
+                <p className='text-3xl font-semibold text-gray-600 mx-4  '>Frequently Asked Questions 4</p>
+                <div className="mt-2 ">
+                    <i className="bi bi-caret-down-fill  "></i>
+                </div>
+            </div>
+            <div className='border-b-2 border-gray-300 w-full mr-1  mt-3'> </div>
 
         </div >
 
         {/* 12th page */}
 
-        <div className=" mx-auto bg-[#049D8E] py-20 z-10 overflow-hidden lg:justify-center items-center ">
-            <div className=' w-44 hidden md:block lg:block    '></div>
+        <div className="mt-10 mx-auto px-12 md:px-40 pt-8 pb-10 ">
+            <div>
+                <p className="font-bold text-4xl text-center">What people say about us</p>
+                <p className="text-gray-600 text-lg text-center mx-auto  mt-8">An establishment created to offer assistance and generate funds for individuals facing  </p>
+                <p className="text-gray-600 text-lg   text-center mx-auto  "> challenges and hardships </p>
+            </div>
+            <div className="flex flex-wrap justify-center  mt-7">
+                <div className="bg-white border-2   md:w-80 mt-10 md:mt-0 md:mr-4 rounded-xl ">
 
-            <div class="mx-4 flex flex-wrap ">
-                <div class="w-full   px-4 sm:w-2/3 lg:w-3/12">
+                    <div className="mt-3 mx-2 pb-3">
+                        <p className="text-2xl font-semibold ">Good Work</p>
+                        <p className=" font-normal  text-gray-500 mt-2">Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis,commodi tempora mollitia voluptatem recusandae impedit totam aperiam ne </p>
+                        <div className=''>
+                            <i className="bi bi-star-fill text-[#FFD705] text-2xl"></i>
+                            <i className="bi bi-star-fill text-[#FFD705] text-2xl"></i>
+                            <i className="bi bi-star-fill text-[#FFD705] text-2xl"></i>
+                            <i className="bi bi-star-fill text-[#FFD705] text-2xl"></i>
+                            <i className="bi bi-star-fill text-[#FFD705] text-2xl"></i>
+                        </div>
+                        <div className='mt-2 flex '>
+                            <img src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NTR8fHByb2ZpbGV8ZW58MHx8MHx8fDA%3D"
+                                alt="" className='rounded-full h-16 w-16' />
+                            <div className=''>
+                                <p className='font-medium text-xl mx-4'>Willam Barklay</p>
+                                <p className='text-[#049D8E] mx-4 mt-3'>Human life International</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="bg-white border-2   md:w-80 mt-10 md:mt-0 md:mr-4 rounded-xl ">
+
+                    <div className="mt-3 mx-2 pb-3">
+                        <p className="text-2xl font-semibold ">Good Work</p>
+                        <p className=" font-normal  text-gray-500 mt-2">Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis,commodi tempora mollitia voluptatem recusandae impedit totam aperiam ne </p>
+                        <div className=''>
+                            <i className="bi bi-star-fill text-[#FFD705] text-2xl"></i>
+                            <i className="bi bi-star-fill text-[#FFD705] text-2xl"></i>
+                            <i className="bi bi-star-fill text-[#FFD705] text-2xl"></i>
+                            <i className="bi bi-star-fill text-[#FFD705] text-2xl"></i>
+                            <i className="bi bi-star-fill text-[#FFD705] text-2xl"></i>
+                        </div>
+                        <div className='mt-2 flex '>
+                            <img src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NTR8fHByb2ZpbGV8ZW58MHx8MHx8fDA%3D"
+                                alt="" className='rounded-full h-16 w-16' />
+                            <div className=''>
+                                <p className='font-medium text-xl mx-4'>Willam Barklay</p>
+                                <p className='text-[#049D8E] mx-4 mt-3'>Human life International</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="bg-white border-2   md:w-80 mt-10 md:mt-0 md:mr-4 rounded-xl ">
+
+                    <div className="mt-3 mx-2 pb-3">
+                        <p className="text-2xl font-semibold ">Good Work</p>
+                        <p className=" font-normal  text-gray-500 mt-2">Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis,commodi tempora mollitia voluptatem recusandae impedit totam aperiam ne </p>
+                        <div className=''>
+                            <i className="bi bi-star-fill text-[#FFD705] text-2xl"></i>
+                            <i className="bi bi-star-fill text-[#FFD705] text-2xl"></i>
+                            <i className="bi bi-star-fill text-[#FFD705] text-2xl"></i>
+                            <i className="bi bi-star-fill text-[#FFD705] text-2xl"></i>
+                            <i className="bi bi-star-fill text-[#FFD705] text-2xl"></i>
+                        </div>
+                        <div className='mt-2 flex '>
+                            <img src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NTR8fHByb2ZpbGV8ZW58MHx8MHx8fDA%3D"
+                                alt="" className='rounded-full h-16 w-16' />
+                            <div className=''>
+                                <p className='font-medium text-xl mx-4'>Willam Barklay</p>
+                                <p className='text-[#049D8E] mx-4 mt-3'>Human life International</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+            </div>
+        </div >
+        {/* 13th page */}
+
+        <div className=" mx-auto bg-[#049D8E] py-20 z-10  mt-5 overflow-hidden lg:justify-center items-center ">
+            <div className=' w-44 hidden md:block lg:block'></div>
+
+            <div class="mx-4 flex flex-wrap lg:justify-center items-center ">
+                <div class="w-full   px-8 sm:w-2/3 lg:w-3/12">
 
                     <div className=" mb-10 mt-3 w-full">
                         <a href="" class="mb-6 inline-block w-full">
@@ -410,8 +513,8 @@ const Home = () => {
                         </p>
                     </div>
                 </div>
-                <div className="w-full px-4 sm:w-1/2 lg:w-2/12">
-                    <div className="mb-10 w-full mt-4">
+                <div className="w-full  px-8 sm:w-1/2 lg:w-2/12">
+                    <div className="mb-10 w-full mt-7">
                         <h4 className="mb-9 text-3xl font-semibold text-white">Latest Posts</h4>
                         <ul>
                             <li>
@@ -421,80 +524,79 @@ const Home = () => {
                                 <p className='text-[#FFD705]'>12 feb,2024</p>
                             </li>
                             <li>
-                                <a href="" className="mb-2 inline-block text-base  text-white ">
-                                    Our Products
+                                <a href="" className="mb-2 inline-block text-xl mt-2  text-white ">
+                                    New post 2
+                                </a>
+                                <p className='text-[#FFD705] mt-1'>12 feb,2024</p>
+                            </li>
+                            <li>
+                                <a href="" className="mb-2 inline-block text-xl mt-2 text-white ">
+                                    New post 3
+                                </a>
+                                <p className='text-[#FFD705]'>12 feb,2024</p>
+                            </li>
+
+                        </ul>
+                    </div>
+                </div>
+                <div className="w-full px-8 sm:w-1/2 lg:w-2/12">
+                    <div className="mb-10 w-full mt-7">
+                        <h4 className="mb-9 text-3xl font-semibold text-white">Links</h4>
+                        <ul>
+                            <li>
+                                <a href="" className="mb-2 inline-block text-xl font-medium text-white ">
+                                    Home
                                 </a>
                             </li>
                             <li>
-                                <a href="" className="mb-2 inline-block text-base  text-white ">
-                                    User Flow
+                                <a href="" className="mb-2 inline-block text-xl mt-2 font-medium  text-white ">
+                                    About Us
                                 </a>
                             </li>
                             <li>
-                                <a href="" className="mb-2 inline-block text-base  text-white ">
-                                    User Strategy
+                                <a href="" className="mb-2 inline-block text-xl font-medium mt-2  text-white ">
+                                    Contact Us
+                                </a>
+                            </li>
+                            <li>
+                                <a href="" className="mb-2 inline-block text-xl font-medium mt-2   text-white ">
+                                    Privacy Policy
+                                </a>
+                            </li>
+                            <li>
+                                <a href="" className="mb-2 inline-block text-xl font-medium mt-2  text-white ">
+                                    Blogs
                                 </a>
                             </li>
                         </ul>
                     </div>
                 </div>
-                <div className="w-full px-4 sm:w-1/2 lg:w-2/12">
-                    <div class="mb-10 w-full mt-4">
-                        <h4 class="mb-9 text-lg font-semibold text-white">Company</h4>
-                        <ul>
-                            <li>
-                                <a href="" class="mb-2 inline-block text-base  text-white ">
-                                    About Matic UI
-                                </a>
-                            </li>
-                            <li>
-                                <a href="" class="mb-2 inline-block text-base text-white ">
-                                    Contact Support
-                                </a>
-                            </li>
-                            <li>
-                                <a href="" class="mb-2 inline-block text-base  text-white ">
-                                    Success History
-                                </a>
-                            </li>
-                            <li>
-                                <a href="" class="mb-2 inline-block text-base  text-white ">
-                                    Setting Privacy
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="w-full px-4 sm:w-1/2 lg:w-2/12">
-                    <div class="mb-10 w-full mt-4">
-                        <h4 class="mb-9 text-lg font-semibold text-white">Quick Links</h4>
-                        <ul>
-                            <li>
-                                <a href="" class="mb-2 inline-block text-base leading-loose text-white ">
-                                    Premium Support
-                                </a>
-                            </li>
-                            <li>
-                                <a href="" class="mb-2 inline-block text-base leading-loose text-white ">
-                                    Our Services
-                                </a>
-                            </li>
-                            <li>
-                                <a href="" class="mb-2 inline-block text-base leading-loose text-white ">
-                                    Know Our Team
-                                </a>
-                            </li>
-                            <li>
-                                <a href="" class="mb-2 inline-block text-base leading-loose text-white ">
-                                    Download App
-                                </a>
-                            </li>
-                        </ul>
+                <div class="w-full px-8  sm:w-1/2 lg:w-1/3 ">
+                    <div class="mb- w-full ">
+                        <img src={Backimg13} alt="" className='' />
                     </div>
                 </div>
 
             </div>
         </div>
+
+        {/* 14th page */}
+
+        <div className="bg-[#EDF6FB] mt-3 w-full px-3 lg:justify-between  md:flex-row">
+            <div className='flex justify-between '>
+                <p class="text-[#048376]">© 2024 UX/UI Team</p>
+                <div class="text-[#048376] ">
+                    <i class="bi bi-instagram"></i>
+                    <i class="bi bi-twitter ml-2"></i>
+                    <i class="bi bi-facebook ml-2"></i>
+                </div>
+                <div className=''>
+                    <p className="text-[#048376]">All Rights Reserved</p>
+                </div>
+            </div>
+        </div>
+
+
     </div >
 }
 
