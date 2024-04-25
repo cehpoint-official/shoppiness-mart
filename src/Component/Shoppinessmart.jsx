@@ -5,18 +5,18 @@ import { Link } from "react-router-dom";
 const Shoppinessmart = () => {
   return (
     <>
-      <div className="">
+      <div className="font-slab">
         <div className="max-screen-xl bg-[#049D8E]  px-12 flex flex-wrap  justify-between mx-auto p-4">
           <div className="flex items-center ">
             <div div class=" ">
               <img src={ShoppingBag} className="h-11 " alt="" />
             </div>
           </div>
-          <div className="flex md:order-2 space-x-3 md:space-x-5  ">
+          <div className="flex md:order-2 space-x-3 md:space-x-5   ">
             <div class="flex border-2 border-gray-100 bg-[#049D8E] rounded-md">
               <Link
                 to="/login"
-                className="text-white flex items-center justify-items-center px-3 py-1 gap-2 "
+                className="text-white flex items-center  justify-items-center px-3 py-1 gap-2 "
               >
                 <i className="bi bi-arrow-right-circle-fill text-white "></i>
                 Login
