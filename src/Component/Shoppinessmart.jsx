@@ -53,7 +53,7 @@ const Shoppinessmart = () => {
               <Link to="/support" className="mt-2  md:mt-0">
                 Support a Cause/NGO
               </Link>
-              <Link to="/register" className="mt-2  md:mt-0">
+              <Link to="/cause" className="mt-2  md:mt-0">
                 Register Causes/NGO
               </Link>
               <Link to="/business" className="mt-2  md:mt-0">
