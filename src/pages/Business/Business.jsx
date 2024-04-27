@@ -1,12 +1,14 @@
 import { Link } from "react-router-dom";
-import SecOne from "../../Component/SecOne";
+import SecOne from "../../Component/Business/SecOne";
 import personImg from "../../assets/RegisterBusiness/person.png";
 import vid from "../../assets/RegisterBusiness/vid.png";
 import boyImg from "../../assets/RegisterBusiness/boy.png";
 import cardOne from "../../assets/RegisterBusiness/cardOne.png";
 import cardTwo from "../../assets/RegisterBusiness/cardTwo.png";
 import cardThree from "../../assets/RegisterBusiness/cardThree.jpg";
-
+import convoImg from "../../assets/RegisterBusiness/convo.png";
+import charitiesImg from "../../assets/RegisterBusiness/charities.png";
+import { LiaLongArrowAltRightSolid } from "react-icons/lia";
 import "./Business.scss";
 
 const Business = () => {
@@ -55,7 +57,10 @@ const Business = () => {
               nisi eum quae voluptatum Lorem ipsum dolor sit amet consectetur
               adipisicing elit. Blanditiis,commodi tempora mollitia voluptatem
               recusandae impedit totam aperiam nesciunt doloremque magni neque
-              placeat, laborum nisi eum quae voluptatum{" "}
+              placeat, laborum nisi eum quae voluptatum ng elit.
+              Blanditiis,commodi tempora mollitia voluptatem recusandae impedit
+              totam aperiam nesciunt doloremque magni neque placeat, laborum
+              nisi eum quae voluptatum{" "}
             </p>
             <div className="links">
               <Link className="online">Online Shopping</Link>
@@ -66,7 +71,7 @@ const Business = () => {
 
         <div className="secFour">
           <div className="upperSec">
-            <h1>Business Growth with Donation</h1>
+            <h1>Why you use this platform</h1>
             <p>
               Lorem ipsum dolor sit amet consectetur adipisicing elit.
               Blanditiis,commodi tempora mollitia voluptatem
@@ -110,6 +115,40 @@ const Business = () => {
               </p>
             </div>
           </div>
+        </div>
+
+        <div className="secFive">
+          <div className="left">
+            <h1>What are other businesses saying about ShoppinessMart</h1>
+            <p>
+              Lorem ipsum dolor sit amet consectetur adipisicing elit.
+              Blanditiis,commodi tempora mollitia voluptatem recusandae impedit
+              totam aperiam nesciunt doloremque magni neque placeat, laborum
+              nisi eum quae voluptatum Lorem ipsum dolor sit amet consectetur
+              adipisicing elit. Blanditiis,commodi tempora mollitia voluptatem
+              recusandae impedit totam aperiam nesciunt doloremque magni neque
+              placeat, laborum nisi eum quae voluptatum
+            </p>
+            <Link to="/signUp">Sign Up for free</Link>
+          </div>
+          <div className="right">
+            <img src={convoImg} alt="convoImg" />
+          </div>
+        </div>
+
+        <div className="secSix">
+          <h1>Over 5000+ charities and good causes are need your support</h1>
+          <div className="imgCon">
+            <img src={charitiesImg} alt="charitiesImg" />
+          </div>
+          <Link className="seeAll">
+            <div>
+              See all <span className="number">5,000 +</span> More
+            </div>
+            <div>
+              <LiaLongArrowAltRightSolid className="arrow" />
+            </div>
+          </Link>
         </div>
       </div>
     </div>

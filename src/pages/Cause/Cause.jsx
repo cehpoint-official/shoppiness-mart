@@ -1,7 +1,7 @@
 import React from "react";
-import SecOne from "../../Component/SecOne";
 import causeImg from "../../assets/RegisterBusiness/cause.jpg";
 import "./Cause.scss";
+import SecOne from "../../Component/Business/SecOne";
 
 const Cause = () => {
   return (
