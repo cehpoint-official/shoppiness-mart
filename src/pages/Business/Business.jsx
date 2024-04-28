@@ -141,7 +141,7 @@ const Business = () => {
           <div className="imgCon">
             <img src={charitiesImg} alt="charitiesImg" />
           </div>
-          <Link className="seeAll">
+          <Link className="seeAll" to="/cause">
             <div>
               See all <span className="number">5,000 +</span> More
             </div>
