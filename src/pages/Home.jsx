@@ -28,7 +28,6 @@ import Blog3 from "../assets/blog3.png";
 import Backimg9 from "../assets/backimg9.png";
 import ShoppingBag from "../assets/ShoppingBag.png";
 import Backimg13 from "../assets/backimg13.png";
-import Footer from "../Component/Footer";
 const Home = () => {
   return (
     <div div className="px-12 overflow-hidden">

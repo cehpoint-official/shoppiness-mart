@@ -6,7 +6,6 @@ import Signup from './pages/Signup'
 import Login from './pages/Login'
 import Business from './pages/Business/Business'
 import Cause from "./pages/Cause/Cause";
-import Footer from './Component/Footer'
 
 const App = () => {
   return (
@@ -20,7 +19,6 @@ const App = () => {
           <Route path="/business" element={<Business />} />
           <Route path="/cause" element={<Cause />} />
         </Routes>
-        <Footer/>
       </BrowserRouter>
     </>
   );
