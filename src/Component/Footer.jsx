@@ -117,7 +117,7 @@ const Footer = () => {
 
       {/* 14th page */}
 
-      <div className="bg-[#EDF6FB] mt-3 w-full px-3 lg:justify-between  md:flex-row">
+      <div className="bg-[#EDF6FB] mt-3 w-full px-3 lg:justify-between p-5 md:flex-row">
         <div className="flex justify-between ">
           <p class="text-[#048376]">© 2024 UX/UI Team</p>
           <div class="text-[#048376] ">
