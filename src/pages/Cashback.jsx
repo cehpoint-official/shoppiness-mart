@@ -7,6 +7,7 @@ import Backimg13 from "../assets/backimg13.png"
 
 const Cashback = () => {
   return <>
+  {/*  */}
   {/* 1st page */}
   <div className='my-28  '>
             <div className="grid grid-cols-12 mx-4 md:mx-16 px-4 md:px-10">
