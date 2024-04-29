@@ -1,0 +1,354 @@
+$gray: #777777;
+$primary: #049d8e;
+$padd: 100px;
+$font: "Roboto Slab";
+
+.business {
+  display: flex;
+  flex-direction: column;
+
+  .businessContainer {
+    display: flex;
+    flex-direction: column;
+    .secOne {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      padding: $padd;
+
+      .left {
+        width: 60%;
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+        h1 {
+          font-size: 45px;
+          font-weight: 600;
+          font-family: $font;
+        }
+
+        > p {
+          font-size: 23px;
+          line-height: 30px;
+          color: $gray;
+          font-weight: 400;
+          width: 90%;
+        }
+
+        .links {
+          width: 40%;
+          min-width: 300px;
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+          .register {
+            background-color: $primary;
+            padding: 15px 5px;
+            text-align: center;
+            font-size: 17px;
+            font-weight: 600;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+          }
+          > a {
+            padding: 15px 5px;
+            font-size: 17px;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            border: 2px solid black;
+          }
+        }
+      }
+
+      .right {
+        width: 40%;
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+        }
+      }
+    }
+
+    .secTwo {
+      display: flex;
+      background-image: url("../../assets/RegisterBusiness/bg.png");
+      padding: $padd;
+      .left {
+        width: 50%;
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+        h1 {
+          font-size: 38px;
+          font-weight: 600;
+          font-family: $font;
+        }
+
+        > p {
+          font-size: 18px;
+          line-height: 30px;
+          color: $gray;
+          font-weight: 400;
+          width: 90%;
+        }
+        a {
+          background-color: $primary;
+          width: 180px;
+          padding: 15px 5px;
+          font-family: $font;
+
+          text-align: center;
+          font-size: 17px;
+          font-weight: 600;
+          color: white;
+          border-radius: 10px;
+          cursor: pointer;
+        }
+      }
+
+      .right {
+        width: 50%;
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+        }
+      }
+    }
+
+    .secThree {
+      display: flex;
+      padding: $padd;
+      gap: 60px;
+      .left {
+        width: 50%;
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+        }
+      }
+
+      .right {
+        width: 50%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 30px;
+        h1 {
+          font-size: 48px;
+          font-weight: 600;
+          font-family: $font;
+        }
+
+        > p {
+          font-size: 23px;
+          line-height: 30px;
+          color: $gray;
+          font-weight: 400;
+        }
+        > a {
+          background-color: $primary;
+          width: 180px;
+          padding: 15px 5px;
+          font-family: $font;
+          text-align: center;
+          font-size: 17px;
+          font-weight: 600;
+          color: white;
+          border-radius: 10px;
+          cursor: pointer;
+        }
+
+        .links {
+          display: flex;
+          gap: 20px;
+          > a {
+            padding: 15px 10px;
+            font-size: 17px;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            color: white;
+            width: 40%;
+          }
+          .online {
+            background-color: $primary;
+          }
+          .offline {
+            background-color: #434343;
+          }
+        }
+      }
+    }
+
+    .secFour {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 60px;
+      padding: $padd;
+      .upperSec {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+        width: 100%;
+        > h1 {
+          font-size: 40px;
+          font-family: $font;
+          font-weight: 600;
+        }
+        > p {
+          font-size: 20px;
+          width: 50%;
+          color: $gray;
+        }
+      }
+
+      .lowerSec {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 40px;
+        .lowerCard {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          width: 430px;
+          min-height: 550px;
+          background-color: #fbffff;
+          border-radius: 21px;
+          box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.15);
+
+          > img {
+            width: 100%;
+            height: 260px;
+            object-fit: cover;
+            border-radius: 21px;
+          }
+          h4 {
+            height: 60px;
+            font-size: 24px;
+            font-family: $font;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* Number of lines to show */
+            -webkit-box-orient: vertical;
+            text-overflow: ellipsis;
+            padding: 10px;
+          }
+
+          p {
+            font-size: 18px;
+            color: $gray; /* Assuming $gray is a valid color variable */
+            padding: 10px;
+            height: 140px;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 5; /* Number of lines to show */
+            -webkit-box-orient: vertical;
+            text-overflow: ellipsis;
+          }
+        }
+      }
+    }
+
+    .secFive {
+      padding: $padd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(238, 250, 249, 1);
+      .left {
+        width: 50%;
+        display: flex;
+        flex-direction: column;
+        gap: 40px;
+
+        > h1 {
+          font-size: 44px;
+          font-family: $font;
+          font-weight: 500;
+        }
+        > p {
+          font-size: 23px;
+          color: $gray;
+        }
+        > a {
+          width: 220px;
+          padding: 15px 25px;
+          background-color: $primary;
+          color: white;
+          font-size: 20px;
+          border-radius: 10px;
+          font-family: $font;
+        }
+      }
+
+      .right {
+        width: 50%;
+        display: flex;
+        flex-direction: column;
+
+        img {
+          object-fit: cover;
+          width: 100%;
+          height: 100%;
+        }
+      }
+    }
+
+    .secSix {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: $padd;
+      gap: 50px;
+      h1 {
+        font-size: 43px;
+        font-weight: 600;
+        font-family: $font;
+        width: 70%;
+        text-align: center;
+      }
+
+      .imgCon {
+        width: 90%;
+        height: 350px;
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+        }
+      }
+
+      .seeAll {
+        font-size: 23px;
+        font-weight: 500;
+        color: $gray;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        span {
+          font-weight: 700;
+          color: black;
+        }
+
+        .arrow {
+          font-size: 40px;
+        }
+      }
+    }
+  }
+}
