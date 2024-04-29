@@ -10,7 +10,7 @@ const Navbar = () => {
             <img src={ShoppingBag} className="h-11 " alt="Loading..." />
           </div>
 
-          <div className="flex md:order-2 border-2 border-red-500 space-x-3 md:space-x-5   ">
+          <div className="flex md:order-2  space-x-3 md:space-x-5   ">
             <div class="flex border-2 border-gray-100 bg-[#049D8E] rounded-md">
               <Link
                 to="/login"
