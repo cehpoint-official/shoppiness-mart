@@ -2,6 +2,7 @@ import React from 'react'
 import work1 from "../assets/work1.png"
 const Work = () => {
   return <>
+  asdasd
    <div className='my-28  '>
             <div className="grid grid-cols-12 mx-4 md:mx-16 px-4 md:px-10">
                 <div className="col-span-12 md:col-span-6">
