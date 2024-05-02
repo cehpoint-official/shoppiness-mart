@@ -1,4 +1,3 @@
-import React from "react";
 import ShoppingBag from "../assets/ShoppingBag.png";
 import { Link } from "react-router-dom";
 const Navbar = () => {
@@ -10,8 +9,8 @@ const Navbar = () => {
             <img src={ShoppingBag} className="h-11 " alt="Loading..." />
           </div>
 
-          <div className="flex md:order-2 border-2 border-red-500 space-x-3 md:space-x-5   ">
-            <div class="flex border-2 border-gray-100 bg-[#049D8E] rounded-md">
+          <div className="flex md:order-2 space-x-3 md:space-x-5   ">
+            <div className="flex border-2 border-gray-100 bg-[#049D8E] rounded-md">
               <Link
                 to="/login"
                 className="text-white flex items-center  justify-items-center px-3 py-1 gap-2 "
@@ -21,7 +20,7 @@ const Navbar = () => {
               </Link>
             </div>
 
-            <div class="flex border-2 border-gray-100 bg-white rounded-md px-3 py-1 text-[#049D8E]">
+            <div className="flex border-2 border-gray-100 bg-white rounded-md px-3 py-1 text-[#049D8E]">
               <Link
                 to="/signup"
                 className=" font-semibold flex items-center justify-items-center p-1 gap-2 "
