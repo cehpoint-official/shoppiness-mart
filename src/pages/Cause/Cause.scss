@@ -1,16 +1,15 @@
 $gray: #777777;
 $primary: #049d8e;
-$paddContainer: 0px 80px;
-$padd: 80px;
+$padd: 100px;
 
 .cause {
   height: 100vh;
   display: flex;
   flex-direction: column;
 
-
   .causeContainer {
-    padding: $paddContainer;
+    display: flex;
+    flex-direction: column;
 
     .secOne {
       width: 100%;

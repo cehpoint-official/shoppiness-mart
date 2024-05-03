@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import SecOne from "../../Component/Business/SecOne";
+import FAQ from "../../Component/FAQ";
 import personImg from "../../assets/RegisterBusiness/person.png";
 import vid from "../../assets/RegisterBusiness/vid.png";
 import boyImg from "../../assets/RegisterBusiness/boy.png";
@@ -135,7 +136,7 @@ const Business = () => {
             <img src={convoImg} alt="convoImg" />
           </div>
         </div>
-
+         <FAQ/>
         <div className="secSix">
           <h1>Over 5000+ charities and good causes are need your support</h1>
           <div className="imgCon">

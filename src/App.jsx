@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Signup from './pages/Signup'
 import Login from './pages/Login'
 import Business from './pages/Business/Business'
+import Cause from './pages/Cause/Cause';
 
 const App = () => {
   return (
@@ -17,8 +18,9 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/business" element={<Business />} />
+          <Route path="/cause" element={<Cause />} />
         </Routes>
-        <Footer/>
+        <Footer />
       </BrowserRouter>
     </>
   );
