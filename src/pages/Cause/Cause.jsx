@@ -4,8 +4,11 @@ import donationImg from "../../assets/RegisterBusiness/donations.png";
 import bg from "../../assets/RegisterBusiness/bg2.png";
 import "./Cause.scss";
 import {Link} from "react-router-dom"
-import SecOne from "../../Component/SecOne";
+import SecOne from "../../Component/SecOne/SecOne";
 import Support from "../../Component/Support/Support";
+import PopularCauses from "../../Component/PopularCauses";
+import PeopleSaySection from "../../Component/PeopleSaySection";
+import FAQ from "../../Component/FAQ";
 
 const Cause = () => {
   return (
@@ -56,6 +59,9 @@ const Cause = () => {
         </div>
 
         <Support num="6,000 +" />
+        <PopularCauses/>
+        <FAQ/>
+        <PeopleSaySection/>
       </div>
     </div>
   );
