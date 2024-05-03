@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import "./SecOne.scss"
 const SecOne = (props) => {
   const { name, title, paragraph,img } = props;
   return (

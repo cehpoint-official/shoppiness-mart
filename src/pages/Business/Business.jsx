@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import SecOne from "../../Component/Business/SecOne";
+import SecOne from "../../Component/SecOne/SecOne";
+import FAQ from "../../Component/FAQ";
 import personImg from "../../assets/RegisterBusiness/person.png";
 import vid from "../../assets/RegisterBusiness/vid.png";
 import boyImg from "../../assets/RegisterBusiness/boy.png";
@@ -7,8 +8,7 @@ import cardOne from "../../assets/RegisterBusiness/cardOne.png";
 import cardTwo from "../../assets/RegisterBusiness/cardTwo.png";
 import cardThree from "../../assets/RegisterBusiness/cardThree.jpg";
 import convoImg from "../../assets/RegisterBusiness/convo.png";
-import charitiesImg from "../../assets/RegisterBusiness/charities.png";
-import { LiaLongArrowAltRightSolid } from "react-icons/lia";
+import Support from "../../Component/Support/Support";
 import "./Business.scss";
 
 const Business = () => {
@@ -135,21 +135,8 @@ const Business = () => {
             <img src={convoImg} alt="convoImg" />
           </div>
         </div>
-
-        <div className="secSix">
-          <h1>Over 5000+ charities and good causes are need your support</h1>
-          <div className="imgCon">
-            <img src={charitiesImg} alt="charitiesImg" />
-          </div>
-          <Link className="seeAll" to="/cause">
-            <div>
-              See all <span className="number">5,000 +</span> More
-            </div>
-            <div>
-              <LiaLongArrowAltRightSolid className="arrow" />
-            </div>
-          </Link>
-        </div>
+        <FAQ />
+        <Support num="5,000 +" />
       </div>
     </div>
   );

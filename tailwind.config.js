@@ -6,11 +6,9 @@ export default {
       fontFamily: {
         slab: ["Roboto Slab", "sans-serif"],
       },
+      colors: {
+        backColor: "rgba(255, 215, 5, 0.09)",
+      },
     },
-  },
-  plugins: [require("daisyui")],
-  daisyui: {
-    // false: only light + dark | true: all themes | array: specific themes like this ["light"]
-    darkTheme: "Light",
   },
 };

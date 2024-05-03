@@ -1,5 +1,3 @@
-import React from "react";
-
 const PeopleSaySection = () => {
   return (
     <div>
@@ -26,7 +24,7 @@ const PeopleSaySection = () => {
                 Blanditiis,commodi tempora mollitia voluptatem recusandae
                 impedit totam aperiam ne{" "}
               </p>
-              <div className="">
+              <div className="gap-1 flex">
                 <i className="bi bi-star-fill text-[#FFD705] text-2xl"></i>
                 <i className="bi bi-star-fill text-[#FFD705] text-2xl"></i>
                 <i className="bi bi-star-fill text-[#FFD705] text-2xl"></i>
@@ -56,7 +54,7 @@ const PeopleSaySection = () => {
                 Blanditiis,commodi tempora mollitia voluptatem recusandae
                 impedit totam aperiam ne{" "}
               </p>
-              <div className="">
+              <div className="gap-1 flex">
                 <i className="bi bi-star-fill text-[#FFD705] text-2xl"></i>
                 <i className="bi bi-star-fill text-[#FFD705] text-2xl"></i>
                 <i className="bi bi-star-fill text-[#FFD705] text-2xl"></i>
@@ -86,7 +84,7 @@ const PeopleSaySection = () => {
                 Blanditiis,commodi tempora mollitia voluptatem recusandae
                 impedit totam aperiam ne{" "}
               </p>
-              <div className="">
+              <div className="gap-1 flex">
                 <i className="bi bi-star-fill text-[#FFD705] text-2xl"></i>
                 <i className="bi bi-star-fill text-[#FFD705] text-2xl"></i>
                 <i className="bi bi-star-fill text-[#FFD705] text-2xl"></i>

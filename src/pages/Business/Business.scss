@@ -10,68 +10,7 @@ $font: "Roboto Slab";
   .businessContainer {
     display: flex;
     flex-direction: column;
-    .secOne {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      padding: $padd;
-
-      .left {
-        width: 60%;
-        display: flex;
-        flex-direction: column;
-        gap: 30px;
-        h1 {
-          font-size: 45px;
-          font-weight: 600;
-          font-family: $font;
-        }
-
-        > p {
-          font-size: 23px;
-          line-height: 30px;
-          color: $gray;
-          font-weight: 400;
-          width: 90%;
-        }
-
-        .links {
-          width: 40%;
-          min-width: 300px;
-          display: flex;
-          flex-direction: column;
-          gap: 20px;
-          .register {
-            background-color: $primary;
-            padding: 15px 5px;
-            text-align: center;
-            font-size: 17px;
-            font-weight: 600;
-            color: white;
-            border-radius: 10px;
-            cursor: pointer;
-          }
-          > a {
-            padding: 15px 5px;
-            font-size: 17px;
-            font-weight: 600;
-            border-radius: 10px;
-            cursor: pointer;
-            text-align: center;
-            border: 2px solid black;
-          }
-        }
-      }
-
-      .right {
-        width: 40%;
-        img {
-          width: 100%;
-          height: 100%;
-          object-fit: contain;
-        }
-      }
-    }
+    
 
     .secTwo {
       display: flex;
@@ -307,48 +246,6 @@ $font: "Roboto Slab";
       }
     }
 
-    .secSix {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: $padd;
-      gap: 50px;
-      h1 {
-        font-size: 43px;
-        font-weight: 600;
-        font-family: $font;
-        width: 70%;
-        text-align: center;
-      }
-
-      .imgCon {
-        width: 90%;
-        height: 350px;
-        img {
-          width: 100%;
-          height: 100%;
-          object-fit: contain;
-        }
-      }
-
-      .seeAll {
-        font-size: 23px;
-        font-weight: 500;
-        color: $gray;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-
-        span {
-          font-weight: 700;
-          color: black;
-        }
-
-        .arrow {
-          font-size: 40px;
-        }
-      }
-    }
+    
   }
 }
