@@ -1,9 +1,10 @@
 $gray: #777777;
 $primary: #049d8e;
 $padd: 100px;
+$padd2: 0 100px 100px 100px;
+$font: "Roboto Slab";
 
 .cause {
-  height: 100vh;
   display: flex;
   flex-direction: column;
 
@@ -68,6 +69,88 @@ $padd: 100px;
           width: 100%;
           height: 100%;
           object-fit: contain;
+        }
+      }
+    }
+
+    .secTwo {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      width: 100%;
+      padding: $padd2;
+      .left {
+        width: 50%;
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+      .right {
+        width: 50%;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        gap: 10px;
+        position: relative;
+
+        > img {
+          position: absolute;
+          z-index: -1;
+          top: 0;
+        }
+
+        > h5 {
+          font-size: 22px;
+          font-family: $font;
+        }
+        h1 {
+          font-family: $font;
+          font-size: 44px;
+          font-weight: 600;
+        }
+        .points {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+          width: 70%;
+          padding: 20px 0 20px 0;
+
+          .point {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+
+            h5 {
+              font-size: 25px;
+              color: rgba(50, 37, 37, 0.81);
+              font-family: $font;
+            }
+            p {
+              font-size: 18px;
+              font-weight: 500;
+              color: $gray;
+            }
+          }
+        }
+
+        .link {
+          width: 100%;
+          display: flex;
+          align-items: center;
+
+          a {
+            width: 50%;
+            background-color: $primary;
+            color: white;
+            padding: 18px;
+            font-size: 17px;
+            font-weight: 600;
+            border-radius: 10px;
+            text-align: center;
+          }
         }
       }
     }

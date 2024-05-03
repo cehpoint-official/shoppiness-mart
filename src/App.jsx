@@ -7,6 +7,7 @@ import Signup from './pages/Signup'
 import Login from './pages/Login'
 import Business from './pages/Business/Business'
 import Cause from './pages/Cause/Cause';
+import SupportACause from "./pages/SupportACause";
 
 const App = () => {
   return (
@@ -19,6 +20,7 @@ const App = () => {
           <Route path="/signup" element={<Signup />} />
           <Route path="/business" element={<Business />} />
           <Route path="/cause" element={<Cause />} />
+          <Route path="/support" element={<SupportACause />} />
         </Routes>
         <Footer />
       </BrowserRouter>
