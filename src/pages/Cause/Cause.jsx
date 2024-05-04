@@ -1,14 +1,13 @@
-import React from "react";
 import causeImg from "../../assets/RegisterBusiness/cause.jpg";
 import donationImg from "../../assets/RegisterBusiness/donations.png";
 import bg from "../../assets/RegisterBusiness/bg2.png";
 import "./Cause.scss";
-import {Link} from "react-router-dom"
-import SecOne from "../../Component/SecOne/SecOne";
-import Support from "../../Component/Support/Support";
-import PopularCauses from "../../Component/PopularCauses";
-import PeopleSaySection from "../../Component/PeopleSaySection";
-import FAQ from "../../Component/FAQ";
+import { Link } from "react-router-dom";
+import SecOne from "../../Components/SecOne/SecOne";
+import Support from "../../Components/Support/Support";
+import PopularCauses from "../../Components/PopularCauses";
+import PeopleSaySection from "../../Components/PeopleSaySection";
+import FAQ from "../../Components/FAQ";
 
 const Cause = () => {
   return (
@@ -59,9 +58,9 @@ const Cause = () => {
         </div>
 
         <Support num="6,000 +" />
-        <PopularCauses/>
-        <FAQ/>
-        <PeopleSaySection/>
+        <PopularCauses />
+        <FAQ />
+        <PeopleSaySection />
       </div>
     </div>
   );

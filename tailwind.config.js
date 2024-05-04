@@ -7,7 +7,9 @@ export default {
         slab: ["Roboto Slab", "sans-serif"],
       },
       colors: {
-        backColor: "rgba(255, 215, 5, 0.09)",
+        backgroundLightYellowColor: "rgba(255, 215, 5, 0.09)",
+        parapgraphColor: "#777777",
+        backgreenColor: "#EEFAF9",
       },
     },
   },

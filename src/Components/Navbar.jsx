@@ -33,7 +33,7 @@ const Navbar = () => {
         </div>
 
         <div className="bg-[#EDF6FB]">
-          <div className="text-lg font-medium ">
+          <div className="text-lg font-medium py-2">
             <div className="flex flex-col md:flex-row justify-center px-12  md:justify-between  pb-3 md:pb-2">
               <Link to="/" className="mt-2  md:mt-0">
                 Home
@@ -50,13 +50,13 @@ const Navbar = () => {
               <Link to="/support" className="mt-2  md:mt-0">
                 Support a Cause/NGO
               </Link>
-              <Link to="/cause" className="mt-2  md:mt-0">
+              <Link to="/register-cause" className="mt-2  md:mt-0">
                 Register Causes/NGO
               </Link>
-              <Link to="/business" className="mt-2  md:mt-0">
+              <Link to="/register-business" className="mt-2  md:mt-0">
                 Register a business/Services
               </Link>
-              <Link to="/support" className="mt-2  md:mt-0">
+              <Link to="/supportmaast" className="mt-2  md:mt-0">
                 Support Maast
               </Link>
             </div>
