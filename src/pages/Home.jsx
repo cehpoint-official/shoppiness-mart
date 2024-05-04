@@ -1,4 +1,3 @@
-import React from "react";
 import Home1 from "../assets/home1.png";
 import OnlineP1 from "../assets/onlineP1.png";
 import OnlineP2 from "../assets/onlineP2.png";
@@ -23,12 +22,12 @@ import Blog1 from "../assets/blog1.png";
 import Blog2 from "../assets/blog2.png";
 import Blog3 from "../assets/blog3.png";
 import Backimg9 from "../assets/backimg9.png";
-import PeopleSaySection from "../Component/PeopleSaySection";
-import FAQ from "../Component/FAQ";
+import PeopleSaySection from "../Components/PeopleSaySection";
+import FAQ from "../Components/FAQ";
 import PopularCauses from "../Component/PopularCauses";
 const Home = () => {
   return (
-    <div div className="px-12 overflow-hidden">
+    <div className="px-12 overflow-hidden">
       {/* 1st Page  */}
       <div className="carousel mx-auto  p-4  ">
         <div className="flex flex-row  space-x-4 ">
@@ -195,22 +194,22 @@ const Home = () => {
 
 
             <div className="col-span-1 lg:col-span-1 pb-7 lg:absolute">
-                <img src="" alt="" class="w-full lg:w-auto lg:max-w-full lg:mx-80 mt-6 lg:mt-0" />
+                <img src={Backimg4} alt="" className="w-full lg:w-auto lg:max-w-full lg:mx-80 mt-6 lg:mt-0" />
             </div>
 
 
-            <div class="col-span-6 flex flex-col justify-center items-center lg:items-start relative">
-                <p class="text-xl text-gray-500 mt-6 md:mt-10 lg:mt-0 md:mx-8 lg:mx-48 lg:px-8">How it Works</p>
-                <p class="text-lg font-semibold mt-4 md:mt-5 lg:mt-2 md:text-4xl lg:text-5xl lg:mx-48 lg:px-8">Cashback, Deals for you, help to others</p>
-                <p class="text-base lg:text-xl text-gray-500 mt-4 px-4 md:px-8 lg:px-0 lg:mx-48">Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis, commodi tempora mollitia voluptatem recusandae impedit totam aperiam nesciunt doloremque magni neque placeat, laborum nisi eum quae voluptatum</p>
-                <p class="text-base lg:text-xl text-gray-500 mt-2 px-4 md:px-8 lg:px-0 lg:mx-48">Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis, commodi tempora mollitia voluptatem recusandae impedit totam aperiam nesciunt doloremque magni neque placeat, laborum nisi eum quae voluptatum</p>
+            <div className="col-span-6 flex flex-col justify-center items-center lg:items-start relative">
+                <p className="text-xl text-gray-500 mt-6 md:mt-10 lg:mt-0 md:mx-8 lg:mx-48 lg:px-8">How it Works</p>
+                <p className="text-lg font-semibold mt-4 md:mt-5 lg:mt-2 md:text-4xl lg:text-5xl lg:mx-48 lg:px-8">Cashback, Deals for you, help to others</p>
+                <p className="text-base lg:text-xl text-gray-500 mt-4 px-4 md:px-8 lg:px-0 lg:mx-48">Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis, commodi tempora mollitia voluptatem recusandae impedit totam aperiam nesciunt doloremque magni neque placeat, laborum nisi eum quae voluptatum</p>
+                <p className="text-base lg:text-xl text-gray-500 mt-2 px-4 md:px-8 lg:px-0 lg:mx-48">Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis, commodi tempora mollitia voluptatem recusandae impedit totam aperiam nesciunt doloremque magni neque placeat, laborum nisi eum quae voluptatum</p>
             </div>
 
 
-            <div class="flex flex-col lg:flex-row justify-center mt-4 lg:mt-7 mb-9 lg:relative">
-                <button type="button" class="bg-[#049D8E] rounded-md py-2 px-4 text-white lg:absolute lg:bottom-0 lg:left-0 lg:ml-48 lg:mb-4">Sign up for free</button>
-                <div class="flex justify-center mt-4 lg:mt-0 lg:absolute lg:right-0 lg:bottom-0 lg:mr-48 lg:mb-4">
-                    <video controls autoplay loop muted class="w-full lg:w-auto lg:max-w-full">
+            <div className="flex flex-col lg:flex-row justify-center mt-4 lg:mt-7 mb-9 lg:relative">
+                <button type="button" className="bg-[#049D8E] rounded-md py-2 px-4 text-white lg:absolute lg:bottom-0 lg:left-0 lg:ml-48 lg:mb-4">Sign up for free</button>
+                <div className="flex justify-center mt-4 lg:mt-0 lg:absolute lg:right-0 lg:bottom-0 lg:mr-48 lg:mb-4">
+                    <video controls autoplay loop muted className="w-full lg:w-auto lg:max-w-full">
                         <source src="https://youtu.be/ZHzVr7rbDus?si=a0Bxnv8El3qQnF44" type="video/mp4" />
                     </video>
                 </div>
@@ -227,15 +226,17 @@ const Home = () => {
           Blanditiis,commodi tempora mollitia voluptatem
         </p>
 
-        <div class="flex flex-wrap justify-center  mt-7">
-          <div class="border-2  md:w-80 mt-10 md:mt-0 md:mr-4 rounded-xl shadow-xl">
-            <div class="">
-              <img src={Card1} alt="" class="" />
+        <div className="flex flex-wrap justify-center  mt-7">
+          <div className="border-2  md:w-80 mt-10 md:mt-0 md:mr-4 rounded-xl shadow-xl">
+            <div className="">
+              <img src={Card1} alt="" className="" />
             </div>
-            <div class="mt-2">
-              <p class="text-3xl font-semibold text-center">Offline & Online</p>
-              <p class="text-3xl font-semibold text-center">Shopping</p>
-              <p class="text-gray-500 mt-5 text-center pb-8">
+            <div className="mt-2">
+              <p className="text-3xl font-semibold text-center">
+                Offline & Online
+              </p>
+              <p className="text-3xl font-semibold text-center">Shopping</p>
+              <p className="text-gray-500 mt-5 text-center pb-8">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit.
                 Blanditiis,commodi tempora mollitia voluptatem recusandae
                 impedit totam aperiam nesciunt doloremque magni neque placeat,
@@ -243,16 +244,18 @@ const Home = () => {
               </p>
             </div>
           </div>
-          <div class="border-2 md:w-80 mt-10 md:mt-0 md:mx-4 rounded-xl shadow-xl">
-            <div class="">
-              <img src={Card2} alt="" class="" />
+          <div className="border-2 md:w-80 mt-10 md:mt-0 md:mx-4 rounded-xl shadow-xl">
+            <div className="">
+              <img src={Card2} alt="" className="" />
             </div>
-            <div class="mt-2">
-              <p class="text-3xl font-semibold text-center">Amazing Deals </p>
-              <p class="text-3xl mx-10 font-semibold text-center">
+            <div className="mt-2">
+              <p className="text-3xl font-semibold text-center">
+                Amazing Deals{" "}
+              </p>
+              <p className="text-3xl mx-10 font-semibold text-center">
                 & Cash Back
               </p>
-              <p class="text-gray-500 mt-5 text-center pb-8">
+              <p className="text-gray-500 mt-5 text-center pb-8">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit.
                 Blanditiis,commodi tempora mollitia voluptatem recusandae
                 impedit totam aperiam nesciunt doloremque magni neque placeat,
@@ -260,15 +263,15 @@ const Home = () => {
               </p>
             </div>
           </div>
-          <div class="border-2  md:w-80 mt-10 md:mt-0 md:ml-4 rounded-xl shadow-xl">
-            <div class="">
-              <img src={Card3} alt="" class="" />
+          <div className="border-2  md:w-80 mt-10 md:mt-0 md:ml-4 rounded-xl shadow-xl">
+            <div className="">
+              <img src={Card3} alt="" className="" />
             </div>
-            <div class="">
-              <p class="text-3xl font-semibold  mt-10 text-center">
+            <div className="">
+              <p className="text-3xl font-semibold  mt-10 text-center">
                 Cashback charity
               </p>
-              <p class="text-gray-500 mt-5 pb-8 text-center">
+              <p className="text-gray-500 mt-5 pb-8 text-center">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit.
                 Blanditiis,commodi tempora mollitia voluptatem recusandae
                 impedit totam aperiam nesciunt doloremque magni neque placeat,
@@ -294,10 +297,10 @@ const Home = () => {
                 shopping works
               </p>
               <p className="text-gray-500 mt-8 mx-2  md:mx-20">
-                Explore our shopping options with just a click! Click the
-                'Online Shopping' button to discover how easy it is to shop from
-                the comfort of your home. Click the 'Offline Shopping' button to
-                see our in-store experience.
+                Explore our shopping options with just a click! Click the Online
+                Shopping button to discover how easy it is to shop from the
+                comfort of your home. Click the Offline Shopping button to see
+                our in-store experience.
               </p>
               <button
                 type="button"
@@ -351,8 +354,8 @@ const Home = () => {
             <div className="mt-10">
               <img src={Logo5} alt="" className="" />
             </div>
-            <div class="mt-10 flex justify-center">
-              <button class="bg-[#FFD705] text-blue-950 text-xl font-bold rounded-full w-20 h-20 lg:w-24 lg:h-24 flex items-center justify-center">
+            <div className="mt-10 flex justify-center">
+              <button className="bg-[#FFD705] text-blue-950 text-xl font-bold rounded-full w-20 h-20 lg:w-24 lg:h-24 flex items-center justify-center">
                 View All
               </button>
             </div>
@@ -368,8 +371,8 @@ const Home = () => {
               <i className="bi bi-search text-2xl px-2 py-1 border-2"></i>
             </div>
           </div>
-          <div class="mt-10 text-center pb-5">
-            <p class="m bg-[#FFD705] rounded-lg w-full md:w-72 py-2 inline-block">
+          <div className="mt-10 text-center pb-5">
+            <p className="m bg-[#FFD705] rounded-lg w-full md:w-72 py-2 inline-block">
               Create Your Own Fundraising Store
             </p>
           </div>
@@ -444,7 +447,7 @@ const Home = () => {
         <div className="relative  text-center">
           <p className="font-bold text-4xl">Subscribe to Our Newsletter</p>
           <p className="text-gray-600 text-lg mx-auto mt-5">
-            Improving your small business's growth through Onir app. It also
+            Improving your small business growth through Onir app. It also
           </p>
           <div className="md:mx-20 mx-10 ">
             <div className=" flex justify-center items-center mt-16   w-full">

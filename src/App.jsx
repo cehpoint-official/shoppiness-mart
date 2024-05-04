@@ -1,13 +1,12 @@
-import React from 'react'
-import Navbar from "./Component/Navbar"
-import Footer from "./Component/Footer";
-import Home from './pages/Home'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import Signup from './pages/Signup'
-import Login from './pages/Login'
-import Business from './pages/Business/Business'
-import Cause from './pages/Cause/Cause';
+import Navbar from "./Components/Navbar";
+import Home from "./pages/Home";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Signup from "./pages/Signup";
+import Login from "./pages/Login";
+import Business from "./pages/Business/Business";
+import Footer from "./Components/Footer";
 import SupportACause from "./pages/SupportACause";
+import SupportMaast from "./pages/SupportMaast";
 
 const App = () => {
   return (
@@ -21,6 +20,7 @@ const App = () => {
           <Route path="/business" element={<Business />} />
           <Route path="/cause" element={<Cause />} />
           <Route path="/support" element={<SupportACause />} />
+          <Route path="/supportmaast" element={<SupportMaast />} />
         </Routes>
         <Footer />
       </BrowserRouter>

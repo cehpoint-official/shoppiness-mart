@@ -1,9 +1,7 @@
-import React from "react";
-
 const FAQ = () => {
   return (
     <div>
-      <div className="mt-40 mx-auto px-12 md:px-40 pt-8 pb-10 bg-[#EEFAF9] ">
+      <div className="mx-auto  px-12 md:px-40 pt-12 pb-10 bg-[#EEFAF9] ">
         <div>
           <p className="font-bold text-4xl text-center">
             Frequently Asked Questions
