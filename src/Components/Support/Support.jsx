@@ -1,5 +1,4 @@
-import React from 'react'
-import { LiaLongArrowAltRightSolid } from "react-icons/lia";
+// import { LiaLongArrowAltRightSolid } from "react-icons/lia";
 import charitiesImg from "../../assets/RegisterBusiness/charities.png";
 import { Link } from 'react-router-dom';
 import "./Support.scss"
@@ -15,7 +14,7 @@ const Support = ({num}) => {
           See all <span className="number">{num}</span> More
         </div>
         <div>
-          <LiaLongArrowAltRightSolid className="arrow" />
+          {/* <LiaLongArrowAltRightSolid className="arrow" /> */}
         </div>
       </Link>
     </div>

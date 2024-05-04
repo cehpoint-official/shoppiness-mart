@@ -1,4 +1,3 @@
-import React from "react";
 import Card7th1 from "../assets/card7th1.png";
 import Card7th2 from "../assets/card7th2.png";
 import Card7th3 from "../assets/card7th3.png";
@@ -22,7 +21,7 @@ const PopularCauses = () => {
           </div>
           <div className="mt-3">
             <p className="text-2xl font-semibold text-center font-slab">
-              Healthy Food For All
+              Healthy Food For All
             </p>
             <p className=" font-normal text-center text-[#049D8E] mt-2">
               Child health Care{" "}
@@ -89,7 +88,7 @@ const PopularCauses = () => {
         <div className="mt-7">
           <p className="text-gray-600 text-2xl">
             See all <span className="text-black font-bold">5,000+</span> Causes{" "}
-            <i class="bi bi-arrow-right  "></i>
+            <i className="bi bi-arrow-right  "></i>
           </p>
         </div>
       </div>

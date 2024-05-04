@@ -24,7 +24,7 @@ import Blog3 from "../assets/blog3.png";
 import Backimg9 from "../assets/backimg9.png";
 import PeopleSaySection from "../Components/PeopleSaySection";
 import FAQ from "../Components/FAQ";
-import PopularCauses from "../Component/PopularCauses";
+import PopularCauses from "../Components/PopularCauses";
 const Home = () => {
   return (
     <div className="px-12 overflow-hidden">

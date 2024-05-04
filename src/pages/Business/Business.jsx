@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import SecOne from "../../Component/SecOne/SecOne";
-import FAQ from "../../Component/FAQ";
+import SecOne from "../../Components/SecOne/SecOne";
+import FAQ from "../../Components/FAQ";
 import personImg from "../../assets/RegisterBusiness/person.png";
 import vid from "../../assets/RegisterBusiness/vid.png";
 import boyImg from "../../assets/RegisterBusiness/boy.png";
@@ -8,7 +8,7 @@ import cardOne from "../../assets/RegisterBusiness/cardOne.png";
 import cardTwo from "../../assets/RegisterBusiness/cardTwo.png";
 import cardThree from "../../assets/RegisterBusiness/cardThree.jpg";
 import convoImg from "../../assets/RegisterBusiness/convo.png";
-import Support from "../../Component/Support/Support";
+import Support from "../../Components/Support/Support";
 import "./Business.scss";
 
 const Business = () => {
