@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
-import "./SecOne.scss"
+import "./SecOne.scss";
 const SecOne = (props) => {
-  const { name, title, paragraph,img } = props;
+  const { name, title, paragraph, img } = props;
   return (
     <div className="secOne">
       <div className="left">

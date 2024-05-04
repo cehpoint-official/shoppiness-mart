@@ -1,4 +1,3 @@
-import React from "react";
 import ShoppingBag from "../assets/ShoppingBag.png";
 import Backimg13 from "../assets/backimg13.png";
 const Footer = () => {
@@ -7,10 +6,10 @@ const Footer = () => {
       <div className=" mx-auto bg-[#049D8E] py-20 z-10  mt-5 overflow-hidden lg:justify-center items-center ">
         <div className=" w-44 hidden md:block lg:block"></div>
 
-        <div class="mx-4 flex flex-wrap lg:justify-center items-center ">
-          <div class="w-full   px-8 sm:w-2/3 lg:w-3/12">
+        <div className="mx-4 flex flex-wrap lg:justify-center items-center ">
+          <div className="w-full   px-8 sm:w-2/3 lg:w-3/12">
             <div className=" mb-10 mt-3 w-full">
-              <a href="" class="mb-6 inline-block w-full">
+              <a href="" className="mb-6 inline-block w-full">
                 <img src={ShoppingBag} alt="" className="" />
               </a>
               <p className="mb-7 text-lg text-white">
@@ -18,11 +17,11 @@ const Footer = () => {
                 Blanditiis,commodi tempora mollitia voluptatem
               </p>
               <p className="flex items-center text-lg  text-white">
-                <span class="mr-3 text-[#FFD705]">Call Us</span>
+                <span className="mr-3 text-[#FFD705]">Call Us</span>
                 <span> +91 6368900045</span>
               </p>
               <p className="flex items-center text-lg mt-4  text-white">
-                <span class="mr-3 text-[#FFD705]">Email Us</span>
+                <span className="mr-3 text-[#FFD705]">Email Us</span>
                 <span> email@gmail.com</span>
               </p>
             </div>
@@ -107,8 +106,8 @@ const Footer = () => {
               </ul>
             </div>
           </div>
-          <div class="w-full px-8  sm:w-1/2 lg:w-1/3 ">
-            <div class="mb- w-full ">
+          <div className="w-full px-8  sm:w-1/2 lg:w-1/3 ">
+            <div className="mb- w-full ">
               <img src={Backimg13} alt="" className="" />
             </div>
           </div>
@@ -119,11 +118,11 @@ const Footer = () => {
 
       <div className="bg-[#EDF6FB] mt-3 w-full px-3 lg:justify-between p-5 md:flex-row">
         <div className="flex justify-between ">
-          <p class="text-[#048376]">© 2024 UX/UI Team</p>
-          <div class="text-[#048376] ">
-            <i class="bi bi-instagram"></i>
-            <i class="bi bi-twitter ml-2"></i>
-            <i class="bi bi-facebook ml-2"></i>
+          <p className="text-[#048376]">© 2024 UX/UI Team</p>
+          <div className="text-[#048376] ">
+            <i className="bi bi-instagram"></i>
+            <i className="bi bi-twitter ml-2"></i>
+            <i className="bi bi-facebook ml-2"></i>
           </div>
           <div className="">
             <p className="text-[#048376]">All Rights Reserved</p>
