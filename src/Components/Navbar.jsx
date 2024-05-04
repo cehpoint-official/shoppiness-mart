@@ -56,7 +56,7 @@ const Navbar = () => {
               <Link to="/register-business" className="mt-2  md:mt-0">
                 Register a business/Services
               </Link>
-              <Link to="/support" className="mt-2  md:mt-0">
+              <Link to="/supportmaast" className="mt-2  md:mt-0">
                 Support Maast
               </Link>
             </div>
