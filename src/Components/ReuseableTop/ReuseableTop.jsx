@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
-import "./SecOne.scss";
-const SecOne = (props) => {
+import "./ReuseableTop.scss";
+const ReuseableTop = (props) => {
   const { name, title, paragraph, img } = props;
   return (
-    <div className="secOne">
+    <div className="ReuseableTop">
       <div className="left">
         <h1>{title}</h1>
         <p>{paragraph}</p>
@@ -19,4 +19,4 @@ const SecOne = (props) => {
   );
 };
 
-export default SecOne;
+export default ReuseableTop;

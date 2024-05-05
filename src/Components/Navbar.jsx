@@ -44,7 +44,7 @@ const Navbar = () => {
               <Link to="/cashback" className="mt-2  md:mt-0">
                 Cashback/deals
               </Link>
-              <Link to="/work" className="mt-2  md:mt-0">
+              <Link to="/howitworks" className="mt-2  md:mt-0">
                 How it works
               </Link>
               <Link to="/support" className="mt-2  md:mt-0">
