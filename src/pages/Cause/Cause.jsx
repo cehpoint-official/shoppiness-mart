@@ -3,7 +3,7 @@ import donationImg from "../../assets/RegisterBusiness/donations.png";
 import bg from "../../assets/RegisterBusiness/bg2.png";
 import "./Cause.scss";
 import { Link } from "react-router-dom";
-import SecOne from "../../Components/SecOne/SecOne";
+import ReuseableTop from "../../Components/ReuseableTop/ReuseableTop";
 import Support from "../../Components/Support/Support";
 import PopularCauses from "../../Components/PopularCauses";
 import PeopleSaySection from "../../Components/PeopleSaySection";
@@ -13,7 +13,7 @@ const Cause = () => {
   return (
     <div className="cause">
       <div className="causeContainer">
-        <SecOne
+        <ReuseableTop
           title="Get wholehearted support for all causes and NGOs"
           paragraph="Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis,commodi tempora mollitia"
           name="Cause/NGO"

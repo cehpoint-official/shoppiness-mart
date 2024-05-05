@@ -10,6 +10,7 @@ import Footer from "./Components/Footer";
 import SupportACause from "./pages/SupportACause";
 import SupportMaast from "./pages/SupportMaast";
 import Cause from "./pages/Cause/Cause";
+import HowItWorks from "./pages/HowItWorks/HowItWorks";
 
 const App = () => {
   return (
@@ -24,6 +25,7 @@ const App = () => {
           <Route path="/register-cause" element={<Cause />} />
           <Route path="/support" element={<SupportACause />} />
           <Route path="/supportmaast" element={<SupportMaast />} />
+          <Route path="/howitworks" element={< HowItWorks/>} />
         </Routes>
         <Footer />
       </BrowserRouter>
