@@ -12,7 +12,8 @@ import Card1 from "../assets/card1.png";
 import Card2 from "../assets/card2.png";
 import Card3 from "../assets/card3.png";
 import Imgpage6 from "../assets/imgpage6.png";
-
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 import Logo1 from "../assets/logo1.png";
 import Logo2 from "../assets/logo2.png";
 import Logo3 from "../assets/logo3.png";
@@ -25,22 +26,32 @@ import Backimg9 from "../assets/backimg9.png";
 import PeopleSaySection from "../Components/PeopleSaySection";
 import FAQ from "../Components/FAQ";
 import PopularCauses from "../Components/PopularCauses";
+import Slider from "react-slick";
 const Home = () => {
+  var settings = {
+    dots: true,
+    infinite: true,
+    speed: 200,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+  };
+
   return (
-    <div className="px-12 overflow-hidden">
+    <div className="px-12 overflow-hidden" {...settings}>
       {/* 1st Page  */}
       <div className="carousel mx-auto  p-4  ">
-        <div className="flex flex-row  space-x-4 ">
-          <div className="carousel-item w-64 lg:w-full  transition-transform translate-x-2">
-            <img src={Home1} className="" alt="Slide 1" />
+        <Slider {...settings}>
+          <div>
+            <img src={Home1} alt="" />
           </div>
-          <div className="carousel-item w-64 lg:w-full">
-            <img src={Home1} className="" alt="Slide 2" />
+          <div>
+            <img src={Home1} alt="" />
           </div>
-          <div className="carousel-item w-64 lg:w-auto">
-            <img src={Home1} className="" alt="Slide 3" />
+          <div>
+            <img src={Home1} alt="" />
           </div>
-        </div>
+        </Slider>
       </div>
       {/* 2nd page */}
       <div className="mt-10 mx-auto px-4 md:px-40 bg-[#EEFAF9] pt-8 pb-6 ">
@@ -321,7 +332,7 @@ const Home = () => {
 
       {/* 7th page */}
 
-      <PopularCauses/>
+      <PopularCauses />
 
       {/* 8th page */}
 
