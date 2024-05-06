@@ -2,22 +2,42 @@ $gray: #777777;
 $primary: #049d8e;
 $padd: 100px;
 $font: "Roboto Slab";
-
+$breakpoint: 1035px;
+$breakpoint2: 736px;
 .ReuseableTop {
   width: 100%;
   display: flex;
   justify-content: center;
   padding: $padd;
 
+  @media (max-width: $breakpoint) {
+    flex-direction: column;
+    align-items: center;
+    flex-direction: column-reverse;
+    gap: 50px;
+  }
+  @media (max-width: $breakpoint2) {
+    padding: 20px;
+  }
+
   .left {
-    width: 60%;
+    width: 50%;
     display: flex;
     flex-direction: column;
     gap: 30px;
+    @media (max-width: $breakpoint) {
+      width: 100%;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
     h1 {
       font-size: 45px;
       font-weight: 600;
       font-family: $font;
+      @media (max-width: $breakpoint) {
+        font-size: 35px;
+      }
     }
 
     > p {
@@ -26,14 +46,23 @@ $font: "Roboto Slab";
       color: $gray;
       font-weight: 400;
       width: 90%;
+      @media (max-width: $breakpoint) {
+        font-size: 18px;
+        width: 100%;
+      }
     }
 
     .links {
       width: 40%;
-      min-width: 300px;
+      min-width: 50%;
       display: flex;
       flex-direction: column;
       gap: 20px;
+      @media (max-width:465px) {
+        font-size: 18px;
+        width: 100%;
+      }
+
       .register {
         background-color: $primary;
         padding: 15px 5px;
@@ -57,7 +86,11 @@ $font: "Roboto Slab";
   }
 
   .right {
-    width: 40%;
+    width: 50%;
+    @media (max-width: $breakpoint) {
+      width: 100%;
+      height: 400px;
+    }
     img {
       width: 100%;
       height: 100%;
