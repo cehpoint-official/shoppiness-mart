@@ -1,4 +1,3 @@
-
 import Navbar from "./Components/Navbar";
 import Home from "./pages/Home";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -11,6 +10,8 @@ import SupportACause from "./pages/SupportACause";
 import SupportMaast from "./pages/SupportMaast";
 import Cause from "./pages/Cause/Cause";
 import HowItWorks from "./pages/HowItWorks/HowItWorks";
+import Cashback from "./pages/Cashback";
+import Shop from "./pages/Shop";
 
 const App = () => {
   return (
@@ -25,13 +26,14 @@ const App = () => {
           <Route path="/register-cause" element={<Cause />} />
           <Route path="/support" element={<SupportACause />} />
           <Route path="/supportmaast" element={<SupportMaast />} />
-          <Route path="/howitworks" element={< HowItWorks/>} />
+          <Route path="/howitworks" element={<HowItWorks />} />
+          <Route path="/cashback" element={<Cashback />} />
+          <Route path="/shop" element={<Shop />} />
         </Routes>
         <Footer />
       </BrowserRouter>
     </>
   );
 };
-
 
 export default App;
