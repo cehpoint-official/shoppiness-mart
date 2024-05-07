@@ -1,4 +1,3 @@
-import Navbar from "./Components/Navbar";
 import Home from "./pages/Home";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Signup from "./pages/Signup";
@@ -12,6 +11,7 @@ import Cause from "./pages/Cause/Cause";
 import HowItWorks from "./pages/HowItWorks/HowItWorks";
 import Cashback from "./pages/Cashback";
 import Shop from "./pages/Shop";
+import Navbar from "./Components/Navbar/Navbar";
 
 const App = () => {
   return (
