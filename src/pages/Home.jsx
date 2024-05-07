@@ -40,7 +40,7 @@ const Home = () => {
     speed: 2000,
     slidesToShow: 1,
     slidesToScroll: 1,
-    autoplay: true,
+    autoPlay: true,
   };
 
   return (

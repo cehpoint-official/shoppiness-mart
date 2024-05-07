@@ -1,10 +1,21 @@
 import ShoppingBag from "../../assets/ShoppingBag.png";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { GiHamburgerMenu } from "react-icons/gi";
 import "./Navbar.scss";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 const Navbar = () => {
   const [active, setActive] = useState(false);
+
+
+
+  const location = useLocation();
+
+  useEffect(() => {
+    setActive(false); 
+  }, [location]);
+
+ 
+
   return (
     <div className="navbar">
       <div className="top">
