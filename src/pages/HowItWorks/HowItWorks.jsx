@@ -6,7 +6,7 @@ import bag from "../../assets/RegisterBusiness/bag.jpg";
 import video from "../../assets/RegisterBusiness/vid.png";
 import Onlinewishes from "../../assets/RegisterBusiness/Onlinewishes.png";
 import { RiSearchFill } from "react-icons/ri";
-import "./HowItWorks.scss";
+import "./HowItworks.scss";
 import RoundedCards from "../../Components/RoundedCards/RoundedCards";
 import PeopleSaySection from "../../Components/PeopleSaySection";
 import FAQ from "../../Components/FAQ";
