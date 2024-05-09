@@ -9,7 +9,7 @@ import img8 from "../assets/Shop/img8.png";
 import img9 from "../assets/Shop/img9.png";
 import img10 from "../assets/Shop/img10.png";
 import img11 from "../assets/Shop/img11.png";
-import img12 from "../assets/Shop/img11.png";
+import img12 from "../assets/Shop/img12.png";
 import img1home from "../assets/Home/img1.png";
 import img2home from "../assets/Home/img2.png";
 import img3home from "../assets/Home/img3.png";
@@ -30,45 +30,153 @@ const Shop = () => {
       <div className="mt-10 mx-auto px-4 md:px-40 pt-8 pb-6 ">
         <div className="mb-5">
           <div className="flex justify-center gap-9">
-            <div className="mt-6  md:flex-row">
-              <img src={img1} alt="" className="px-4 py-2 rounded-md" />
+            <div className="mt-6 text-center">
+              <div>
+                <img
+                  src={img1}
+                  alt=""
+                  className="px-4 py-2 w-[120px] rounded-md"
+                />
+              </div>
+              <div>
+                <p className="font-bold">Offer Zone</p>
+              </div>
             </div>
-            <div className="mt-6  md:flex-row">
-              <img src={img2} alt="" className="px-4 py-2 rounded-md" />
+            <div className="mt-6 text-center">
+              <div>
+                <img
+                  src={img2}
+                  alt=""
+                  className=" w-[120px] px-4 py-2 rounded-md"
+                />
+              </div>
+              <div>
+                <p className="font-bold">Grocery</p>
+              </div>
             </div>
-            <div className="mt-6">
-              <img src={img3} alt="" className="px-4 py-2 rounded-md" />
+            <div className="mt-6 text-center">
+              <div>
+                <img
+                  src={img3}
+                  alt=""
+                  className="px-4 py-2 w-[120px] rounded-md"
+                />
+              </div>
+              <div>
+                <p className="font-bold">Restaurant</p>
+              </div>
             </div>
-            <div className="mt-6">
-              <img src={img4} alt="" className="px-4 py-2 rounded-md" />
+            <div className="mt-6 text-center">
+              <div>
+                <img
+                  src={img4}
+                  alt=""
+                  className="px-4 py-2 w-[120px] rounded-md"
+                />
+              </div>
+              <div>
+                <p className="font-bold">Electronincs</p>
+              </div>
             </div>
-            <div className="mt-6">
-              <img src={img5} alt="" className="px-4 py-2 rounded-md" />
+            <div className="mt-6 text-center">
+              <div>
+                <img
+                  src={img5}
+                  alt=""
+                  className="px-4 py-2 w-[120px] rounded-md"
+                />
+              </div>
+              <div>
+                <p className="font-bold">Fashion</p>
+              </div>
             </div>
-            <div className="mt-6">
-              <img src={img6} alt="" className="px-4 py-2 rounded-md" />
+            <div className="mt-6 text-center">
+              <div>
+                <img
+                  src={img6}
+                  alt=""
+                  className="px-4 py-2 w-[120px] rounded-md"
+                />
+              </div>
+              <div>
+                <p className="font-bold">Pharmacy</p>
+              </div>
             </div>
           </div>
         </div>
         <div className="mb-20">
           <div className="flex justify-center gap-9">
-            <div className="mt-6  md:flex-row">
-              <img src={img7} alt="" className="px-4 py-2 rounded-md" />
+            <div className="mt-6 text-center">
+              <div>
+                <img
+                  src={img7}
+                  alt=""
+                  className="px-4 py-2 w-[120px] rounded-md"
+                />
+              </div>
+              <div>
+                <p className="font-bold">Study</p>
+              </div>
             </div>
-            <div className="mt-6  md:flex-row">
-              <img src={img8} alt="" className="px-4 py-2 rounded-md" />
+            <div className="mt-6 text-center">
+              <div>
+                <img
+                  src={img8}
+                  alt=""
+                  className="px-4 py-2 w-[120px] rounded-md"
+                />
+              </div>
+              <div>
+                <p className="font-bold">Sports</p>
+              </div>
             </div>
-            <div className="mt-6">
-              <img src={img9} alt="" className="px-4 py-2 rounded-md" />
+            <div className="mt-6 text-center">
+              <div>
+                <img
+                  src={img9}
+                  alt=""
+                  className="px-4 py-2 w-[120px] rounded-md"
+                />
+              </div>
+              <div>
+                <p className="font-bold">Child Care</p>
+              </div>
             </div>
-            <div className="mt-6">
-              <img src={img10} alt="" className="px-4 py-2 rounded-md" />
+            <div className="mt-6 text-center">
+              <div>
+                <img
+                  src={img10}
+                  alt=""
+                  className="px-4 py-2 w-[120px] rounded-md"
+                />
+              </div>
+              <div>
+                <p className="font-bold">Travel</p>
+              </div>
             </div>
-            <div className="mt-6">
-              <img src={img11} alt="" className="px-4 py-2 rounded-md" />
+            <div className="mt-6 text-center">
+              <div>
+                <img
+                  src={img11}
+                  alt=""
+                  className="px-4 py-2 w-[120px] rounded-md"
+                />
+              </div>
+              <div>
+                <p className="font-bold">Beauty</p>
+              </div>
             </div>
-            <div className="mt-6">
-              <img src={img12} alt="" className="px-4 py-2 rounded-md" />
+            <div className="mt-6 text-center">
+              <div>
+                <img
+                  src={img12}
+                  alt=""
+                  className="px-4 py-2 w-[120px] rounded-md"
+                />
+              </div>
+              <div>
+                <p className="font-bold">500+ More</p>
+              </div>
             </div>
           </div>
         </div>

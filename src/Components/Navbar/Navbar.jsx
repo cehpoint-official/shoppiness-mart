@@ -6,15 +6,12 @@ import { useEffect, useState } from "react";
 const Navbar = () => {
   const [active, setActive] = useState(false);
 
-
-
   const location = useLocation();
+  console.log(location.pathname);
 
   useEffect(() => {
-    setActive(false); 
+    setActive(false);
   }, [location]);
-
- 
 
   return (
     <div className="navbar">
