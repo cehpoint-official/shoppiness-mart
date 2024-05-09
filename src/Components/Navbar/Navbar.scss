@@ -8,7 +8,12 @@ $font: "Roboto Slab";
   display: flex;
   flex-direction: column;
   width: 100%;
+  z-index: 9999;
 
+  @media (max-width: 978px) {
+    position: sticky;
+    top: 0;
+  }
   .top {
     padding: $padd;
     display: flex;

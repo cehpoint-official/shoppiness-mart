@@ -5,17 +5,11 @@ import "./Navbar.scss";
 import { useEffect, useState } from "react";
 const Navbar = () => {
   const [active, setActive] = useState(false);
-
-
-
   const location = useLocation();
-
   useEffect(() => {
     setActive(false); 
   }, [location]);
-
- 
-
+  
   return (
     <div className="navbar">
       <div className="top">
