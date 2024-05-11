@@ -1,32 +1,38 @@
-import Home1 from "../assets/home1.png";
-import OnlineP1 from "../assets/onlineP1.png";
-import OnlineP2 from "../assets/onlineP2.png";
-import OnlineP3 from "../assets/onlineP3.png";
-import OnlineP4 from "../assets/onlineP4.png";
-import OnlineP5 from "../assets/onlineP5.png";
-import Shopmart1 from "../assets/Shopmart1.png";
-import Shopmart2 from "../assets/shopmart2.png";
-import Shopmart3 from "../assets/shopmart3.png";
-//import Backimg4 from "../assets/backimg4.png"
-import Card1 from "../assets/card1.png";
-import Card2 from "../assets/card2.png";
-import Card3 from "../assets/card3.png";
-import Imgpage6 from "../assets/imgpage6.png";
+import Home1 from "../assets/Home/home1.png";
+import img1 from "../assets/Home/img1.png";
+import img2 from "../assets/Home/img2.png";
+import img3 from "../assets/Home/img3.png";
+import img4 from "../assets/Home/img4.png";
+import img5 from "../assets/Home/img5.png";
+import img6 from "../assets/Home/img6.png";
+import img7 from "../assets/Home/img7.png";
+import img8 from "../assets/Home/img8.png";
+import img9 from "../assets/Home/img9.png";
+import img10 from "../assets/Home/img10.png";
+import img11 from "../assets/Home/img11.png";
+import img12 from "../assets/Home/img12.png";
+import img13 from "../assets/Home/img13.png";
+import img14 from "../assets/Home/img14.png";
+import img15 from "../assets/Home/img15.png";
+import img16 from "../assets/Home/img16.png";
+import img17 from "../assets/Home/img17.png";
+import Logo1 from "../assets/Home/logo1.png";
+import Logo2 from "../assets/Home/logo2.png";
+import Logo3 from "../assets/Home/logo3.png";
+import Logo4 from "../assets/Home/logo4.png";
+import Logo5 from "../assets/Home/logo5.png";
+import Blog1 from "../assets/Home/blog1.png";
+import Blog2 from "../assets/Home/blog2.png";
+import Blog3 from "../assets/Home/blog3.png";
+import Backimg9 from "../assets/Home/backimg9.png";
+
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import Logo1 from "../assets/logo1.png";
-import Logo2 from "../assets/logo2.png";
-import Logo3 from "../assets/logo3.png";
-import Logo4 from "../assets/logo4.png";
-import Logo5 from "../assets/logo5.png";
-import Blog1 from "../assets/blog1.png";
-import Blog2 from "../assets/blog2.png";
-import Blog3 from "../assets/blog3.png";
-import Backimg9 from "../assets/backimg9.png";
+import Slider from "react-slick";
 import PeopleSaySection from "../Components/PeopleSaySection";
 import FAQ from "../Components/FAQ";
 import PopularCauses from "../Components/PopularCauses";
-import Slider from "react-slick";
+// import { Link } from "react-router-dom";
 const Home = () => {
   var settings = {
     dots: true,
@@ -34,7 +40,7 @@ const Home = () => {
     speed: 2000,
     slidesToShow: 1,
     slidesToScroll: 1,
-    autoplay: true,
+    autoPlay: true,
   };
 
   return (
@@ -72,35 +78,35 @@ const Home = () => {
           <div className="flex justify-center gap-9">
             <div className="mt-6  md:flex-row">
               <img
-                src={OnlineP1}
+                src={img1}
                 alt=""
                 className="bg-white border-2 shadow-lg border-gray-100 px-4 py-2 rounded-md"
               />
             </div>
             <div className="mt-6">
               <img
-                src={OnlineP2}
+                src={img2}
                 alt=""
                 className="bg-white border-2 shadow-lg border-gray-100 px-4 py-2 rounded-md"
               />
             </div>
             <div className="mt-6">
               <img
-                src={OnlineP3}
+                src={img3}
                 alt=""
                 className="bg-white border-2 shadow-lg border-gray-100 px-4 py-2 rounded-md"
               />
             </div>
             <div className="mt-6">
               <img
-                src={OnlineP4}
+                src={img4}
                 alt=""
                 className="bg-white border-2 shadow-lg border-gray-100 px-4 py-2 rounded-md"
               />
             </div>
             <div className="mt-6">
               <img
-                src={OnlineP5}
+                src={img5}
                 alt=""
                 className="bg-white border-2 shadow-lg border-gray-100 px-4 py-2 rounded-md"
               />
@@ -114,35 +120,35 @@ const Home = () => {
           <div className="flex justify-center gap-9">
             <div className="mt-6  md:flex-row">
               <img
-                src={OnlineP1}
+                src={img6}
                 alt=""
                 className="bg-white border-2 shadow-lg border-gray-100 px-4 py-2 rounded-md"
               />
             </div>
             <div className="mt-6">
               <img
-                src={OnlineP2}
+                src={img7}
                 alt=""
                 className="bg-white border-2 shadow-lg border-gray-100 px-4 py-2 rounded-md"
               />
             </div>
             <div className="mt-6">
               <img
-                src={OnlineP3}
+                src={img8}
                 alt=""
                 className="bg-white border-2 shadow-lg border-gray-100 px-4 py-2 rounded-md"
               />
             </div>
             <div className="mt-6">
               <img
-                src={OnlineP4}
+                src={img9}
                 alt=""
                 className="bg-white border-2 shadow-lg border-gray-100 px-4 py-2 rounded-md"
               />
             </div>
             <div className="mt-6">
               <img
-                src={OnlineP5}
+                src={img10}
                 alt=""
                 className="bg-white border-2 shadow-lg border-gray-100 px-4 py-2 rounded-md"
               />
@@ -162,20 +168,16 @@ const Home = () => {
           <div className="col-span-12 md:col-span-6">
             <div className="flex flex-wrap justify-center md:justify-start">
               <img
-                src={Shopmart1}
+                src={img11}
                 alt=""
                 className="w-32 md:w-auto md:max-w-xs mr-2 md:mr-4 mb-2 md:mb-0"
               />
-              <img
-                src={Shopmart2}
-                alt=""
-                className="w-32 md:w-auto md:max-w-xs"
-              />
+              <img src={img12} alt="" className="w-32 md:w-auto md:max-w-xs" />
             </div>
 
             <div className="flex justify-center relative mt-4 md:mt-0">
               <img
-                src={Shopmart3}
+                src={img13}
                 alt=""
                 className="absolute -top-10 w-24 md:w-80"
               />
@@ -201,32 +203,7 @@ const Home = () => {
         </div>
       </div>
       {/* 4th page */}
-      {/* <div className="grid lg:grid-cols-1 md:grid-cols-2 px-4 md:px-5 lg:px-0 gap-4 mt-16 overflow-hidden">
-
-
-            <div className="col-span-1 lg:col-span-1 pb-7 lg:absolute">
-                <img src={Backimg4} alt="" className="w-full lg:w-auto lg:max-w-full lg:mx-80 mt-6 lg:mt-0" />
-            </div>
-
-
-            <div className="col-span-6 flex flex-col justify-center items-center lg:items-start relative">
-                <p className="text-xl text-gray-500 mt-6 md:mt-10 lg:mt-0 md:mx-8 lg:mx-48 lg:px-8">How it Works</p>
-                <p className="text-lg font-semibold mt-4 md:mt-5 lg:mt-2 md:text-4xl lg:text-5xl lg:mx-48 lg:px-8">Cashback, Deals for you, help to others</p>
-                <p className="text-base lg:text-xl text-gray-500 mt-4 px-4 md:px-8 lg:px-0 lg:mx-48">Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis, commodi tempora mollitia voluptatem recusandae impedit totam aperiam nesciunt doloremque magni neque placeat, laborum nisi eum quae voluptatum</p>
-                <p className="text-base lg:text-xl text-gray-500 mt-2 px-4 md:px-8 lg:px-0 lg:mx-48">Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis, commodi tempora mollitia voluptatem recusandae impedit totam aperiam nesciunt doloremque magni neque placeat, laborum nisi eum quae voluptatum</p>
-            </div>
-
-
-            <div className="flex flex-col lg:flex-row justify-center mt-4 lg:mt-7 mb-9 lg:relative">
-                <button type="button" className="bg-[#049D8E] rounded-md py-2 px-4 text-white lg:absolute lg:bottom-0 lg:left-0 lg:ml-48 lg:mb-4">Sign up for free</button>
-                <div className="flex justify-center mt-4 lg:mt-0 lg:absolute lg:right-0 lg:bottom-0 lg:mr-48 lg:mb-4">
-                    <video controls autoplay loop muted className="w-full lg:w-auto lg:max-w-full">
-                        <source src="https://youtu.be/ZHzVr7rbDus?si=a0Bxnv8El3qQnF44" type="video/mp4" />
-                    </video>
-                </div>
-            </div>
-        </div> */}
-
+      {/* /////////////////////////////////////////// */}
       {/* 5th page */}
       <div className="mt-auto mx-auto px-4 md:px-40   pb-6 ">
         <p className="font-bold text-4xl text-center">Why use this platform</p>
@@ -240,7 +217,7 @@ const Home = () => {
         <div className="flex flex-wrap justify-center  mt-7">
           <div className="border-2  md:w-80 mt-10 md:mt-0 md:mr-4 rounded-xl shadow-xl">
             <div className="">
-              <img src={Card1} alt="" className="" />
+              <img src={img14} alt="" className="" />
             </div>
             <div className="mt-2">
               <p className="text-3xl font-semibold text-center">
@@ -257,7 +234,7 @@ const Home = () => {
           </div>
           <div className="border-2 md:w-80 mt-10 md:mt-0 md:mx-4 rounded-xl shadow-xl">
             <div className="">
-              <img src={Card2} alt="" className="" />
+              <img src={img15} alt="" className="" />
             </div>
             <div className="mt-2">
               <p className="text-3xl font-semibold text-center">
@@ -276,7 +253,7 @@ const Home = () => {
           </div>
           <div className="border-2  md:w-80 mt-10 md:mt-0 md:ml-4 rounded-xl shadow-xl">
             <div className="">
-              <img src={Card3} alt="" className="" />
+              <img src={img16} alt="" className="" />
             </div>
             <div className="">
               <p className="text-3xl font-semibold  mt-10 text-center">
@@ -296,7 +273,7 @@ const Home = () => {
       {/* 6th page  */}
       <div className="grid grid-cols-12 gap-8  mt-20 bg-[#EAEFF2] px-12 ">
         <div className="col-span-12 md:col-span-5 lg:col-span-5">
-          <img src={Imgpage6} alt="" className="w-72 md:w-full" />
+          <img src={img17} alt="" className="w-72 md:w-full" />
         </div>
         <div className="col-span-12 md:col-span-7 lg:col-span-7 p-10">
           <div className="">

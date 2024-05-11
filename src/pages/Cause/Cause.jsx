@@ -1,8 +1,9 @@
+import "./Cause.scss";
+import { Link } from "react-router-dom";
 import causeImg from "../../assets/RegisterBusiness/cause.jpg";
 import donationImg from "../../assets/RegisterBusiness/donations.png";
 import bg from "../../assets/RegisterBusiness/bg2.png";
-import "./Cause.scss";
-import { Link } from "react-router-dom";
+
 import ReuseableTop from "../../Components/ReuseableTop/ReuseableTop";
 import Support from "../../Components/Support/Support";
 import PopularCauses from "../../Components/PopularCauses";

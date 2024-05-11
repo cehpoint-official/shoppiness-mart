@@ -1,13 +1,14 @@
 import { Link } from "react-router-dom";
 import ReuseableTop from "../../Components/ReuseableTop/ReuseableTop";
 import FAQ from "../../Components/FAQ";
+import Support from "../../Components/Support/Support";
+import RoundedCards from "../../Components/RoundedCards/RoundedCards";
+import "./Business.scss";
+
 import personImg from "../../assets/RegisterBusiness/person.png";
 import vid from "../../assets/RegisterBusiness/vid.png";
 import boyImg from "../../assets/RegisterBusiness/boy.png";
-import RoundedCards from "../../Components/RoundedCards/RoundedCards"
 import convoImg from "../../assets/RegisterBusiness/convo.png";
-import Support from "../../Components/Support/Support";
-import "./Business.scss";
 
 const Business = () => {
   return (
@@ -67,7 +68,7 @@ const Business = () => {
           </div>
         </div>
 
-         <RoundedCards/>
+        <RoundedCards />
 
         <div className="secFive">
           <div className="left">

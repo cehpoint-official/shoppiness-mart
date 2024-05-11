@@ -1,12 +1,14 @@
 import { Link } from "react-router-dom";
+import "./HowItworks.scss";
+
 import store from "../../assets/RegisterBusiness/store.png";
 import signup from "../../assets/RegisterBusiness/signup.png";
 import money from "../../assets/RegisterBusiness/money.png";
 import bag from "../../assets/RegisterBusiness/bag.jpg";
 import video from "../../assets/RegisterBusiness/vid.png";
 import Onlinewishes from "../../assets/RegisterBusiness/Onlinewishes.png";
+
 import { RiSearchFill } from "react-icons/ri";
-import "./HowItworks.scss";
 import RoundedCards from "../../Components/RoundedCards/RoundedCards";
 import PeopleSaySection from "../../Components/PeopleSaySection";
 import FAQ from "../../Components/FAQ";

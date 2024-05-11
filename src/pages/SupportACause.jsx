@@ -10,7 +10,7 @@ const SupportACause = () => {
       {/* 1st page  */}
       <div className="flex flex-wrap  justify-evenly py-16 px-3">
         <div className=" pt-10">
-          <h3 className="text-4xl font-medium">
+          <h3 className="text-4xl font-bold">
             Explore our list of good causes and
           </h3>
           <h3 className="text-4xl font-medium pb-3">

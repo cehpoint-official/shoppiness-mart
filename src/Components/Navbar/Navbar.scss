@@ -1,0 +1,145 @@
+$gray: #777777;
+$primary: #049d8e;
+$sec: #edf6fb;
+$padd: 20px 60px 20px 60px;
+$font: "Roboto Slab";
+
+.navbar {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  z-index: 9999;
+
+  @media (max-width: 978px) {
+    position: sticky;
+    top: 0;
+  }
+  .top {
+    padding: $padd;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: $font;
+    background-color: $primary;
+    width: 100%;
+    img {
+      object-fit: contain;
+      cursor: pointer;
+    }
+
+    .links {
+      display: flex;
+      gap: 20px;
+      @media (max-width: 978px) {
+        display: none;
+      }
+
+      > a {
+        background-color: $primary;
+        border: 2px solid white;
+        padding: 8px 20px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        font-weight: 500;
+        font-size: 18px;
+        color: white;
+      }
+
+      .register {
+        background-color: white;
+        color: $primary;
+      }
+    }
+
+    .hamburgerMenu {
+      display: none;
+
+      > svg {
+        font-size: 30px;
+        color: white;
+        cursor: pointer;
+      }
+      @media (max-width: 978px) {
+        display: flex;
+      }
+    }
+  }
+
+  .bottom {
+    padding: $padd;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    background-color: $sec;
+    font-family: $font;
+    font-weight: 700;
+    font-size: 18px;
+    width: 100%;
+
+    @media (max-width: 978px) {
+      display: none;
+    }
+  }
+
+  .menu {
+    display: flex;
+    flex-direction: column;
+    padding: 30px;
+    align-self: flex-end;
+    gap: 20px;
+    width: 50%;
+    border-radius: 0 0 0 30px;
+    font-size: 20px;
+    font-family: $font;
+    font-weight: 600;
+    background-color: $sec;
+    position: absolute;
+    top: 84px;
+    transition: 1s all ease-in;
+    z-index: 2000;
+    @media (min-width: 978px) {
+      display: none;
+    }
+
+    @media (max-width: 650px) {
+      width: 100%;
+      border-radius: 0px 0px 60px 60px;
+    }
+    > a {
+      padding: 3px;
+      border-bottom: 1px solid rgba(128, 128, 128, 0.467);
+    }
+
+    .register {
+      color: $primary;
+      border: 2px solid $primary;
+      padding: 8px 20px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-weight: 500;
+      font-size: 18px;
+      color: $primary;
+    }
+
+    .login {
+      background-color: $primary;
+      border: 2px solid white;
+      padding: 8px 20px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-weight: 500;
+      font-size: 18px;
+      color: white;
+    }
+  }
+}
