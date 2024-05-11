@@ -39,7 +39,7 @@ const Shop = () => {
                 />
               </div>
               <div>
-                <p className="font-bold">Offer Zone</p>
+                <p className="font-bold">Offer zone</p>
               </div>
             </div>
             <div className="mt-6 text-center">
