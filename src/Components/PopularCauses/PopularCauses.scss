@@ -75,7 +75,8 @@ $breakpoint2: 735px;
         border-radius: 21px 21px 0px 0px;
       }
       h4 {
-        font-size: 24px;
+        font-size: 26px;
+        font-weight: 600;
         font-family: $font;
         overflow: hidden;
         display: -webkit-box;
@@ -86,14 +87,15 @@ $breakpoint2: 735px;
       }
       >span{
         color: $primary;
-        font-weight: 700;
+        font-weight: 600;
+        font-size: 17px;
       }
       >h6{
         font-weight: 500;
         font-size: 17px;
         color: $gray;
       }
-      p {
+      >p {
         font-size: 18px;
         color: $gray; 
         padding: 10px;
@@ -105,5 +107,17 @@ $breakpoint2: 735px;
         text-overflow: ellipsis;
       }
     }
+
+    
   }
+  .seeAll{
+     font-size: 24px;
+     font-weight: 600;
+     color: $gray;
+     cursor: pointer;
+     span{
+      color: black;
+      font-weight: 700;
+     }
+    }
 }

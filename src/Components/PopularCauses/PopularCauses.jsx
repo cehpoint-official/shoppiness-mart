@@ -1,6 +1,7 @@
 
 
-import "./PopularCauses.scss"
+import "./PopularCauses.scss";
+
 const PopularCauses = ({ color, data }) => {
   return (
     <div
@@ -21,7 +22,7 @@ const PopularCauses = ({ color, data }) => {
           <div className="lowerCard" key={e.id}>
             <img src={e.img} alt="card" />
             <h4>{e.title}</h4>
-            <span>Child health Care</span>
+            <span>{e.titleSmall}</span>
             <h6>400 Supports, 5,000000 raised</h6>
             <p>
               Lorem ipsum dolor sit amet consectetur adipisicing elit.
@@ -34,6 +35,9 @@ const PopularCauses = ({ color, data }) => {
           </div>
         ))}
       </div>
+      <p className="seeAll">
+        See all <span>5,000 +</span> Causes
+      </p>
     </div>
   );
 };

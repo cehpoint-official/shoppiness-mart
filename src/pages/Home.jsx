@@ -242,9 +242,24 @@ const Home = () => {
 
       <PopularCauses
         data={[
-          { title: "Offline & Online Shopping", img: Card7th1, id: 1 },
-          { title: "Amazing Deals & Cash Back", img: Card7th2, id: 2 },
-          { title: "Cashback Charity", img: Card7th3, id: 3 },
+          {
+            title: "Healthy Food For All",
+            titleSmall: "Child health Care",
+            img: Card7th1,
+            id: 1,
+          },
+          {
+            title: "Animal Care",
+            titleSmall: "Animal Care",
+            img: Card7th2,
+            id: 2,
+          },
+          {
+            title: "Green World",
+            titleSmall: "Green World",
+            img: Card7th3,
+            id: 3,
+          },
         ]}
       />
 

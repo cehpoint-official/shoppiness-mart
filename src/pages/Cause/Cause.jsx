@@ -9,7 +9,9 @@ import Support from "../../Components/Support/Support";
 import PopularCauses from "../../Components/PopularCauses/PopularCauses";
 import PeopleSaySection from "../../Components/PeopleSaySection";
 import FAQ from "../../Components/FAQ";
-
+import Card7th1 from "../../assets/card7th1.png";
+import Card7th2 from "../../assets/card7th2.png";
+import Card7th3 from "../../assets/card7th3.png";
 const Cause = () => {
   return (
     <div className="cause">
@@ -59,7 +61,28 @@ const Cause = () => {
         </div>
 
         <Support num="6,000 +" />
-        <PopularCauses />
+        <PopularCauses
+          data={[
+            {
+              title: "Healthy Food For All",
+              titleSmall: "Child health Care",
+              img: Card7th1,
+              id: 1,
+            },
+            {
+              title: "Animal Care",
+              titleSmall: "Animal Care",
+              img: Card7th2,
+              id: 2,
+            },
+            {
+              title: "Green World",
+              titleSmall: "Green World",
+              img: Card7th3,
+              id: 3,
+            },
+          ]}
+        />
         <FAQ />
         <PeopleSaySection />
       </div>
