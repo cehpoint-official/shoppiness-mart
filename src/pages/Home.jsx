@@ -25,22 +25,19 @@ import Blog1 from "../assets/Home/blog1.png";
 import Blog2 from "../assets/Home/blog2.png";
 import Blog3 from "../assets/Home/blog3.png";
 import Backimg9 from "../assets/Home/backimg9.png";
-
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
 import PeopleSaySection from "../Components/PeopleSaySection";
 import FAQ from "../Components/FAQ";
 import PopularCauses from "../Components/PopularCauses";
-// import { Link } from "react-router-dom";
+import RoundedCards from "../Components/RoundedCards/RoundedCards";
+
 const Home = () => {
   var settings = {
-    dots: true,
-    infinite: true,
     speed: 2000,
-    slidesToShow: 1,
-    slidesToScroll: 1,
     autoPlay: true,
+    dots: true,
   };
 
   return (
@@ -60,11 +57,11 @@ const Home = () => {
         </Slider>
       </div>
       {/* 2nd page */}
-      <div className="mt-10 mx-auto px-4 md:px-40 bg-[#EEFAF9] pt-8 pb-6 ">
-        <p className="font-bold text-4xl text-center">
+      <div className="mt-10 mx-auto px-4 md:px-40 bg-[#EEFAF9] pt-8 mb-40 ">
+        <p className="font-bold text-5xl text-center font-slab ">
           Most preferred online and offline partners{" "}
         </p>
-        <p className="text-gray-600 text-lg text-center mx-auto  mt-8">
+        <p className="text-gray-600 text-xl text-center mx-auto  mt-8">
           Lorem ipsum dolor sit amet consectetur adipisicing elit.
           Blanditiis,commodi tempora{" "}
         </p>
@@ -143,7 +140,7 @@ const Home = () => {
               <img
                 src={img9}
                 alt=""
-                className="bg-white border-2 shadow-lg border-gray-100 px-4 py-2 rounded-md"
+                className="bg-white border-2 shadow-lg border-gray-100 px-4 py-2 rounded-md "
               />
             </div>
             <div className="mt-6">
@@ -156,14 +153,14 @@ const Home = () => {
           </div>
         </div>
         <div className="pb-5 text-lg">
-          <p className="text-center mt-16 text-gray-500">
+          <p className="text-center mt-16 text-xl text-gray-500 font-bold cursor-pointer">
             Sell all <span className="text-black">6,000+</span>Platforms
             <i className="bi bi-arrow-right"></i>
           </p>
         </div>
       </div>
       {/* 3rd page */}
-      <div className="my-28 pb-44 ">
+      <div className=" pb-40 ">
         <div className="grid grid-cols-12 mx-4 md:mx-10 px-4 md:px-10">
           <div className="col-span-12 md:col-span-6">
             <div className="flex flex-wrap justify-center md:justify-start">
@@ -184,91 +181,29 @@ const Home = () => {
             </div>
           </div>
           <div className="col-span-12 md:col-span-6">
-            <p className="text-2xl md:text-4xl font-semibold mt-16 md:mt-12">
+            <p className="text-5xl  font-semibold mt-16 md:mt-12  font-slab ">
               What is ShoppinessMart?
             </p>
-            <p className="text-base md:text-lg text-gray-500 mt-7">
+            <p className="  text-gray-500 mt-7 text-2xl">
               Lorem ipsum dolor sit amet consectetur adipisicing elit.
               Blanditiis, commodi tempora mollitia voluptatem recusandae impedit
-              totam aperiam nesciunt doloremque magni neque placeat, laborum
-              nisi eum quae voluptatum
-            </p>
-            <p className="text-base md:text-lg text-gray-500 mt-2 md:mt-5">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Blanditiis, commodi tempora mollitia voluptatem recusandae impedit
-              totam aperiam nesciunt doloremque magni neque placeat, laborum
-              nisi eum quae voluptatum
+              totam aperiam nesciunt doloremque magni neque placeat, nisi eum
+              quae voluptatum Lorem ipsum dolor sit amet consectetur adipisicing
+              elit. Blanditiis,commodi tempora mollitia voluptatem recusandae
+              .Lorem ipsum dolor sit amet consectetur adipisicing elit.
+              Blanditiis,commodi tempora mollitia voluptatem recusandae .
             </p>
           </div>
         </div>
       </div>
       {/* 4th page */}
-      {/* /////////////////////////////////////////// */}
-      {/* 5th page */}
-      <div className="mt-auto mx-auto px-4 md:px-40   pb-6 ">
-        <p className="font-bold text-4xl text-center">Why use this platform</p>
-        <p className="text-gray-500 text-lg text-center mx-auto  mt-8">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit.{" "}
-        </p>
-        <p className="text-gray-500 text-lg   text-center mx-auto  ">
-          Blanditiis,commodi tempora mollitia voluptatem
-        </p>
-
-        <div className="flex flex-wrap justify-center  mt-7">
-          <div className="border-2  md:w-80 mt-10 md:mt-0 md:mr-4 rounded-xl shadow-xl">
-            <div className="">
-              <img src={img14} alt="" className="" />
-            </div>
-            <div className="mt-2">
-              <p className="text-3xl font-semibold text-center">
-                Offline & Online
-              </p>
-              <p className="text-3xl font-semibold text-center">Shopping</p>
-              <p className="text-gray-500 mt-5 text-center pb-8">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Blanditiis,commodi tempora mollitia voluptatem recusandae
-                impedit totam aperiam nesciunt doloremque magni neque placeat,
-                laborum nisi eum quae d
-              </p>
-            </div>
-          </div>
-          <div className="border-2 md:w-80 mt-10 md:mt-0 md:mx-4 rounded-xl shadow-xl">
-            <div className="">
-              <img src={img15} alt="" className="" />
-            </div>
-            <div className="mt-2">
-              <p className="text-3xl font-semibold text-center">
-                Amazing Deals{" "}
-              </p>
-              <p className="text-3xl mx-10 font-semibold text-center">
-                & Cash Back
-              </p>
-              <p className="text-gray-500 mt-5 text-center pb-8">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Blanditiis,commodi tempora mollitia voluptatem recusandae
-                impedit totam aperiam nesciunt doloremque magni neque placeat,
-                laborum nisi eum quae d
-              </p>
-            </div>
-          </div>
-          <div className="border-2  md:w-80 mt-10 md:mt-0 md:ml-4 rounded-xl shadow-xl">
-            <div className="">
-              <img src={img16} alt="" className="" />
-            </div>
-            <div className="">
-              <p className="text-3xl font-semibold  mt-10 text-center">
-                Cashback charity
-              </p>
-              <p className="text-gray-500 mt-5 pb-8 text-center">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Blanditiis,commodi tempora mollitia voluptatem recusandae
-                impedit totam aperiam nesciunt doloremque magni neque placeat,
-                laborum nisi eum quae d
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
+      <RoundedCards
+        data={[
+          { title: "Offline & Online Shopping", img: img14, id: 1 },
+          { title: "Amazing Deals & Cash Back", img: img15, id: 2 },
+          { title: "Cashback Charity", img: img16, id: 3 },
+        ]}
+      />
 
       {/* 6th page  */}
       <div className="grid grid-cols-12 gap-8  mt-20 bg-[#EAEFF2] px-12 ">
@@ -278,13 +213,11 @@ const Home = () => {
         <div className="col-span-12 md:col-span-7 lg:col-span-7 p-10">
           <div className="">
             <div className="border-slate-500 relative">
-              <p className="text-4xl font-bold mx-2  md:mx-20 mt-10  md:mt-10">
-                How online and offline
+              <p className="text-5xl font-bold   md:mx-20 mt-10  md:mt-10 font-slab">
+                How online and offline shopping works
               </p>
-              <p className="text-4xl font-bold mx-2 md:mx-20 mt-2  md:mt-2">
-                shopping works
-              </p>
-              <p className="text-gray-500 mt-8 mx-2  md:mx-20">
+
+              <p className="text-gray-500 mt-8 mx-2  md:mx-20 text-xl">
                 Explore our shopping options with just a click! Click the Online
                 Shopping button to discover how easy it is to shop from the
                 comfort of your home. Click the Offline Shopping button to see
@@ -292,13 +225,13 @@ const Home = () => {
               </p>
               <button
                 type="button"
-                className="mx-2  md:mx-20 mt-5 text-white bg-[#049D8E] border-2 rounded-md px-4 py-2"
+                className="mx-2  md:mx-20 mt-5 text-white bg-[#049D8E] border-2 rounded-md px-6 py-4"
               >
                 Online Shopping
               </button>
               <button
                 type="button"
-                className="mx-2  md:mx-10 mt-5 text-white bg-black border-2 rounded-md px-4 py-2"
+                className="mx-2  md:mx-10 mt-5 text-white bg-black border-2 rounded-md px-6 py-4"
               >
                 Offline Shopping
               </button>
@@ -314,13 +247,13 @@ const Home = () => {
       {/* 8th page */}
 
       <div className="mt-10 mx-auto px-4 md:px-40 bg-amber-50 pt-10 pb-6 ">
-        <p className="font-bold text-4xl text-center">
+        <p className="font-bold text-5xl font-slab text-center">
           Raise funds for your cause/NGOs/ charity
         </p>
-        <p className="text-gray-600 text-lg text-center mx-auto  mt-8">
+        <p className="text-gray-600  text-center mx-auto text-xl mt-8">
           Lorem ipsum dolor sit amet consectetur adipisicing elit.{" "}
         </p>
-        <p className="text-gray-600 text-lg   text-center mx-auto  ">
+        <p className="text-gray-600 text-xl  text-center mx-auto  ">
           {" "}
           Blanditiis,commodi tempora mollitia voluptatem{" "}
         </p>
@@ -352,7 +285,7 @@ const Home = () => {
             <div className=" flex justify-center items-center mt-16   w-full">
               <input
                 type="search"
-                className=" py-2 px-10 w-full    text-gray-900 bg-amber-50 border-2 "
+                className=" py-2 px-10 w-full  text-gray-900 bg-amber-50 border-2 "
                 placeholder="Search name of the cause or NGO you want to support.."
                 required
               />
@@ -369,11 +302,13 @@ const Home = () => {
 
       {/* 9th page */}
       <div className="mt-10 mx-auto px-12 md:px-40 pt-8 pb-6 ">
-        <p className="font-bold text-4xl text-center">Recently Posted Blog</p>
-        <p className="text-gray-600 text-lg text-center mx-auto  mt-8">
+        <p className="font-bold text-5xl text-center font-slab">
+          Recently Posted Blog
+        </p>
+        <p className="text-gray-600 text-xl text-center mx-auto  mt-8">
           Lorem ipsum dolor sit amet consectetur adipisicing elit.{" "}
         </p>
-        <p className="text-gray-600 text-lg   text-center mx-auto  ">
+        <p className="text-gray-600 text-xl   text-center mx-auto  ">
           {" "}
           Blanditiis,commodi tempora mollitia voluptatem{" "}
         </p>
@@ -433,8 +368,10 @@ const Home = () => {
           <img src={Backimg9} alt="" className="w-full h-[20rem ]" />
         </div>
         <div className="relative  text-center">
-          <p className="font-bold text-4xl">Subscribe to Our Newsletter</p>
-          <p className="text-gray-600 text-lg mx-auto mt-5">
+          <p className="font-bold font-slab text-5xl">
+            Subscribe to Our Newsletter
+          </p>
+          <p className="text-gray-600 text-xl mx-auto mt-5">
             Improving your small business growth through Onir app. It also
           </p>
           <div className="md:mx-20 mx-10 ">
