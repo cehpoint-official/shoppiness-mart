@@ -6,7 +6,7 @@ import bg from "../../assets/RegisterBusiness/bg2.png";
 
 import ReuseableTop from "../../Components/ReuseableTop/ReuseableTop";
 import Support from "../../Components/Support/Support";
-import PopularCauses from "../../Components/PopularCauses";
+import PopularCauses from "../../Components/PopularCauses/PopularCauses";
 import PeopleSaySection from "../../Components/PeopleSaySection";
 import FAQ from "../../Components/FAQ";
 

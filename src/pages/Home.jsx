@@ -30,12 +30,14 @@ import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
 import PeopleSaySection from "../Components/PeopleSaySection";
 import FAQ from "../Components/FAQ";
-import PopularCauses from "../Components/PopularCauses";
+import PopularCauses from "../Components/PopularCauses/PopularCauses";
 import RoundedCards from "../Components/RoundedCards/RoundedCards";
-
+import Card7th1 from "../assets/card7th1.png";
+import Card7th2 from "../assets/card7th2.png";
+import Card7th3 from "../assets/card7th3.png";
 const Home = () => {
   var settings = {
-    speed: 2000,
+    speed: 20,
     autoPlay: true,
     dots: true,
   };
@@ -166,7 +168,7 @@ const Home = () => {
             <div className="flex flex-wrap justify-center md:justify-start">
               <img
                 src={img11}
-                alt=""
+                alt="loading"
                 className="w-32 md:w-auto md:max-w-xs mr-2 md:mr-4 mb-2 md:mb-0"
               />
               <img src={img12} alt="" className="w-32 md:w-auto md:max-w-xs" />
@@ -210,30 +212,26 @@ const Home = () => {
         <div className="col-span-12 md:col-span-5 lg:col-span-5">
           <img src={img17} alt="" className="w-72 md:w-full" />
         </div>
-        <div className="col-span-12 md:col-span-7 lg:col-span-7 p-10">
-          <div className="">
-            <div className="border-slate-500 relative">
-              <p className="text-5xl font-bold   md:mx-20 mt-10  md:mt-10 font-slab">
-                How online and offline shopping works
-              </p>
+        <div className="col-span-12 md:col-span-7 lg:col-span-7 ">
+          <div className="border-slate-500  p-10 flex flex-col  gap-20">
+            <p className="text-5xl font-bold   font-slab">
+              How online and offline shopping works
+            </p>
 
-              <p className="text-gray-500 mt-8 mx-2  md:mx-20 text-xl">
-                Explore our shopping options with just a click! Click the Online
-                Shopping button to discover how easy it is to shop from the
-                comfort of your home. Click the Offline Shopping button to see
-                our in-store experience.
-              </p>
-              <button
-                type="button"
-                className="mx-2  md:mx-20 mt-5 text-white bg-[#049D8E] border-2 rounded-md px-6 py-4"
-              >
+            <p className="text-gray-500   text-xl">
+              Explore our shopping options with just a click! Click the Online
+              Shopping button to discover how easy it is to shop from the
+              comfort of your home. Click the Offline Shopping button to see our
+              in-store experience.
+            </p>
+
+            <div className="flex gap-5 ">
+              <button className=" text-xl font-semibold w-100 text-white bg-[#049D8E] border-2 rounded-xl p-5 ">
                 Online Shopping
               </button>
-              <button
-                type="button"
-                className="mx-2  md:mx-10 mt-5 text-white bg-black border-2 rounded-md px-6 py-4"
-              >
-                Offline Shopping
+
+              <button className=" text-xl font-semibold w-100 text-white bg-[#434343] border-2 rounded-xl p-5 ">
+                Online Shopping
               </button>
             </div>
           </div>
@@ -242,7 +240,13 @@ const Home = () => {
 
       {/* 7th page */}
 
-      <PopularCauses />
+      <PopularCauses
+        data={[
+          { title: "Offline & Online Shopping", img: Card7th1, id: 1 },
+          { title: "Amazing Deals & Cash Back", img: Card7th2, id: 2 },
+          { title: "Cashback Charity", img: Card7th3, id: 3 },
+        ]}
+      />
 
       {/* 8th page */}
 
