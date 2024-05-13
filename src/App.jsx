@@ -4,7 +4,6 @@ import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import Business from "./pages/Business/Business";
 import Footer from "./Components/Footer";
-
 import SupportACause from "./pages/SupportACause";
 import SupportMaast from "./pages/SupportMaast";
 import Cause from "./pages/Cause/Cause";
