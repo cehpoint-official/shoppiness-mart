@@ -1,12 +1,12 @@
 const FAQ = () => {
   return (
     <div>
-      <div className="mx-auto  px-12 md:px-40 pt-12 pb-10 bg-[#EEFAF9] ">
+      <div className="mx-auto mt-44  px-12 md:px-40 pt-12 pb-10 bg-[#EEFAF9] ">
         <div>
-          <p className="font-bold text-4xl text-center">
+          <p className="font-bold text-5xl font-slab text-center">
             Frequently Asked Questions
           </p>
-          <p className="text-gray-600 text-lg text-center mx-auto  mt-8">
+          <p className="text-gray-600 text-xl text-center mx-auto  mt-8">
             An establishment created to offer assistance and generate funds for
             individuals facing{" "}
           </p>

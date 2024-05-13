@@ -3,10 +3,10 @@ const PeopleSaySection = () => {
     <div>
       <div className="mt-10 mx-auto px-12 md:px-40 pt-8 pb-10 ">
         <div>
-          <p className="font-bold text-4xl text-center">
+          <p className="font-bold text-5xl text-center font-slab">
             What people say about us
           </p>
-          <p className="text-gray-600 text-lg text-center mx-auto  mt-8">
+          <p className="text-gray-600 text-xl text-center mx-auto  mt-8">
             An establishment created to offer assistance and generate funds for
             individuals facing{" "}
           </p>

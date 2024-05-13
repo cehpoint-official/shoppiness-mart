@@ -1,10 +1,11 @@
 
-import "./RoundedCards.scss"
-const RoundedCards = ({color,data}) => {
-  console.log(data);
+
+import "./PopularCauses.scss";
+
+const PopularCauses = ({ color, data }) => {
   return (
     <div
-      className="secFour"
+      className="causes"
       style={{
         backgroundColor: color,
       }}
@@ -21,6 +22,8 @@ const RoundedCards = ({color,data}) => {
           <div className="lowerCard" key={e.id}>
             <img src={e.img} alt="card" />
             <h4>{e.title}</h4>
+            <span>{e.titleSmall}</span>
+            <h6>400 Supports, 5,000000 raised</h6>
             <p>
               Lorem ipsum dolor sit amet consectetur adipisicing elit.
               Blanditiis,commodi tempora mollitia voluptatem recusandae impedit
@@ -32,8 +35,11 @@ const RoundedCards = ({color,data}) => {
           </div>
         ))}
       </div>
+      <p className="seeAll">
+        See all <span>5,000 +</span> Causes
+      </p>
     </div>
   );
 };
 
-export default RoundedCards;
+export default PopularCauses;

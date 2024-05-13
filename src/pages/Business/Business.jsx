@@ -4,7 +4,9 @@ import FAQ from "../../Components/FAQ";
 import Support from "../../Components/Support/Support";
 import RoundedCards from "../../Components/RoundedCards/RoundedCards";
 import "./Business.scss";
-
+import cardOne from "../../assets/RegisterBusiness/cardOne.png";
+import cardTwo from "../../assets/RegisterBusiness/cardTwo.png";
+import cardThree from "../../assets/RegisterBusiness/cardThree.jpg";
 import personImg from "../../assets/RegisterBusiness/person.png";
 import vid from "../../assets/RegisterBusiness/vid.png";
 import boyImg from "../../assets/RegisterBusiness/boy.png";
@@ -68,7 +70,13 @@ const Business = () => {
           </div>
         </div>
 
-        <RoundedCards />
+        <RoundedCards
+          data={[
+            { title: "Good Social impact", img: cardOne, id: 1 },
+            { title: "Enhance staff participation", img: cardTwo, id: 2 },
+            { title: "Business Growth with Donation", img: cardThree, id: 3 },
+          ]}
+        />
 
         <div className="secFive">
           <div className="left">
