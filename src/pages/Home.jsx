@@ -12,10 +12,10 @@ import img10 from "../assets/Home/img10.png";
 import img11 from "../assets/Home/img11.png";
 import img12 from "../assets/Home/img12.png";
 import img13 from "../assets/Home/img13.png";
-import img14 from "../assets/Home/img14.png";
-import img15 from "../assets/Home/img15.png";
-import img16 from "../assets/Home/img16.png";
-import img17 from "../assets/Home/img17.png";
+// import img14 from "../assets/Home/img14.png";
+// import img15 from "../assets/Home/img15.png";
+// import img16 from "../assets/Home/img16.png";
+// import img17 from "../assets/Home/img17.png";
 import Logo1 from "../assets/Home/logo1.png";
 import Logo2 from "../assets/Home/logo2.png";
 import Logo3 from "../assets/Home/logo3.png";
@@ -30,11 +30,16 @@ import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
 import PeopleSaySection from "../Components/PeopleSaySection";
 import FAQ from "../Components/FAQ";
-import PopularCauses from "../Components/PopularCauses/PopularCauses";
-import RoundedCards from "../Components/RoundedCards/RoundedCards";
-import Card7th1 from "../assets/card7th1.png";
-import Card7th2 from "../assets/card7th2.png";
-import Card7th3 from "../assets/card7th3.png";
+// import PopularCauses from "../Components/PopularCauses/PopularCauses";
+import page3 from "../assets/SupportMaast/page3.png";
+
+// import RoundedCards from "../Components/RoundedCards/RoundedCards";
+// import Card7th1 from "../assets/card7th1.png";
+// import Card7th2 from "../assets/card7th2.png";
+// import Card7th3 from "../assets/card7th3.png";
+import page41 from "../assets/SupportMaast/page41.png";
+import supportPage1 from "../assets/supportPage1.png";
+
 const Home = () => {
   var settings = {
     speed: 20,
@@ -43,7 +48,7 @@ const Home = () => {
   };
 
   return (
-    <div className="px-12 overflow-hidden" {...settings}>
+    <div className=" overflow-hidden" {...settings}>
       {/* 1st Page  */}
       <div className="carousel mx-auto  p-4  ">
         <Slider {...settings}>
@@ -59,22 +64,23 @@ const Home = () => {
         </Slider>
       </div>
       {/* 2nd page */}
-      <div className="mt-10 mx-auto px-4 md:px-40 bg-[#EEFAF9] pt-8 mb-40 ">
-        <p className="font-bold text-5xl text-center font-slab ">
-          Most preferred online and offline partners{" "}
-        </p>
-        <p className="text-gray-600 text-xl text-center mx-auto  mt-8">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit.
-          Blanditiis,commodi tempora{" "}
-        </p>
-        <p className="text-gray-600 text-lg   text-center mx-auto  ">
-          mollitia voluptatem recusandae impedit totam aperiam nesciunt{" "}
-        </p>
+      <div className="mt-10 mx-auto px-4 md:px-40 bg-[#EEFAF9] py-12 mb-40 ">
+        <div>
+          <h1 className="font-bold md:text-4xl text-3xl text-center font-slab ">
+            Most preferred online and offline partners{" "}
+          </h1>
+          <p className="text-gray-600 md:text-xl text-sm text-center mx-auto  md:mt-8 mt-4">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit.
+            Blanditiis,commodi tempora mollitia voluptatem recusandae impedit
+            totam aperiam nesciunt
+          </p>
+        </div>
+
         <div className="">
-          <div className="text-[#047E72] font-medium text-lg text-center mt-10">
+          <div className="text-[#047E72] font-medium text-lg text-center md:mt-10 mt-4">
             Online partners
           </div>
-          <div className="flex justify-center gap-9">
+          <div className="flex justify-center items-center flex-wrap gap-9">
             <div className="mt-6  md:flex-row">
               <img
                 src={img1}
@@ -112,11 +118,13 @@ const Home = () => {
             </div>
           </div>
         </div>
-        <div className="">
-          <div className="text-[#047E72] font-medium text-lg text-center mt-10">
+
+        <div className="mt-20">
+          <div className="text-[#047E72] font-medium text-lg text-center md:mt-10 mt-4">
             Offline partners
           </div>
-          <div className="flex justify-center gap-9">
+
+          <div className="flex justify-center items-center flex-wrap gap-9">
             <div className="mt-6  md:flex-row">
               <img
                 src={img6}
@@ -154,10 +162,11 @@ const Home = () => {
             </div>
           </div>
         </div>
-        <div className="pb-5 text-lg">
-          <p className="text-center mt-16 text-xl text-gray-500 font-bold cursor-pointer">
-            Sell all <span className="text-black">6,000+</span>Platforms
-            <i className="bi bi-arrow-right"></i>
+
+        <div className="text-center mt-20">
+          <p className="text-xl">
+            See all <span className="font-bold">5,000 + </span> Causes{" "}
+            <i className="bi bi-arrow-right"></i>{" "}
           </p>
         </div>
       </div>
@@ -182,11 +191,12 @@ const Home = () => {
               />
             </div>
           </div>
+
           <div className="col-span-12 md:col-span-6">
-            <p className="text-5xl  font-semibold mt-16 md:mt-12  font-slab ">
+            <h1 className="md:text-4xl text-3xl font-semibold mt-16 md:mt-12  font-slab ">
               What is ShoppinessMart?
-            </p>
-            <p className="  text-gray-500 mt-7 text-2xl">
+            </h1>
+            <p className="  text-gray-500 md:mt-7 mt-3  md:text-2xl text-sm">
               Lorem ipsum dolor sit amet consectetur adipisicing elit.
               Blanditiis, commodi tempora mollitia voluptatem recusandae impedit
               totam aperiam nesciunt doloremque magni neque placeat, nisi eum
@@ -199,72 +209,198 @@ const Home = () => {
         </div>
       </div>
       {/* 4th page */}
-      <RoundedCards
-        data={[
-          { title: "Offline & Online Shopping", img: img14, id: 1 },
-          { title: "Amazing Deals & Cash Back", img: img15, id: 2 },
-          { title: "Cashback Charity", img: img16, id: 3 },
-        ]}
-      />
-
-      {/* 6th page  */}
-      <div className="grid grid-cols-12 gap-8  mt-20 bg-[#EAEFF2] px-12 ">
-        <div className="col-span-12 md:col-span-5 lg:col-span-5">
-          <img src={img17} alt="" className="w-72 md:w-full" />
+      <div className=" py-20">
+        <div className="text-center">
+          <h1 className="text-3xl md:text-4xl font-medium mb-2 font-slab ">
+            Why use this platform
+          </h1>
+          <p className="text-sm text-parapgraphColor">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit.
+          </p>
+          <p className="text-sm text-parapgraphColor">
+            Blanditiis,commodi tempora mollitia voluptatem{" "}
+          </p>
         </div>
-        <div className="col-span-12 md:col-span-7 lg:col-span-7 ">
-          <div className="border-slate-500  p-10 flex flex-col  gap-20">
-            <p className="text-5xl font-bold   font-slab">
-              How online and offline shopping works
-            </p>
 
-            <p className="text-gray-500   text-xl">
-              Explore our shopping options with just a click! Click the Online
-              Shopping button to discover how easy it is to shop from the
-              comfort of your home. Click the Offline Shopping button to see our
-              in-store experience.
-            </p>
+        <div className="flex justify-center gap-6 flex-wrap px-10 py-10">
+          <div className=" bg-white md:w-[350px] w-[250px] shadow-lg rounded-lg">
+            <div>
+              <img src={page41} alt="Loading..." className="md:h-[297px]" />
+            </div>
 
-            <div className="flex gap-5 ">
-              <button className=" text-xl font-semibold w-100 text-white bg-[#049D8E] border-2 rounded-xl p-5 ">
-                Online Shopping
-              </button>
+            <div className="text-center p-4">
+              <h3 className="md:text-xl text-lg font-semibold">
+                Mission and vision
+              </h3>
+              <p className="text-parapgraphColor text-sm md:text-basic">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                Blanditiis,commodi tempora mollitia voluptatem recusandae
+                impedit totam aperiam nesciunt doloremque magni neque placeat,
+                laborum nisi eum quae voluptatum
+              </p>
+            </div>
+          </div>
+          <div className=" bg-white md:w-[350px] w-[250px] shadow-lg rounded-lg">
+            <div>
+              <img src={page41} alt="Loading..." className="md:h-[297px]" />
+            </div>
 
-              <button className=" text-xl font-semibold w-100 text-white bg-[#434343] border-2 rounded-xl p-5 ">
-                Online Shopping
-              </button>
+            <div className="text-center p-4">
+              <h3 className="md:text-xl text-lg font-semibold">
+                Mission and vision
+              </h3>
+              <p className="text-parapgraphColor text-sm md:text-basic">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                Blanditiis,commodi tempora mollitia voluptatem recusandae
+                impedit totam aperiam nesciunt doloremque magni neque placeat,
+                laborum nisi eum quae voluptatum
+              </p>
+            </div>
+          </div>
+          <div className=" bg-white md:w-[350px] w-[250px] shadow-lg rounded-lg">
+            <div>
+              <img src={page41} alt="Loading..." className="md:h-[297px]" />
+            </div>
+
+            <div className="text-center p-4">
+              <h3 className="md:text-xl text-lg font-semibold">
+                Mission and vision
+              </h3>
+              <p className="text-parapgraphColor text-sm md:text-basic">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                Blanditiis,commodi tempora mollitia voluptatem recusandae
+                impedit totam aperiam nesciunt doloremque magni neque placeat,
+                laborum nisi eum quae voluptatum
+              </p>
             </div>
           </div>
         </div>
       </div>
-
+      {/* 6th page  */}
+      <div className="bg-backgroundLightYellowColor gap-12 flex justify-center items-center flex-wrap p-10 ">
+        <div className="mt-6">
+          <img src={page3} alt="Loading..." className="w-[432px] h-[300px]" />
+        </div>
+        <div className="md:w-[400px] mt-6 ">
+          <h1 className="md:text-4xl text-3xl font-semibold font-slab mb-4">
+            Support MAAST and Other Charities
+          </h1>
+          <p className="text-parapgraphColor">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit.
+            Blanditiis,commodi tempora mollitia .Lorem ipsum dolor sit amet
+            consectetur adipisicing elit. Blanditiis,commodi tempora mollitia
+          </p>
+          <div className="flex gap-2">
+            <button className="bg-teal-500 text-white font-medium rounded-md py-2.5 px-8 mt-4">
+              Online Shopping
+            </button>
+            <button className="bg-teal-500 text-white font-medium rounded-md py-2.5 px-8 mt-4">
+              Offline Shopping
+            </button>
+          </div>
+        </div>
+      </div>
       {/* 7th page */}
+      <div className="py-20">
+        <div className="text-center">
+          <h1 className="text-3xl font-medium mb-2 font-slab">
+            Our Popular Causes{" "}
+          </h1>
+          <p className="text-sm text-parapgraphColor">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit.
+          </p>
+          <p className="text-sm text-parapgraphColor">
+            Blanditiis,commodi tempora mollitia voluptatem{" "}
+          </p>
+        </div>
 
-      <PopularCauses
-        data={[
-          {
-            title: "Healthy Food For All",
-            titleSmall: "Child health Care",
-            img: Card7th1,
-            id: 1,
-          },
-          {
-            title: "Animal Care",
-            titleSmall: "Animal Care",
-            img: Card7th2,
-            id: 2,
-          },
-          {
-            title: "Green World",
-            titleSmall: "Green World",
-            img: Card7th3,
-            id: 3,
-          },
-        ]}
-      />
+        <div className="flex justify-center gap-10 flex-wrap px-10 py-10">
+          <div className="md:w-[400px] w-[250px]   shadow-lg rounded-lg bg-white">
+            <div>
+              <img
+                src={supportPage1}
+                alt="Loading..."
+                className="md:h-[297px] h-[200px]"
+              />
+            </div>
+
+            <div className="text-center p-4">
+              <h3 className="md:text-xl font-semibold">Healthy Food For All</h3>
+              <p className="text-teal-600 text-sm md:text-md">
+                children education{" "}
+              </p>
+              <p className="font-medium py-2 text-sm md:text-md">
+                400 Supports, 5,000000 raised
+              </p>
+              <p className="text-parapgraphColor md:text-md text-sm">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                Blanditiis,commodi tempora mollitia voluptatem recusandae
+                impedit totam aperiam nesciunt doloremque magni neque placeat,
+                laborum nisi eum quae voluptatum{" "}
+              </p>
+            </div>
+          </div>
+          <div className="md:w-[400px] w-[250px]   shadow-lg rounded-lg bg-white">
+            <div>
+              <img
+                src={supportPage1}
+                alt="Loading..."
+                className="md:h-[297px] h-[200px]"
+              />
+            </div>
+
+            <div className="text-center p-4">
+              <h3 className="md:text-xl font-semibold">Healthy Food For All</h3>
+              <p className="text-teal-600 text-sm md:text-md">
+                children education{" "}
+              </p>
+              <p className="font-medium py-2 text-sm md:text-md">
+                400 Supports, 5,000000 raised
+              </p>
+              <p className="text-parapgraphColor md:text-md text-sm">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                Blanditiis,commodi tempora mollitia voluptatem recusandae
+                impedit totam aperiam nesciunt doloremque magni neque placeat,
+                laborum nisi eum quae voluptatum{" "}
+              </p>
+            </div>
+          </div>
+          <div className="md:w-[400px] w-[250px]   shadow-lg rounded-lg bg-white">
+            <div>
+              <img
+                src={supportPage1}
+                alt="Loading..."
+                className="md:h-[297px] h-[200px]"
+              />
+            </div>
+
+            <div className="text-center p-4">
+              <h3 className="md:text-xl font-semibold">Healthy Food For All</h3>
+              <p className="text-teal-600 text-sm md:text-md">
+                children education{" "}
+              </p>
+              <p className="font-medium py-2 text-sm md:text-md">
+                400 Supports, 5,000000 raised
+              </p>
+              <p className="text-parapgraphColor md:text-md text-sm">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                Blanditiis,commodi tempora mollitia voluptatem recusandae
+                impedit totam aperiam nesciunt doloremque magni neque placeat,
+                laborum nisi eum quae voluptatum{" "}
+              </p>
+            </div>
+          </div>{" "}
+        </div>
+
+        <div className="text-center">
+          <p className="text-xl">
+            See all <span className="font-bold">5,000 + </span> Causes{" "}
+            <i className="bi bi-arrow-right"></i>{" "}
+          </p>
+        </div>
+      </div>
 
       {/* 8th page */}
-
       <div className="mt-10 mx-auto px-4 md:px-40 bg-amber-50 pt-10 pb-6 ">
         <p className="font-bold text-5xl font-slab text-center">
           Raise funds for your cause/NGOs/ charity
@@ -318,7 +454,6 @@ const Home = () => {
           </div>
         </div>
       </div>
-
       {/* 9th page */}
       <div className="mt-10 mx-auto px-12 md:px-40 pt-8 pb-6 ">
         <p className="font-bold text-5xl text-center font-slab">
@@ -379,9 +514,7 @@ const Home = () => {
           </div>
         </div>
       </div>
-
       {/* 10th page */}
-
       <div className="mt-44 mx-auto px-12  flex flex-col justify-center items-center">
         <div className="absolute">
           <img src={Backimg9} alt="" className="w-full h-[20rem ]" />
@@ -409,9 +542,7 @@ const Home = () => {
         </div>
       </div>
       {/* 11th page */}
-
       <FAQ />
-
       <PeopleSaySection />
     </div>
   );
