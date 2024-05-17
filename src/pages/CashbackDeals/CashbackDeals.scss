@@ -49,23 +49,22 @@ $font: "Roboto Slab";
           transition: all 0.2s ease-in;
           margin-top: 5px;
           &:hover {
-           scale: 1.1;
-           background-color: rgb(246, 246, 246);
+            scale: 1.1;
+            background-color: rgb(246, 246, 246);
           }
-          h6{
+          h6 {
             font-size: 25px;
             font-weight: 600;
           }
-          p{
-            background-color: #0F9B03;
+          p {
+            background-color: #0f9b03;
             color: white;
             padding: 5px 10px;
             border-radius: 10px;
             font-weight: 500;
-
           }
 
-          img{
+          img {
             width: 100%;
             height: 120px;
             object-fit: contain;
@@ -73,32 +72,32 @@ $font: "Roboto Slab";
         }
       }
 
-      .viewAll{
-       padding: 10px;
-       min-width: 400px;
-       border: 1px solid #4987FF;
-       font-size: 20px;
-       display: flex;
-       align-items: center;
-       justify-content: center;
-       color: #4987FF;
-       gap: 10px;
-       cursor: pointer;
+      .viewAll {
+        padding: 10px;
+        min-width: 400px;
+        border: 1px solid #4987ff;
+        font-size: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #4987ff;
+        gap: 10px;
+        cursor: pointer;
 
-       >svg{
-        font-size: 38px;
-        color: #4987FF;
-       }
+        > svg {
+          font-size: 38px;
+          color: #4987ff;
+        }
       }
     }
 
-    .onlineStoreOffers{
-        display: flex;
+    .onlineStoreOffers {
+      display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
 
-       h5 {
+      > h5 {
         width: 100%;
         text-align: center;
         font-size: 35px;
@@ -107,8 +106,103 @@ $font: "Roboto Slab";
         background-color: #eefaf9;
       }
 
-      .onlineStoreOffersContainer{
-        // pending
+      .onlineStoreOffersContainer {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 30px;
+        width: 100%;
+        padding: $padd;
+        flex-wrap: wrap;
+
+        .itemCard {
+          display: flex;
+          flex-direction: column;
+          width: 300px;
+          min-height: 400px;
+          height: 450px;
+          padding: 10px;
+          border: 2px solid rgb(255, 255, 255);
+          border-radius: 20px;
+          transition: 0.5s ease;
+          cursor: pointer;
+          margin-bottom: 20px;
+
+          &:hover {
+            border: 2px solid rgb(209, 209, 209);
+          }
+          > img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+          }
+
+          .details {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            h4 {
+              color: $gray;
+              font-family: $font;
+              font-size: 22px;
+              text-overflow: ellipsis;
+              overflow: hidden;
+              display: -webkit-box;
+              -webkit-line-clamp: 2; /* Number of lines to show */
+              -webkit-box-orient: vertical;
+              text-overflow: ellipsis;
+              width: 100%;
+              text-align: center;
+            }
+            .offer {
+              display: flex;
+              width: 100%;
+              justify-content: space-between;
+
+              .price {
+                display: flex;
+                flex-direction: column;
+
+                h5 {
+                  font-size: 22px;
+                }
+                p {
+                  font-size: 23px;
+                  font-weight: bold;
+                  color: black;
+                }
+
+                .actual {
+                  color: rgb(183, 183, 183);
+                  text-decoration: line-through;
+                }
+              }
+
+              .discount {
+                > img {
+                  width: 80px;
+                  height: 50px;
+                  object-fit: contain;
+                }
+
+                p {
+                  font-weight: 700;
+                  font-size: 20px;
+                  color: #0f9b03;
+                }
+              }
+            }
+
+            .viewDetails {
+              width: 100%;
+              background-color: #0f9b03;
+              padding: 6px;
+              color: #eefaf9;
+              font-size: 18px;
+              border-radius: 8px;
+            }
+          }
+        }
       }
     }
   }

@@ -1,4 +1,4 @@
-import Jio from "./assets/RegisterBusiness/jio.png";
+import Jio from "./assets/RegisterBusiness/Jio.png";
 
 export const OfflineDealsData = [
   {

@@ -1,7 +1,7 @@
 import "./CashbackDeals.scss";
 import Carousel from "../../Components/Carousel/Carousel";
 import carousel1 from "../../assets/RegisterBusiness/carousel1.png";
-import {OfflineDealsData} from "../../dummydata.jsx"
+import { OfflineDealsData } from "../../dummydata.jsx";
 import { MdOutlineArrowRightAlt } from "react-icons/md";
 const CashbackDeals = () => {
   return (
@@ -27,7 +27,203 @@ const CashbackDeals = () => {
         <div className="onlineStoreOffers">
           <h5>Best Online store Offers</h5>
           <div className="onlineStoreOffersContainer">
-            {/* pending */}
+            <div className="itemCard">
+              <img
+                src="https://m.media-amazon.com/images/I/61oBDqjxreL._SX679_.jpg"
+                alt="loading"
+              />
+              <div className="details">
+                <h4>
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Nam
+                  impedit, omnis dicta voluptatem incidunt repudiandae
+                  recusandae ratione totam eaque eum quisquam nobis, saepe nihil
+                  facere iusto. Animi libero dolorum ullam illo suscipit veniam
+                  veritatis expedita pariatur. Maiores voluptatem autem
+                  aspernatur.
+                </h4>
+                <div className="offer">
+                  <div className="price">
+                    <h5>Offer Price</h5>
+                    <p>$1599</p>
+                    <p className="actual">$3999</p>
+                  </div>
+                  <div className="discount">
+                    <img
+                      src="https://logos-world.net/wp-content/uploads/2020/04/Amazon-Logo-2000-present.jpg"
+                      alt=""
+                    />
+                    <p>60% Off</p>
+                  </div>
+                </div>
+
+                <button className="viewDetails">View Details</button>
+              </div>
+            </div>
+
+            <div className="itemCard">
+              <img
+                src="https://m.media-amazon.com/images/I/61oBDqjxreL._SX679_.jpg"
+                alt="loading"
+              />
+              <div className="details">
+                <h4>
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Nam
+                  impedit, omnis dicta voluptatem incidunt repudiandae
+                  recusandae ratione totam eaque eum quisquam nobis, saepe nihil
+                  facere iusto. Animi libero dolorum ullam illo suscipit veniam
+                  veritatis expedita pariatur. Maiores voluptatem autem
+                  aspernatur.
+                </h4>
+                <div className="offer">
+                  <div className="price">
+                    <h5>Offer Price</h5>
+                    <p>$1599</p>
+                    <p className="actual">$3999</p>
+                  </div>
+                  <div className="discount">
+                    <img
+                      src="https://logos-world.net/wp-content/uploads/2020/04/Amazon-Logo-2000-present.jpg"
+                      alt=""
+                    />
+                    <p>60% Off</p>
+                  </div>
+                </div>
+
+                <button className="viewDetails">View Details</button>
+              </div>
+            </div>
+
+            <div className="itemCard">
+              <img
+                src="https://m.media-amazon.com/images/I/61oBDqjxreL._SX679_.jpg"
+                alt="loading"
+              />
+              <div className="details">
+                <h4>
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Nam
+                  impedit, omnis dicta voluptatem incidunt repudiandae
+                  recusandae ratione totam eaque eum quisquam nobis, saepe nihil
+                  facere iusto. Animi libero dolorum ullam illo suscipit veniam
+                  veritatis expedita pariatur. Maiores voluptatem autem
+                  aspernatur.
+                </h4>
+                <div className="offer">
+                  <div className="price">
+                    <h5>Offer Price</h5>
+                    <p>$1599</p>
+                    <p className="actual">$3999</p>
+                  </div>
+                  <div className="discount">
+                    <img
+                      src="https://logos-world.net/wp-content/uploads/2020/04/Amazon-Logo-2000-present.jpg"
+                      alt=""
+                    />
+                    <p>60% Off</p>
+                  </div>
+                </div>
+
+                <button className="viewDetails">View Details</button>
+              </div>
+            </div>
+
+            <div className="itemCard">
+              <img
+                src="https://m.media-amazon.com/images/I/61oBDqjxreL._SX679_.jpg"
+                alt="loading"
+              />
+              <div className="details">
+                <h4>
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Nam
+                  impedit, omnis dicta voluptatem incidunt repudiandae
+                  recusandae ratione totam eaque eum quisquam nobis, saepe nihil
+                  facere iusto. Animi libero dolorum ullam illo suscipit veniam
+                  veritatis expedita pariatur. Maiores voluptatem autem
+                  aspernatur.
+                </h4>
+                <div className="offer">
+                  <div className="price">
+                    <h5>Offer Price</h5>
+                    <p>$1599</p>
+                    <p className="actual">$3999</p>
+                  </div>
+                  <div className="discount">
+                    <img
+                      src="https://logos-world.net/wp-content/uploads/2020/04/Amazon-Logo-2000-present.jpg"
+                      alt=""
+                    />
+                    <p>60% Off</p>
+                  </div>
+                </div>
+
+                <button className="viewDetails">View Details</button>
+              </div>
+            </div>
+
+            <div className="itemCard">
+              <img
+                src="https://m.media-amazon.com/images/I/61oBDqjxreL._SX679_.jpg"
+                alt="loading"
+              />
+              <div className="details">
+                <h4>
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Nam
+                  impedit, omnis dicta voluptatem incidunt repudiandae
+                  recusandae ratione totam eaque eum quisquam nobis, saepe nihil
+                  facere iusto. Animi libero dolorum ullam illo suscipit veniam
+                  veritatis expedita pariatur. Maiores voluptatem autem
+                  aspernatur.
+                </h4>
+                <div className="offer">
+                  <div className="price">
+                    <h5>Offer Price</h5>
+                    <p>$1599</p>
+                    <p className="actual">$3999</p>
+                  </div>
+                  <div className="discount">
+                    <img
+                      src="https://logos-world.net/wp-content/uploads/2020/04/Amazon-Logo-2000-present.jpg"
+                      alt=""
+                    />
+                    <p>60% Off</p>
+                  </div>
+                </div>
+
+                <button className="viewDetails">View Details</button>
+              </div>
+            </div>
+
+            <div className="itemCard">
+              <img
+                src="https://m.media-amazon.com/images/I/61oBDqjxreL._SX679_.jpg"
+                alt="loading"
+              />
+              <div className="details">
+                <h4>
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Nam
+                  impedit, omnis dicta voluptatem incidunt repudiandae
+                  recusandae ratione totam eaque eum quisquam nobis, saepe nihil
+                  facere iusto. Animi libero dolorum ullam illo suscipit veniam
+                  veritatis expedita pariatur. Maiores voluptatem autem
+                  aspernatur.
+                </h4>
+                <div className="offer">
+                  <div className="price">
+                    <h5>Offer Price</h5>
+                    <p>$1599</p>
+                    <p className="actual">$3999</p>
+                  </div>
+                  <div className="discount">
+                    <img
+                      src="https://logos-world.net/wp-content/uploads/2020/04/Amazon-Logo-2000-present.jpg"
+                      alt=""
+                    />
+                    <p>60% Off</p>
+                  </div>
+                </div>
+
+                <button className="viewDetails">View Details</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
