@@ -4,7 +4,6 @@ import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import Business from "./pages/Business/Business";
 import Footer from "./Components/Footer";
-
 import SupportACause from "./pages/SupportACause";
 import SupportMaast from "./pages/SupportMaast";
 import Cause from "./pages/Cause/Cause";
@@ -12,6 +11,7 @@ import HowItWorks from "./pages/HowItWorks/HowItWorks";
 import Cashback from "./pages/Cashback";
 import Shop from "./pages/Shop";
 import Navbar from "./Components/Navbar/Navbar";
+import CashbackDeals from "./pages/CashbackDeals/CashbackDeals";
 
 const App = () => {
   return (
@@ -27,7 +27,8 @@ const App = () => {
           <Route path="/support" element={<SupportACause />} />
           <Route path="/supportmaast" element={<SupportMaast />} />
           <Route path="/howitworks" element={<HowItWorks />} />
-          <Route path="/cashback" element={<Cashback />} />
+          <Route path="/cashback-charity" element={<Cashback />} />
+          <Route path="/cashback-deals" element={<CashbackDeals />} />
           <Route path="/shop" element={<Shop />} />
         </Routes>
         <Footer />

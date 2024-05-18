@@ -1,25 +1,36 @@
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+
 const PeopleSaySection = () => {
+  var settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+  };
   return (
-    <div>
-      <div className="mt-10 mx-auto px-12 md:px-40 pt-8 pb-10 ">
-        <div>
-          <p className="font-bold text-4xl text-center">
-            What people say about us
-          </p>
-          <p className="text-gray-600 text-lg text-center mx-auto  mt-8">
-            An establishment created to offer assistance and generate funds for
-            individuals facing{" "}
-          </p>
-          <p className="text-gray-600 text-lg   text-center mx-auto  ">
-            {" "}
-            challenges and hardships{" "}
-          </p>
-        </div>
-        <div className="flex flex-wrap justify-center  mt-7">
-          <div className="bg-white border-2   md:w-80 mt-10 md:mt-0 md:mr-4 rounded-xl ">
+    <div className="mt-16 mx-auto px-12 md:px-40 pt-8 pb-10 ">
+      <div>
+        <p className="font-bold md:text-4xl text-3xl text-center font-slab">
+          What people say about us
+        </p>
+        <p className="text-gray-600 text-md md:text-xl text-center mx-auto  md:mt-4 mt-2 ">
+          An establishment created to offer assistance and generate funds for
+          individuals facing{" "}
+        </p>
+        <p className="text-gray-600 text-md md:text-xl text-center mx-auto ">
+          {" "}
+          challenges and hardships{" "}
+        </p>
+      </div>
+      <div className="flex flex-wrap justify-center  md:mt-7">
+        <Slider {...settings} className="container">
+          <div className="bg-white border-2  md:w-80 mt-8 md:mr-4 rounded-xl ">
             <div className="mt-3 mx-2 pb-3">
-              <p className="text-2xl font-semibold ">Good Work</p>
-              <p className=" font-normal  text-gray-500 mt-2">
+              <p className="md:text-2xl text-lg font-semibold ">Good Work</p>
+              <p className=" font-normal  text-gray-500 mt-2 text-sm md:text-lg">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit.
                 Blanditiis,commodi tempora mollitia voluptatem recusandae
                 impedit totam aperiam ne{" "}
@@ -38,18 +49,20 @@ const PeopleSaySection = () => {
                   className="rounded-full h-16 w-16"
                 />
                 <div className="">
-                  <p className="font-medium text-xl mx-4">Willam Barklay</p>
-                  <p className="text-[#049D8E] mx-4 mt-3">
+                  <p className="font-medium md:text-xl text-base mx-4">
+                    Willam Barklay
+                  </p>
+                  <p className="text-[#049D8E] mx-4 md:mt-3 mt-1 text-sm">
                     Human life International
                   </p>
                 </div>
               </div>
             </div>
           </div>
-          <div className="bg-white border-2   md:w-80 mt-10 md:mt-0 md:mr-4 rounded-xl ">
+          <div className="bg-white border-2  md:w-80 mt-8 md:mr-4 rounded-xl ">
             <div className="mt-3 mx-2 pb-3">
-              <p className="text-2xl font-semibold ">Good Work</p>
-              <p className=" font-normal  text-gray-500 mt-2">
+              <p className="md:text-2xl text-lg font-semibold ">Good Work</p>
+              <p className=" font-normal  text-gray-500 mt-2 text-sm md:text-lg">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit.
                 Blanditiis,commodi tempora mollitia voluptatem recusandae
                 impedit totam aperiam ne{" "}
@@ -68,18 +81,20 @@ const PeopleSaySection = () => {
                   className="rounded-full h-16 w-16"
                 />
                 <div className="">
-                  <p className="font-medium text-xl mx-4">Willam Barklay</p>
-                  <p className="text-[#049D8E] mx-4 mt-3">
+                  <p className="font-medium md:text-xl text-base mx-4">
+                    Willam Barklay
+                  </p>
+                  <p className="text-[#049D8E] mx-4 md:mt-3 mt-1 text-sm">
                     Human life International
                   </p>
                 </div>
               </div>
             </div>
           </div>
-          <div className="bg-white border-2   md:w-80 mt-10 md:mt-0 md:mr-4 rounded-xl ">
+          <div className="bg-white border-2  md:w-80 mt-8 md:mr-4 rounded-xl ">
             <div className="mt-3 mx-2 pb-3">
-              <p className="text-2xl font-semibold ">Good Work</p>
-              <p className=" font-normal  text-gray-500 mt-2">
+              <p className="md:text-2xl text-lg font-semibold ">Good Work</p>
+              <p className=" font-normal  text-gray-500 mt-2 text-sm md:text-lg">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit.
                 Blanditiis,commodi tempora mollitia voluptatem recusandae
                 impedit totam aperiam ne{" "}
@@ -98,15 +113,17 @@ const PeopleSaySection = () => {
                   className="rounded-full h-16 w-16"
                 />
                 <div className="">
-                  <p className="font-medium text-xl mx-4">Willam Barklay</p>
-                  <p className="text-[#049D8E] mx-4 mt-3">
+                  <p className="font-medium md:text-xl text-base mx-4">
+                    Willam Barklay
+                  </p>
+                  <p className="text-[#049D8E] mx-4 md:mt-3 mt-1 text-sm">
                     Human life International
                   </p>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </Slider>
       </div>
     </div>
   );
