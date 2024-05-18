@@ -3,9 +3,9 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
-const Carousel = ({img1,img2,img3}) => {
-  var settings = {
-   dots: true,
+const Carousel = ({ img1, img2, img3 }) => {
+  let settings = {
+    dots: true,
     infinite: true,
     speed: 500,
     slidesToShow: 1,

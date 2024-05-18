@@ -1,7 +1,6 @@
 
 import "./RoundedCards.scss"
 const RoundedCards = ({color,data}) => {
-  console.log(data);
   return (
     <div
       className="secFour"
