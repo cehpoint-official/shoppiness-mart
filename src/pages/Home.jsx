@@ -63,7 +63,7 @@ const Home = () => {
 
           <div className="col-span-12 md:col-span-6">
             <h1 className="md:text-4xl text-3xl font-semibold mt-16 md:mt-12  font-slab ">
-              What is ShoppinessMart?
+              What is ShoppinessMarts?
             </h1>
             <p className="  text-gray-500 md:mt-7 mt-3  md:text-2xl text-sm">
               Lorem ipsum dolor sit amet consectetur adipisicing elit.
