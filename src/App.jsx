@@ -12,6 +12,7 @@ import Cashback from "./pages/Cashback";
 import Shop from "./pages/Shop";
 import Navbar from "./Components/Navbar/Navbar";
 import CashbackDeals from "./pages/CashbackDeals/CashbackDeals";
+import Form from "./Components/Form/Form";
 
 const App = () => {
   return (
@@ -30,6 +31,7 @@ const App = () => {
           <Route path="/cashback-charity" element={<Cashback />} />
           <Route path="/cashback-deals" element={<CashbackDeals />} />
           <Route path="/shop" element={<Shop />} />
+          <Route path="/form" element={<Form />} />
         </Routes>
         <Footer />
       </BrowserRouter>

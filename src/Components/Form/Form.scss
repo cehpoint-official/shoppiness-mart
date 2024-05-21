@@ -1,0 +1,71 @@
+$gray: #777777;
+$primary: #049d8e;
+$padd: 30px 100px;
+$font: "Roboto Slab";
+
+.form {
+  display: flex;
+  flex-direction: column;
+  margin-top: 30px;
+  font-family: $font;
+  gap: 20px;
+  height: 100vh; //limited time
+
+  font-weight: 600;
+  h1 {
+    text-align: center;
+    font-size: 32px;
+    color: $gray;
+  }
+  .stepper {
+    display: flex;
+    justify-content: space-between;
+    background-color: #f0f9ff;
+    padding: $padd;
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 20px;
+      cursor: pointer;
+
+      .check {
+        border: 2px solid gray;
+        border-radius: 50%;
+        width: 25px;
+        height: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        svg {
+          font-size: 25px;
+          color: #3ab002;
+          display: none;
+        }
+
+        &.active {
+          svg {
+            font-size: 25px;
+            color: #3ab002;
+            display: flex;
+          }
+        }
+      }
+    }
+  }
+
+  .formContainer {
+    display: flex;
+    align-items: center;
+    padding: $padd;
+
+    .first {
+      button {
+        border: 1px solid gray;
+        padding: 10px;
+      }
+    }
+  }
+}

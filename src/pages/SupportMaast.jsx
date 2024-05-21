@@ -33,13 +33,13 @@ const SupportMasst = () => {
         </div>
 
         <div className="mt-6">
-          <img src={page2} alt="Loading..." className="w-[432px] h-[300px]" />
+          <img src={page2} alt="Loading..." className="w-[432px] h-[300px] rounded-lg" />
         </div>
       </div>
       {/* { 3rd page } */}
       <div className="bg-backgroundLightYellowColor gap-12 flex justify-center items-center flex-wrap p-10 ">
         <div className="mt-6">
-          <img src={page3} alt="Loading..." className="w-[432px] h-[300px]" />
+          <img src={page3} alt="Loading..." className="w-[432px] h-[300px] rounded-lg" />
         </div>
         <div className="md:w-[400px] mt-6 ">
           <h1 className="md:text-4xl text-3xl font-semibold font-slab mb-4">
