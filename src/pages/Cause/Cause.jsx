@@ -84,7 +84,7 @@ const Cause = () => {
           ]}
         />
         <FAQ />
-        <PeopleSaySection />
+        {/* <PeopleSaySection /> */}
       </div>
     </div>
   );

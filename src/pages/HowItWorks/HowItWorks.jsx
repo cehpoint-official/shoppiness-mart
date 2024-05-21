@@ -131,7 +131,7 @@ const HowItWorks = () => {
           ]}
         />
         <FAQ />
-        <PeopleSaySection />
+        {/* <PeopleSaySection /> */}
       </div>
     </div>
   );

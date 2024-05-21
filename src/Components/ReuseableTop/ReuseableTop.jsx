@@ -8,7 +8,7 @@ const ReuseableTop = (props) => {
         <h1>{title}</h1>
         <p>{paragraph}</p>
         <div className="links">
-          <div className="register">Register your {name}</div>
+          <Link to="/form" className="register">Register your {name}</Link>
           <Link to="/login">Log in to your Account</Link>
         </div>
       </div>
