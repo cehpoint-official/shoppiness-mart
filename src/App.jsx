@@ -1,5 +1,4 @@
 import Home from "./pages/Home";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import Business from "./pages/Business/Business";
@@ -13,29 +12,75 @@ import Shop from "./pages/Shop";
 import Navbar from "./Components/Navbar/Navbar";
 import CashbackDeals from "./pages/CashbackDeals/CashbackDeals";
 import Form from "./Components/Form/Form";
-
+import { Outlet, createBrowserRouter, RouterProvider } from "react-router-dom";
 const App = () => {
-  return (
-    <>
-      <BrowserRouter>
+  const Layout = () => {
+    return (
+      <div className="app">
         <Navbar />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/register-business" element={<Business />} />
-          <Route path="/register-cause" element={<Cause />} />
-          <Route path="/support" element={<SupportACause />} />
-          <Route path="/supportmaast" element={<SupportMaast />} />
-          <Route path="/howitworks" element={<HowItWorks />} />
-          <Route path="/cashback-charity" element={<Cashback />} />
-          <Route path="/cashback-deals" element={<CashbackDeals />} />
-          <Route path="/shop" element={<Shop />} />
-          <Route path="/form" element={<Form />} />
-        </Routes>
+        <Outlet />
         <Footer />
-      </BrowserRouter>
-    </>
+      </div>
+    );
+  };
+
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: <Layout />,
+      children: [
+        {
+          path: "/",
+          element: <Home />,
+        },
+        {
+          path: "/login",
+          element: <Login />,
+        },
+        {
+          path: "/signup",
+          element: <Signup />,
+        },
+        {
+          path: "/register-business",
+          element: <Business />,
+        },
+        {
+          path: "/register-cause",
+          element: <Cause />,
+        },
+        {
+          path: "/support",
+          element: <SupportACause />,
+        },
+        {
+          path: "/supportmaast",
+          element: <SupportMaast />,
+        },
+        {
+          path: "/howitworks",
+          element: <HowItWorks />,
+        },
+        {
+          path: "/cashback-charity",
+          element: <Cashback />,
+        },
+        {
+          path: "/cashback-deals",
+          element: <CashbackDeals />,
+        },
+        {
+          path: "/shop",
+          element: <Shop />,
+        },
+      ],
+    },
+    { path: "/form", element: <Form /> },
+  ]);
+  return (
+    <div>
+      <RouterProvider router={router} />
+    </div>
   );
 };
 
