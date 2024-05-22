@@ -6,7 +6,19 @@ import logo from "../../assets/RegisterBusiness/logo.png";
 
 const Form = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const handleNextPage = () => setCurrentPage((prev) => prev + 1);
+  const [success, setSuccess] = useState(false);
+  const [completedSteps, setCompletedSteps] = useState([false, false, false]);
+
+  const handleNextPage = (e) => {
+    e.preventDefault();
+    setCompletedSteps((prev) => {
+      const updatedSteps = [...prev];
+      updatedSteps[currentPage - 1] = true;
+      return updatedSteps;
+    });
+    setCurrentPage((prev) => prev + 1);
+  };
+
   const handleBackPage = () => setCurrentPage((prev) => prev - 1);
 
   const pages = [
@@ -31,7 +43,7 @@ const Form = () => {
               <input id="offline" type="radio" name="options" />
             </div>
           </div>
-          <for className="right">
+          <div className="right">
             <div className="item">
               <label>Contact number</label>
               <p>(The number of the business man or service provider office)</p>
@@ -48,25 +60,25 @@ const Form = () => {
               <Link className="cancel" to="/register-business">
                 Cancel
               </Link>
-              <button onClick={handleNextPage} className="save">
+              <button type="button" onClick={handleNextPage} className="save">
                 Save & Next
               </button>
             </div>
-          </for>
+          </div>
         </form>
       ),
     },
     {
       title: "Shop Details",
       content: (
-        <div className="formSecond">
+        <form className="formSecond">
           <div className="left">
             <div className="item">
-              <label>Select Catagory</label>
+              <label>Select Category</label>
               <select>
                 <option value="one">One</option>
-                <option value="one">Two</option>
-                <option value="one">Three</option>
+                <option value="two">Two</option>
+                <option value="three">Three</option>
               </select>
             </div>
             <div className="item">
@@ -87,44 +99,84 @@ const Form = () => {
           <div className="right">
             <div className="item">
               <h3>Upload Logo</h3>
-              <label htmlFor="file">
+              <label htmlFor="file1">
                 <p>Drag And Drop</p>
                 or
-                <p>Choose File</p>
+                <p className="chooseFile">Choose File</p>
               </label>
-              <input type="file" id="file" />
+              <input type="file" id="file1" />
             </div>
 
             <div className="item">
               <h3>Add Banner</h3>
-              <label htmlFor="file">
+              <label htmlFor="file2">
                 <p>Drag And Drop</p>
                 or
-                <p>Choose File</p>
+                <p className="chooseFile">Choose File</p>
               </label>
-              <input type="file" id="file" />
+              <input type="file" id="file2" />
             </div>
 
             <div className="btns">
-              <button onClick={handleNextPage}>Next</button>
-              <button onClick={handleBackPage}>Back</button>
+              <button className="back" onClick={handleBackPage}>
+                Back
+              </button>
+              <button className="next" onClick={handleNextPage}>
+                Save & Next
+              </button>
             </div>
           </div>
-        </div>
+        </form>
       ),
     },
     {
       title: "Create your account",
       content: (
-        <div className="first">
-          <h2>hey page three</h2>
-          <button onClick={handleBackPage}>Back</button>
-        </div>
+        <form className="formThird">
+          <div className="left">
+            <div className="item">
+              <label>First Name</label>
+              <input type="text" />
+            </div>
+            <div className="item">
+              <label>Last Name</label>
+              <input type="text" />
+            </div>
+            <div className="item">
+              <label>Mobile number</label>
+              <input type="text" />
+            </div>
+          </div>
+          <div className="right">
+            <div className="item">
+              <label>Email Address</label>
+              <input type="email" />
+            </div>
+            <div className="item">
+              <label>Password</label>
+              <input type="password" />
+            </div>
+            <div className="item">
+              <label> Confirm Password</label>
+              <input type="password" />
+            </div>
+            <div className="btns">
+              <button className="back" onClick={handleBackPage}>
+                Back
+              </button>
+              <button className="next" onClick={() => setSuccess(true)}>
+                Create Your Account
+              </button>
+            </div>
+          </div>
+        </form>
       ),
     },
   ];
 
-  return (
+  return success ? (
+    <h1>Success</h1>
+  ) : (
     <div className="form">
       <div className="nav">
         <div className="logo">
@@ -137,9 +189,7 @@ const Form = () => {
       <div className="stepper">
         {pages.map((page, index) => (
           <div className="btn" key={index}>
-            <div
-              className={currentPage === index + 1 ? "check active" : "check"}
-            >
+            <div className={completedSteps[index] ? "check active" : "check"}>
               <FaCircleCheck />
             </div>
             <h3>{page.title}</h3>
