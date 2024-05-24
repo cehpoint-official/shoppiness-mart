@@ -3,6 +3,7 @@ import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import Business from "./pages/Business/Business";
 import Footer from "./Components/Footer";
+import Test from "./Components/Test";
 import SupportACause from "./pages/SupportACause";
 import SupportMaast from "./pages/SupportMaast";
 import Cause from "./pages/Cause/Cause";
@@ -72,6 +73,10 @@ const App = () => {
         {
           path: "/shop",
           element: <Shop />,
+        },
+        {
+          path: "/test",
+          element: <Test />,
         },
       ],
     },

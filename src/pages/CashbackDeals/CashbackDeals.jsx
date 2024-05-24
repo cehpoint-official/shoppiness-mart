@@ -4,6 +4,9 @@ import carousel1 from "../../assets/RegisterBusiness/carousel1.png";
 import { OfflineDealsData } from "../../dummydata.jsx";
 import { MdOutlineArrowRightAlt } from "react-icons/md";
 const CashbackDeals = () => {
+
+
+  
   return (
     <div className="cashbackDeals">
       <div className="cashbackContainer">
