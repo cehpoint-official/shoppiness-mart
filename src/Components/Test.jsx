@@ -8,12 +8,12 @@ const DataFetchingComponent = () => {
   
   useEffect(() => {
     const fetchData = async () => {
-      const actual = "https://inrdeals.com/fetch/stores?token=2c3f5a1662f83d1db90c9441012d4b3ffc21bbfb&id=maa443089855";
-      // const url = "https://jsonplaceholder.typicode.com/todos";
+      // const actual = "https://inrdeals.com/fetch/stores?token=2c3f5a1662f83d1db90c9441012d4b3ffc21bbfb&id=maa443089855";
+      const url = "https://jsonplaceholder.typicode.com/todos";
 
       try {
         // Make a GET request to a URL
-        const response = await axios.get(actual);
+        const response = await axios.get(url);
         setData(response.data);
         setLoading(false);
         console.log(response.data);
