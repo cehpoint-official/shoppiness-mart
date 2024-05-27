@@ -5,24 +5,26 @@ const DataFetchingComponent = () => {
   const [data, setData] = useState([]); // Ensure initial state is an array
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-const url = "https://inrdeals.com/fetch/stores?token=2c3f5a1662f83d1db90c9441012d4b3ffc21bbfb&id=maa443089855";
-
-
+  
   useEffect(() => {
     const fetchData = async () => {
+      const actual = "https://inrdeals.com/fetch/stores?token=2c3f5a1662f83d1db90c9441012d4b3ffc21bbfb&id=maa443089855";
+      // const url = "https://jsonplaceholder.typicode.com/todos";
+
       try {
-        const response = await axios.get(url);
-        console.log("Response:", response);
-        setData(response); // Set response data correctly
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setError(error);
-      } finally {
+        // Make a GET request to a URL
+        const response = await axios.get(actual);
+        setData(response.data);
         setLoading(false);
+        console.log(response.data);
+      } catch (error) {
+        // Handle any errors
+        setError(error);
+        setLoading(false);
+        console.error('Error:', error);
       }
     };
 
-    console.log("Fetching from URL:", url);
     fetchData();
   }, []);
 
@@ -33,12 +35,12 @@ const url = "https://inrdeals.com/fetch/stores?token=2c3f5a1662f83d1db90c9441012
     <div>
       <h1>Fetched Data</h1>
       <ul>
-        {data.map((item) => (
-          <div key={item.id}>
-            <li>{item.title}</li>
-            <p>{item.description}</p>
-          </div>
-        ))}
+        {/* {data.map((item) => (
+            <div key={item.id}>
+              <li>{item.title}</li>
+              <p>{item.description}</p>
+            </div>
+          ))} */}
       </ul>
     </div>
   );
