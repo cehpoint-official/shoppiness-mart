@@ -2,22 +2,19 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 const DataFetchingComponent = () => {
-  const [data, setData] = useState([]); // Ensure initial state is an array
+  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
   useEffect(() => {
     const fetchData = async () => {
-      const actual = "https://inrdeals.com/fetch/stores?token=2c3f5a1662f83d1db90c9441012d4b3ffc21bbfb&id=maa443089855";
-      // const url = "https://jsonplaceholder.typicode.com/todos";
+      const actual = "https://proxy-server-1-qaao.onrender.com/";
 
       try {
-        // Make a GET request to a URL
         const response = await axios.get(actual);
         setData(response.data);
         setLoading(false);
       } catch (error) {
-        // Handle any errors
         setError(error);
         setLoading(false);
         console.error('Error:', error);
