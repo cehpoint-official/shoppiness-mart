@@ -3,13 +3,17 @@ import "./Form.scss";
 import { FaCircleCheck } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import logo from "../../assets/RegisterBusiness/logo.png";
-
+import { addDoc, collection } from "firebase/firestore";
+import { db } from "../../firebase.js";
 const Form = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [success, setSuccess] = useState(false);
   const [completedSteps, setCompletedSteps] = useState([false, false, false]);
+  const [formData, setFormData] = useState({})
 
   const handleNextPage = (e) => {
+    addData();
+    console.log(formData);
     e.preventDefault();
     setCompletedSteps((prev) => {
       const updatedSteps = [...prev];
@@ -18,49 +22,98 @@ const Form = () => {
     });
     setCurrentPage((prev) => prev + 1);
   };
-
   const handleBackPage = () => setCurrentPage((prev) => prev - 1);
+
+  const addData = async () => {
+    try {
+      const docRef = await addDoc(collection(db, "formData"), {
+        formData,
+      });
+      console.log("Document written with ID: ", docRef.id);
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+  };
 
   const pages = [
     {
       title: "Business Details",
       content: (
-        <form className="formFirst">
+        <form className="formFirst" onSubmit={handleNextPage}>
           <div className="left">
             <div className="item">
               <label>Business/Services Name</label>
-              <input type="text" />
+              <input
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+                type="text"
+                required
+              />
             </div>
             <div className="item">
-              <label>Business/Services Name</label>
-              <input type="text" />
+              <label>Business/Services Owner Name</label>
+              <input
+                onChange={(e) =>
+                  setFormData({ ...formData, owner: e.target.value })
+                }
+                type="text"
+                required
+              />
             </div>
-            <h3>Business/Services Owner Name</h3>
+            <h3>Business/Services Type</h3>
             <div className="options">
               <label htmlFor="online">Online</label>
-              <input id="online" name="options" type="radio" />
+              <input
+                id="online"
+                name="options"
+                type="radio"
+                required
+                onClick={(e) =>
+                  setFormData({ ...formData, mode: e.target.value })
+                }
+              />
               <label htmlFor="offline">Offline</label>
-              <input id="offline" type="radio" name="options" />
+              <input
+                id="offline"
+                type="radio"
+                name="options"
+                onClick={(e) =>
+                  setFormData({ ...formData, mode: e.target.value })
+                }
+              />
             </div>
           </div>
           <div className="right">
             <div className="item">
               <label>Contact number</label>
               <p>(The number of the business man or service provider office)</p>
-              <input type="tel" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" />
+              <input
+                type="tel"
+                required
+                onChange={(e) =>
+                  setFormData({ ...formData, contact: e.target.value })
+                }
+              />
             </div>
 
             <div className="item">
               <label>Email Id</label>
               <p>(The number of the business man or service provider office)</p>
-              <input type="email" />
+              <input
+                type="email"
+                required
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+              />
             </div>
 
             <div className="btns">
               <Link className="cancel" to="/register-business">
                 Cancel
               </Link>
-              <button type="button" onClick={handleNextPage} className="save">
+              <button type="submit" className="save">
                 Save & Next
               </button>
             </div>
