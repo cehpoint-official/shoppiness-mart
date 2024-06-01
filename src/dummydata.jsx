@@ -1,8 +1,7 @@
-import Jio from "./assets/RegisterBusiness/Jio.png";
-
 export const OfflineDealsData = [
   {
-    image: Jio,
+    image:
+      "https://st3.depositphotos.com/43745012/44906/i/450/depositphotos_449066958-stock-photo-financial-accounting-logo-financial-logo.jpg",
     name: "Jio Mart",
     cashback: "50",
   },
@@ -65,5 +64,6 @@ export const OfflineDealsData = [
     name: "Sainbury’s",
     cashback: "50",
   },
-
 ];
+
+
