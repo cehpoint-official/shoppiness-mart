@@ -9,17 +9,25 @@ const Form = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [success, setSuccess] = useState(false);
   const [completedSteps, setCompletedSteps] = useState([false, false, false]);
-  const [formData, setFormData] = useState({})
+  const [formData, setFormData] = useState({});
+  const [activePbar, setActivePbar] = useState(false);
 
   const handleNextPage = (e) => {
     addData();
-    console.log(formData);
     e.preventDefault();
+    // console.log(formData);
     setCompletedSteps((prev) => {
       const updatedSteps = [...prev];
       updatedSteps[currentPage - 1] = true;
       return updatedSteps;
     });
+
+    // setActivePbar((prev) => {
+    //   const updatedSteps = [...prev];
+    //   updatedSteps[currentPage + 1] = true;
+    //   return updatedSteps;
+    // });
+
     setCurrentPage((prev) => prev + 1);
   };
   const handleBackPage = () => setCurrentPage((prev) => prev - 1);
@@ -48,7 +56,6 @@ const Form = () => {
                   setFormData({ ...formData, name: e.target.value })
                 }
                 type="text"
-                required
               />
             </div>
             <div className="item">
@@ -58,7 +65,6 @@ const Form = () => {
                   setFormData({ ...formData, owner: e.target.value })
                 }
                 type="text"
-                required
               />
             </div>
             <h3>Business/Services Type</h3>
@@ -68,7 +74,6 @@ const Form = () => {
                 id="online"
                 name="options"
                 type="radio"
-                required
                 onClick={(e) =>
                   setFormData({ ...formData, mode: e.target.value })
                 }
@@ -90,7 +95,6 @@ const Form = () => {
               <p>(The number of the business man or service provider office)</p>
               <input
                 type="tel"
-                required
                 onChange={(e) =>
                   setFormData({ ...formData, contact: e.target.value })
                 }
@@ -102,7 +106,6 @@ const Form = () => {
               <p>(The number of the business man or service provider office)</p>
               <input
                 type="email"
-                required
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
                 }
@@ -248,6 +251,11 @@ const Form = () => {
             <h3>{page.title}</h3>
           </div>
         ))}
+      </div>
+      <div className="progress">
+        <div className={activePbar ? "first active" : "first"}></div>
+        <div className={activePbar ? "second active" : "second"}></div>
+        <div className={activePbar ? "third active" : "third"}></div>
       </div>
       <div className="formContainer">{pages[currentPage - 1].content}</div>
     </div>

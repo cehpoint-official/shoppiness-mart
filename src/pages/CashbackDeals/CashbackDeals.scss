@@ -74,7 +74,7 @@ $font: "Roboto Slab";
 
       .viewAll {
         padding: 10px;
-        min-width: 400px;
+        min-width: 200px;
         border: 1px solid #4987ff;
         font-size: 20px;
         display: flex;
@@ -83,6 +83,12 @@ $font: "Roboto Slab";
         color: #4987ff;
         gap: 10px;
         cursor: pointer;
+
+        @media (max-width : 400px) {
+          min-width: 200px;
+         font-size: 18px;
+          
+        }
 
         > svg {
           font-size: 38px;
