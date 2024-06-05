@@ -8,10 +8,11 @@ const DataFetchingComponent = () => {
   
   useEffect(() => {
     const fetchData = async () => {
-      const actual = "https://proxy-server-1-qaao.onrender.com/";
+      // const stores = "https://proxy-server-1-qaao.onrender.com/";
+      const offers = "https://proxy-server-1-qaao.onrender.com/offers";
 
       try {
-        const response = await axios.get(actual);
+        const response = await axios.get(offers);
         setData(response.data);
         setLoading(false);
       } catch (error) {
