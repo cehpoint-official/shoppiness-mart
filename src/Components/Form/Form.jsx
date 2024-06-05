@@ -5,28 +5,22 @@ import { Link } from "react-router-dom";
 import logo from "../../assets/RegisterBusiness/logo.png";
 import { addDoc, collection } from "firebase/firestore";
 import { db } from "../../firebase.js";
+
 const Form = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [success, setSuccess] = useState(false);
   const [completedSteps, setCompletedSteps] = useState([false, false, false]);
   const [formData, setFormData] = useState({});
-  const [activePbar, setActivePbar] = useState(false);
 
   const handleNextPage = (e) => {
     addData();
     e.preventDefault();
-    // console.log(formData);
+
     setCompletedSteps((prev) => {
       const updatedSteps = [...prev];
       updatedSteps[currentPage - 1] = true;
       return updatedSteps;
     });
-
-    // setActivePbar((prev) => {
-    //   const updatedSteps = [...prev];
-    //   updatedSteps[currentPage + 1] = true;
-    //   return updatedSteps;
-    // });
 
     setCurrentPage((prev) => prev + 1);
   };
@@ -74,6 +68,7 @@ const Form = () => {
                 id="online"
                 name="options"
                 type="radio"
+                value="online"
                 onClick={(e) =>
                   setFormData({ ...formData, mode: e.target.value })
                 }
@@ -83,6 +78,7 @@ const Form = () => {
                 id="offline"
                 type="radio"
                 name="options"
+                value="offline"
                 onClick={(e) =>
                   setFormData({ ...formData, mode: e.target.value })
                 }
@@ -253,9 +249,12 @@ const Form = () => {
         ))}
       </div>
       <div className="progress">
-        <div className={activePbar ? "first active" : "first"}></div>
-        <div className={activePbar ? "second active" : "second"}></div>
-        <div className={activePbar ? "third active" : "third"}></div>
+        {pages.map((_, index) => (
+          <div
+            className={completedSteps[index] ? "complete active" : "complete"}
+            key={index}
+          ></div>
+        ))}
       </div>
       <div className="formContainer">{pages[currentPage - 1].content}</div>
     </div>

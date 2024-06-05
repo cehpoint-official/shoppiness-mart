@@ -22,6 +22,9 @@ $font: "Roboto Slab";
     font-family: $font;
     background-color: $primary;
     width: 100%;
+     @media (max-width: 434px) {
+    padding: 20px;
+  }
     img {
       object-fit: contain;
       cursor: pointer;

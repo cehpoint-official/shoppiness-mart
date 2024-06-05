@@ -100,24 +100,11 @@ $breakpointForm2: 675px;
     height: 5px;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    .first  {
+    .complete {
+      transition: 0.34s all ease-in-out;
       background-color: rgba(255, 255, 255, 0.807);
-      &.active{
-        background-color: rgba(0, 0, 255, 0.585);
-      }
-    }
-
-    .second  {
-      background-color: rgba(255, 255, 255, 0.807);
-      &.active{
-        background-color: rgba(0, 0, 255, 0.585);
-      }
-    }
-
-    .third  {
-      background-color: rgba(255, 255, 255, 0.807);
-      &.active{
-        background-color: rgba(0, 0, 255, 0.585);
+      &.active {
+        background-color: #669BF2;
       }
     }
   }
