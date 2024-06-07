@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./Form.scss";
+import "./BusinessForm.scss";
 import { FaCircleCheck } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import logo from "../../assets/RegisterBusiness/logo.png";
