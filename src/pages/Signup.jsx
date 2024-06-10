@@ -91,7 +91,7 @@ const Signup = () => {
           </div>
 
           <button
-            onClick={(e) => Register(userData)}
+            onClick={() => Register(userData)}
             className="bg-[#049D8E] text-white w-full py-2 rounded mt-4"
           >
             Create account
