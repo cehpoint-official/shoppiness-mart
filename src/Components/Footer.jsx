@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import ShoppingBag from "../assets/ShoppingBag.png";
 import Backimg13 from "../assets/backimg13.png";
 const Footer = () => {
@@ -64,44 +65,44 @@ const Footer = () => {
               <h4 className="mb-9 text-3xl font-semibold text-white">Links</h4>
               <ul>
                 <li>
-                  <a
-                    href=""
+                  <Link
+                    to="/"
                     className="mb-2 inline-block text-xl font-medium text-white "
                   >
                     Home
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href=""
+                  <Link
+                    to="/about"
                     className="mb-2 inline-block text-xl mt-2 font-medium  text-white "
                   >
                     About Us
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href=""
+                  <Link
+                    to="/contact"
                     className="mb-2 inline-block text-xl font-medium mt-2  text-white "
                   >
                     Contact Us
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href=""
+                  <Link
+                    to="privacy-policy"
                     className="mb-2 inline-block text-xl font-medium mt-2   text-white "
                   >
                     Privacy Policy
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href=""
+                  <Link
+                    to="/blogs"
                     className="mb-2 inline-block text-xl font-medium mt-2  text-white "
                   >
                     Blogs
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
