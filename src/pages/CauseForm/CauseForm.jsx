@@ -3,6 +3,7 @@ import "./CauseForm.scss";
 import { FaCircleCheck } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import logo from "../../assets/RegisterBusiness/logo.png";
+import SuccessPage from "../../Components/SuccessPage/SuccessPage";
 // import { addDoc, collection } from "firebase/firestore";
 // import { db, storage } from "../../firebase.js";
 // import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -29,6 +30,12 @@ const Form = () => {
   };
 
   const handleBackPage = () => setCurrentPage((prev) => prev - 1);
+
+  const handleCreateAccount = (e) => {
+    e.preventDefault();
+    handleNextPage(e);
+    setSuccess(true);
+  };
 
   const pages = [
     {
@@ -206,7 +213,7 @@ const Form = () => {
     {
       title: "Create your account",
       content: (
-        <form className="formThird">
+        <form className="formThird" onSubmit={handleCreateAccount}>
           <div className="left">
             <div className="item">
               <label>First Name</label>
@@ -238,7 +245,7 @@ const Form = () => {
               <button className="back" onClick={handleBackPage}>
                 Back
               </button>
-              <button className="next" onClick={() => setSuccess(true)}>
+              <button className="next" type="submit">
                 Create Your Account
               </button>
             </div>
@@ -248,9 +255,7 @@ const Form = () => {
     },
   ];
 
-  return success ? (
-    <h1>Success</h1>
-  ) : (
+  return (
     <div className="form">
       <div className="nav">
         <div className="logo">
@@ -279,7 +284,9 @@ const Form = () => {
           ></div>
         ))}
       </div>
-      <div className="formContainer">{pages[currentPage - 1].content}</div>
+      <div className="formContainer">
+        {success ? <SuccessPage /> : pages[currentPage - 1].content}
+      </div>
     </div>
   );
 };
