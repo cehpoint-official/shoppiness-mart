@@ -12,7 +12,9 @@ import Cashback from "./pages/Cashback";
 import Shop from "./pages/Shop";
 import Navbar from "./Components/Navbar/Navbar";
 import CashbackDeals from "./pages/CashbackDeals/CashbackDeals";
-import Form from "./Components/Form/Form";
+import BusinessForm from "./pages/BusinessForm/BusinessForm";
+import CauseForm from "./pages/CauseForm/CauseForm";
+
 import { Outlet, createBrowserRouter, RouterProvider } from "react-router-dom";
 const App = () => {
   const Layout = () => {
@@ -80,7 +82,8 @@ const App = () => {
         },
       ],
     },
-    { path: "/form", element: <Form /> },
+    { path: "/business-form", element: <BusinessForm /> },
+    { path: "/cause-form", element: <CauseForm/> },
   ]);
   return (
     <div>

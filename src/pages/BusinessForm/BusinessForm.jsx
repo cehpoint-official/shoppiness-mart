@@ -1,33 +1,62 @@
 import { useState } from "react";
-import "./Form.scss";
+import "./BusinessForm.scss";
 import { FaCircleCheck } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import logo from "../../assets/RegisterBusiness/logo.png";
 import { addDoc, collection } from "firebase/firestore";
-import { db } from "../../firebase.js";
+import { db, storage } from "../../firebase.js";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
 const Form = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [success, setSuccess] = useState(false);
   const [completedSteps, setCompletedSteps] = useState([false, false, false]);
-  const [formData, setFormData] = useState({})
+  const [businessDetails, setBusinessDetails] = useState({});
+  const [shopDetails, setShopDetails] = useState({});
+  const [logoFile, setLogoFile] = useState(null);
+  const [bannerFile, setBannerFile] = useState(null);
 
   const handleNextPage = (e) => {
-    addData();
-    console.log(formData);
     e.preventDefault();
+    addDataBusiness();
+    addDataShop();
+
     setCompletedSteps((prev) => {
       const updatedSteps = [...prev];
       updatedSteps[currentPage - 1] = true;
       return updatedSteps;
     });
+
     setCurrentPage((prev) => prev + 1);
   };
+
   const handleBackPage = () => setCurrentPage((prev) => prev - 1);
 
-  const addData = async () => {
+  const uploadFile = async (file) => {
+    const storageRef = ref(storage, `images/${file.name}`);
+    await uploadBytes(storageRef, file);
+    return await getDownloadURL(storageRef);
+  };
+
+  const addDataBusiness = async () => {
     try {
-      const docRef = await addDoc(collection(db, "formData"), {
-        formData,
+      const docRef = await addDoc(collection(db, "BusinessDetails"), {
+        businessDetails,
+      });
+      console.log("Document written with ID: ", docRef.id);
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+  };
+
+  const addDataShop = async () => {
+    try {
+      const logoUrl = logoFile ? await uploadFile(logoFile) : "";
+      const bannerUrl = bannerFile ? await uploadFile(bannerFile) : "";
+      const docRef = await addDoc(collection(db, "ShopDetails"), {
+        ...shopDetails,
+        logoUrl,
+        bannerUrl,
       });
       console.log("Document written with ID: ", docRef.id);
     } catch (e) {
@@ -45,20 +74,24 @@ const Form = () => {
               <label>Business/Services Name</label>
               <input
                 onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
+                  setBusinessDetails({
+                    ...businessDetails,
+                    name: e.target.value,
+                  })
                 }
                 type="text"
-                required
               />
             </div>
             <div className="item">
               <label>Business/Services Owner Name</label>
               <input
                 onChange={(e) =>
-                  setFormData({ ...formData, owner: e.target.value })
+                  setBusinessDetails({
+                    ...businessDetails,
+                    owner: e.target.value,
+                  })
                 }
                 type="text"
-                required
               />
             </div>
             <h3>Business/Services Type</h3>
@@ -68,9 +101,12 @@ const Form = () => {
                 id="online"
                 name="options"
                 type="radio"
-                required
+                value="online"
                 onClick={(e) =>
-                  setFormData({ ...formData, mode: e.target.value })
+                  setBusinessDetails({
+                    ...businessDetails,
+                    mode: e.target.value,
+                  })
                 }
               />
               <label htmlFor="offline">Offline</label>
@@ -78,8 +114,12 @@ const Form = () => {
                 id="offline"
                 type="radio"
                 name="options"
+                value="offline"
                 onClick={(e) =>
-                  setFormData({ ...formData, mode: e.target.value })
+                  setBusinessDetails({
+                    ...businessDetails,
+                    mode: e.target.value,
+                  })
                 }
               />
             </div>
@@ -90,9 +130,11 @@ const Form = () => {
               <p>(The number of the business man or service provider office)</p>
               <input
                 type="tel"
-                required
                 onChange={(e) =>
-                  setFormData({ ...formData, contact: e.target.value })
+                  setBusinessDetails({
+                    ...businessDetails,
+                    contact: e.target.value,
+                  })
                 }
               />
             </div>
@@ -102,9 +144,11 @@ const Form = () => {
               <p>(The number of the business man or service provider office)</p>
               <input
                 type="email"
-                required
                 onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
+                  setBusinessDetails({
+                    ...businessDetails,
+                    email: e.target.value,
+                  })
                 }
               />
             </div>
@@ -124,11 +168,18 @@ const Form = () => {
     {
       title: "Shop Details",
       content: (
-        <form className="formSecond">
+        <form className="formSecond" onSubmit={handleNextPage}>
           <div className="left">
             <div className="item">
               <label>Select Category</label>
-              <select>
+              <select
+                onChange={(e) =>
+                  setShopDetails({
+                    ...shopDetails,
+                    cat: e.target.value,
+                  })
+                }
+              >
                 <option value="one">One</option>
                 <option value="two">Two</option>
                 <option value="three">Three</option>
@@ -136,17 +187,40 @@ const Form = () => {
             </div>
             <div className="item">
               <label>Location</label>
-              <input type="text" />
+              <input
+                type="text"
+                onChange={(e) =>
+                  setShopDetails({
+                    ...shopDetails,
+                    location: e.target.value,
+                  })
+                }
+              />
             </div>
             <div className="item">
               <label>PIN Code</label>
-              <input type="text" />
+              <input
+                type="text"
+                onChange={(e) =>
+                  setShopDetails({
+                    ...shopDetails,
+                    pincode: e.target.value,
+                  })
+                }
+              />
             </div>
 
             <div className="item">
               <label>Short Description</label>
               <p>(Write a description about your business or service)</p>
-              <textarea></textarea>
+              <textarea
+                onChange={(e) =>
+                  setShopDetails({
+                    ...shopDetails,
+                    shortDesc: e.target.value,
+                  })
+                }
+              ></textarea>
             </div>
           </div>
           <div className="right">
@@ -157,7 +231,11 @@ const Form = () => {
                 or
                 <p className="chooseFile">Choose File</p>
               </label>
-              <input type="file" id="file1" />
+              <input
+                type="file"
+                id="file1"
+                onChange={(e) => setLogoFile(e.target.files[0])}
+              />
             </div>
 
             <div className="item">
@@ -167,14 +245,18 @@ const Form = () => {
                 or
                 <p className="chooseFile">Choose File</p>
               </label>
-              <input type="file" id="file2" />
+              <input
+                type="file"
+                id="file2"
+                onChange={(e) => setBannerFile(e.target.files[0])}
+              />
             </div>
 
             <div className="btns">
               <button className="back" onClick={handleBackPage}>
                 Back
               </button>
-              <button className="next" onClick={handleNextPage}>
+              <button type="submit" className="next">
                 Save & Next
               </button>
             </div>
@@ -247,6 +329,14 @@ const Form = () => {
             </div>
             <h3>{page.title}</h3>
           </div>
+        ))}
+      </div>
+      <div className="progress">
+        {pages.map((_, index) => (
+          <div
+            className={completedSteps[index] ? "complete active" : "complete"}
+            key={index}
+          ></div>
         ))}
       </div>
       <div className="formContainer">{pages[currentPage - 1].content}</div>
