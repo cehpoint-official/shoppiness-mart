@@ -361,6 +361,16 @@ $breakpointForm2: 675px;
             justify-content: center;
           }
         }
+
+        .uploadProgress{
+          background-color: rgb(237, 237, 237);
+          align-items: center;
+          justify-content: center;
+          display: flex;
+          padding: 10px;
+          color: #3ab002;
+          border-radius: 10px;
+        }
       }
     }
 

@@ -249,6 +249,11 @@ const Form = () => {
                 Create Your Account
               </button>
             </div>
+            {/* {uploadProgress !== "" ? (
+              <p className="uploadProgress">{uploadProgress}</p>
+            ) : (
+              ""
+            )} */}
           </div>
         </form>
       ),

@@ -5,7 +5,8 @@ import { Link } from "react-router-dom";
 import logo from "../../assets/RegisterBusiness/logo.png";
 import { addDoc, collection } from "firebase/firestore";
 import { db, storage } from "../../firebase.js";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import SuccessPage from "../../Components/SuccessPage/SuccessPage";
 
 const Form = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -15,6 +16,7 @@ const Form = () => {
   const [shopDetails, setShopDetails] = useState({});
   const [logoFile, setLogoFile] = useState(null);
   const [bannerFile, setBannerFile] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState("");
 
   const handleNextPage = (e) => {
     e.preventDefault();
@@ -29,13 +31,69 @@ const Form = () => {
 
     setCurrentPage((prev) => prev + 1);
   };
+  const handleFileChangeLogo = async (e) => {
+    const file = e.target.files[0];
+    setLogoFile(file);
+    if (file) {
+      await uploadFile(file);
+    }
+  };
 
+  const handleFileChangeBanner = async (e) => {
+    const file = e.target.files[0];
+    setBannerFile(file);
+    if (file) {
+      await uploadFile(file);
+    }
+  };
   const handleBackPage = () => setCurrentPage((prev) => prev - 1);
 
-  const uploadFile = async (file) => {
-    const storageRef = ref(storage, `images/${file.name}`);
-    await uploadBytes(storageRef, file);
-    return await getDownloadURL(storageRef);
+  const uploadFile = (file) => {
+    return new Promise((resolve, reject) => {
+      const metadata = {
+        contentType: "image/jpeg",
+      };
+      const storageRef = ref(storage, "images/" + file.name);
+      const uploadTask = uploadBytesResumable(storageRef, file, metadata);
+
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setUploadProgress(`${progress}%`);
+          switch (snapshot.state) {
+            case "paused":
+              setUploadProgress(progress);
+              break;
+            case "running":
+              setUploadProgress(`Uploded ${progress}%`);
+
+              break;
+          }
+        },
+        (error) => {
+          switch (error.code) {
+            case "storage/unauthorized":
+              reject("User doesn't have permission to access the object");
+              break;
+            case "storage/canceled":
+              reject("User canceled the upload");
+              break;
+            case "storage/unknown":
+              reject("Unknown error occurred, inspect error.serverResponse");
+              break;
+            default:
+              reject("An error occurred");
+          }
+        },
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            resolve(downloadURL);
+          });
+        }
+      );
+    });
   };
 
   const addDataBusiness = async () => {
@@ -64,6 +122,11 @@ const Form = () => {
     }
   };
 
+  const handleCreateAccount = (e) => {
+    e.preventDefault();
+    handleNextPage(e);
+    setSuccess(true);
+  };
   const pages = [
     {
       title: "Business Details",
@@ -79,6 +142,7 @@ const Form = () => {
                     name: e.target.value,
                   })
                 }
+                // required
                 type="text"
               />
             </div>
@@ -91,6 +155,7 @@ const Form = () => {
                     owner: e.target.value,
                   })
                 }
+                // required
                 type="text"
               />
             </div>
@@ -102,6 +167,7 @@ const Form = () => {
                 name="options"
                 type="radio"
                 value="online"
+                // required
                 onClick={(e) =>
                   setBusinessDetails({
                     ...businessDetails,
@@ -115,6 +181,7 @@ const Form = () => {
                 type="radio"
                 name="options"
                 value="offline"
+                // required
                 onClick={(e) =>
                   setBusinessDetails({
                     ...businessDetails,
@@ -130,6 +197,7 @@ const Form = () => {
               <p>(The number of the business man or service provider office)</p>
               <input
                 type="tel"
+                // required
                 onChange={(e) =>
                   setBusinessDetails({
                     ...businessDetails,
@@ -144,6 +212,7 @@ const Form = () => {
               <p>(The number of the business man or service provider office)</p>
               <input
                 type="email"
+                // required
                 onChange={(e) =>
                   setBusinessDetails({
                     ...businessDetails,
@@ -173,6 +242,7 @@ const Form = () => {
             <div className="item">
               <label>Select Category</label>
               <select
+                // required
                 onChange={(e) =>
                   setShopDetails({
                     ...shopDetails,
@@ -188,6 +258,7 @@ const Form = () => {
             <div className="item">
               <label>Location</label>
               <input
+                // required
                 type="text"
                 onChange={(e) =>
                   setShopDetails({
@@ -200,6 +271,7 @@ const Form = () => {
             <div className="item">
               <label>PIN Code</label>
               <input
+                // required
                 type="text"
                 onChange={(e) =>
                   setShopDetails({
@@ -214,6 +286,7 @@ const Form = () => {
               <label>Short Description</label>
               <p>(Write a description about your business or service)</p>
               <textarea
+                // required
                 onChange={(e) =>
                   setShopDetails({
                     ...shopDetails,
@@ -225,16 +298,18 @@ const Form = () => {
           </div>
           <div className="right">
             <div className="item">
-              <h3>Upload Logo</h3>
+              <h3>Add Logo</h3>
               <label htmlFor="file1">
                 <p>Drag And Drop</p>
                 or
                 <p className="chooseFile">Choose File</p>
               </label>
+
               <input
+                // required
                 type="file"
                 id="file1"
-                onChange={(e) => setLogoFile(e.target.files[0])}
+                onChange={handleFileChangeLogo}
               />
             </div>
 
@@ -246,9 +321,10 @@ const Form = () => {
                 <p className="chooseFile">Choose File</p>
               </label>
               <input
+                // required
                 type="file"
                 id="file2"
-                onChange={(e) => setBannerFile(e.target.files[0])}
+                onChange={handleFileChangeBanner}
               />
             </div>
 
@@ -260,6 +336,11 @@ const Form = () => {
                 Save & Next
               </button>
             </div>
+            {uploadProgress !== "" ? (
+              <p className="uploadProgress">{uploadProgress}</p>
+            ) : (
+              ""
+            )}
           </div>
         </form>
       ),
@@ -267,41 +348,39 @@ const Form = () => {
     {
       title: "Create your account",
       content: (
-        <form className="formThird">
+        <form className="formThird" onSubmit={handleCreateAccount}>
           <div className="left">
             <div className="item">
               <label>First Name</label>
-              <input type="text" />
+              <input required type="text" />
             </div>
             <div className="item">
               <label>Last Name</label>
-              <input type="text" />
+              <input required type="text" />
             </div>
             <div className="item">
               <label>Mobile number</label>
-              <input type="text" />
+              <input required type="text" />
             </div>
           </div>
           <div className="right">
             <div className="item">
               <label>Email Address</label>
-              <input type="email" />
+              <input required type="email" />
             </div>
             <div className="item">
               <label>Password</label>
-              <input type="password" />
+              <input required type="password" />
             </div>
             <div className="item">
               <label> Confirm Password</label>
-              <input type="password" />
+              <input required type="password" />
             </div>
             <div className="btns">
               <button className="back" onClick={handleBackPage}>
                 Back
               </button>
-              <button className="next" onClick={() => setSuccess(true)}>
-                Create Your Account
-              </button>
+              <button className="next">Create Your Account</button>
             </div>
           </div>
         </form>
@@ -309,9 +388,7 @@ const Form = () => {
     },
   ];
 
-  return success ? (
-    <h1>Success</h1>
-  ) : (
+  return (
     <div className="form">
       <div className="nav">
         <div className="logo">
@@ -339,7 +416,9 @@ const Form = () => {
           ></div>
         ))}
       </div>
-      <div className="formContainer">{pages[currentPage - 1].content}</div>
+      <div className="formContainer">
+        {success ? <SuccessPage /> : pages[currentPage - 1].content}
+      </div>
     </div>
   );
 };
