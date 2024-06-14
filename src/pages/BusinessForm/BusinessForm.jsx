@@ -4,7 +4,7 @@ import { FaCircleCheck } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import logo from "../../assets/RegisterBusiness/logo.png";
 import { addDoc, collection } from "firebase/firestore";
-import { db, storage } from "../../firebase.js";
+import { db, storage } from "../../config/firebase.js";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import SuccessPage from "../../Components/SuccessPage/SuccessPage";
 
@@ -297,6 +297,11 @@ const Form = () => {
             </div>
           </div>
           <div className="right">
+            {uploadProgress !== "" ? (
+              <p className="uploadProgress">{uploadProgress}</p>
+            ) : (
+              ""
+            )}
             <div className="item">
               <h3>Add Logo</h3>
               <label htmlFor="file1">
@@ -336,11 +341,6 @@ const Form = () => {
                 Save & Next
               </button>
             </div>
-            {uploadProgress !== "" ? (
-              <p className="uploadProgress">{uploadProgress}</p>
-            ) : (
-              ""
-            )}
           </div>
         </form>
       ),

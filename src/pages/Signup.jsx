@@ -4,9 +4,7 @@ import ShoppingBag2 from "../assets/ShoppingBag2.png";
 import Signupimg from "../assets/signupimg.png";
 import Googleicon from "../assets/googleicon.png";
 import Facebookicon from "../assets/facebookicon.png";
-import { useRegisterMutation } from "../redux/api/AuthApi";
 const Signup = () => {
-  const [Register] = useRegisterMutation();
   const [userData, setUserData] = useState({
     fname: "",
     lname: "",
@@ -91,7 +89,6 @@ const Signup = () => {
           </div>
 
           <button
-            onClick={() => Register(userData)}
             className="bg-[#049D8E] text-white w-full py-2 rounded mt-4"
           >
             Create account

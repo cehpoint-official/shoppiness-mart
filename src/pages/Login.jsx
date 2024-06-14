@@ -4,16 +4,9 @@ import Loginimg from "../assets/loginimg.png";
 import ShoppingBag2 from "../assets/ShoppingBag2.png";
 import Googleicon from "../assets/googleicon.png";
 import Facebookicon from "../assets/facebookicon.png";
-import {
-  useContinueWithGoogleMutation,
-  useLazyLoginQuery,
-} from "../redux/api/AuthApi";
 import { Link } from "react-router-dom";
 
 const Login = () => {
-  const [login] = useLazyLoginQuery();
-  const [gooleLogin] = useContinueWithGoogleMutation();
-
   const [userData, setUserData] = useState({
     // email: "yadavuma419@gmail.com",
     // password: '123456'
@@ -88,7 +81,6 @@ const Login = () => {
 
                 <Link
                   to="/"
-                  onClick={() => login(userData)}
                   className="bg-[#049D8E] text-white text-center w-full py-2 rounded mt-6"
                 >
                   Login
@@ -100,7 +92,6 @@ const Login = () => {
                 <img
                   src={Googleicon}
                   alt="Google Login"
-                  onClick={gooleLogin}
                   className="border-2 px-8 py-2 rounded-md cursor-pointer"
                 />
                 <img
