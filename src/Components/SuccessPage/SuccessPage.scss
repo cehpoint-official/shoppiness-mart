@@ -1,0 +1,60 @@
+$gray: #777777;
+$primary: #049d8e;
+$padd: 30px 100px;
+$font: "Roboto Slab";
+$breakpoint: 657px;
+
+.success {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  width: 100%;
+  text-align: center;
+  gap: 50px;
+
+  img{
+  @media (max-width: $breakpoint) {
+     height: 150px;
+     width: 150px;
+     object-fit: contain;
+    }
+  }
+
+  h1 {
+    font-size: 40px;
+    font-family: $font;
+    color: #3f3f3f;
+    width: 60%;
+
+    @media (max-width: $breakpoint) {
+      width: 100%;
+      font-size: 25px;
+    }
+  }
+
+  p {
+    font-size: 20px;
+    width: 48%;
+    font-weight: 600;
+    color: #3b3b3b;
+    @media (max-width: $breakpoint) {
+      width: 100%;
+      font-size: 18px;
+    }
+  }
+
+  a {
+    background-color: #049d8e;
+    padding: 15px 60px;
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+    min-width: 300px;
+    @media (max-width: $breakpoint) {
+      min-width: 40px;
+      padding: 10px 30px;
+      font-size: 18px;
+    }
+  }
+}

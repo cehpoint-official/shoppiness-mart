@@ -16,6 +16,7 @@ $breakpoint2: 736px;
       width: 100%;
       display: flex;
       justify-content: center;
+      align-items: center;
       padding: $padd;
       @media (max-width: $breakpoint) {
         flex-direction: column;
@@ -103,7 +104,7 @@ $breakpoint2: 736px;
       .container {
         display: flex;
         align-items: center;
-        justify-content: center;
+        justify-content: space-between;
         text-align: start;
         gap: 40px;
         @media (max-width: $breakpoint) {

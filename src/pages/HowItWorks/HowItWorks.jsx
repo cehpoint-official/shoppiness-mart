@@ -11,9 +11,7 @@ import card2 from "../../assets/RegisterBusiness/howitworksCard2.png";
 import card3 from "../../assets/RegisterBusiness/howitworksCard3.png";
 import { RiSearchFill } from "react-icons/ri";
 import RoundedCards from "../../Components/RoundedCards/RoundedCards";
-import PeopleSaySection from "../../Components/PeopleSaySection";
 import FAQ from "../../Components/FAQ";
-import { GiCard3Clubs } from "react-icons/gi";
 
 const HowItWorks = () => {
   return (

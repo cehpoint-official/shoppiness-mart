@@ -1,20 +1,27 @@
 import { useState } from "react";
-import "./Form.scss";
+import "./BusinessForm.scss";
 import { FaCircleCheck } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import logo from "../../assets/RegisterBusiness/logo.png";
 import { addDoc, collection } from "firebase/firestore";
-import { db } from "../../firebase.js";
+import { db, storage } from "../../config/firebase.js";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import SuccessPage from "../../Components/SuccessPage/SuccessPage";
 
 const Form = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [success, setSuccess] = useState(false);
   const [completedSteps, setCompletedSteps] = useState([false, false, false]);
-  const [formData, setFormData] = useState({});
+  const [businessDetails, setBusinessDetails] = useState({});
+  const [shopDetails, setShopDetails] = useState({});
+  const [logoFile, setLogoFile] = useState(null);
+  const [bannerFile, setBannerFile] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState("");
 
   const handleNextPage = (e) => {
-    addData();
     e.preventDefault();
+    addDataBusiness();
+    addDataShop();
 
     setCompletedSteps((prev) => {
       const updatedSteps = [...prev];
@@ -24,12 +31,75 @@ const Form = () => {
 
     setCurrentPage((prev) => prev + 1);
   };
+  const handleFileChangeLogo = async (e) => {
+    const file = e.target.files[0];
+    setLogoFile(file);
+    if (file) {
+      await uploadFile(file);
+    }
+  };
+
+  const handleFileChangeBanner = async (e) => {
+    const file = e.target.files[0];
+    setBannerFile(file);
+    if (file) {
+      await uploadFile(file);
+    }
+  };
   const handleBackPage = () => setCurrentPage((prev) => prev - 1);
 
-  const addData = async () => {
+  const uploadFile = (file) => {
+    return new Promise((resolve, reject) => {
+      const metadata = {
+        contentType: "image/jpeg",
+      };
+      const storageRef = ref(storage, "images/" + file.name);
+      const uploadTask = uploadBytesResumable(storageRef, file, metadata);
+
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setUploadProgress(`${progress}%`);
+          switch (snapshot.state) {
+            case "paused":
+              setUploadProgress(progress);
+              break;
+            case "running":
+              setUploadProgress(`Uploded ${progress}%`);
+
+              break;
+          }
+        },
+        (error) => {
+          switch (error.code) {
+            case "storage/unauthorized":
+              reject("User doesn't have permission to access the object");
+              break;
+            case "storage/canceled":
+              reject("User canceled the upload");
+              break;
+            case "storage/unknown":
+              reject("Unknown error occurred, inspect error.serverResponse");
+              break;
+            default:
+              reject("An error occurred");
+          }
+        },
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            resolve(downloadURL);
+          });
+        }
+      );
+    });
+  };
+
+  const addDataBusiness = async () => {
     try {
-      const docRef = await addDoc(collection(db, "formData"), {
-        formData,
+      const docRef = await addDoc(collection(db, "BusinessDetails"), {
+        businessDetails,
       });
       console.log("Document written with ID: ", docRef.id);
     } catch (e) {
@@ -37,6 +107,26 @@ const Form = () => {
     }
   };
 
+  const addDataShop = async () => {
+    try {
+      const logoUrl = logoFile ? await uploadFile(logoFile) : "";
+      const bannerUrl = bannerFile ? await uploadFile(bannerFile) : "";
+      const docRef = await addDoc(collection(db, "ShopDetails"), {
+        ...shopDetails,
+        logoUrl,
+        bannerUrl,
+      });
+      console.log("Document written with ID: ", docRef.id);
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+  };
+
+  const handleCreateAccount = (e) => {
+    e.preventDefault();
+    handleNextPage(e);
+    setSuccess(true);
+  };
   const pages = [
     {
       title: "Business Details",
@@ -47,8 +137,12 @@ const Form = () => {
               <label>Business/Services Name</label>
               <input
                 onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
+                  setBusinessDetails({
+                    ...businessDetails,
+                    name: e.target.value,
+                  })
                 }
+                // required
                 type="text"
               />
             </div>
@@ -56,8 +150,12 @@ const Form = () => {
               <label>Business/Services Owner Name</label>
               <input
                 onChange={(e) =>
-                  setFormData({ ...formData, owner: e.target.value })
+                  setBusinessDetails({
+                    ...businessDetails,
+                    owner: e.target.value,
+                  })
                 }
+                // required
                 type="text"
               />
             </div>
@@ -69,8 +167,12 @@ const Form = () => {
                 name="options"
                 type="radio"
                 value="online"
+                // required
                 onClick={(e) =>
-                  setFormData({ ...formData, mode: e.target.value })
+                  setBusinessDetails({
+                    ...businessDetails,
+                    mode: e.target.value,
+                  })
                 }
               />
               <label htmlFor="offline">Offline</label>
@@ -79,8 +181,12 @@ const Form = () => {
                 type="radio"
                 name="options"
                 value="offline"
+                // required
                 onClick={(e) =>
-                  setFormData({ ...formData, mode: e.target.value })
+                  setBusinessDetails({
+                    ...businessDetails,
+                    mode: e.target.value,
+                  })
                 }
               />
             </div>
@@ -91,8 +197,12 @@ const Form = () => {
               <p>(The number of the business man or service provider office)</p>
               <input
                 type="tel"
+                // required
                 onChange={(e) =>
-                  setFormData({ ...formData, contact: e.target.value })
+                  setBusinessDetails({
+                    ...businessDetails,
+                    contact: e.target.value,
+                  })
                 }
               />
             </div>
@@ -102,8 +212,12 @@ const Form = () => {
               <p>(The number of the business man or service provider office)</p>
               <input
                 type="email"
+                // required
                 onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
+                  setBusinessDetails({
+                    ...businessDetails,
+                    email: e.target.value,
+                  })
                 }
               />
             </div>
@@ -123,11 +237,19 @@ const Form = () => {
     {
       title: "Shop Details",
       content: (
-        <form className="formSecond">
+        <form className="formSecond" onSubmit={handleNextPage}>
           <div className="left">
             <div className="item">
               <label>Select Category</label>
-              <select>
+              <select
+                // required
+                onChange={(e) =>
+                  setShopDetails({
+                    ...shopDetails,
+                    cat: e.target.value,
+                  })
+                }
+              >
                 <option value="one">One</option>
                 <option value="two">Two</option>
                 <option value="three">Three</option>
@@ -135,28 +257,65 @@ const Form = () => {
             </div>
             <div className="item">
               <label>Location</label>
-              <input type="text" />
+              <input
+                // required
+                type="text"
+                onChange={(e) =>
+                  setShopDetails({
+                    ...shopDetails,
+                    location: e.target.value,
+                  })
+                }
+              />
             </div>
             <div className="item">
               <label>PIN Code</label>
-              <input type="text" />
+              <input
+                // required
+                type="text"
+                onChange={(e) =>
+                  setShopDetails({
+                    ...shopDetails,
+                    pincode: e.target.value,
+                  })
+                }
+              />
             </div>
 
             <div className="item">
               <label>Short Description</label>
               <p>(Write a description about your business or service)</p>
-              <textarea></textarea>
+              <textarea
+                // required
+                onChange={(e) =>
+                  setShopDetails({
+                    ...shopDetails,
+                    shortDesc: e.target.value,
+                  })
+                }
+              ></textarea>
             </div>
           </div>
           <div className="right">
+            {uploadProgress !== "" ? (
+              <p className="uploadProgress">{uploadProgress}</p>
+            ) : (
+              ""
+            )}
             <div className="item">
-              <h3>Upload Logo</h3>
+              <h3>Add Logo</h3>
               <label htmlFor="file1">
                 <p>Drag And Drop</p>
                 or
                 <p className="chooseFile">Choose File</p>
               </label>
-              <input type="file" id="file1" />
+
+              <input
+                // required
+                type="file"
+                id="file1"
+                onChange={handleFileChangeLogo}
+              />
             </div>
 
             <div className="item">
@@ -166,14 +325,19 @@ const Form = () => {
                 or
                 <p className="chooseFile">Choose File</p>
               </label>
-              <input type="file" id="file2" />
+              <input
+                // required
+                type="file"
+                id="file2"
+                onChange={handleFileChangeBanner}
+              />
             </div>
 
             <div className="btns">
               <button className="back" onClick={handleBackPage}>
                 Back
               </button>
-              <button className="next" onClick={handleNextPage}>
+              <button type="submit" className="next">
                 Save & Next
               </button>
             </div>
@@ -184,41 +348,39 @@ const Form = () => {
     {
       title: "Create your account",
       content: (
-        <form className="formThird">
+        <form className="formThird" onSubmit={handleCreateAccount}>
           <div className="left">
             <div className="item">
               <label>First Name</label>
-              <input type="text" />
+              <input required type="text" />
             </div>
             <div className="item">
               <label>Last Name</label>
-              <input type="text" />
+              <input required type="text" />
             </div>
             <div className="item">
               <label>Mobile number</label>
-              <input type="text" />
+              <input required type="text" />
             </div>
           </div>
           <div className="right">
             <div className="item">
               <label>Email Address</label>
-              <input type="email" />
+              <input required type="email" />
             </div>
             <div className="item">
               <label>Password</label>
-              <input type="password" />
+              <input required type="password" />
             </div>
             <div className="item">
               <label> Confirm Password</label>
-              <input type="password" />
+              <input required type="password" />
             </div>
             <div className="btns">
               <button className="back" onClick={handleBackPage}>
                 Back
               </button>
-              <button className="next" onClick={() => setSuccess(true)}>
-                Create Your Account
-              </button>
+              <button className="next">Create Your Account</button>
             </div>
           </div>
         </form>
@@ -226,9 +388,7 @@ const Form = () => {
     },
   ];
 
-  return success ? (
-    <h1>Success</h1>
-  ) : (
+  return (
     <div className="form">
       <div className="nav">
         <div className="logo">
@@ -256,7 +416,9 @@ const Form = () => {
           ></div>
         ))}
       </div>
-      <div className="formContainer">{pages[currentPage - 1].content}</div>
+      <div className="formContainer">
+        {success ? <SuccessPage /> : pages[currentPage - 1].content}
+      </div>
     </div>
   );
 };

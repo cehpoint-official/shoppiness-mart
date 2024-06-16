@@ -49,9 +49,10 @@ $breakpointForm2: 675px;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     background-color: #f0f9ff;
-    place-items: flex-start;
+    place-items: center;
     font-family: $font;
     padding: $padd;
+    text-align: center;
     @media (max-width: $breakpoint2) {
       display: flex;
       flex-direction: column;
@@ -104,7 +105,7 @@ $breakpointForm2: 675px;
       transition: 0.34s all ease-in-out;
       background-color: rgba(255, 255, 255, 0.807);
       &.active {
-        background-color: #669BF2;
+        background-color: #669bf2;
       }
     }
   }
@@ -115,7 +116,7 @@ $breakpointForm2: 675px;
     @media (max-width: $breakpoint2) {
       padding: 50px;
     }
-    .formFirst {
+    .causeformFirst {
       display: flex;
       width: 100%;
       justify-content: space-between;
@@ -137,6 +138,15 @@ $breakpointForm2: 675px;
           display: flex;
           flex-direction: column;
           gap: 8px;
+          .causeDesc {
+            border: 1px solid gray;
+            outline: none;
+            width: 70%;
+            padding: 15px 25px;
+            @media (max-width: $breakpoint3) {
+              width: 100%;
+            }
+          }
           label {
             font-size: 17px;
             color: #2d393f;
@@ -146,7 +156,7 @@ $breakpointForm2: 675px;
             width: 70%;
             padding: 15px 25px;
             outline: none;
-            @media (max-width: $breakpoint2) {
+            @media (max-width: $breakpoint3) {
               width: 100%;
             }
           }
@@ -154,15 +164,12 @@ $breakpointForm2: 675px;
             font-size: 17px;
             color: #2d393f;
           }
-        }
-        .options {
-          display: flex;
-          width: 100px;
-          gap: 10px;
 
-          label {
-            font-size: 17px;
-            color: #2d393f;
+          p {
+            width: 70%;
+            @media (max-width: $breakpoint3) {
+              width: 100%;
+            }
           }
         }
       }
@@ -174,6 +181,22 @@ $breakpointForm2: 675px;
         flex-direction: column;
         @media (max-width: $breakpoint2) {
           width: 100%;
+        }
+        .options {
+          display: flex;
+          width: 100px;
+          gap: 10px;
+          @media (max-width: $breakpoint3) {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 20px;
+          }
+          label {
+            font-size: 17px;
+            color: #2d393f;
+            min-width: max-content;
+          }
         }
         .item {
           display: flex;
@@ -202,7 +225,7 @@ $breakpointForm2: 675px;
         .btns {
           display: flex;
           gap: 10px;
-          margin-top: 20px;
+          margin-top: auto;
           @media (max-width: $breakpoint3) {
             flex-direction: column;
             gap: 30px;
@@ -359,6 +382,16 @@ $breakpointForm2: 675px;
             align-items: center;
             justify-content: center;
           }
+        }
+
+        .uploadProgress{
+          background-color: rgb(237, 237, 237);
+          align-items: center;
+          justify-content: center;
+          display: flex;
+          padding: 10px;
+          color: #3ab002;
+          border-radius: 10px;
         }
       }
     }
