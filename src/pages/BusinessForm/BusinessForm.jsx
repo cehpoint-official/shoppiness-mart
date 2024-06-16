@@ -4,7 +4,7 @@ import { FaCircleCheck } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import logo from "../../assets/RegisterBusiness/logo.png";
 import { addDoc, collection } from "firebase/firestore";
-import { db, storage } from "../../config/firebase.js";
+import { db, storage } from "../../config/Firebase.js";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import SuccessPage from "../../Components/SuccessPage/SuccessPage";
 
