@@ -17,7 +17,7 @@ import CauseForm from "./pages/CauseForm/CauseForm";
 import ContactUs from "./pages/ContactUs";
 import AboutUs from "./pages/AboutUs";
 import Blogs from "./pages/Blogs";
-
+import UserDashboard from "./pages/UserDashboard/UserDashBoard"
 import { Outlet, createBrowserRouter, RouterProvider } from "react-router-dom";
 const App = () => {
   const Layout = () => {
@@ -94,6 +94,10 @@ const App = () => {
         {
           path: "/test",
           element: <Test />,
+        },
+        { 
+          path: "/user-dashboard/:id",
+          element: <UserDashboard />,
         },
       ],
     },

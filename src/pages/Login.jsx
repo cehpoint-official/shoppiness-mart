@@ -4,13 +4,33 @@ import Loginimg from "../assets/loginimg.png";
 import ShoppingBag2 from "../assets/ShoppingBag2.png";
 import Googleicon from "../assets/googleicon.png";
 import Facebookicon from "../assets/facebookicon.png";
-import { Link } from "react-router-dom";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../config/firebase";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [userData, setUserData] = useState({
-    // email: "yadavuma419@gmail.com",
-    // password: '123456'
+    email: "",
+    password: "",
   });
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const submitHandler = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const res = await signInWithEmailAndPassword(
+        auth,
+        userData.email,
+        userData.password
+      );
+      navigate(`/user-dashboard/${res.user.uid}`);
+    } catch (error) {
+      console.log(error);
+    }
+    setLoading(false);
+  };
 
   return (
     <>
@@ -36,8 +56,9 @@ const Login = () => {
           </div>
 
           {/* <!-- Right Column --> */}
+
           <div className="w-full sm:w-1/2 flex flex-col justify-center p-4">
-            <div className="w-full max-w-md mx-auto">
+            <form className="w-full max-w-md mx-auto">
               <div className="flex flex-col gap-4">
                 <p className="text-4xl font-semibold text-center mt-10 md:mt-12">
                   Login
@@ -45,6 +66,11 @@ const Login = () => {
                 <p className="text-xl text-gray-500 text-center mt-10">
                   Welcome! Login in to your account
                 </p>
+                {loading && (
+                  <span className="text-green-500 font-semibold">
+                    Logging in...
+                  </span>
+                )}
 
                 <div className="mt-3">
                   <label htmlFor="email" className="block mb-1 text-gray-600">
@@ -52,6 +78,7 @@ const Login = () => {
                   </label>
                   <input
                     type="email"
+                    required
                     onChange={(e) =>
                       setUserData({ ...userData, email: e.target.value })
                     }
@@ -67,6 +94,7 @@ const Login = () => {
                     Password
                   </label>
                   <input
+                    required
                     onChange={(e) =>
                       setUserData({ ...userData, password: e.target.value })
                     }
@@ -75,16 +103,17 @@ const Login = () => {
                     className="w-full p-2 border border-gray-200 bg-slate-100 rounded"
                   />
                 </div>
-                <a href="#" className="text-blue-600 underline text-center">
-                  I ve forgotten password
+                <a href="#" className="text-blue-700  text-center">
+                  Forgot password?
                 </a>
 
-                <Link
-                  to="/"
+                <button
+                  onClick={submitHandler}
+                  type="submit"
                   className="bg-[#049D8E] text-white text-center w-full py-2 rounded mt-6"
                 >
                   Login
-                </Link>
+                </button>
                 <div className="text-gray-500 text-center mt-5">or</div>
               </div>
 
@@ -111,7 +140,7 @@ const Login = () => {
                   </a>
                 </p>
               </div>
-            </div>
+            </form>
           </div>
         </div>
       </div>

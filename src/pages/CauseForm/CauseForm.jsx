@@ -4,19 +4,20 @@ import { FaCircleCheck } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import logo from "../../assets/RegisterBusiness/logo.png";
 import SuccessPage from "../../Components/SuccessPage/SuccessPage";
-// import { addDoc, collection } from "firebase/firestore";
-// import { db, storage } from "../../firebase.js";
-// import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { db, storage } from "../../config/firebase";
+import { addDoc, collection } from "firebase/firestore";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
 const Form = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [success, setSuccess] = useState(false);
   const [completedSteps, setCompletedSteps] = useState([false, false, false]);
-  const [businessDetails, setBusinessDetails] = useState({});
-  const [shopDetails, setShopDetails] = useState({});
+  const [causeDetails, setCauseDetails] = useState({});
   const [logoFile, setLogoFile] = useState(null);
   const [bannerFile, setBannerFile] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState("");
 
+  //next page
   const handleNextPage = (e) => {
     e.preventDefault();
 
@@ -29,12 +30,97 @@ const Form = () => {
     setCurrentPage((prev) => prev + 1);
   };
 
+  //previous page
   const handleBackPage = () => setCurrentPage((prev) => prev - 1);
 
+  //create Account
   const handleCreateAccount = (e) => {
     e.preventDefault();
+    addData();
     handleNextPage(e);
     setSuccess(true);
+  };
+
+  //setting and uploading logo
+  const handleFileChangeLogo = async (e) => {
+    const file = e.target.files[0];
+    setLogoFile(file);
+    if (file) {
+      await uploadFile(file);
+    }
+  };
+
+  //setting and uploading banner
+  const handleFileChangeBanner = async (e) => {
+    const file = e.target.files[0];
+    setBannerFile(file);
+    if (file) {
+      await uploadFile(file);
+    }
+  };
+
+  // uplod photo function with percentage
+  const uploadFile = (file) => {
+    return new Promise((resolve, reject) => {
+      const metadata = {
+        contentType: "image/jpeg",
+      };
+      const storageRef = ref(storage, "images/" + file.name);
+      const uploadTask = uploadBytesResumable(storageRef, file, metadata);
+
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setUploadProgress(`${progress}%`);
+          switch (snapshot.state) {
+            case "paused":
+              setUploadProgress(progress);
+              break;
+            case "running":
+              setUploadProgress(`Uploded ${progress}%`);
+
+              break;
+          }
+        },
+        (error) => {
+          switch (error.code) {
+            case "storage/unauthorized":
+              reject("User doesn't have permission to access the object");
+              break;
+            case "storage/canceled":
+              reject("User canceled the upload");
+              break;
+            case "storage/unknown":
+              reject("Unknown error occurred, inspect error.serverResponse");
+              break;
+            default:
+              reject("An error occurred");
+          }
+        },
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            resolve(downloadURL);
+          });
+        }
+      );
+    });
+  };
+
+  //Adding All data  to firestore DB
+  const addData = async () => {
+    try {
+      const logoUrl = logoFile ? await uploadFile(logoFile) : "";
+      const bannerUrl = bannerFile ? await uploadFile(bannerFile) : "";
+      await addDoc(collection(db, "causeDetails"), {
+        ...causeDetails,
+        logoUrl,
+        bannerUrl,
+      });
+    } catch (e) {
+      alert(e.message);
+    }
   };
 
   const pages = [
@@ -47,8 +133,8 @@ const Form = () => {
               <label>Cause/NGO Name</label>
               <input
                 onChange={(e) =>
-                  setBusinessDetails({
-                    ...businessDetails,
+                  setCauseDetails({
+                    ...causeDetails,
                     name: e.target.value,
                   })
                 }
@@ -61,8 +147,8 @@ const Form = () => {
               <textarea
                 className="causeDesc"
                 onChange={(e) =>
-                  setShopDetails({
-                    ...shopDetails,
+                  setCauseDetails({
+                    ...causeDetails,
                     shortDesc: e.target.value,
                   })
                 }
@@ -72,29 +158,29 @@ const Form = () => {
           <div className="right">
             <h3>Cause Type</h3>
             <div className="options">
-              <label htmlFor="online">Individual</label>
+              <label htmlFor="individual">Individual</label>
               <input
-                id="online"
+                id="individual"
                 name="options"
                 type="radio"
-                value="online"
+                value="individual"
                 onClick={(e) =>
-                  setBusinessDetails({
-                    ...businessDetails,
-                    mode: e.target.value,
+                  setCauseDetails({
+                    ...causeDetails,
+                    type: e.target.value,
                   })
                 }
               />
-              <label htmlFor="offline">Group / Organisation</label>
+              <label htmlFor="organisation">Group / Organisation</label>
               <input
-                id="offline"
+                id="organisation"
                 type="radio"
                 name="options"
-                value="offline"
+                value="organisation"
                 onClick={(e) =>
-                  setBusinessDetails({
-                    ...businessDetails,
-                    mode: e.target.value,
+                  setCauseDetails({
+                    ...causeDetails,
+                    type: e.target.value,
                   })
                 }
               />
@@ -120,8 +206,8 @@ const Form = () => {
               <label>Select Category</label>
               <select
                 onChange={(e) =>
-                  setShopDetails({
-                    ...shopDetails,
+                  setCauseDetails({
+                    ...causeDetails,
                     cat: e.target.value,
                   })
                 }
@@ -136,8 +222,8 @@ const Form = () => {
               <input
                 type="text"
                 onChange={(e) =>
-                  setShopDetails({
-                    ...shopDetails,
+                  setCauseDetails({
+                    ...causeDetails,
                     location: e.target.value,
                   })
                 }
@@ -148,8 +234,8 @@ const Form = () => {
               <input
                 type="text"
                 onChange={(e) =>
-                  setShopDetails({
-                    ...shopDetails,
+                  setCauseDetails({
+                    ...causeDetails,
                     pincode: e.target.value,
                   })
                 }
@@ -161,8 +247,8 @@ const Form = () => {
               <p>(Write a description about your Cause/NGO)</p>
               <textarea
                 onChange={(e) =>
-                  setShopDetails({
-                    ...shopDetails,
+                  setCauseDetails({
+                    ...causeDetails,
                     shortDesc: e.target.value,
                   })
                 }
@@ -170,6 +256,11 @@ const Form = () => {
             </div>
           </div>
           <div className="right">
+            {uploadProgress !== "" ? (
+              <p className="uploadProgress">{uploadProgress.slice(0, 12)}</p>
+            ) : (
+              ""
+            )}
             <div className="item">
               <h3>Upload Logo</h3>
               <label htmlFor="file1">
@@ -177,11 +268,7 @@ const Form = () => {
                 or
                 <p className="chooseFile">Choose File</p>
               </label>
-              <input
-                type="file"
-                id="file1"
-                onChange={(e) => setLogoFile(e.target.files[0])}
-              />
+              <input type="file" id="file1" onChange={handleFileChangeLogo} />
             </div>
 
             <div className="item">
@@ -191,11 +278,7 @@ const Form = () => {
                 or
                 <p className="chooseFile">Choose File</p>
               </label>
-              <input
-                type="file"
-                id="file2"
-                onChange={(e) => setBannerFile(e.target.files[0])}
-              />
+              <input type="file" id="file2" onChange={handleFileChangeBanner} />
             </div>
 
             <div className="btns">
@@ -249,11 +332,6 @@ const Form = () => {
                 Create Your Account
               </button>
             </div>
-            {/* {uploadProgress !== "" ? (
-              <p className="uploadProgress">{uploadProgress}</p>
-            ) : (
-              ""
-            )} */}
           </div>
         </form>
       ),

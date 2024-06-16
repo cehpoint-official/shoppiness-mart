@@ -4,11 +4,12 @@ import { FaCircleCheck } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import logo from "../../assets/RegisterBusiness/logo.png";
 import { addDoc, collection } from "firebase/firestore";
-import { db, storage } from "../../config/firebase.js";
+import { db, storage } from "../../config/firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import SuccessPage from "../../Components/SuccessPage/SuccessPage";
 
 const Form = () => {
+  //states
   const [currentPage, setCurrentPage] = useState(1);
   const [success, setSuccess] = useState(false);
   const [completedSteps, setCompletedSteps] = useState([false, false, false]);
@@ -18,6 +19,7 @@ const Form = () => {
   const [bannerFile, setBannerFile] = useState(null);
   const [uploadProgress, setUploadProgress] = useState("");
 
+  //next page
   const handleNextPage = (e) => {
     e.preventDefault();
     addDataBusiness();
@@ -31,6 +33,18 @@ const Form = () => {
 
     setCurrentPage((prev) => prev + 1);
   };
+
+  //previous page
+  const handleBackPage = () => setCurrentPage((prev) => prev - 1);
+
+  //create Account
+  const handleCreateAccount = (e) => {
+    e.preventDefault();
+    handleNextPage(e);
+    setSuccess(true);
+  };
+
+  //setting and uploading logo
   const handleFileChangeLogo = async (e) => {
     const file = e.target.files[0];
     setLogoFile(file);
@@ -39,6 +53,7 @@ const Form = () => {
     }
   };
 
+  //setting and uploading banner
   const handleFileChangeBanner = async (e) => {
     const file = e.target.files[0];
     setBannerFile(file);
@@ -46,8 +61,8 @@ const Form = () => {
       await uploadFile(file);
     }
   };
-  const handleBackPage = () => setCurrentPage((prev) => prev - 1);
 
+  // uplod photo function with percentage
   const uploadFile = (file) => {
     return new Promise((resolve, reject) => {
       const metadata = {
@@ -96,6 +111,7 @@ const Form = () => {
     });
   };
 
+  //Adding All Business data i.e page1 to firestore DB
   const addDataBusiness = async () => {
     try {
       const docRef = await addDoc(collection(db, "BusinessDetails"), {
@@ -107,6 +123,7 @@ const Form = () => {
     }
   };
 
+  //Adding All Shop data i.e page1 to firestore DB
   const addDataShop = async () => {
     try {
       const logoUrl = logoFile ? await uploadFile(logoFile) : "";
@@ -122,11 +139,9 @@ const Form = () => {
     }
   };
 
-  const handleCreateAccount = (e) => {
-    e.preventDefault();
-    handleNextPage(e);
-    setSuccess(true);
-  };
+
+
+
   const pages = [
     {
       title: "Business Details",
