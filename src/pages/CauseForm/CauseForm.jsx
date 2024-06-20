@@ -8,11 +8,19 @@ import { db, storage } from "../../config/firebase";
 import { addDoc, collection } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
-const Form = () => {
+const CauseForm = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [success, setSuccess] = useState(false);
   const [completedSteps, setCompletedSteps] = useState([false, false, false]);
-  const [causeDetails, setCauseDetails] = useState({});
+  const [causeDetails, setCauseDetails] = useState({
+    causeName: "",
+    aboutCause: "",
+    type: "",
+    cat: "",
+    location: "",
+    pincode: "",
+    shortDesc: "",
+  });
   const [logoFile, setLogoFile] = useState(null);
   const [bannerFile, setBannerFile] = useState(null);
   const [uploadProgress, setUploadProgress] = useState("");
@@ -73,7 +81,7 @@ const Form = () => {
         (snapshot) => {
           const progress =
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          setUploadProgress(`${progress}%`);
+          setUploadProgress(progress);
           switch (snapshot.state) {
             case "paused":
               setUploadProgress(progress);
@@ -132,24 +140,26 @@ const Form = () => {
             <div className="item">
               <label>Cause/NGO Name</label>
               <input
+                required
                 onChange={(e) =>
                   setCauseDetails({
                     ...causeDetails,
-                    name: e.target.value,
+                    causeName: e.target.value,
                   })
                 }
                 type="text"
               />
             </div>
             <div className="item">
-              <label>Short Description</label>
+              <label>About Cause</label>
               <p>(Write a description about your Cause/NGO)</p>
               <textarea
+                required
                 className="causeDesc"
                 onChange={(e) =>
                   setCauseDetails({
                     ...causeDetails,
-                    shortDesc: e.target.value,
+                    aboutCause: e.target.value,
                   })
                 }
               ></textarea>
@@ -164,6 +174,7 @@ const Form = () => {
                 name="options"
                 type="radio"
                 value="individual"
+                required
                 onClick={(e) =>
                   setCauseDetails({
                     ...causeDetails,
@@ -177,6 +188,7 @@ const Form = () => {
                 type="radio"
                 name="options"
                 value="organisation"
+                required
                 onClick={(e) =>
                   setCauseDetails({
                     ...causeDetails,
@@ -205,6 +217,7 @@ const Form = () => {
             <div className="item">
               <label>Select Category</label>
               <select
+                required
                 onChange={(e) =>
                   setCauseDetails({
                     ...causeDetails,
@@ -221,6 +234,7 @@ const Form = () => {
               <label>Location</label>
               <input
                 type="text"
+                required
                 onChange={(e) =>
                   setCauseDetails({
                     ...causeDetails,
@@ -232,7 +246,8 @@ const Form = () => {
             <div className="item">
               <label>PIN Code</label>
               <input
-                type="text"
+                type="number"
+                required
                 onChange={(e) =>
                   setCauseDetails({
                     ...causeDetails,
@@ -246,6 +261,7 @@ const Form = () => {
               <label>Short Description</label>
               <p>(Write a description about your Cause/NGO)</p>
               <textarea
+                required
                 onChange={(e) =>
                   setCauseDetails({
                     ...causeDetails,
@@ -268,6 +284,7 @@ const Form = () => {
                 or
                 <p className="chooseFile">Choose File</p>
               </label>
+
               <input type="file" id="file1" onChange={handleFileChangeLogo} />
             </div>
 
@@ -278,7 +295,12 @@ const Form = () => {
                 or
                 <p className="chooseFile">Choose File</p>
               </label>
-              <input type="file" id="file2" onChange={handleFileChangeBanner} />
+              <input
+                required
+                type="file"
+                id="file2"
+                onChange={handleFileChangeBanner}
+              />
             </div>
 
             <div className="btns">
@@ -300,29 +322,29 @@ const Form = () => {
           <div className="left">
             <div className="item">
               <label>First Name</label>
-              <input type="text" />
+              <input required type="text" />
             </div>
             <div className="item">
               <label>Last Name</label>
-              <input type="text" />
+              <input required type="text" />
             </div>
             <div className="item">
               <label>Mobile number</label>
-              <input type="text" />
+              <input required type="number" />
             </div>
           </div>
           <div className="right">
             <div className="item">
               <label>Email Address</label>
-              <input type="email" />
+              <input required type="email" />
             </div>
             <div className="item">
               <label>Password</label>
-              <input type="password" />
+              <input required type="password" />
             </div>
             <div className="item">
               <label> Confirm Password</label>
-              <input type="password" />
+              <input required type="password" />
             </div>
             <div className="btns">
               <button className="back" onClick={handleBackPage}>
@@ -374,4 +396,4 @@ const Form = () => {
   );
 };
 
-export default Form;
+export default CauseForm;

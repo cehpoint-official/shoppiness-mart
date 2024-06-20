@@ -57,7 +57,7 @@ const Signup = () => {
         ...userData,
         uid: user.uid,
       });
-      navigate(`/user-dashboard/${user.id}`);
+      navigate(`/user-dashboard/${user.uid}`);
       setcpassword("");
       console.log(user);
       setUserData({ fname: "", lname: "", phone: "", password: "", email: "" });

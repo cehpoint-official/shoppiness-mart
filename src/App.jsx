@@ -95,8 +95,8 @@ const App = () => {
           path: "/test",
           element: <Test />,
         },
-        { 
-          path: "/user-dashboard/:id",
+        {
+          path: "/user-dashboard/:userId",
           element: <UserDashboard />,
         },
       ],

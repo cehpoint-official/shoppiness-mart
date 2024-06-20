@@ -4,9 +4,10 @@ import Loginimg from "../assets/loginimg.png";
 import ShoppingBag2 from "../assets/ShoppingBag2.png";
 import Googleicon from "../assets/googleicon.png";
 import Facebookicon from "../assets/facebookicon.png";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../config/firebase";
+import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { auth, db, provider } from "../config/firebase";
 import { useNavigate } from "react-router-dom";
+import { doc, setDoc } from "firebase/firestore";
 
 const Login = () => {
   const [userData, setUserData] = useState({
@@ -27,9 +28,28 @@ const Login = () => {
       );
       navigate(`/user-dashboard/${res.user.uid}`);
     } catch (error) {
-      console.log(error);
+      alert(error.message);
     }
     setLoading(false);
+  };
+
+  const GoogleSubmitHandler = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const res = await signInWithPopup(auth, provider);
+      console.log(res);
+      await setDoc(doc(db, "users", res.user.uid), {
+        fname: res.user.displayName,
+        email: res.user.email,
+        profilePic: res.user.photoURL,
+      });
+      setLoading(false);
+      navigate(`/user-dashboard/${res.user.uid}`);
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   return (
@@ -122,6 +142,7 @@ const Login = () => {
                   src={Googleicon}
                   alt="Google Login"
                   className="border-2 px-8 py-2 rounded-md cursor-pointer"
+                  onClick={GoogleSubmitHandler}
                 />
                 <img
                   src={Facebookicon}

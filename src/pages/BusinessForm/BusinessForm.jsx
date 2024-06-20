@@ -4,26 +4,32 @@ import { FaCircleCheck } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import logo from "../../assets/RegisterBusiness/logo.png";
 import { addDoc, collection } from "firebase/firestore";
-import { db, storage } from "../../config/firebase";
+import { db, storage } from "../../config/firebase.js";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import SuccessPage from "../../Components/SuccessPage/SuccessPage";
 
-const Form = () => {
+const BusinessForm = () => {
   //states
   const [currentPage, setCurrentPage] = useState(1);
   const [success, setSuccess] = useState(false);
   const [completedSteps, setCompletedSteps] = useState([false, false, false]);
-  const [businessDetails, setBusinessDetails] = useState({});
-  const [shopDetails, setShopDetails] = useState({});
+  const [businessDetails, setBusinessDetails] = useState({
+    businessName: "",
+    owner: "",
+    mode: "",
+    contact: "",
+    email: "",
+    cat: "",
+    location: "",
+    pincode: "",
+    shortDesc: "",
+  });
   const [logoFile, setLogoFile] = useState(null);
   const [bannerFile, setBannerFile] = useState(null);
   const [uploadProgress, setUploadProgress] = useState("");
-
   //next page
   const handleNextPage = (e) => {
     e.preventDefault();
-    addDataBusiness();
-    addDataShop();
 
     setCompletedSteps((prev) => {
       const updatedSteps = [...prev];
@@ -40,6 +46,7 @@ const Form = () => {
   //create Account
   const handleCreateAccount = (e) => {
     e.preventDefault();
+    addData();
     handleNextPage(e);
     setSuccess(true);
   };
@@ -76,7 +83,7 @@ const Form = () => {
         (snapshot) => {
           const progress =
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          setUploadProgress(`${progress}%`);
+          setUploadProgress(progress);
           switch (snapshot.state) {
             case "paused":
               setUploadProgress(progress);
@@ -111,36 +118,20 @@ const Form = () => {
     });
   };
 
-  //Adding All Business data i.e page1 to firestore DB
-  const addDataBusiness = async () => {
-    try {
-      const docRef = await addDoc(collection(db, "BusinessDetails"), {
-        businessDetails,
-      });
-      console.log("Document written with ID: ", docRef.id);
-    } catch (e) {
-      console.error("Error adding document: ", e);
-    }
-  };
-
-  //Adding All Shop data i.e page1 to firestore DB
-  const addDataShop = async () => {
+  //Adding All data  to firestore DB
+  const addData = async () => {
     try {
       const logoUrl = logoFile ? await uploadFile(logoFile) : "";
       const bannerUrl = bannerFile ? await uploadFile(bannerFile) : "";
-      const docRef = await addDoc(collection(db, "ShopDetails"), {
-        ...shopDetails,
+      await addDoc(collection(db, "businessDetails"), {
+        ...businessDetails,
         logoUrl,
         bannerUrl,
       });
-      console.log("Document written with ID: ", docRef.id);
     } catch (e) {
-      console.error("Error adding document: ", e);
+      alert(e.message);
     }
   };
-
-
-
 
   const pages = [
     {
@@ -154,10 +145,10 @@ const Form = () => {
                 onChange={(e) =>
                   setBusinessDetails({
                     ...businessDetails,
-                    name: e.target.value,
+                    businessName: e.target.value,
                   })
                 }
-                // required
+                required
                 type="text"
               />
             </div>
@@ -170,7 +161,7 @@ const Form = () => {
                     owner: e.target.value,
                   })
                 }
-                // required
+                required
                 type="text"
               />
             </div>
@@ -182,7 +173,7 @@ const Form = () => {
                 name="options"
                 type="radio"
                 value="online"
-                // required
+                required
                 onClick={(e) =>
                   setBusinessDetails({
                     ...businessDetails,
@@ -196,7 +187,7 @@ const Form = () => {
                 type="radio"
                 name="options"
                 value="offline"
-                // required
+                required
                 onClick={(e) =>
                   setBusinessDetails({
                     ...businessDetails,
@@ -212,7 +203,7 @@ const Form = () => {
               <p>(The number of the business man or service provider office)</p>
               <input
                 type="tel"
-                // required
+                required
                 onChange={(e) =>
                   setBusinessDetails({
                     ...businessDetails,
@@ -227,7 +218,7 @@ const Form = () => {
               <p>(The number of the business man or service provider office)</p>
               <input
                 type="email"
-                // required
+                required
                 onChange={(e) =>
                   setBusinessDetails({
                     ...businessDetails,
@@ -257,10 +248,10 @@ const Form = () => {
             <div className="item">
               <label>Select Category</label>
               <select
-                // required
+                required
                 onChange={(e) =>
-                  setShopDetails({
-                    ...shopDetails,
+                  setBusinessDetails({
+                    ...businessDetails,
                     cat: e.target.value,
                   })
                 }
@@ -273,11 +264,11 @@ const Form = () => {
             <div className="item">
               <label>Location</label>
               <input
-                // required
+                required
                 type="text"
                 onChange={(e) =>
-                  setShopDetails({
-                    ...shopDetails,
+                  setBusinessDetails({
+                    ...businessDetails,
                     location: e.target.value,
                   })
                 }
@@ -286,11 +277,11 @@ const Form = () => {
             <div className="item">
               <label>PIN Code</label>
               <input
-                // required
-                type="text"
+                required
+                type="number"
                 onChange={(e) =>
-                  setShopDetails({
-                    ...shopDetails,
+                  setBusinessDetails({
+                    ...businessDetails,
                     pincode: e.target.value,
                   })
                 }
@@ -301,10 +292,10 @@ const Form = () => {
               <label>Short Description</label>
               <p>(Write a description about your business or service)</p>
               <textarea
-                // required
+                required
                 onChange={(e) =>
-                  setShopDetails({
-                    ...shopDetails,
+                  setBusinessDetails({
+                    ...businessDetails,
                     shortDesc: e.target.value,
                   })
                 }
@@ -313,7 +304,7 @@ const Form = () => {
           </div>
           <div className="right">
             {uploadProgress !== "" ? (
-              <p className="uploadProgress">{uploadProgress}</p>
+              <p className="uploadProgress">{uploadProgress.slice(0, 12)}</p>
             ) : (
               ""
             )}
@@ -325,12 +316,7 @@ const Form = () => {
                 <p className="chooseFile">Choose File</p>
               </label>
 
-              <input
-                // required
-                type="file"
-                id="file1"
-                onChange={handleFileChangeLogo}
-              />
+              <input type="file" id="file1" onChange={handleFileChangeLogo} />
             </div>
 
             <div className="item">
@@ -340,12 +326,7 @@ const Form = () => {
                 or
                 <p className="chooseFile">Choose File</p>
               </label>
-              <input
-                // required
-                type="file"
-                id="file2"
-                onChange={handleFileChangeBanner}
-              />
+              <input type="file" id="file2" onChange={handleFileChangeBanner} />
             </div>
 
             <div className="btns">
@@ -438,4 +419,4 @@ const Form = () => {
   );
 };
 
-export default Form;
+export default BusinessForm;

@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import "./ReuseableTop.scss";
 const ReuseableTop = (props) => {
   const { name, title, paragraph, img } = props;
-  console.log(name);
   return (
     <div className="ReuseableTop">
       <div className="left">
