@@ -1,6 +1,6 @@
 import "./UserDashBoard.scss";
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "../../config/firebase";
+import { db } from "../../../firebase.js";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
