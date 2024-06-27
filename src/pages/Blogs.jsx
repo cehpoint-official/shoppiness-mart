@@ -49,7 +49,7 @@ const Blogs = () => {
               <p className="text-parapgraphColor text-sm md:text-basic">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit.
                 Blanditiis,commodi tempora mollitia voluptatem recusandae
-                impedit totam aperiam nesciunt doloremque magni neque placeat,
+                impedit totam aperiam nesciunt doloremque magni neque placeat, 
                 laborum nisi eum quae voluptatum
               </p>
             </div>
