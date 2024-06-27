@@ -19,6 +19,8 @@ import AboutUs from "./pages/AboutUs";
 import Blogs from "./pages/Blogs";
 import UserDashboard from "./pages/UserDashboard/UserDashBoard"
 import { Outlet, createBrowserRouter, RouterProvider } from "react-router-dom";
+import OnlineShop from "./pages/OnlineShop";
+import OfflineShop from "./pages/OfflineShop";
 const App = () => {
   const Layout = () => {
     return (
@@ -86,6 +88,14 @@ const App = () => {
         {
           path: "/cashback-deals",
           element: <CashbackDeals />,
+        },
+        {
+          path: "/offline-shop",
+          element: <OfflineShop />,
+        },
+        {
+          path: "/online-shop",
+          element: <OnlineShop />,
         },
         {
           path: "/shop",
