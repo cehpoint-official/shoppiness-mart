@@ -5,7 +5,7 @@ import ShoppingBag2 from "../assets/ShoppingBag2.png";
 import Signupimg from "../assets/signupimg.png";
 import Googleicon from "../assets/googleicon.png";
 import Facebookicon from "../assets/facebookicon.png";
-import { auth, db } from "../config/firebase.js";
+import { auth, db } from "../../firebase.js";
 import { useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 const Signup = () => {

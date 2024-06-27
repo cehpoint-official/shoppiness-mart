@@ -5,7 +5,7 @@ import ShoppingBag2 from "../assets/ShoppingBag2.png";
 import Googleicon from "../assets/googleicon.png";
 import Facebookicon from "../assets/facebookicon.png";
 import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
-import { auth, db, provider } from "../config/firebase.js";
+import { auth, db, provider } from "../../firebase.js";
 import { useNavigate } from "react-router-dom";
 import { doc, setDoc } from "firebase/firestore";
 
