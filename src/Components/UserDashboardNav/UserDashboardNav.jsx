@@ -5,7 +5,7 @@ import { CiLocationOn } from "react-icons/ci";
 import { Link } from "react-router-dom";
 import { IoNotifications } from "react-icons/io5";
 
-const UserDashboardNav = () => {
+const UserDashboardNav = ({profilePic}) => {
   return (
     <div className="UserDashboardNav">
       <div className="upperNav">
@@ -49,7 +49,7 @@ const UserDashboardNav = () => {
           <IoNotifications />
           <div className="profilePic">
             <img
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8oghbsuzggpkknQSSU-Ch_xep_9v3m6EeBQ&s"
+              src={profilePic || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8oghbsuzggpkknQSSU-Ch_xep_9v3m6EeBQ&s"}
               alt=""
             />
           </div>

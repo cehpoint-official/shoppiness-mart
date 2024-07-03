@@ -1,8 +1,109 @@
+$padding: 0px 100px;
+$font: "Poppins", sans-serif;
+
 .userDashboard {
-  img {
-    width: 100px;
-    height: 100px;
-    border-radius: 100%;
-    object-fit: contain;
+  .userDashboardContainer {
+    padding: $padding;
+
+    .mainDashboard {
+      display: flex;
+      padding: 50px 0px;
+      .topSec {
+        display: flex;
+        width: 100%;
+        gap: 10px;
+        .left {
+          width: 80%;
+          padding: 40px 50px;
+          display: flex;
+          border-radius: 10px;
+          gap: 70px;
+          box-shadow: 0px 1px 15px 0px #0000002e;
+
+          .profile {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            overflow: hidden;
+            img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+            }
+          }
+
+          .info {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            .name {
+              display: flex;
+              gap: 5px;
+
+              h3 {
+                font-size: 43px;
+                font-weight: 500px;
+              }
+            }
+            .email,
+            .phone {
+              display: flex;
+              align-items: center;
+              gap: 10px;
+              font-size: 18px;
+
+              svg {
+                font-size: 20px;
+              }
+            }
+
+            button {
+              width: max-content;
+              background-color: #0059de;
+              font-size: 18px;
+              color: #fff;
+              padding: 5px;
+            }
+          }
+        }
+
+        .right {
+          width: 20%;
+          padding: 15px;
+          box-shadow: 0px 1px 15px 0px #0000002e;
+          border-radius: 10px;
+          display: flex;
+          flex-direction: column;
+          gap: 30px;
+          h2 {
+            font-size: 30px;
+            font-weight: 600;
+          }
+          .links {
+            display: flex;
+            flex-direction: column;
+            padding: 0px 20px;
+            gap: 20px;
+
+            .link {
+              border: 2px solid #0059de;
+              padding: 6px 30px;
+              border-radius: 10px;
+              color: #0059de;
+              font-size: 18px;
+              font-weight: 500;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              gap: 10px;
+              min-width: 200px;
+              svg {
+                font-size: 20px;
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }

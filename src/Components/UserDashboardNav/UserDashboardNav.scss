@@ -62,7 +62,7 @@ $font: "Poppins", sans-serif;
 
   .lowerNav {
     background-color: #047e72;
-    height: 80px;
+    height: 100px;
     padding: $padding;
     display: flex;
     align-items: center;
@@ -94,6 +94,7 @@ $font: "Poppins", sans-serif;
         width: 60px;
         height: 60px;
         border-radius: 100%;
+        overflow: hidden;
 
         img {
           width: 100%;
