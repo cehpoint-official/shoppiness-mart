@@ -3,6 +3,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../../firebase.js";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import UserDashboardNav from "../../Components/UserDashboardNav/UserDashboardNav.jsx";
 
 const UserDashBoard = () => {
   const [userData, setUserData] = useState({});
@@ -32,16 +33,11 @@ const UserDashBoard = () => {
         "Loading..."
       ) : (
         <>
-          <img
-            src={
-              userData.profilePic ||
-              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAd5avdba8EiOZH8lmV3XshrXx7dKRZvhx-A&s"
-            }
-            alt=""
-          />
-          <h1>{`Name: ${userData.fname}`}</h1>
-          <h1>{`Email: ${userData.email}`} </h1>
-          <h1>{`Phone: ${userData.phone || "Not Added"}`} </h1>
+          <div className="userDashboard">
+            <div className="userDashboardContainer">
+              <UserDashboardNav />
+            </div>
+          </div>
         </>
       )}
     </div>

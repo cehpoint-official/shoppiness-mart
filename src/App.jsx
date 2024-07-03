@@ -17,7 +17,7 @@ import CauseForm from "./pages/CauseForm/CauseForm";
 import ContactUs from "./pages/ContactUs";
 import AboutUs from "./pages/AboutUs";
 import Blogs from "./pages/Blogs";
-import UserDashboard from "./pages/UserDashboard/UserDashBoard"
+import UserDashboard from "./pages/UserDashboard/UserDashBoard";
 import { Outlet, createBrowserRouter, RouterProvider } from "react-router-dom";
 import OnlineShop from "./pages/OnlineShop";
 import OfflineShop from "./pages/OfflineShop";
@@ -105,14 +105,14 @@ const App = () => {
           path: "/test",
           element: <Test />,
         },
-        {
-          path: "/user-dashboard/:userId",
-          element: <UserDashboard />,
-        },
       ],
     },
     { path: "/business-form", element: <BusinessForm /> },
     { path: "/cause-form", element: <CauseForm /> },
+    {
+      path: "/user-dashboard/:userId",
+      element: <UserDashboard />,
+    },
   ]);
   return (
     <div>
