@@ -8,7 +8,7 @@ const DataFetchingComponent = () => {
   
   useEffect(() => {
     const fetchData = async () => {
-      // const stores = "https://proxy-server-1-qaao.onrender.com/";
+      // const stores = " ";
       const offers = "https://proxy-server-1-qaao.onrender.com/offers";
 
       try {

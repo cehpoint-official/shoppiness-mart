@@ -2,8 +2,11 @@ import "./UserDashBoard.scss";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../../firebase.js";
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-
+import { Link, useParams } from "react-router-dom";
+import UserDashboardNav from "../../Components/UserDashboardNav/UserDashboardNav.jsx";
+import { MdOutlineMailOutline } from "react-icons/md";
+import { FaPhoneAlt } from "react-icons/fa";
+import { IoArrowRedoSharp } from "react-icons/io5";
 const UserDashBoard = () => {
   const [userData, setUserData] = useState({});
   const [loading, setLoading] = useState(true);
@@ -15,6 +18,7 @@ const UserDashBoard = () => {
 
     if (docSnap.exists()) {
       setUserData(docSnap.data());
+      console.log(docSnap.data());
       setLoading(false);
       console.log(docSnap.data());
     } else {
@@ -32,16 +36,59 @@ const UserDashBoard = () => {
         "Loading..."
       ) : (
         <>
-          <img
-            src={
-              userData.profilePic ||
-              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAd5avdba8EiOZH8lmV3XshrXx7dKRZvhx-A&s"
-            }
-            alt=""
-          />
-          <h1>{`Name: ${userData.fname}`}</h1>
-          <h1>{`Email: ${userData.email}`} </h1>
-          <h1>{`Phone: ${userData.phone || "Not Added"}`} </h1>
+          <div className="userDashboard">
+            <UserDashboardNav profilePic={userData.profilePic} />
+            <div className="userDashboardContainer">
+              <div className="mainDashboard">
+                <div className="topSec">
+                  <div className="left">
+                    <div className="profile">
+                      <img
+                        src={
+                          userData.profilePic ||
+                          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8oghbsuzggpkknQSSU-Ch_xep_9v3m6EeBQ&s"
+                        }
+                        alt="err"
+                      />
+                    </div>
+                    <div className="info">
+                      <div className="name">
+                        <h3>{userData.fname}</h3>
+                        <h3>{userData.lname || ""}</h3>
+                      </div>
+                      <div className="email">
+                        <MdOutlineMailOutline />
+                        <p>{userData.email}</p>
+                      </div>
+                      <div className="phone">
+                        <FaPhoneAlt />
+                        <p>{userData.phone || "Not Added!"}</p>
+                      </div>
+                      <button>Edit Profile</button>
+                    </div>
+                  </div>
+                  <div className="right">
+                    <h2>Let's start Shopping!</h2>
+                    <div className="links">
+                      <Link>
+                        <div className="link">
+                          Online Shop
+                          <IoArrowRedoSharp />
+                        </div>
+                      </Link>
+
+                      <Link>
+                        <div className="link">
+                          Offline Shop
+                          <IoArrowRedoSharp />
+                        </div>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </>
       )}
     </div>
