@@ -22,8 +22,6 @@ import { Outlet, createBrowserRouter, RouterProvider } from "react-router-dom";
 import OnlineShop from "./pages/OnlineShop";
 import OfflineShop from "./pages/OfflineShop";
 
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-
 const App = () => {
   const Layout = () => {
     return (
@@ -56,10 +54,7 @@ const App = () => {
           path: "/contact",
           element: <ContactUs />,
         },
-        // {
-        //   path: "/privacy-policy",
-        //   element: <PrivacyPolicy />,
-        // },
+
         {
           path: "/about",
           element: <AboutUs />,
