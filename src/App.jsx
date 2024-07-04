@@ -56,10 +56,10 @@ const App = () => {
           path: "/contact",
           element: <ContactUs />,
         },
-        {
-          path: "/privacy-policy",
-          element: <PrivacyPolicy />,
-        },
+        // {
+        //   path: "/privacy-policy",
+        //   element: <PrivacyPolicy />,
+        // },
         {
           path: "/about",
           element: <AboutUs />,
