@@ -7,6 +7,12 @@ import UserDashboardNav from "../../Components/UserDashboardNav/UserDashboardNav
 import { MdOutlineMailOutline } from "react-icons/md";
 import { FaPhoneAlt } from "react-icons/fa";
 import { IoArrowRedoSharp } from "react-icons/io5";
+import Widget from "../../Components/Widget/Widget.jsx";
+import money from "../../assets/RegisterBusiness/money-vector.png";
+import tag from "../../assets/RegisterBusiness/tag-vector.png";
+import giveback from "../../assets/RegisterBusiness/giveback-vector.png";
+import cashback from "../../assets/RegisterBusiness/cashback-vector.png";
+import Loader from "../../Components/Loader/Loader.jsx";
 const UserDashBoard = () => {
   const [userData, setUserData] = useState({});
   const [loading, setLoading] = useState(true);
@@ -33,7 +39,7 @@ const UserDashBoard = () => {
   return (
     <div className="userDashboard">
       {loading ? (
-        "Loading..."
+        <Loader/>
       ) : (
         <>
           <div className="userDashboard">
@@ -70,14 +76,14 @@ const UserDashBoard = () => {
                   <div className="right">
                     <h2>Let's start Shopping!</h2>
                     <div className="links">
-                      <Link>
+                      <Link to="/online-shop">
                         <div className="link">
                           Online Shop
                           <IoArrowRedoSharp />
                         </div>
                       </Link>
 
-                      <Link>
+                      <Link to="/offline-shop">
                         <div className="link">
                           Offline Shop
                           <IoArrowRedoSharp />
@@ -86,6 +92,28 @@ const UserDashBoard = () => {
                     </div>
                   </div>
                 </div>
+              </div>
+              <div className="widgets">
+                <Widget
+                  title="Collected Cash backs"
+                  heading="RS 2500"
+                  icon={money}
+                />
+                <Widget
+                  title="Collected Coupon "
+                  heading="04"
+                  icon={tag}
+                />
+                <Widget
+                  title="Give Back"
+                  heading="500"
+                  icon={giveback}
+                />
+                <Widget
+                  title="Cash back requests"
+                  heading="02"
+                  icon={cashback}
+                />
               </div>
             </div>
           </div>
