@@ -9,8 +9,7 @@ const DataFetchingComponent = () => {
   useEffect(() => {
     const fetchData = async () => {
       // const stores = " ";
-      const offers = "https://proxy-server-1-qaao.onrender.com/offers";
-
+      const offers = "https://proxy-server-1-qaao.onrender.com/offers";      
       try {
         const response = await axios.get(offers);
         setData(response.data);
@@ -21,11 +20,13 @@ const DataFetchingComponent = () => {
         console.error('Error:', error);
       }
       
+
     };
     
     fetchData();
   }, []);
    console.log(data);
+   console.log("code test1 ");
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
@@ -42,6 +43,6 @@ const DataFetchingComponent = () => {
       </ul>
     </div>
   );
-};
+}; 
 
 export default DataFetchingComponent;
