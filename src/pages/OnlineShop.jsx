@@ -15,6 +15,7 @@ const OnlineShop = () => {
         const response = await axios.get(
           "https://proxy-server-1-qaao.onrender.com"
         );
+        console.log(response.data);
         setStores(response.data.stores);
       } catch (error) {
         console.log(error);

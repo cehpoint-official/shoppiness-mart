@@ -18,6 +18,8 @@ import Blog3 from "../assets/Home/blog3.png";
 import Card7th1 from "../assets/card7th1.png";
 import Card7th2 from "../assets/card7th2.png";
 import Card7th3 from "../assets/card7th3.png";
+import bgimg from "../assets/imagehome.png";
+import homepage from "../assets/homepage.png";
 import Backimg9 from "../assets/Home/backimg9.png";
 import FAQ from "../Components/FAQ";
 import PeopleSaySection from "../Components/PeopleSaySection";
@@ -26,7 +28,37 @@ import RoundedCards from "../Components/RoundedCards/RoundedCards";
 import Carousel from "../Components/Carousel/Carousel";
 import Partners from "../Components/Partners";
 
+import { useState } from "react";
+import { db } from "../../firebase"; // Adjust the import path as necessary
+import { collection, addDoc } from "firebase/firestore";
+
 const Home = () => {
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+
+  const handleSubscribe = async (e) => {
+    e.preventDefault();
+    if (!email) {
+      setMessage("Please enter a valid email address.");
+      return;
+    }
+
+    try {
+      await addDoc(collection(db, "Newsletter"), {
+        email: email,
+        timestamp: new Date(),
+      });
+      setMessage("Successfully subscribed!");
+      setInterval(() => {
+        setMessage("");
+      }, 5000);
+      setEmail("");
+    } catch (error) {
+      console.error("Error adding document: ", error);
+      setMessage("Subscription failed. Please try again.");
+    }
+  };
+
   return (
     <div className=" overflow-hidden">
       {/* 1st Page  */}
@@ -75,6 +107,38 @@ const Home = () => {
               Blanditiis,commodi tempora mollitia voluptatem recusandae .
             </p>
           </div>
+        </div>
+      </div>
+
+      <div
+        className="gap-20 flex justify-center items-center flex-wrap py-20"
+        style={{
+          backgroundImage: `url(${bgimg})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        <div className="md:w-[550px] md:mt-6  ">
+          <p className="text-xl mb-2 ">How it works</p>
+          <h1 className="md:text-4xl text-3xl font-semibold font-slab mb-4">
+            Cashback,Deals for you,help to others
+          </h1>
+          <p className="text-parapgraphColor text-sm md:text-lg">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit.
+            Blanditiis,commodi tempora mollitia .Lorem ipsum dolor sit amet
+            consectetur adipisicing elit. Blanditiis,commodi tempora mollitia
+            Lorem ipsum dolor sit amet consectetur adipisicing elit.
+            Blanditiis,commodi tempora mollitia .Lorem ipsum dolor sit amet
+            consectetur adipisicing elit. Blanditiis,commodi tempora mollitia
+          </p>
+          <div className="flex gap-2">
+            <button className="bg-teal-500 text-white font-medium rounded-md text-sm md:text-base h-[40px] w-[150px] mt-4">
+              Sign up for free
+            </button>
+          </div>
+        </div>
+        <div className="mt-6">
+          <img src={homepage} alt="Loading..." className="w-[400px]" />
         </div>
       </div>
       {/* 4th page */}
@@ -252,34 +316,43 @@ const Home = () => {
           </div>
         </div>
       </div>
-      {/* 10th page */}
-      <div className="mt-44 mx-auto  flex flex-col justify-center items-center">
+      {/* NewsLetter */}
+      <div className="mt-44 mx-auto flex flex-col justify-center items-center">
         <div className="absolute">
           <img
             src={Backimg9}
-            alt=""
-            className="w-[100%] md:h-[100%] h-[300px] "
+            alt="Background"
+            className="w-[100%] md:h-[100%] h-[300px]"
           />
         </div>
-        <div className="relative  text-center">
+        <div className="relative text-center">
           <p className="font-bold font-slab md:text-4xl text-3xl">
             Subscribe to Our Newsletter
           </p>
           <p className="text-gray-600 md:text-base text-sm mx-auto mt-2">
             Improving your small business growth through Onir app. It also
           </p>
-          <div className="md:mx-20 mx-10 ">
-            <div className=" flex justify-center items-center mt-16   w-full">
+          <div className="md:mx-20 mx-10">
+            <form
+              className="flex justify-center items-center mt-16 w-full"
+              onSubmit={handleSubscribe}
+            >
               <input
-                type="search"
-                className=" px-24 w-full    text-gray-900 bg-white border-2 py-3 "
+                type="email"
+                className="px-24 w-full text-gray-900 bg-white border-2 py-3"
                 placeholder="Enter your Email here"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
-              <button className=" text-lg px-4   py-3 border-2 text-white bg-[#049D8E]">
+              <button
+                className="text-lg px-4 py-3 border-2 text-white bg-[#049D8E]"
+                type="submit"
+              >
                 Subscribe
               </button>
-            </div>
+            </form>
+            {message && <p className="mt-4 text-gray-600">{message}</p>}
           </div>
         </div>
       </div>
