@@ -115,7 +115,15 @@ const UserDashBoard = () => {
                   icon={cashback}
                 />
               </div>
+              <div className="welcomeContainer">
+                <h2>Hello <span>{userData.fname}</span> , Welcome to your Dashboard</h2>
+                <p>Thanks for signing up and choosing to support our mission. We would like to help you get started and generating donations from your everyday shopping.
+                Get great offers & Cashback.</p>
+                <button>Show Me how get cashback to give back</button>
+
+              </div>
             </div>
+            
           </div>
         </>
       )}
