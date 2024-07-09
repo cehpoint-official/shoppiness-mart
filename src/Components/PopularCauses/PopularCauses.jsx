@@ -1,41 +1,54 @@
-
-
+import { useEffect, useState } from "react";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../../firebase";
 import "./PopularCauses.scss";
 
-const PopularCauses = ({ color, data }) => {
+const PopularCauses = () => {
+  const [causes, setCauses] = useState(null);
+  useEffect(() => {
+    const fetchCauses = async () => {
+      try {
+        const docRef = doc(db, "Causes", "OxT3LtS6aO3GhZ2NbEeo");
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          setCauses(docSnap.data().causesList);
+          console.log(docSnap.data().causesList);
+        } else {
+          console.log("No such document!");
+        }
+      } catch (error) {
+        console.log("Error getting document:", error);
+      }
+    };
+
+    fetchCauses();
+  }, []);
+
   return (
-    <div
-      className="causes"
-      style={{
-        backgroundColor: color,
-      }}
-    >
+    <div className="causes">
       <div className="upperSec">
-        <h1>Why you use this platform</h1>
+        <h1>Our Popular Causes</h1>
         <p>
           Lorem ipsum dolor sit amet consectetur adipisicing elit.
           Blanditiis,commodi tempora mollitia voluptatem
         </p>
       </div>
       <div className="lowerSec">
-        {data.map((e) => (
-          <div className="lowerCard" key={e.id}>
-            <img src={e.img} alt="card" />
-            <h4>{e.title}</h4>
-            <span>{e.titleSmall}</span>
-            <h6>400 Supports, 5,000000 raised</h6>
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Blanditiis,commodi tempora mollitia voluptatem recusandae impedit
-              totam aperiam nesciunt doloremque magni neque placeat, laborum
-              nisi tiis,commodi tempora mollitia voluptatem recusandae impedit
-              totam aperiam nesciunt doloremque magni neque placeat, laborum
-              nisi
-            </p>
+        {causes?.map((item, index) => (
+          <div className="lowerCard" key={index}>
+            <img
+              src="https://shoppinessmart.com/assets/card7th1-9ad9884f.png"
+              alt="card"
+            />
+            <h4>{item.title}</h4>
+            <span>{item.category}</span>
+            <h6>{item.support}</h6>
+            <p>{item?.description}</p>
           </div>
         ))}
       </div>
-      <p className="seeAll">
+      <p className="seeAll underline">
         See all <span>5,000 +</span> Causes
       </p>
     </div>

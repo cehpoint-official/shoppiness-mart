@@ -15,9 +15,6 @@ import Logo5 from "../assets/Home/logo5.png";
 import Blog1 from "../assets/Home/blog1.png";
 import Blog2 from "../assets/Home/blog2.png";
 import Blog3 from "../assets/Home/blog3.png";
-import Card7th1 from "../assets/card7th1.png";
-import Card7th2 from "../assets/card7th2.png";
-import Card7th3 from "../assets/card7th3.png";
 import bgimg from "../assets/imagehome.png";
 import homepage from "../assets/homepage.png";
 import Backimg9 from "../assets/Home/backimg9.png";
@@ -181,28 +178,7 @@ const Home = () => {
       </div>
 
       {/* 7th page */}
-      <PopularCauses
-        data={[
-          {
-            title: "Healthy Food For All",
-            titleSmall: "Child health Care",
-            img: Card7th1,
-            id: 1,
-          },
-          {
-            title: "Animal Care",
-            titleSmall: "Animal Care",
-            img: Card7th2,
-            id: 2,
-          },
-          {
-            title: "Green World",
-            titleSmall: "Green World",
-            img: Card7th3,
-            id: 3,
-          },
-        ]}
-      />
+      <PopularCauses />
       {/* 8th page */}
       <div className="m-20 mx-auto px-4 md:px-40 bg-amber-50 pt-10 pb-6 ">
         <p className="font-bold md:text-4xl text-3xl font-slab text-center">
