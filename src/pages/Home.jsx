@@ -31,6 +31,7 @@ import Partners from "../Components/Partners";
 import { useState } from "react";
 import { db } from "../../firebase"; // Adjust the import path as necessary
 import { collection, addDoc } from "firebase/firestore";
+import { Link } from "react-router-dom";
 
 const Home = () => {
   const [email, setEmail] = useState("");
@@ -165,12 +166,16 @@ const Home = () => {
             consectetur adipisicing elit. Blanditiis,commodi tempora mollitia
           </p>
           <div className="flex gap-2">
-            <button className="bg-teal-500 text-white font-medium rounded-md text-sm md:text-base h-[40px] w-[150px] mt-4">
-              Online Shopping
-            </button>
-            <button className="bg-[#434343] text-white font-medium rounded-md text-sm md:text-base h-[40px] w-[150px] mt-4">
-              Offline Shopping
-            </button>
+            <Link to="/online-shop">
+              <button className="bg-teal-500 text-white font-medium rounded-md text-sm md:text-base h-[40px] w-[150px] mt-4">
+                Online Shopping
+              </button>
+            </Link>
+            <Link to={"offline-shop"}>
+              <button className="bg-[#434343] text-white font-medium rounded-md text-sm md:text-base h-[40px] w-[150px] mt-4">
+                Offline Shopping
+              </button>
+            </Link>
           </div>
         </div>
       </div>
