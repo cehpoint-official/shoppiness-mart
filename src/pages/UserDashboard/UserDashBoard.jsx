@@ -13,6 +13,7 @@ import tag from "../../assets/RegisterBusiness/tag-vector.png";
 import giveback from "../../assets/RegisterBusiness/giveback-vector.png";
 import cashback from "../../assets/RegisterBusiness/cashback-vector.png";
 import Loader from "../../Components/Loader/Loader.jsx";
+import BannerImg from "../../assets/RegisterBusiness/bannerImg.png";
 const UserDashBoard = () => {
   const [userData, setUserData] = useState({});
   const [loading, setLoading] = useState(true);
@@ -39,7 +40,7 @@ const UserDashBoard = () => {
   return (
     <div className="userDashboard">
       {loading ? (
-        <Loader/>
+        <Loader />
       ) : (
         <>
           <div className="userDashboard">
@@ -115,7 +116,76 @@ const UserDashBoard = () => {
                   icon={cashback}
                 />
               </div>
+              <div className="welcomeSec">
+                <h2>
+                  Hello <span>{userData.fname}</span> , Welcome to your
+                  Dashboard
+                </h2>
+                <p>
+                  Thanks for signing up and choosing to support our mission. We
+                  would like to help you get started and generating donations
+                  from your everyday shopping.
+                </p>
+                <p>Get great offers & Cashback.</p>
+                <button>Show Me how get cashback to give back</button>
+              </div>
             </div>
+            <div className="banner">
+              <div className="item">
+                <img
+                  src={BannerImg}
+                  alt=""
+                />
+              </div>
+              <div className="item">
+                <img
+                  src={BannerImg}
+                  alt=""
+                />
+              </div>
+              <div className="item">
+                <img
+                  src={BannerImg}
+                  alt=""
+                />
+              </div>
+              <div className="item">
+                <img
+                  src={BannerImg}
+                  alt=""
+                />
+              </div>
+              <div className="item">
+                <img
+                  src={BannerImg}
+                  alt=""
+                />
+              </div>
+              <div className="item">
+                <img
+                  src={BannerImg}
+                  alt=""
+                />
+              </div>
+              <div className="item">
+                <img
+                  src={BannerImg}
+                  alt=""
+                />
+              </div>
+              <div className="item">
+                <img
+                  src={BannerImg}
+                  alt=""
+                />
+              </div>
+            </div>
+           <div className="userDashboardContainer">
+            <div className="featuresSec">    
+              
+            </div>
+           </div>
+
           </div>
         </>
       )}
