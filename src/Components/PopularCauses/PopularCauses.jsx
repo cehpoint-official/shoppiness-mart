@@ -13,7 +13,6 @@ const PopularCauses = () => {
 
         if (docSnap.exists()) {
           setCauses(docSnap.data().causesList);
-          console.log(docSnap.data().causesList);
         } else {
           console.log("No such document!");
         }
