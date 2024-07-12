@@ -14,6 +14,12 @@ import giveback from "../../assets/RegisterBusiness/giveback-vector.png";
 import cashback from "../../assets/RegisterBusiness/cashback-vector.png";
 import Loader from "../../Components/Loader/Loader.jsx";
 import BannerImg from "../../assets/RegisterBusiness/bannerImg.png";
+import feature from "../../assets/RegisterBusiness/feature.png";
+import gift from "../../assets/RegisterBusiness/gift.png";
+import cashbackImg from "../../assets/RegisterBusiness/cashback.png";
+import storeImg from "../../assets/RegisterBusiness/storeImg.png";
+import coupon from "../../assets/RegisterBusiness/coupon.png";
+
 const UserDashBoard = () => {
   const [userData, setUserData] = useState({});
   const [loading, setLoading] = useState(true);
@@ -100,16 +106,8 @@ const UserDashBoard = () => {
                   heading="RS 2500"
                   icon={money}
                 />
-                <Widget
-                  title="Collected Coupon "
-                  heading="04"
-                  icon={tag}
-                />
-                <Widget
-                  title="Give Back"
-                  heading="500"
-                  icon={giveback}
-                />
+                <Widget title="Collected Coupon " heading="04" icon={tag} />
+                <Widget title="Give Back" heading="500" icon={giveback} />
                 <Widget
                   title="Cash back requests"
                   heading="02"
@@ -132,60 +130,66 @@ const UserDashBoard = () => {
             </div>
             <div className="banner">
               <div className="item">
-                <img
-                  src={BannerImg}
-                  alt=""
-                />
+                <img src={BannerImg} alt="" />
               </div>
               <div className="item">
-                <img
-                  src={BannerImg}
-                  alt=""
-                />
+                <img src={BannerImg} alt="" />
               </div>
               <div className="item">
-                <img
-                  src={BannerImg}
-                  alt=""
-                />
+                <img src={BannerImg} alt="" />
               </div>
               <div className="item">
-                <img
-                  src={BannerImg}
-                  alt=""
-                />
+                <img src={BannerImg} alt="" />
               </div>
               <div className="item">
-                <img
-                  src={BannerImg}
-                  alt=""
-                />
+                <img src={BannerImg} alt="" />
               </div>
               <div className="item">
-                <img
-                  src={BannerImg}
-                  alt=""
-                />
+                <img src={BannerImg} alt="" />
               </div>
               <div className="item">
-                <img
-                  src={BannerImg}
-                  alt=""
-                />
+                <img src={BannerImg} alt="" />
               </div>
               <div className="item">
-                <img
-                  src={BannerImg}
-                  alt=""
-                />
+                <img src={BannerImg} alt="" />
               </div>
             </div>
-           <div className="userDashboardContainer">
-            <div className="featuresSec">    
-              
+            <div className="userDashboardContainer">
+              <div className="featuresSec">
+                <h2>
+                  How do you get happiness with <span>Shoppiness Mart</span>
+                </h2>
+                <div className="featuresSecLowerSection">
+                  <div className="featuresSecItem">
+                    <img src={feature} alt="err" />
+                    <p>Visit favorite stores listed in Shopping Mart</p>
+                  </div>
+                  <div className="featuresSecItem">
+                    <img src={coupon} alt="err" />
+                    <p>Generate a coupon</p>
+                  </div>
+                  <div className="featuresSecItem">
+                    <img src={storeImg} alt="err" />
+                    <p>Visit offline shop</p>
+                  </div>
+                  <div className="featuresSecItem">
+                    <img src={gift} alt="err" />
+                    <p>Readme your coupon</p>
+                  </div>
+                  <div className="featuresSecItem">
+                    <img src={cashbackImg} alt="err" />
+                    <p>
+                      Get cashback, you can also give back to support an NGO or
+                      cause
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="popularOfflineShops">
+                {/* start here */}
+                hu
+              </div>
             </div>
-           </div>
-
           </div>
         </>
       )}
