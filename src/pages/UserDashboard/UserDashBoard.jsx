@@ -58,7 +58,7 @@ const UserDashBoard = () => {
       ) : (
         <>
           <div className="userDashboard">
-            <UserDashboardNav profilePic={userData.profilePic} />
+            <UserDashboardNav profilePic={userData.profilePic} userId={userId} />
             <div className="userDashboardContainer">
               <div className="mainDashboard">
                 <div className="topSec">

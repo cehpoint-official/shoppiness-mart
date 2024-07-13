@@ -21,6 +21,7 @@ import UserDashboard from "./pages/UserDashboard/UserDashBoard";
 import { Outlet, createBrowserRouter, RouterProvider } from "react-router-dom";
 import OnlineShop from "./pages/OnlineShop";
 import OfflineShop from "./pages/OfflineShop";
+import NewLayout from "./NewLayout";
 
 const App = () => {
   const Layout = () => {
@@ -114,6 +115,33 @@ const App = () => {
     {
       path: "/user-dashboard/:userId",
       element: <UserDashboard />,
+    },
+    {
+      path: "/user-dashboard/:userId",
+      element: <NewLayout />,
+      children: [
+        
+        {
+          path: "/user-dashboard/:userId/online-shop",
+          element: <OnlineShop />, 
+        },
+        {
+          path: "/user-dashboard/:userId/offline-shop",
+          element: <OfflineShop />, 
+        },
+        {
+          path: "/user-dashboard/:userId/howitworks",
+          element: <HowItWorks />, 
+        },
+        {
+          path: "/user-dashboard/:userId/cashback-charity",
+          element: <Cashback />, 
+        },
+        {
+          path: "/user-dashboard/:userId/supportmaast",
+          element: <SupportMaast />, 
+        },
+      ],
     },
   ]);
   return (
