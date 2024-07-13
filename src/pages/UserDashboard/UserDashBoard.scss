@@ -8,7 +8,6 @@ $breakpoint2: 736px;
 
 .userDashboard {
   font-family: $font;
-
   .userDashboardContainer {
     padding: $padding;
 
@@ -199,7 +198,7 @@ $breakpoint2: 736px;
           width: 200px;
           gap: 10px;
           transition: 0.34s ease;
-          &:hover{
+          &:hover {
             scale: 1.1;
           }
           img {
@@ -232,6 +231,8 @@ $breakpoint2: 736px;
       .shopsContainer {
         display: flex;
         gap: 30px;
+        width: 100%;
+        justify-content: space-around;
 
         .offlineShop {
           display: flex;
@@ -239,8 +240,8 @@ $breakpoint2: 736px;
           gap: 10px;
 
           img {
-            width: 200px;
-            height: 120px;
+            width: 230px;
+            height: 130px;
             object-fit: cover;
             border-radius: 20px;
           }
@@ -283,7 +284,7 @@ $breakpoint2: 736px;
             }
           }
 
-          .moreIcon{
+          .moreIcon {
             display: flex;
             align-items: center;
             justify-content: center;
@@ -293,14 +294,10 @@ $breakpoint2: 736px;
             border-radius: 100%;
             cursor: pointer;
             box-shadow: 0px 5px 4px 0px #00000040;
-
-
           }
         }
       }
     }
-
-    
   }
   .banner {
     display: flex;
@@ -330,7 +327,7 @@ $breakpoint2: 736px;
     padding: 50px 100px;
     gap: 30px;
     margin-top: 50px;
-    background-color: #FFFCEE;
+    background-color: #fffcee;
     @media (max-width: $breakpoint2) {
       padding: 20px;
     }
@@ -410,7 +407,7 @@ $breakpoint2: 736px;
           }
 
           .signup {
-            background-color: #047E72;
+            background-color: #047e72;
             padding: 15px 5px;
             text-align: center;
             font-size: 18px;
@@ -420,8 +417,8 @@ $breakpoint2: 736px;
             cursor: pointer;
             width: 250px;
             margin-left: 90px;
-              @media (max-width: $breakpoint2) {
-              margin: 10px 0 0 0 ;
+            @media (max-width: $breakpoint2) {
+              margin: 10px 0 0 0;
               align-self: center;
             }
           }

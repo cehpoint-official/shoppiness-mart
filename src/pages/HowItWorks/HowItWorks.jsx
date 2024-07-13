@@ -1,14 +1,17 @@
 import { Link } from "react-router-dom";
 import "./HowItworks.scss";
-import store from "../../assets/RegisterBusiness/store.png";
+// ================================
+import store from "../../assets/homepage/store.png";
+import video from "../../assets/homepage/homepage.png";
+import Onlinewishes from "../../assets/homepage/Onlinewishes.png";
+import card1 from "../../assets/homepage/howitworksCard1.png";
+import card2 from "../../assets/homepage/howitworksCard2.png";
+import card3 from "../../assets/homepage/howitworksCard3.png";
+
 import signup from "../../assets/RegisterBusiness/signup.png";
 import money from "../../assets/RegisterBusiness/money.png";
 import bag from "../../assets/RegisterBusiness/bag.jpg";
-import video from "../../assets/RegisterBusiness/vid.png";
-import Onlinewishes from "../../assets/RegisterBusiness/Onlinewishes.png";
-import card1 from "../../assets/RegisterBusiness/howitworksCard1.png";
-import card2 from "../../assets/RegisterBusiness/howitworksCard2.png";
-import card3 from "../../assets/RegisterBusiness/howitworksCard3.png";
+// =====================================
 import { RiSearchFill } from "react-icons/ri";
 import RoundedCards from "../../Components/RoundedCards/RoundedCards";
 import FAQ from "../../Components/FAQ";
@@ -29,7 +32,7 @@ const HowItWorks = () => {
               recusandae impedit totam aperiam nesciunt doloremque magni neque
               placeat, laborum nisi eum quae voluptatum
             </p>
-            <Link to="/register" className="register">
+            <Link to="/signup" className="register">
               Sign up for free
             </Link>
           </div>

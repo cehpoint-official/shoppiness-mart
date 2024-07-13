@@ -8,6 +8,7 @@ import img7 from "../assets/Home/img7.png";
 import img8 from "../assets/Home/img8.png";
 import img9 from "../assets/Home/img9.png";
 import img10 from "../assets/Home/img10.png";
+// eslint-disable-next-line react/prop-types
 const Partners = ({ title, para }) => {
   return (
     <div>
