@@ -4,6 +4,7 @@ import Login from "./pages/Login";
 import Business from "./pages/Business/Business";
 import Footer from "./Components/Footer";
 import Test from "./Components/Test";
+import ScrollToTop from "./Components/ScrollToTop/ScrollToTop";
 import SupportACause from "./pages/SupportACause";
 import SupportMaast from "./pages/SupportMaast";
 import Cause from "./pages/Cause/Cause";
@@ -22,11 +23,13 @@ import { Outlet, createBrowserRouter, RouterProvider } from "react-router-dom";
 import OnlineShop from "./pages/OnlineShop";
 import OfflineShop from "./pages/OfflineShop";
 import NewLayout from "./NewLayout";
+import UserProfile from "./pages/UserProfile/UserProfile";
 
 const App = () => {
   const Layout = () => {
     return (
       <div className="app">
+        <ScrollToTop />
         <Navbar />
         <Outlet />
         <Footer />
@@ -120,26 +123,29 @@ const App = () => {
       path: "/user-dashboard/:userId",
       element: <NewLayout />,
       children: [
-        
         {
           path: "/user-dashboard/:userId/online-shop",
-          element: <OnlineShop />, 
+          element: <OnlineShop />,
         },
         {
           path: "/user-dashboard/:userId/offline-shop",
-          element: <OfflineShop />, 
+          element: <OfflineShop />,
         },
         {
           path: "/user-dashboard/:userId/howitworks",
-          element: <HowItWorks />, 
+          element: <HowItWorks />,
         },
         {
           path: "/user-dashboard/:userId/cashback-charity",
-          element: <Cashback />, 
+          element: <Cashback />,
         },
         {
           path: "/user-dashboard/:userId/supportmaast",
-          element: <SupportMaast />, 
+          element: <SupportMaast />,
+        },
+        {
+          path: "/user-dashboard/:userId/profile",
+          element: <UserProfile />,
         },
       ],
     },

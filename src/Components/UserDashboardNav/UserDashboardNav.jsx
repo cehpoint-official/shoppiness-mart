@@ -45,7 +45,7 @@ const UserDashboardNav = ({ profilePic, userId }) => {
           <Link to={`/user-dashboard/${userId}/supportmaast`}>
             Support Maast
           </Link>
-          <Link to="">My Profile</Link>
+          <Link to={`/user-dashboard/${userId}/profile`}>My Profile</Link>
         </div>
 
         <div className="profile">
