@@ -4,6 +4,7 @@ import { db } from "../../../firebase.js";
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import UserDashboardNav from "../../Components/UserDashboardNav/UserDashboardNav.jsx";
+import Footer from "../../Components/Footer.jsx";
 import { MdOutlineMailOutline } from "react-icons/md";
 import { FaPhoneAlt } from "react-icons/fa";
 import { IoArrowRedoSharp } from "react-icons/io5";
@@ -20,12 +21,10 @@ import cashbackImg from "../../assets/RegisterBusiness/cashback.png";
 import storeImg from "../../assets/RegisterBusiness/storeImg.png";
 import coupon from "../../assets/RegisterBusiness/coupon.png";
 import { MdOutlineArrowForwardIos } from "react-icons/md";
-
 import signup from "../../assets/RegisterBusiness/signup.png";
 import money2 from "../../assets/RegisterBusiness/money.png";
 import bag from "../../assets/RegisterBusiness/bag.jpg";
 import video from "../../assets/RegisterBusiness/vid.png";
-
 import { RiSearchFill } from "react-icons/ri";
 
 const UserDashBoard = () => {
@@ -310,6 +309,7 @@ const UserDashBoard = () => {
                   </div>
                 </div>
               </div>
+              <Footer/>
           </div>
         </>
       )}
