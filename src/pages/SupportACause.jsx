@@ -2,8 +2,9 @@ import FAQ from "../Components/FAQ";
 import PeopleSaySection from "../Components/PeopleSaySection";
 import supportACause from "../assets/supportACause.png";
 import charitiesImg from "../assets/RegisterBusiness/charities.png";
-
 import supportPage1 from "../assets/supportPage1.png";
+import PopularCauses from "../Components/PopularCauses/PopularCauses";
+
 const SupportACause = () => {
   // border-2 border-red-500
   document.title = "Support A Cause - Shopiness";
@@ -46,7 +47,7 @@ const SupportACause = () => {
         </div>
       </div>
       {/* { 2nd page } */}
-      <div className="bg-backgreenColor py-10">
+      {/* <div className="bg-backgreenColor py-10">
         <div className="text-center">
           <h1 className="text-3xl font-medium mb-2 font-slab">
             Our Popular Causes{" "}
@@ -219,7 +220,8 @@ const SupportACause = () => {
             <i className="bi bi-arrow-right"></i>{" "}
           </p>
         </div>
-      </div>
+      </div> */}
+        <PopularCauses />
       {/* { 3rd page } */}
       <div className="my-20">
         <div className="text-center">

@@ -1,10 +1,10 @@
 import FAQ from "../Components/FAQ";
+import PopularCauses from "../Components/PopularCauses/PopularCauses";
 import headerImg from "../assets/SupportMaast/header.png";
 import page2 from "../assets/SupportMaast/page2.png";
 import page3 from "../assets/SupportMaast/page3.png";
 import page41 from "../assets/SupportMaast/page41.png";
-import supportPage1 from "../assets/supportPage1.png";
-
+// import supportPage1 from "../assets/supportPage1.png";
 // import page42 from "../assets/SupportMaast/page42.png";
 // import page43 from "../assets/SupportMaast/page43.png";
 const SupportMasst = () => {
@@ -30,17 +30,31 @@ const SupportMasst = () => {
             nesciunt doloremque magni neque placeat, laborum nisi eum quae
             voluptatum
           </p>
+          <div>
+            <button className="bg-teal-500 text-white font-medium rounded-md py-2.5 px-8 mt-4">
+              Donate
+            </button>
+          </div>
         </div>
 
         <div className="mt-6">
-          <img src={page2} alt="Loading..." className="w-[432px] h-[300px] rounded-lg" />
+          <img
+            src={page2}
+            alt="Loading..."
+            className="w-[432px] h-[300px] rounded-lg"
+          />
         </div>
       </div>
       {/* { 3rd page } */}
       <div className="bg-backgroundLightYellowColor gap-12 flex justify-center items-center flex-wrap p-10 ">
         <div className="mt-6">
-          <img src={page3} alt="Loading..." className="w-[432px] h-[300px] rounded-lg" />
+          <img
+            src={page3}
+            alt="Loading..."
+            className="w-[432px] h-[300px] rounded-lg"
+          />
         </div>
+
         <div className="md:w-[400px] mt-6 ">
           <h1 className="md:text-4xl text-3xl font-semibold font-slab mb-4">
             Support MAAST and Other Charities
@@ -201,7 +215,7 @@ const SupportMasst = () => {
         </div>
       </div>
       {/* { 6th page } */}
-      <div className="py-20">
+      {/* <div className="py-20">
         <div className="text-center">
           <h1 className="text-3xl font-medium mb-2 font-slab">
             Our Popular Causes{" "}
@@ -374,7 +388,8 @@ const SupportMasst = () => {
             <i className="bi bi-arrow-right"></i>{" "}
           </p>
         </div>
-      </div>
+      </div> */}
+      <PopularCauses />
       {/* { 7th page } */}
       <FAQ />
     </div>
