@@ -18,6 +18,7 @@ import CauseForm from "./pages/CauseForm/CauseForm";
 import ContactUs from "./pages/ContactUs";
 import AboutUs from "./pages/AboutUs";
 import Blogs from "./pages/Blogs";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import UserDashboard from "./pages/UserDashboard/UserDashBoard";
 import { Outlet, createBrowserRouter, RouterProvider } from "react-router-dom";
 import OnlineShop from "./pages/OnlineShop";
@@ -49,6 +50,10 @@ const App = () => {
         {
           path: "/login",
           element: <Login />,
+        },
+        {
+          path: "/privacy-policy",
+          element: <PrivacyPolicy />,
         },
         {
           path: "/signup",
@@ -126,21 +131,26 @@ const App = () => {
         {
           path: "/user-dashboard/:userId/online-shop",
           element: <OnlineShop />,
+          element: <OnlineShop />,
         },
         {
           path: "/user-dashboard/:userId/offline-shop",
+          element: <OfflineShop />,
           element: <OfflineShop />,
         },
         {
           path: "/user-dashboard/:userId/howitworks",
           element: <HowItWorks />,
+          element: <HowItWorks />,
         },
         {
           path: "/user-dashboard/:userId/cashback-charity",
           element: <Cashback />,
+          element: <Cashback />,
         },
         {
           path: "/user-dashboard/:userId/supportmaast",
+          element: <SupportMaast />,
           element: <SupportMaast />,
         },
         {

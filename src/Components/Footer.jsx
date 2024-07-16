@@ -90,7 +90,7 @@ const Footer = () => {
                 </li>
                 <li>
                   <Link
-                    to="/"
+                    to="/privacy-policy"
                     className="mb-2 inline-block text-xl font-medium mt-2   text-white "
                   >
                     Privacy Policy
