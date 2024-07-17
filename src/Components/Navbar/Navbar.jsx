@@ -14,23 +14,15 @@ const Navbar = () => {
   return (
     <div className="navbar">
       <div className="top">
-        <img
-          src={ShoppingBag}
-          className="h-11 "
-          alt="Loading..."
-        />
+        <Link to="/">
+          <img src={ShoppingBag} className="h-11 " alt="Loading..." />
+        </Link>
         <div className="links">
-          <Link
-            to="/login"
-            className="login"
-          >
+          <Link to="/login" className="login">
             <i className="bi bi-arrow-right-circle-fill text-white "></i>
             Login
           </Link>
-          <Link
-            to="/signup"
-            className="register"
-          >
+          <Link to="/signup" className="register">
             <i className="bi bi-pencil-fill text-[#049D8E]  text-lg"></i>
             Signup
           </Link>
@@ -61,17 +53,11 @@ const Navbar = () => {
           <Link to="/register-cause">Register a Cause/NGO</Link>
           <Link to="/register-business">Register a business/Service</Link>
           <Link to="/supportmaast">Support Maast</Link>
-          <Link
-            to="/login"
-            className="login"
-          >
+          <Link to="/login" className="login">
             <i className="bi bi-arrow-right-circle-fill text-white "></i>
             Login
           </Link>
-          <Link
-            to="/signup"
-            className="register"
-          >
+          <Link to="/signup" className="register">
             <i className="bi bi-pencil-fill text-[#049D8E]  text-lg"></i>
             Signup
           </Link>
