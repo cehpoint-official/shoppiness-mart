@@ -15,7 +15,7 @@ const OnlineShop = () => {
     const fetchStores = async () => {
       try {
         const response = await axios.get(
-          "https://proxy-server-1-qaao.onrender.com"
+          "https://proxy-server-4er9.onrender.com/"
         );
         console.log(response.data);
         setStores(response.data.stores);
@@ -31,7 +31,7 @@ const OnlineShop = () => {
     const fetchStores = async () => {
       try {
         const response = await axios.get(
-          "https://proxy-server-1-qaao.onrender.com/offers"
+          "https://proxy-server-4er9.onrender.com/offers"
         );
         setOffers(response.data.data);
         console.log(response.data.data);

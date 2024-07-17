@@ -18,6 +18,7 @@ import CauseForm from "./pages/CauseForm/CauseForm";
 import ContactUs from "./pages/ContactUs";
 import AboutUs from "./pages/AboutUs";
 import Blogs from "./pages/Blogs";
+import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import UserDashboard from "./pages/UserDashboard/UserDashBoard";
 import { Outlet, createBrowserRouter, RouterProvider } from "react-router-dom";
 import OnlineShop from "./pages/OnlineShop";
@@ -49,6 +50,10 @@ const App = () => {
         {
           path: "/login",
           element: <Login />,
+        },
+        {
+          path: "/privacy-policy",
+          element: <PrivacyPolicyPage />,
         },
         {
           path: "/signup",
