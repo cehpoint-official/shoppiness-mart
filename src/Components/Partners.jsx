@@ -14,7 +14,7 @@ const Partners = ({ title, para }) => {
     <div>
       <div className="mt-10 mx-auto px-4 md:px-40 bg-[#EEFAF9] py-12 mb-40 ">
         <div>
-          <h1 className="font-bold md:text-4xl text-3xl text-center font-slab ">
+          <h1 className="font-bold md:text-4xl text-2xl text-center font-slab ">
             {title}
           </h1>
           <p className="text-gray-600 md:text-xl text-sm text-center mx-auto  md:mt-8 mt-4">
@@ -26,7 +26,7 @@ const Partners = ({ title, para }) => {
           <div className="text-[#047E72] font-medium text-lg text-center md:mt-10 mt-4">
             Online partners
           </div>
-          <div className="flex justify-center items-center flex-wrap gap-9">
+          <div className="flex justify-center items-center flex-wrap md:gap-9 gap-4">
             <div className="mt-6  md:flex-row">
               <img
                 src={img1}
@@ -70,7 +70,7 @@ const Partners = ({ title, para }) => {
             Offline partners
           </div>
 
-          <div className="flex justify-center items-center flex-wrap gap-9">
+          <div className="flex justify-center items-center flex-wrap md:gap-9 gap-4">
             <div className="mt-6  md:flex-row">
               <img
                 src={img6}
