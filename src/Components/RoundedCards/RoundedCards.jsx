@@ -1,5 +1,6 @@
 
 import "./RoundedCards.scss"
+
 const RoundedCards = ({color,data}) => {
   return (
     <div
@@ -11,8 +12,7 @@ const RoundedCards = ({color,data}) => {
       <div className="upperSec">
         <h1>Why you use this platform</h1>
         <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit.
-          Blanditiis,commodi tempora mollitia voluptatem
+        Shoppinessmart creates a win-win-win situation for shoppers, charities, and businesses by making charitable giving an effortless part of the shopping experience.
         </p>
       </div>
       <div className="lowerSec">
@@ -21,12 +21,7 @@ const RoundedCards = ({color,data}) => {
             <img src={e.img} alt="card" />
             <h4>{e.title}</h4>
             <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Blanditiis,commodi tempora mollitia voluptatem recusandae impedit
-              totam aperiam nesciunt doloremque magni neque placeat, laborum
-              nisi tiis,commodi tempora mollitia voluptatem recusandae impedit
-              totam aperiam nesciunt doloremque magni neque placeat, laborum
-              nisi
+              {e.desc}
             </p>
           </div>
         ))}

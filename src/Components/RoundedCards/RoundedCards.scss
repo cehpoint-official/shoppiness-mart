@@ -51,8 +51,8 @@ $breakpoint2: 735px;
     width: 100%;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 40px;
+    justify-content: center;
+    gap: 60px;
     @media (max-width: $breakpoint) {
       flex-direction: column;
       align-items: center;
@@ -66,12 +66,17 @@ $breakpoint2: 735px;
       background-color: #fbffff;
       border-radius: 21px;
       box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.15);
-
+      padding-bottom: 25px;
+      width: 400px;
+      @media (max-width: $breakpoint2) {
+      width: 300px;
+      }
+      cursor: pointer;
       > img {
         width: 100%;
         height: 260px;
         object-fit: cover;
-        border-radius: 21px;
+        border-radius: 21px 21px 0px 0px;
       }
       h4 {
         font-size: 24px;

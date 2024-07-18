@@ -29,15 +29,14 @@ const PopularCauses = () => {
       <div className="upperSec">
         <h1>Our Popular Causes</h1>
         <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit.
-          Blanditiis,commodi tempora mollitia voluptatem
+        Addressing these challenges requires a multifaceted approach
         </p>
       </div>
       <div className="lowerSec">
         {causes?.map((item, index) => (
           <div className="lowerCard" key={index}>
             <img
-              src="https://shoppinessmart.com/assets/card7th1-9ad9884f.png"
+              src={item.img}
               alt="card"
             />
             <h4>{item.title}</h4>

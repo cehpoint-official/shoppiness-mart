@@ -11,8 +11,31 @@ import personImg from "../../assets/RegisterBusiness/person.png";
 import vid from "../../assets/RegisterBusiness/vid.png";
 import boyImg from "../../assets/RegisterBusiness/boy.png";
 import convoImg from "../../assets/RegisterBusiness/convo.png";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../../firebase";
+import { useState,useEffect } from "react";
 
 const Business = () => {
+  const [roundedCardsData, setRoundedCardsData] = useState([]);
+
+  const fetchData = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "WhyThisPlatform"));
+      const data = [];
+      querySnapshot.forEach((doc) => {
+        data.push({ id: doc.id, ...doc.data() });
+        setRoundedCardsData(data);
+      });
+    } catch (error) {
+      console.log("Error getting documents: ", error);
+    }
+  };
+  console.log(roundedCardsData);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   return (
     <div className="business">
       <div className="businessContainer">
@@ -71,11 +94,7 @@ const Business = () => {
         </div>
 
         <RoundedCards
-          data={[
-            { title: "Good Social impact", img: cardOne, id: 1 },
-            { title: "Enhance staff participation", img: cardTwo, id: 2 },
-            { title: "Business Growth with Donation", img: cardThree, id: 3 },
-          ]}
+          data={roundedCardsData}
         />
 
         <div className="secFive">
