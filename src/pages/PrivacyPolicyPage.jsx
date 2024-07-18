@@ -1,19 +1,19 @@
 const PrivacyPolicyPage = () => {
   const policies = [
     {
-      title: "Privacy-policies-1",
+      title: "Privacy-policiy-1",
       content:
-        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis,commodi tempora mollitia voluptatem recusandae impedit totam aperiam nesciunt doloremque magni neque placeat, laborum nisi eum quae voluptatum Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis,commodi tempora mollitia voluptatem recusandae impedit totam aperiam nesciunt doloremque magni neque placeat, laborum nisi eum quae voluptatum recusandae impedit totam aperiam nesciunt doloremque magni neque placeat, laborum nisi",
+        "When you use our services, you’re trusting us with your information. We understand that this is a big responsibility and we work hard to protect your information and put you in control.The information we collect, and how that information is used, depends on how you use our services and how you manage your privacy controls.",
     },
     {
-      title: "Privacy-policies-2",
+      title: "Privacy-policiy-2",
       content:
-        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis,commodi tempora mollitia voluptatem recusandae impedit totam aperiam nesciunt doloremque magni neque placeat, laborum nisi eum quae voluptatum Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis,commodi tempora mollitia voluptatem recusandae impedit totam aperiam nesciunt doloremque magni neque placeat, laborum nisi eum quae voluptatum recusandae impedit totam aperiam nesciunt doloremque magni neque placeat, laborum nisi",
+        "We collect information to provide better services to all our users – from figuring out basic stuff such as which language you speak, to more complex things like which ads you’ll find most useful, the people who matter most to you online or which YouTube videos you might like. The information we collect, and how that information is used, depends on how you use our services and how you manage your privacy controls.",
     },
     {
-      title: "Privacy-policies-3",
+      title: "Privacy-policiy-3",
       content:
-        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis,commodi tempora mollitia voluptatem recusandae impedit totam aperiam nesciunt doloremque magni neque placeat, laborum nisi eum quae voluptatum Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis,commodi tempora mollitia voluptatem recusandae impedit totam aperiam nesciunt doloremque magni neque placeat, laborum nisi eum quae voluptatum recusandae impedit totam aperiam nesciunt doloremque magni neque placeat, laborum nisi",
+        "When you create a Google Account, you provide us with personal information that includes your name and a password. You can also choose to add a phone number or payment information to your account. Even if you aren’t signed in to a Google Account, you might choose to provide us with information — like an email address to communicate with Google or receive updates about our services.",
     },
   ];
   return (

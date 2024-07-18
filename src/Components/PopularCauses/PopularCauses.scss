@@ -51,7 +51,7 @@ $breakpoint2: 735px;
     width: 100%;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: space-around;
     gap: 40px;
     @media (max-width: $breakpoint) {
       flex-direction: column;
@@ -67,6 +67,10 @@ $breakpoint2: 735px;
       border-radius: 21px;
       box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.15);
       padding-bottom: 25px;
+      width: 400px;
+      @media (max-width: $breakpoint) {
+        width: 100%;
+      }
       cursor: pointer;
       > img {
         width: 100%;

@@ -11,7 +11,6 @@ import Backimg9 from "../assets/homepage/backimg9.png";
 
 import Home1 from "../assets/Home/home1.png"; //use in carasaul
 import Logo1 from "../assets/Home/logo1.png"; //use in ngo's
-import Blog1 from "../assets/Home/blog1.png"; //use in blog
 
 // ========================
 import FAQ from "../Components/FAQ";
