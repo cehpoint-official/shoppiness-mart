@@ -23,7 +23,7 @@ const PeopleSaySection = () => {
         querySnapshot.forEach((doc) => {
           reviewsData.push({ id: doc.id, ...doc.data() });
         });
-        console.log(reviewsData);
+        // console.log(reviewsData);
         setReviews(reviewsData);
       } catch (error) {
         console.log("Error getting documents: ", error);
