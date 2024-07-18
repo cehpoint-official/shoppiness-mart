@@ -69,7 +69,7 @@ const Home = () => {
         }
       />
       {/* what is the shopiness mart */}
-      <div className=" pb-40 ">
+      <div className="md:pb-40 pb-20">
         <div className="grid grid-cols-12 mx-4 md:mx-10 px-4 md:px-10">
           <div className="col-span-12 md:col-span-6">
             <div className="flex flex-wrap justify-center md:justify-start">
@@ -109,7 +109,7 @@ const Home = () => {
 
       {/* {cashback deals for help other } */}
       <div
-        className="gap-20 flex justify-center items-center flex-wrap py-20"
+        className="md:gap-20 gap-10 flex justify-center items-center flex-wrap mb-40 px-10 py-10"
         style={{
           backgroundImage: `url(${bgimg})`,
           backgroundSize: "cover",
@@ -150,7 +150,7 @@ const Home = () => {
       />
 
       {/* how online or offline shop work  */}
-      <div className="bg-[#EAEFF2] gap-20 flex justify-center items-center flex-wrap px-10 pb-16 mb-16">
+      <div className="bg-[#EAEFF2] md:gap-20 flex justify-center items-center flex-wrap px-10 pb-16 my-16">
         <div className="mt-6">
           <img src={img18} alt="Loading..." className="w-[500px]" />
         </div>
@@ -183,14 +183,11 @@ const Home = () => {
 
       {/* NGO's */}
       <div className="m-20 mx-auto px-4 md:px-40 bg-amber-50 pt-10 pb-6 ">
-        <p className="font-bold md:text-4xl text-3xl font-slab text-center">
+        <p className="font-bold md:text-4xl text-2xl font-slab text-center">
           Raise funds for your cause/NGOs/ charity
         </p>
         <p className="text-gray-600  text-center mx-auto md:text-lg text-sm mt-4">
           Lorem ipsum dolor sit amet consectetur adipisicing elit.{" "}
-        </p>
-        <p className="text-gray-600 md:text-lg text-sm  text-center mx-auto  ">
-          {" "}
           Blanditiis,commodi tempora mollitia voluptatem{" "}
         </p>
 
@@ -240,7 +237,7 @@ const Home = () => {
       {/* Blogs */}
       <div className="mt-10 mx-auto px-12 md:px-40 pt-8 pb-6 ">
         <div>
-          <p className="font-bold md:text-4xl text-3xl text-center font-slab">
+          <p className="font-bold md:text-4xl text-2xl text-center font-slab">
             Recently Posted Blog
           </p>
           <p className="text-gray-600 md:text-lg text-sm text-center mx-auto  mt-2">
@@ -302,7 +299,7 @@ const Home = () => {
       </div>
 
       {/* NewsLetter */}
-      <div className="mt-44 mx-auto flex flex-col justify-center items-center">
+      <div className="mt-44 flex flex-col justify-center items-center">
         <div className="absolute">
           <img
             src={Backimg9}
@@ -311,10 +308,10 @@ const Home = () => {
           />
         </div>
         <div className="relative text-center">
-          <p className="font-bold font-slab md:text-4xl text-3xl">
+          <p className="font-bold font-slab md:text-4xl text-2xl ">
             Subscribe to Our Newsletter
           </p>
-          <p className="text-gray-600 md:text-base text-sm mx-auto mt-2">
+          <p className="text-gray-600 md:text-base text-sm mx-auto mt-2 px-10">
             Improving your small business growth through Onir app. It also
           </p>
           <div className="md:mx-20 mx-10">
@@ -331,7 +328,7 @@ const Home = () => {
                 required
               />
               <button
-                className="text-lg px-4 py-3 border-2 text-white bg-[#049D8E]"
+                className="md:text-lg text-sm px-4 py-3 border-2 text-white bg-[#049D8E]"
                 type="submit"
               >
                 Subscribe
