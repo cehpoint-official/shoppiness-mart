@@ -51,8 +51,8 @@ $breakpoint2: 735px;
     width: 100%;
     display: flex;
     align-items: center;
-    justify-content: space-around;
-    gap: 40px;
+    justify-content: center;
+    gap: 60px;
     @media (max-width: $breakpoint) {
       flex-direction: column;
       align-items: center;
