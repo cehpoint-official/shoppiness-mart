@@ -69,6 +69,7 @@ const Home = () => {
       console.log("Error getting documents: ", error);
     }
 
+
     try {
       const querySnapshot = await getDocs(collection(db, "BlogsHome"));
       const data = [];
@@ -81,6 +82,7 @@ const Home = () => {
       console.log("Error getting documents: ", error);
     }
   };
+
 
   // console.log(roundedCardsData);
   console.log(blogsData);
@@ -123,9 +125,12 @@ const Home = () => {
           </div>
         </div>
 
+
         <div className="col-span-12 md:col-span-6">
           <h1 className="md:text-4xl text-3xl font-semibold mt-16 md:mt-12  font-slab ">
             What is ShoppinessMart?
+
+     
           </h1>
           <p className="  text-gray-500 md:mt-7 mt-3  md:text-2xl text-sm">
             Shoppinessmart is a platform that turns your everyday online
@@ -181,6 +186,7 @@ const Home = () => {
       data={roundedCardsData}
     />
 
+
     {/* how online or offline shop work  */}
     <div className="bg-[#EAEFF2] gap-20 flex justify-center items-center flex-wrap px-10 pb-16 mb-16">
       <div className="mt-6">
@@ -206,6 +212,7 @@ const Home = () => {
               Offline Shopping
             </button>
           </Link>
+
         </div>
       </div>
     </div>
@@ -227,6 +234,7 @@ const Home = () => {
         By simply shopping through our platform, you can contribute to a
         better world without spending a penny more.{" "}
       </p>
+
 
       <div className="">
         <div className=" flex justify-center items-center flex-wrap gap-2 mt-4">
@@ -271,6 +279,7 @@ const Home = () => {
       </div>
     </div>
 
+
     {/* Blogs */}
     <div className="mt-10 mx-auto px-12 md:px-40 pt-8 pb-6 ">
       <div>
@@ -294,6 +303,8 @@ const Home = () => {
             </p>
             <p className="text-gray-400 mt-4">By Tithi Mondal, 10 Mar 2024</p>
           </div>
+
+
         </div>
 
         <div className="lg:col-span-7 col-span-12 mx-5  ">
@@ -335,6 +346,7 @@ const Home = () => {
       </div>
     </div>
 
+
     {/* NewsLetter */}
     <div className="mt-44 mx-auto flex flex-col justify-center items-center">
       <div className="absolute">
@@ -372,6 +384,8 @@ const Home = () => {
             </button>
           </form>
           {message && <p className="mt-4 text-gray-600">{message}</p>}
+
+      
         </div>
       </div>
     </div>
