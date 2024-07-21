@@ -4,7 +4,9 @@ import PopularCauses from "../Components/PopularCauses/PopularCauses";
 import headerImg from "../assets/SupportMaast/header.png";
 import page2 from "../assets/SupportMaast/page2.png";
 import page3 from "../assets/SupportMaast/page3.png";
-import page41 from "../assets/SupportMaast/page41.png";
+import playingworld from "../assets/SupportMaast/playingworld.png";
+import savenature from "../assets/SupportMaast/savenature.png";
+import blooddonate from "../assets/SupportMaast/blooddonate.png";
 const SupportMasst = () => {
   document.title = "Support Maast - Shopiness";
   return (
@@ -21,12 +23,13 @@ const SupportMasst = () => {
             What is MAAST?
           </h1>
           <p className="text-parapgraphColor">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit.
-            Blanditiis,commodi tempora mollitia voluptatem recusandae impedit
-            totam aperiam nesciunt doloremque magni neque placeat, laborum nisi
-            eum quae voluptatum .voluptatem recusandae impedit totam aperiam
-            nesciunt doloremque magni neque placeat, laborum nisi eum quae
-            voluptatum
+            MAAST is an initiative designed to create a positive impact on
+            society by supporting various charitable causes. Through the MAAST
+            program, users can contribute to meaningful projects that focus on
+            areas such as hunger relief, nutrition, emergency aid, support for
+            the elderly, and children's welfare. By participating in MAAST,
+            individuals can donate, volunteer, or raise awareness to help
+            transform lives and communities.
           </p>
           <div>
             <button className="bg-teal-500 text-white font-medium rounded-md py-2.5 px-8 mt-4">
@@ -58,9 +61,13 @@ const SupportMasst = () => {
             Support MAAST and Other Charities
           </h1>
           <p className="text-parapgraphColor">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit.
-            Blanditiis,commodi tempora mollitia .Lorem ipsum dolor sit amet
-            consectetur adipisicing elit. Blanditiis,commodi tempora mollitia
+            ShoppinessMart is committed to making a difference by turning
+            everyday online shopping into a powerful force for good. Through our
+            platform, you can support a variety of charities, including the
+            MAAST initiative and others, without spending any extra money. By
+            simply shopping through ShoppinessMart, a percentage of your
+            purchase is donated to the cause you care about. It’s an effortless
+            way to contribute to a better world.
           </p>
           <div>
             <button className="bg-teal-500 text-white font-medium rounded-md py-2.5 px-8 mt-4">
@@ -90,12 +97,16 @@ const SupportMasst = () => {
         <div className="flex justify-center gap-6 flex-wrap px-10 py-10">
           <div className=" bg-white md:w-[400px] w-[250px] shadow-lg rounded-lg">
             <div>
-              <img src={page41} alt="Loading..." className="md:h-[297px]" />
+              <img
+                src={blooddonate}
+                alt="Loading..."
+                className="md:h-[297px]"
+              />
             </div>
 
             <div className="text-center p-4">
               <h3 className="text-lg md:text-xl font-semibold ">
-                We Want To Help
+                Blood Donations Camp
               </h3>
               <p className="text-[#F8BD00] my-3 md:text-lg text-sm">
                 8:00 AM - 10 AM
@@ -109,12 +120,12 @@ const SupportMasst = () => {
           </div>
           <div className=" bg-white md:w-[400px] w-[250px] shadow-lg rounded-lg">
             <div>
-              <img src={page41} alt="Loading..." className="md:h-[297px]" />
+              <img src={savenature} alt="Loading..." className="md:h-[297px]" />
             </div>
 
             <div className="text-center p-4">
               <h3 className="text-lg md:text-xl font-semibold ">
-                We Want To Help
+                Save The Nature
               </h3>
               <p className="text-[#F8BD00] my-3 md:text-lg text-sm">
                 8:00 AM - 10 AM
@@ -128,12 +139,16 @@ const SupportMasst = () => {
           </div>
           <div className=" bg-white md:w-[400px] w-[250px] shadow-lg rounded-lg">
             <div>
-              <img src={page41} alt="Loading..." className="md:h-[297px]" />
+              <img
+                src={playingworld}
+                alt="Loading..."
+                className="md:h-[297px]"
+              />
             </div>
 
             <div className="text-center p-4">
               <h3 className="text-lg md:text-xl font-semibold ">
-                We Want To Help
+                Playing For World
               </h3>
               <p className="text-[#F8BD00] my-3 md:text-lg text-sm">
                 8:00 AM - 10 AM
