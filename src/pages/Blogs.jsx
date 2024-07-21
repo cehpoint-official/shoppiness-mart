@@ -1,7 +1,12 @@
 import { Link } from "react-router-dom";
 import page41 from "../assets/SupportMaast/page41.png";
-
+import { useState } from "react";
+import Loader from "../Components/Loader/Loader";
 const Blogs = () => {
+  const [loading, setLoading] = useState(true);
+  setInterval(() => {
+    setLoading(false);
+  }, [3000]);
   const blogs = [
     {
       photo: "df",
@@ -41,7 +46,9 @@ const Blogs = () => {
     },
   ];
 
-  return (
+  return loading ? (
+    <Loader />
+  ) : (
     <div>
       {/* { 1st page } */}
       <div className="flex justify-center items-center bg-backgreenColor py-10">
@@ -74,10 +81,16 @@ const Blogs = () => {
               key={index}
             >
               <div>
-                <img src={page41} alt="Loading..." className="w-full h-auto md:h-[291px] object-cover" />
+                <img
+                  src={page41}
+                  alt="Loading..."
+                  className="w-full h-auto md:h-[291px] object-cover"
+                />
               </div>
               <div className="text-center p-4 flex-grow">
-                <h3 className="text-lg md:text-xl font-semibold">{item?.title}</h3>
+                <h3 className="text-lg md:text-xl font-semibold">
+                  {item?.title}
+                </h3>
                 <p className="text-paragraphColor text-sm md:text-base">
                   {item?.description}
                 </p>

@@ -4,11 +4,18 @@ import supportACause from "../assets/supportACause.png";
 import charitiesImg from "../assets/RegisterBusiness/charities.png";
 import supportPage1 from "../assets/supportPage1.png";
 import PopularCauses from "../Components/PopularCauses/PopularCauses";
+import Loader from "../Components/Loader/Loader";
+import { useState } from "react";
 
 const SupportACause = () => {
-  // border-2 border-red-500
+  const [loading, setLoading] = useState(true);
+  setInterval(() => {
+    setLoading(false);
+  }, [3000]);
   document.title = "Support A Cause - Shopiness";
-  return (
+  return loading ? (
+    <Loader />
+  ) : (
     <div className="overflow-hidden">
       {/* 1st page  */}
       <div className="flex flex-wrap  justify-evenly py-16 px-3">
@@ -221,7 +228,7 @@ const SupportACause = () => {
           </p>
         </div>
       </div> */}
-        <PopularCauses />
+      <PopularCauses />
       {/* { 3rd page } */}
       <div className="my-20">
         <div className="text-center">
@@ -413,23 +420,6 @@ const SupportACause = () => {
       {/* { 6th page } */}
       <PeopleSaySection />
     </div>
-    // <>
-    //   <div className="supportcuasep1">
-    //     <div>
-    //       <h1>Explore our list of good causes and</h1>
-    //       <h1>NGOs that need your support</h1>
-    //       <p>Choose the one you want to support</p>
-    //       <div>
-    //         <input
-    //           type="text"
-    //           placeholder="Search name of the cause or NGO you want to support.."
-    //         />
-    //         <button>Find</button>
-    //       </div>
-    //     </div>
-    //     <div></div>
-    //   </div>
-    // </>
   );
 };
 
