@@ -3,8 +3,13 @@ import { db, storage } from "../../firebase"; // Adjust the import path as neces
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import img1 from "../assets/contactus.png";
+import Loader from "../Components/Loader/Loader";
 
 const ContactUs = () => {
+  const [loading, setLoading] = useState(true);
+  setInterval(() => {
+    setLoading(false);
+  }, [3000]);
   const [formData, setFormData] = useState({
     name: "",
     role: "",
@@ -46,7 +51,7 @@ const ContactUs = () => {
         await new Promise((resolve, reject) => {
           uploadTask.on(
             "state_changed",
-            (snapshot) => {},
+            () => {},
             (error) => {
               console.error(error);
               reject(error);
@@ -86,7 +91,9 @@ const ContactUs = () => {
     }
   };
 
-  return (
+  return loading ? (
+    <Loader />
+  ) : (
     <div className="relative flex justify-center py-20 items-center min-h-screen bg-gray-100">
       <img
         src={img1}
@@ -98,8 +105,8 @@ const ContactUs = () => {
           Contact Us
         </h1>
         <p className="text-center text-gray-600 mb-8">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit.
-          Blanditiis,commodi tempora mollitia
+          Reach out to us with any questions, suggestions, or feedback, and
+          we'll get back to you as soon as possible.
         </p>
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">

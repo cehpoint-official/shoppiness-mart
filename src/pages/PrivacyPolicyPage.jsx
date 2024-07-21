@@ -1,4 +1,10 @@
+import { useState } from "react";
+import Loader from "../Components/Loader/Loader";
 const PrivacyPolicyPage = () => {
+  const [loading, setLoading] = useState(true);
+  setInterval(() => {
+    setLoading(false);
+  }, [3000]);
   const policies = [
     {
       title: "Privacy-policiy-1",
@@ -16,7 +22,9 @@ const PrivacyPolicyPage = () => {
         "When you create a Google Account, you provide us with personal information that includes your name and a password. You can also choose to add a phone number or payment information to your account. Even if you aren’t signed in to a Google Account, you might choose to provide us with information — like an email address to communicate with Google or receive updates about our services.",
     },
   ];
-  return (
+  return loading ? (
+    <Loader />
+  ) : (
     <div className="mt-10">
       <div>
         <p className="text-center font-medium text-3xl my-10">Privacy Policy</p>

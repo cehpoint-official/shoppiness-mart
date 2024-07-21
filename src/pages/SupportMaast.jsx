@@ -7,9 +7,17 @@ import page3 from "../assets/SupportMaast/page3.png";
 import playingworld from "../assets/SupportMaast/playingworld.png";
 import savenature from "../assets/SupportMaast/savenature.png";
 import blooddonate from "../assets/SupportMaast/blooddonate.png";
+import Loader from "../Components/Loader/Loader";
+import { useState } from "react";
 const SupportMasst = () => {
+  const [loading, setLoading] = useState(true);
   document.title = "Support Maast - Shopiness";
-  return (
+  setInterval(() => {
+    setLoading(false);
+  }, [3000]);
+  return loading ? (
+    <Loader />
+  ) : (
     <div className=" overflow-hidden">
       {/* { 1st page } */}
       <div>

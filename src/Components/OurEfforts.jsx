@@ -11,10 +11,11 @@ const OurEfforts = () => {
             Our efforts
           </h1>
           <p className="text-sm text-parapgraphColor">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit.
+            Our efforts focus on supporting numerous charity projects and
           </p>
           <p className="text-sm text-parapgraphColor">
-            Blanditiis,commodi tempora mollitia voluptatem{" "}
+            fostering a community of giving through seamless and effortless
+            actions.
           </p>
         </div>
 
@@ -29,10 +30,12 @@ const OurEfforts = () => {
                 Mission and vision
               </h3>
               <p className="text-parapgraphColor text-sm md:text-basic">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Blanditiis,commodi tempora mollitia voluptatem recusandae
-                impedit totam aperiam nesciunt doloremque magni neque placeat,
-                laborum nisi eum quae voluptatum
+                At ShoppinessMart, our mission is to revolutionize online
+                shopping by integrating effortless giving into every purchase.
+                We envision a world where supporting meaningful causes is a
+                seamless part of everyday life. Our platform is designed to make
+                philanthropy accessible, enabling everyone to contribute to
+                positive change through their regular shopping habits.
               </p>
             </div>
           </div>
@@ -46,10 +49,13 @@ const OurEfforts = () => {
                 Charity projects
               </h3>
               <p className="text-parapgraphColor text-sm md:text-basic">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Blanditiis,commodi tempora mollitia voluptatem recusandae
-                impedit totam aperiam nesciunt doloremque magni neque placeat,
-                laborum nisi eum quae voluptatum
+                We are committed to supporting a wide range of charity projects
+                that make a real difference in people's lives. From providing
+                hunger relief and emergency aid to supporting education and
+                healthcare initiatives, our partnerships with various
+                organizations ensure that your contributions go where they are
+                needed most. Together, we are building stronger communities and
+                fostering a better future for all.
               </p>
             </div>
           </div>
@@ -63,10 +69,13 @@ const OurEfforts = () => {
                 Foundation and events
               </h3>
               <p className="text-parapgraphColor text-sm md:text-basic">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Blanditiis,commodi tempora mollitia voluptatem recusandae
-                impedit totam aperiam nesciunt doloremque magni neque placeat,
-                laborum nisi eum quae voluptatum
+                The ShoppinessMart Foundation organizes and participates in
+                numerous events to raise awareness and funds for important
+                causes. Through charity drives, community events, and special
+                campaigns, we engage with our users and partners to amplify our
+                impact. These events not only provide critical support to our
+                partner organizations but also bring our community together in
+                the spirit of giving and solidarity.
               </p>
             </div>
           </div>

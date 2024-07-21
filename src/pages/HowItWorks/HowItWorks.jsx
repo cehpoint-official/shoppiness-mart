@@ -15,9 +15,17 @@ import bag from "../../assets/RegisterBusiness/bag.jpg";
 import { RiSearchFill } from "react-icons/ri";
 import RoundedCards from "../../Components/RoundedCards/RoundedCards";
 import FAQ from "../../Components/FAQ";
+import Loader from "../../Components/Loader/Loader";
+import { useState } from "react";
 
 const HowItWorks = () => {
-  return (
+  const [loading, setLoading] = useState(true);
+  setInterval(() => {
+    setLoading(false);
+  }, [3000]);
+  return loading ? (
+    <Loader />
+  ) : (
     <div className="howitworks">
       <div className="howitworksContainer">
         <div className="secOne">
