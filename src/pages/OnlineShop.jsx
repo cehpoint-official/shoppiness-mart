@@ -16,7 +16,7 @@ const OnlineShop = () => {
     const fetchStores = async () => {
       try {
         const response = await axios.get(
-          "https://proxy-server-4er9.onrender.com/"
+          "https://proxy-server-4er9.onrender.com"
         );
         setLoading(false);
         setStores(response.data.stores);
@@ -44,18 +44,18 @@ const OnlineShop = () => {
   return loading ? (
     <Loader />
   ) : (
-    <div className="overflow-hidden px-4 md:px-10">
+    <div className="overflow-hidde px-4">
       {/* 1st page */}
       <div>
         <img
           src={onlineShopHeader}
           alt="Loading..."
-          className="w-full h-auto"
+          className="w-full h-auto px-0"
         />
       </div>
 
       {/* 2nd page */}
-      <div className="flex flex-col md:flex-row items-center justify-between py-4 px-6 bg-white shadow-sm">
+      <div className="flex flex-col md:flex-row items-center justify-between py-4  bg-white shadow-sm">
         <div className="flex flex-wrap items-center gap-2 mb-4 md:mb-0">
           <div className="bg-black text-white text-sm py-2 px-4 rounded cursor-pointer">
             SAVINGS MODE &rarr;

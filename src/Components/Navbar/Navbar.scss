@@ -9,11 +9,10 @@ $font: "Roboto Slab";
   flex-direction: column;
   width: 100%;
   z-index: 9999;
+  position: sticky;
+  top: 0;
+  background-color: white; // Ensures the navbar background is visible when sticky
 
-  @media (max-width: 978px) {
-    position: sticky;
-    top: 0;
-  }
   .top {
     padding: $padd;
     display: flex;
@@ -22,9 +21,10 @@ $font: "Roboto Slab";
     font-family: $font;
     background-color: $primary;
     width: 100%;
-     @media (max-width: 434px) {
-    padding: 20px;
-  }
+    @media (max-width: 434px) {
+      padding: 20px;
+    }
+
     img {
       object-fit: contain;
       cursor: pointer;
@@ -49,17 +49,16 @@ $font: "Roboto Slab";
         font-weight: 500;
         font-size: 18px;
         color: white;
-      }
 
-      .register {
-        background-color: white;
-        color: $primary;
+        &.register {
+          background-color: white;
+          color: $primary;
+        }
       }
     }
 
     .hamburgerMenu {
       display: none;
-
       > svg {
         font-size: 30px;
         color: white;
@@ -86,6 +85,32 @@ $font: "Roboto Slab";
     @media (max-width: 978px) {
       display: none;
     }
+
+    a {
+      position: relative;
+      text-decoration: none;
+      color: black;
+      transition: color 0.3s;
+
+      &.active {
+        color: $primary;
+        font-weight: bold;
+
+        &::after {
+          content: "";
+          position: absolute;
+          bottom: -10px; // Adjust based on desired distance from text
+          left: 0;
+          width: 100%;
+          height: 2px;
+          background-color: $primary;
+        }
+      }
+
+      &:hover {
+        color: $primary;
+      }
+    }
   }
 
   .menu {
@@ -104,6 +129,7 @@ $font: "Roboto Slab";
     top: 84px;
     transition: 1s all ease-in;
     z-index: 2000;
+
     @media (min-width: 978px) {
       display: none;
     }
@@ -112,9 +138,32 @@ $font: "Roboto Slab";
       width: 100%;
       border-radius: 0px 0px 60px 60px;
     }
-    > a {
+
+    a {
       padding: 3px;
       border-bottom: 1px solid rgba(128, 128, 128, 0.467);
+      text-decoration: none;
+      color: black;
+      transition: color 0.3s;
+
+      &.active {
+        color: $primary;
+        font-weight: bold;
+
+        &::after {
+          content: "";
+          position: absolute;
+          bottom: -10px; // Adjust based on desired distance from text
+          left: 0;
+          width: 100%;
+          height: 2px;
+          background-color: $primary;
+        }
+      }
+
+      &:hover {
+        color: $primary;
+      }
     }
 
     .register {

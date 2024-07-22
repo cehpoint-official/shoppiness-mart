@@ -14,8 +14,10 @@ const Footer = () => {
                 <img src={ShoppingBag} alt="" className="" />
               </a>
               <p className="mb-7 text-lg text-white">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Blanditiis,commodi tempora mollitia voluptatem
+                Shoppinessmart is a platform that turns your everyday online
+                shopping into a force for good. By simply shopping through our
+                website or app, you can support your favorite charities without
+                spending a penny extra.
               </p>
               <p className="flex items-center text-lg  text-white">
                 <span className="mr-3 text-[#FFD705]">Call Us</span>
@@ -117,16 +119,16 @@ const Footer = () => {
 
       {/* 14th page */}
 
-      <div className="bg-[#EDF6FB] mt-3 w-full px-3 lg:justify-between p-5 md:flex-row">
+      <div className="bg-[#EDF6FB] mt-3 w-full md:px-10 lg:justify-between md:p-5 py-5 md:flex-row">
         <div className="flex justify-between ">
-          <p className="text-[#048376]">© 2024 UX/UI Team</p>
-          <div className="text-[#048376] ">
+          <p className="text-[#048376] text-sm">© 2024 UX/UI Team</p>
+          <div className="text-[#048376] flex md:gap-6">
             <i className="bi bi-instagram"></i>
             <i className="bi bi-twitter ml-2"></i>
             <i className="bi bi-facebook ml-2"></i>
           </div>
           <div className="">
-            <p className="text-[#048376]">All Rights Reserved</p>
+            <p className="text-[#048376] text-sm">All Rights Reserved</p>
           </div>
         </div>
       </div>

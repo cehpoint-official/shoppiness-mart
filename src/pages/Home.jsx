@@ -11,6 +11,7 @@ import Backimg9 from "../assets/homepage/backimg9.png";
 
 import Home1 from "../assets/Home/home1.png"; //use in carasaul
 import Logo1 from "../assets/Home/logo1.png"; //use in ngo's
+import supportACause from "../assets/homeheader.png";
 
 // ========================
 import FAQ from "../Components/FAQ";
@@ -94,7 +95,26 @@ const Home = () => {
   ) : (
     <div className=" overflow-hidden">
       {/* carousel  */}
-      <Carousel img1={Home1} img2={Home1} img3={Home1} />
+      {/* <Carousel img1={Home1} img2={Home1} img3={Home1} /> */}
+      <div className="flex flex-wrap items-center justify-center min-h-screen ">
+        <div className="rounded-lg px-6 max-w-xl">
+          <h1 className="text-4xl font-bold text-blue-900 mb-4">
+            Cashback to giveback
+          </h1>
+          <p className="text-gray-700 mb-6">
+            Shop at Soppiness Mart, earn cashback to spread joy—use it for
+            yourself or donate to charity, sharing kindness exponentially.
+          </p>
+          <Link href="/signup">
+            <button className="bg-[#049D8E] text-white py-2 px-4 rounded-lg transition duration-300">
+              Sign up and Get Started
+            </button>
+          </Link>
+        </div>
+        <div>
+          <img src={supportACause} alt="Cashback to giveback illustration" />
+        </div>
+      </div>
 
       {/* our partners */}
       <Partners
