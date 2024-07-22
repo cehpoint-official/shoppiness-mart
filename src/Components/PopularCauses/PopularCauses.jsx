@@ -28,17 +28,12 @@ const PopularCauses = () => {
     <div className="causes">
       <div className="upperSec">
         <h1>Our Popular Causes</h1>
-        <p>
-        Addressing these challenges requires a multifaceted approach
-        </p>
+        <p>Addressing these challenges requires a multifaceted approach</p>
       </div>
       <div className="lowerSec">
         {causes?.map((item, index) => (
           <div className="lowerCard" key={index}>
-            <img
-              src={item.img}
-              alt="card"
-            />
+            <img src={item.img} alt="card" />
             <h4>{item.title}</h4>
             <span>{item.category}</span>
             <h6>{item.support}</h6>
@@ -46,8 +41,13 @@ const PopularCauses = () => {
           </div>
         ))}
       </div>
-      <p className="seeAll underline">
-        See all <span>5,000 +</span> Causes
+      <p className="seeAll underline flex gap-2 items-center justify-center">
+        <div>
+          See all <span>5,000 +</span> Causes
+        </div>
+        <div>
+          <i className="bi bi-arrow-right"></i>{" "}
+        </div>
       </p>
     </div>
   );

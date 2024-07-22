@@ -32,13 +32,18 @@ const HowItWorks = () => {
           <div className="left">
             <h1>How Works SHOPPINESSMART</h1>
             <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Blanditiis,commodi tempora mollitia voluptatem recusandae impedit
-              totam aperiam nesciunt doloremque magni neque placeat, laborum
-              nisi eum quae voluptatum Lorem ipsum dolor sit amet consectetur
-              adipisicing elit. Blanditiis,commodi tempora mollitia voluptatem
-              recusandae impedit totam aperiam nesciunt doloremque magni neque
-              placeat, laborum nisi eum quae voluptatum
+              SHOPPINESSMART makes it easy to turn your everyday online shopping
+              into a force for good. Simply join our platform for free by
+              signing up on our website or app and select the charities you wish
+              to support. Browse through our extensive list of partnered online
+              stores and shop for your favorite products at no extra cost. For
+              every purchase you make through SHOPPINESSMART, a percentage of
+              the sale is automatically donated to your chosen charity. This
+              way, you can enjoy your shopping while knowing you're contributing
+              to meaningful causes and making a positive impact on the world. By
+              seamlessly integrating charity into your everyday shopping
+              experience, SHOPPINESSMART helps you support the causes you care
+              about without spending an extra penny.
             </p>
             <Link to="/signup" className="register">
               Sign up for free
@@ -62,9 +67,9 @@ const HowItWorks = () => {
                     <img src={signup} alt="loading" />
                   </div>
                   <p>
-                    <span>Sign up: </span>Lorem ipsum dolor sit amet consectetur
-                    adipisicing elit. Blanditiis,commodi tempora mollitia
-                    voluptatem recusandae impedit
+                    <span>Sign up: </span>Join our platform for free by signing
+                    up on our website or app and select the charities you wish
+                    to support.
                   </p>
                 </div>
                 <div className="point">
@@ -72,9 +77,9 @@ const HowItWorks = () => {
                     <RiSearchFill fontSize={"40px"} />
                   </div>
                   <p>
-                    <span>Sign up: </span>Lorem ipsum dolor sit amet consectetur
-                    adipisicing elit. Blanditiis,commodi tempora mollitia
-                    voluptatem recusandae impedit
+                    <span>Make a Difference: </span>Enjoy your shopping while
+                    knowing you're contributing to meaningful causes and making
+                    a positive impact on the world.
                   </p>
                 </div>
                 <div className="point">
@@ -82,9 +87,9 @@ const HowItWorks = () => {
                     <img src={bag} alt="loading" />
                   </div>
                   <p>
-                    <span>Sign up: </span>Lorem ipsum dolor sit amet consectetur
-                    adipisicing elit. Blanditiis,commodi tempora mollitia
-                    voluptatem recusandae impedit
+                    <span>Shop: </span>Browse through our extensive list of
+                    partnered online stores and shop for your favorite products
+                    at no extra cost.
                   </p>
                 </div>
 
@@ -93,9 +98,9 @@ const HowItWorks = () => {
                     <img src={money} alt="loading" />
                   </div>
                   <p>
-                    <span>Sign up: </span>Lorem ipsum dolor sit amet consectetur
-                    adipisicing elit. Blanditiis,commodi tempora mollitia
-                    voluptatem recusandae impedit
+                    <span>Donate: </span>For every purchase you make through
+                    SHOPPINESSMART, a percentage of the sale is automatically
+                    donated to your chosen charity.
                   </p>
                 </div>
 
@@ -114,13 +119,14 @@ const HowItWorks = () => {
               Online Offline Shopping With Cashback,Deals for you,help to others
             </h1>
             <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Blanditiis,commodi tempora mollitia voluptatem recusandae impedit
-              totam aperiam nesciunt doloremque magni neque placeat, laborum
-              nisi eum quae voluptatum Lorem ipsum dolor sit amet consectetur
-              adipisicing elit. Blanditiis,commodi tempora mollitia voluptatem
-              recusandae impedit totam aperiam nesciunt doloremque magni neque
-              placeat, laborum nisi eum quae voluptatum
+              When you shop through our platform, whether online or offline, you
+              earn cashback on every purchase. Simply browse and select from our
+              partnered stores, shop as usual, and enjoy exclusive deals. A
+              portion of the cashback you earn is automatically donated to a
+              charity of your choice, allowing you to support important causes
+              without any extra cost. Track your earnings and contributions
+              through your user dashboard, making every purchase a meaningful
+              one. Save money and make a difference with Shoppinessmart!
             </p>
             <Link to="/register" className="shoping">
               Start Shopping
@@ -134,9 +140,24 @@ const HowItWorks = () => {
         <RoundedCards
           color={"#049D8E1A"}
           data={[
-            { title: "Buyer", img: card1, id: 1 },
-            { title: "Seller", img: card2, id: 2 },
-            { title: "Volunteer", img: card3, id: 3 },
+            {
+              title: "Buyer",
+              img: card1,
+              id: 1,
+              desc: "Shoppinessmart turns your everyday shopping into a powerful tool for giving back. By shopping through our platform, you not only enjoy exclusive deals and cashback on your purchases, but a portion of this cashback is automatically donated to a charity of your choice. This way, every purchase you make contributes to a greater cause, making your shopping experience both rewarding and impactful.",
+            },
+            {
+              title: "Seller",
+              img: card2,
+              id: 2,
+              desc: "Partnering with Shoppinessmart provides businesses with an opportunity to connect with socially conscious consumers. By offering exclusive deals and participating in our cashback program, sellers can increase their visibility and customer base. This partnership not only drives sales but also enhances your brand’s reputation as a business that supports charitable initiatives, fostering customer loyalty and trust.",
+            },
+            {
+              title: "Volunteer",
+              img: card3,
+              id: 3,
+              desc: "Shoppinessmart also empowers volunteers and charities by providing a steady stream of donations through our platform. This consistent funding helps charities and non-profits to sustain and expand their efforts, making a real difference in communities. Volunteers can promote Shoppinessmart to their networks, ensuring that every purchase made supports their cause, amplifying their impact with minimal effort.",
+            },
           ]}
         />
         <FAQ />
