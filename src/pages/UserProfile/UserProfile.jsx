@@ -25,11 +25,11 @@ const UserProfile = () => {
           <h1>Available Coupons</h1>
           <div className="coupon">
             <div className="top">
-              <p>Pizza Hut</p>
+              <p className="title">Pizza Hut</p>
               <p>15 Jun, 2024</p>
             </div>
             <div className="bottom">
-              <p>
+              <p className="desc">
                 Enjoy 25% Off In-Store Purchases + 1% Cashback at Shoppiness
                 Mart!
               </p>
