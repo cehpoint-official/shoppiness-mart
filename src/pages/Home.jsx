@@ -96,12 +96,12 @@ const Home = () => {
     <div className=" overflow-hidden">
       {/* carousel  */}
       {/* <Carousel img1={Home1} img2={Home1} img3={Home1} /> */}
-      <div className="flex flex-wrap items-center justify-center min-h-screen ">
-        <div className="rounded-lg px-6 max-w-xl">
-          <h1 className="text-4xl font-bold text-blue-900 mb-4">
+      <div className="flex flex-wrap items-center justify-center w-full p-10">
+        <div className="rounded-lg px-6 max-w-xl justify-between ">
+          <h1 className="text-5xl font-bold text-blue-900 mb-4 font-slab">
             Cashback to giveback
           </h1>
-          <p className="text-gray-700 mb-6">
+          <p className="text-gray-700 mb-6 text-xl">
             Shop at Soppiness Mart, earn cashback to spread joy—use it for
             yourself or donate to charity, sharing kindness exponentially.
           </p>
