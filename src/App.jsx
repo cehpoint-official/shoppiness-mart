@@ -25,7 +25,8 @@ import OnlineShop from "./pages/OnlineShop";
 import OfflineShop from "./pages/OfflineShop";
 import NewLayout from "./NewLayout";
 import UserProfile from "./pages/UserProfile/UserProfile";
-
+import FaqHome from "./Admin/pages/FAQ/home";
+import AddFaq from "./Admin/pages/FAQ/AddFaq";
 const App = () => {
   const Layout = () => {
     return (
@@ -154,6 +155,9 @@ const App = () => {
         },
       ],
     },
+    // ADMIN
+    { path: "/admin/shoppiness/faq", element: <FaqHome /> },
+    { path: "/admin/shoppiness/addfaq", element: <AddFaq /> },
   ]);
   return (
     <div>
