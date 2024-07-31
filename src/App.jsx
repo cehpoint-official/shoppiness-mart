@@ -29,6 +29,7 @@ import FaqHome from "./Admin/pages/FAQ/home";
 import AddFaq from "./Admin/pages/FAQ/AddFaq";
 import PrivacyPolicyHome from "./Admin/pages/PrivacyPolicy/PrivacyPolicy";
 import AddPrivacyPolicy from "./Admin/pages/PrivacyPolicy/AddPrivacyPolicy";
+import Newsletter from "./Admin/pages/Newsletter/Newsletter";
 const App = () => {
   const Layout = () => {
     return (
@@ -167,6 +168,10 @@ const App = () => {
     {
       path: "/admin/shoppiness/add/privacy-policy",
       element: <AddPrivacyPolicy />,
+    },
+    {
+      path: "/admin/shoppiness/newsletter",
+      element: <Newsletter />,
     },
   ]);
   return (

@@ -67,7 +67,7 @@ const Sidebar = () => {
                 FAQs
               </Link>
               <Link
-                to="/maast/submenu2"
+                to="/admin/shoppiness/newsletter"
                 className="py-2 px-6 hover:bg-teal-600"
               >
                 Newsletters
