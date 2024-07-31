@@ -55,7 +55,7 @@ const Sidebar = () => {
                 Blog
               </Link>
               <Link
-                to="/maast/submenu2"
+                to="/admin/shoppiness/privacy-policy"
                 className="py-2 px-6 hover:bg-teal-600"
               >
                 Privacy polices

@@ -27,6 +27,8 @@ import NewLayout from "./NewLayout";
 import UserProfile from "./pages/UserProfile/UserProfile";
 import FaqHome from "./Admin/pages/FAQ/home";
 import AddFaq from "./Admin/pages/FAQ/AddFaq";
+import PrivacyPolicyHome from "./Admin/pages/PrivacyPolicy/PrivacyPolicy";
+import AddPrivacyPolicy from "./Admin/pages/PrivacyPolicy/AddPrivacyPolicy";
 const App = () => {
   const Layout = () => {
     return (
@@ -158,6 +160,14 @@ const App = () => {
     // ADMIN
     { path: "/admin/shoppiness/faq", element: <FaqHome /> },
     { path: "/admin/shoppiness/addfaq", element: <AddFaq /> },
+    {
+      path: "/admin/shoppiness/privacy-policy",
+      element: <PrivacyPolicyHome />,
+    },
+    {
+      path: "/admin/shoppiness/add/privacy-policy",
+      element: <AddPrivacyPolicy />,
+    },
   ]);
   return (
     <div>
