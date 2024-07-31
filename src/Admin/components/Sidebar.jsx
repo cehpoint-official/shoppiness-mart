@@ -37,7 +37,7 @@ const Sidebar = () => {
                 Edit Pages
               </Link>
               <Link
-                to="/maast/submenu2"
+                to="/admin/shoppiness/contact"
                 className="py-2 px-6 hover:bg-teal-600"
               >
                 Contact Info

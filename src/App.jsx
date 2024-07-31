@@ -30,6 +30,8 @@ import AddFaq from "./Admin/pages/FAQ/AddFaq";
 import PrivacyPolicyHome from "./Admin/pages/PrivacyPolicy/PrivacyPolicy";
 import AddPrivacyPolicy from "./Admin/pages/PrivacyPolicy/AddPrivacyPolicy";
 import Newsletter from "./Admin/pages/Newsletter/Newsletter";
+import ContactMessage from "./Admin/pages/Contact/ContactMessage";
+import ContactInfo from "./Admin/pages/Contact/ContactInfo";
 const App = () => {
   const Layout = () => {
     return (
@@ -172,6 +174,14 @@ const App = () => {
     {
       path: "/admin/shoppiness/newsletter",
       element: <Newsletter />,
+    },
+    {
+      path: "/admin/shoppiness/contact",
+      element: <ContactInfo />,
+    },
+    {
+      path: "/admin/shoppiness/contact/message",
+      element: <ContactMessage />,
     },
   ]);
   return (
