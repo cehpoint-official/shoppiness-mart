@@ -303,10 +303,10 @@ const Home = () => {
         <div className="grid grid-cols-12 gap-4 mt-10">
           <div className="lg:col-span-5 col-span-12">
             <div>
-              <img src={blogsData[0].img} alt="" className="w-full" />
-              <p className="font-medium text-lg mt-4">{blogsData[0].title}</p>
+              <img src={blogsData[1].img} alt="" className="w-full" />
+              <p className="font-medium text-lg mt-4">{blogsData[1].title}</p>
               <p className="text-gray-500 text-sm md:text-base">
-                {blogsData[0].desc}{" "}
+                {blogsData[1].desc}{" "}
                 <span className="text-[#049D8E] font-medium">Read More...</span>
               </p>
               <p className="text-gray-400 mt-4">By Tithi Mondal, 10 Mar 2024</p>
@@ -315,11 +315,11 @@ const Home = () => {
 
           <div className="lg:col-span-7 col-span-12 mx-5">
             <div className="lg:flex mb-4">
-              <img src={blogsData[1].img} alt=" " className="lg:w-1/3 w-full" />
+              <img src={blogsData[0].img} alt=" " className="lg:w-1/3 w-full" />
               <div className="lg:ml-4 mt-4 lg:mt-0">
-                <p className="font-medium text-lg">{blogsData[1].title}</p>
+                <p className="font-medium text-lg">{blogsData[0].title}</p>
                 <p className="text-gray-500 text-sm md:text-base">
-                  {blogsData[1].desc}
+                  {blogsData[0].desc}
                   <span className="text-[#049D8E] text-sm md:text-base font-medium">
                     {" "}
                     Read More...

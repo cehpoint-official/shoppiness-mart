@@ -1,4 +1,5 @@
 import "./UserProfile.scss";
+import { IoCopyOutline } from "react-icons/io5";
 
 const UserProfile = () => {
   return (
@@ -35,7 +36,7 @@ const UserProfile = () => {
               </p>
               <div className="code">
                 Coupon code - #878583
-                {/* icon to be added */}
+                <IoCopyOutline />
               </div>
             </div>
           </div>

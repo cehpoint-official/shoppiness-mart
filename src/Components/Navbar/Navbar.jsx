@@ -42,32 +42,51 @@ const Navbar = () => {
         </div>
       </div>
       <div className="bottom">
-        <Link to="/" className={`border ${getLinkClass("/")}`}>Home</Link>
-        <Link to="/offline-shop" className={getLinkClass("/offline-shop")}>Offline Shop</Link>
-        <Link to="/online-shop" className={getLinkClass("/online-shop")}>Online Shop</Link>
-        <Link to="/howitworks" className={getLinkClass("/howitworks")}>How it works</Link>
-        <Link to="/support" className={getLinkClass("/support")}>Support a Cause/NGO</Link>
-        <Link to="/register-cause" className={getLinkClass("/register-cause")}>Register a Cause/NGO</Link>
-        <Link to="/register-business" className={getLinkClass("/register-business")}>Register a business/Service</Link>
-        <Link to="/supportmaast" className={getLinkClass("/supportmaast")}>Support Maast</Link>
+        <Link to="/" className={getLinkClass("/")}>
+          Home
+        </Link>
+        <Link to="/offline-shop" className={getLinkClass("/offline-shop")}>
+          Offline Shop
+        </Link>
+        <Link to="/online-shop" className={getLinkClass("/online-shop")}>
+          Online Shop
+        </Link>
+        <Link to="/howitworks" className={getLinkClass("/howitworks")}>
+          How it works
+        </Link>
+        <Link to="/support" className={getLinkClass("/support")}>
+          Support a Cause/NGO
+        </Link>
+        <Link to="/register-cause" className={getLinkClass("/register-cause")}>
+          Register a Cause/NGO
+        </Link>
+        <Link
+          to="/register-business"
+          className={getLinkClass("/register-business")}
+        >
+          Register a business/Service
+        </Link>
+        <Link to="/supportmaast" className={getLinkClass("/supportmaast")}>
+          Support Maast
+        </Link>
       </div>
 
       {active && (
         <div className="menu">
-          <Link to="/" className={getLinkClass("/")}>Home</Link>
-          <Link to="/offline-shop" className={getLinkClass("/offline-shop")}>Offline Shop</Link>
-          <Link to="/online-shop" className={getLinkClass("/online-shop")}>Online Shop</Link>
-          <Link to="/cashback-deals" className={getLinkClass("/cashback-deals")}>Cashback/deals</Link>
-          <Link to="/howitworks" className={getLinkClass("/howitworks")}>How it works</Link>
-          <Link to="/support" className={getLinkClass("/support")}>Support a Cause/NGO</Link>
-          <Link to="/register-cause" className={getLinkClass("/register-cause")}>Register a Cause/NGO</Link>
-          <Link to="/register-business" className={getLinkClass("/register-business")}>Register a business/Service</Link>
-          <Link to="/supportmaast" className={getLinkClass("/supportmaast")}>Support Maast</Link>
-          <Link to="/login" className={`login ${getLinkClass("/login")}`}>
+          <Link to="/">Home</Link>
+          <Link to="/offline-shop">Offline Shop</Link>
+          <Link to="/online-shop">Online Shop</Link>
+          <Link to="/cashback-deals">Cashback/deals</Link>
+          <Link to="/howitworks">How it works</Link>
+          <Link to="/support">Support a Cause/NGO</Link>
+          <Link to="/register-cause">Register a Cause/NGO</Link>
+          <Link to="/register-business">Register a business/Service</Link>
+          <Link to="/supportmaast">Support Maast</Link>
+          <Link to="/login" className="login">
             <i className="bi bi-arrow-right-circle-fill text-white"></i>
             Login
           </Link>
-          <Link to="/signup" className={`register ${getLinkClass("/signup")}`}>
+          <Link to="/signup" className="register">
             <i className="bi bi-pencil-fill text-[#049D8E] text-lg"></i>
             Signup
           </Link>

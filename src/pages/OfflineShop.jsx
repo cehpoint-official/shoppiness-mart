@@ -211,24 +211,23 @@ const OfflineShop = () => {
             <FaSearch className="text-gray-500" />
           </button>
         </div>
-        {/* Categories */}
-        <div className="flex flex-wrap   justify-center mt-10">
-          {categories.map((category) => (
-            <div
-              key={category.name}
-              className="flex flex-col items-center w-1/2 sm:w-1/3 md:w-1/4 lg:w-1/6 p-2"
-            >
-              <img
-                src={category.icon}
-                alt={category.name}
-                className="w-20 h-20 mb-2 bg-[#F7F7F7] rounded-full p-2"
-              />
-              <span className="text-gray-700 text-center">{category.name}</span>
-            </div>
-          ))}
-        </div>
       </div>
-
+      {/* Categories */}
+      <div className="flex justify-center p-11 w-full flex-wrap">
+        {categories.map((category) => (
+          <div
+            key={category.name}
+            className="flex flex-col items-center w-1/2 sm:w-1/4 md:w-1/4 lg:w-1/6 p-2"
+          >
+            <img
+              src={category.icon}
+              alt={category.name}
+              className="w-20 h-20 mb-2 bg-[#F7F7F7] rounded-full p-2"
+            />
+            <span className="text-gray-700 text-center">{category.name}</span>
+          </div>
+        ))}
+      </div>
       {/* {3nd Component} */}
       <div className="p-8">
         <h2 className="text-center text-2xl font-bold mb-12">
@@ -290,11 +289,11 @@ const OfflineShop = () => {
             <h2 className="text-2xl font-bold my-8 text-center">
               {section.title}
             </h2>
-            <div className="flex overflow-x-auto space-x-4">
+            <div className="flex overflow-x-auto space-x-4 w-full justify-around p-10">
               {section.items.map((item, idx) => (
                 <div
                   key={idx}
-                  className="flex-none bg-white shadow-md rounded-md overflow-hidden w-72"
+                  className="flex-none bg-white shadow-md rounded-2xl overflow-hidden w-72"
                 >
                   <img
                     src={item.image}
@@ -310,7 +309,7 @@ const OfflineShop = () => {
                   </div>
                 </div>
               ))}
-              <div className="flex-none flex flex-col justify-center items-center bg-gray-100 shadow-md rounded-md w-72">
+              <div className="flex-none flex flex-col justify-center items-center  bg-gray-100 shadow-md rounded-2xl w-28 cursor-pointer">
                 <p className="text-orange-500 font-bold">View More</p>
                 <FaArrowRight className="text-orange-500 mt-2" />
               </div>
