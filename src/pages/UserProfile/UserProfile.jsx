@@ -40,6 +40,24 @@ const UserProfile = () => {
               </div>
             </div>
           </div>
+
+          <div className="coupon">
+            <div className="top">
+              <p className="title">Pizza Hut</p>
+              <p>15 Jun, 2024</p>
+            </div>
+            <div className="bottom">
+              <p className="desc">
+                Enjoy 25% Off In-Store Purchases + 1% Cashback at Shoppiness
+                Mart!
+              </p>
+              <div className="code">
+                Coupon code - #878583
+                <IoCopyOutline />
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
