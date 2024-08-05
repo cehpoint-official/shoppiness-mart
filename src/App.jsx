@@ -33,6 +33,7 @@ import Newsletter from "./Admin/pages/Newsletter/Newsletter";
 import ContactMessage from "./Admin/pages/Contact/ContactMessage";
 import ContactInfo from "./Admin/pages/Contact/ContactInfo";
 import NgoRequest from "./Admin/pages/NGO/NgoRequest";
+import NgoViewDetails from "./Admin/pages/NGO/NgoViewDetails";
 const App = () => {
   const Layout = () => {
     return (
@@ -187,6 +188,10 @@ const App = () => {
     {
       path: "/admin/shoppiness/ngo/cause/requests",
       element: <NgoRequest />,
+    },
+    {
+      path: "/admin/shoppiness/ngo/cause/requests/see",
+      element: <NgoViewDetails />,
     },
   ]);
   return (

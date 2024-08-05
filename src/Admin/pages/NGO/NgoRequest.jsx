@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Sidebar from "../../components/Sidebar";
 import Navbar from "../../components/Navbar";
+import { Link } from "react-router-dom";
 
 const NgoRequest = () => {
   const [activeTab, setActiveTab] = useState("requests");
@@ -74,9 +75,11 @@ const NgoRequest = () => {
                     <div className="mr-4">
                       <p className="font-bold">{item.date}</p>
                     </div>
-                    <button className="px-4 py-2 bg-blue-500 text-white rounded">
-                      View Details
-                    </button>
+                    <Link to="/admin/shoppiness/ngo/cause/requests/see">
+                      <button className="px-4 py-2 bg-blue-500 text-white rounded">
+                        View Details
+                      </button>
+                    </Link>
                   </div>
                 ))}
               </div>
@@ -87,6 +90,7 @@ const NgoRequest = () => {
               </div>
             )}
           </div>
+          
         </div>
       </div>
     </div>
