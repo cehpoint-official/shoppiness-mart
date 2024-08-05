@@ -37,7 +37,7 @@ const Sidebar = () => {
                 Edit Pages
               </Link>
               <Link
-                to="/maast/submenu2"
+                to="/admin/shoppiness/contact"
                 className="py-2 px-6 hover:bg-teal-600"
               >
                 Contact Info
@@ -55,7 +55,7 @@ const Sidebar = () => {
                 Blog
               </Link>
               <Link
-                to="/maast/submenu2"
+                to="/admin/shoppiness/privacy-policy"
                 className="py-2 px-6 hover:bg-teal-600"
               >
                 Privacy polices
@@ -67,7 +67,7 @@ const Sidebar = () => {
                 FAQs
               </Link>
               <Link
-                to="/maast/submenu2"
+                to="/admin/shoppiness/newsletter"
                 className="py-2 px-6 hover:bg-teal-600"
               >
                 Newsletters
