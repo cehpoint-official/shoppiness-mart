@@ -110,11 +110,17 @@ const Sidebar = () => {
           </div>
           {isNgoOpen && (
             <div className="flex flex-col pl-6">
-              <Link to="/ngo/submenu1" className="py-2 px-6 hover:bg-teal-600">
-                Submenu 1
+              <Link
+                to="/admin/shoppiness/ngo/cause/requests"
+                className="py-2 px-6 hover:bg-teal-600"
+              >
+                NGO/Cause Requests
               </Link>
               <Link to="/ngo/submenu2" className="py-2 px-6 hover:bg-teal-600">
-                Submenu 2
+                All NGO/Causes
+              </Link>
+              <Link to="/ngo/submenu1" className="py-2 px-6 hover:bg-teal-600">
+                Give Back Record
               </Link>
             </div>
           )}

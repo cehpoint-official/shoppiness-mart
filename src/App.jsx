@@ -32,6 +32,7 @@ import AddPrivacyPolicy from "./Admin/pages/PrivacyPolicy/AddPrivacyPolicy";
 import Newsletter from "./Admin/pages/Newsletter/Newsletter";
 import ContactMessage from "./Admin/pages/Contact/ContactMessage";
 import ContactInfo from "./Admin/pages/Contact/ContactInfo";
+import NgoRequest from "./Admin/pages/NGO/NgoRequest";
 const App = () => {
   const Layout = () => {
     return (
@@ -182,6 +183,10 @@ const App = () => {
     {
       path: "/admin/shoppiness/contact/message",
       element: <ContactMessage />,
+    },
+    {
+      path: "/admin/shoppiness/ngo/cause/requests",
+      element: <NgoRequest />,
     },
   ]);
   return (
