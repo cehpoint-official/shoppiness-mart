@@ -27,11 +27,12 @@ import NewLayout from "./NewLayout";
 import UserProfile from "./pages/UserProfile/UserProfile";
 import FaqHome from "./Admin/pages/FAQ/home";
 import AddFaq from "./Admin/pages/FAQ/AddFaq";
-import PrivacyPolicyHome from "./Admin/pages/PrivacyPolicy/PrivacyPolicy";
+// import PrivacyPolicyHome from "./Admin/pages/PrivacyPolicy/PrivacyPolicy";
 import AddPrivacyPolicy from "./Admin/pages/PrivacyPolicy/AddPrivacyPolicy";
 import Newsletter from "./Admin/pages/Newsletter/Newsletter";
 import ContactMessage from "./Admin/pages/Contact/ContactMessage";
 import ContactInfo from "./Admin/pages/Contact/ContactInfo";
+import Dashboard from './Services-Dashboard/pages/Dashboard/Dashboard';
 const App = () => {
   const Layout = () => {
     return (
@@ -57,10 +58,10 @@ const App = () => {
           path: "/login",
           element: <Login />,
         },
-        {
-          path: "/privacy-policy",
-          element: <PrivacyPolicyPage />,
-        },
+        // {
+        //   path: "/privacy-policy",
+        //   element: <PrivacyPolicyPage />,
+        // },
         {
           path: "/signup",
           element: <Signup />,
@@ -163,10 +164,10 @@ const App = () => {
     // ADMIN
     { path: "/admin/shoppiness/faq", element: <FaqHome /> },
     { path: "/admin/shoppiness/addfaq", element: <AddFaq /> },
-    {
-      path: "/admin/shoppiness/privacy-policy",
-      element: <PrivacyPolicyHome />,
-    },
+    // {
+    //   path: "/admin/shoppiness/privacy-policy",
+    //   element: <PrivacyPolicyHome />,
+    // },
     {
       path: "/admin/shoppiness/add/privacy-policy",
       element: <AddPrivacyPolicy />,
@@ -182,6 +183,13 @@ const App = () => {
     {
       path: "/admin/shoppiness/contact/message",
       element: <ContactMessage />,
+    },
+
+    //Services Dashboard 
+
+    {
+      path: "/services-dashboard/:id",
+      element: <Dashboard />,
     },
   ]);
   return (

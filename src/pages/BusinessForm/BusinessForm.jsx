@@ -3,7 +3,7 @@ import "./BusinessForm.scss";
 import { FaCircleCheck } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import logo from "../../assets/RegisterBusiness/logo.png";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, setDoc } from "firebase/firestore";
 import { db, storage } from "../../../firebase.js";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import SuccessPage from "../../Components/SuccessPage/SuccessPage";
@@ -12,6 +12,7 @@ const BusinessForm = () => {
   //states
   const [currentPage, setCurrentPage] = useState(1);
   const [success, setSuccess] = useState(false);
+  const [id, setId] = useState("");
   const [completedSteps, setCompletedSteps] = useState([false, false, false]);
   const [businessDetails, setBusinessDetails] = useState({
     businessName: "",
@@ -23,6 +24,7 @@ const BusinessForm = () => {
     location: "",
     pincode: "",
     shortDesc: "",
+    id: "",
   });
   const [logoFile, setLogoFile] = useState(null);
   const [bannerFile, setBannerFile] = useState(null);
@@ -123,11 +125,19 @@ const BusinessForm = () => {
     try {
       const logoUrl = logoFile ? await uploadFile(logoFile) : "";
       const bannerUrl = bannerFile ? await uploadFile(bannerFile) : "";
-      await addDoc(collection(db, "businessDetails"), {
+      const docRef = await addDoc(collection(db, "businessDetails"), {
         ...businessDetails,
         logoUrl,
         bannerUrl,
       });
+
+      await setDoc(docRef, {
+        ...businessDetails,
+        logoUrl,
+        id: docRef.id,
+        bannerUrl,
+      });
+      setId(docRef.id);
     } catch (e) {
       alert(e.message);
     }
@@ -413,7 +423,7 @@ const BusinessForm = () => {
         ))}
       </div>
       <div className="formContainer">
-        {success ? <SuccessPage /> : pages[currentPage - 1].content}
+        {success ? <SuccessPage id={id} /> : pages[currentPage - 1].content}
       </div>
     </div>
   );
