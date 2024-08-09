@@ -4,10 +4,10 @@ import { FaCircleCheck } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import logo from "../../assets/RegisterBusiness/logo.png";
 import { addDoc, collection, setDoc } from "firebase/firestore";
-import { db, storage } from "../../../firebase.js";
+import { auth, db, storage } from "../../../firebase.js";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import SuccessPage from "../../Components/SuccessPage/SuccessPage";
-import Loader from "../../Components/Loader/Loader.jsx";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
 const BusinessForm = () => {
   //states
@@ -26,6 +26,15 @@ const BusinessForm = () => {
     pincode: "",
     shortDesc: "",
     id: "",
+  });
+
+  const [accountDetails, setAccountDetails] = useState({
+    firstName: "",
+    lastName: "",
+    mobileNumber: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
   const [logoFile, setLogoFile] = useState(null);
   const [bannerFile, setBannerFile] = useState(null);
@@ -46,13 +55,36 @@ const BusinessForm = () => {
   //previous page
   const handleBackPage = () => setCurrentPage((prev) => prev - 1);
 
-  //create Account
-  const handleCreateAccount = (e) => {
+  //create account
+  const handleCreateAccount = async (e) => {
     e.preventDefault();
-    addData();
-    setSuccess(true);
-    handleNextPage(e);
+  
+    // Check if passwords match
+    if (accountDetails.password !== accountDetails.confirmPassword) {
+      alert("Passwords do not match. Please try again.");
+      return; // Exit the function to prevent further execution
+    }
+  
+    try {
+      await addData(); // Add business data to Firestore
+      
+      // Attempt to register the user
+      const isRegistered = await registration();
+  
+      // If registration is successful, show the success page
+      if (isRegistered) {
+        setSuccess(true);
+      } else {
+        // If registration failed, do not move to the success page
+        return;
+      }
+    } catch (error) {
+      alert("An error occurred while creating your account: " + error.message);
+      return; // Prevent page from moving forward
+    }
   };
+  
+  
 
   //setting and uploading logo
   const handleFileChangeLogo = async (e) => {
@@ -143,6 +175,25 @@ const BusinessForm = () => {
       alert(e.message);
     }
   };
+  //Registration in Auth
+
+  const registration = async () => {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        accountDetails.email,
+        accountDetails.password
+      );
+      const user = userCredential.user;
+      console.log(user);
+      return true; // Return true if registration is successful
+    } catch (error) {
+      alert("Registration failed: " + error.message);
+      return false; // Return false if an error occurs
+    }
+  };
+  
+  
 
   const pages = [
     {
@@ -349,29 +400,80 @@ const BusinessForm = () => {
           <div className="left">
             <div className="item">
               <label>First Name</label>
-              <input type="text" />
+              <input
+                type="text"
+                onChange={(e) =>
+                  setAccountDetails({
+                    ...accountDetails,
+                    firstName: e.target.value,
+                  })
+                }
+              />
             </div>
             <div className="item">
               <label>Last Name</label>
-              <input type="text" />
+              <input
+                type="text"
+                onChange={(e) =>
+                  setAccountDetails({
+                    ...accountDetails,
+                    lastName: e.target.value,
+                  })
+                }
+              />
             </div>
             <div className="item">
               <label>Mobile number</label>
-              <input type="text" />
+              <input
+                type="text"
+                onChange={(e) =>
+                  setAccountDetails({
+                    ...accountDetails,
+                    mobileNumber: e.target.value,
+                  })
+                }
+              />
             </div>
           </div>
           <div className="right">
             <div className="item">
               <label>Email Address</label>
-              <input type="email" />
+              <input
+                required
+                type="email"
+                onChange={(e) =>
+                  setAccountDetails({
+                    ...accountDetails,
+                    email: e.target.value,
+                  })
+                }
+              />
             </div>
             <div className="item">
               <label>Password</label>
-              <input type="password" />
+              <input
+                required
+                type="password"
+                onChange={(e) =>
+                  setAccountDetails({
+                    ...accountDetails,
+                    password: e.target.value,
+                  })
+                }
+              />
             </div>
             <div className="item">
-              <label> Confirm Password</label>
-              <input type="password" />
+              <label>Confirm Password</label>
+              <input
+                required
+                type="password"
+                onChange={(e) =>
+                  setAccountDetails({
+                    ...accountDetails,
+                    confirmPassword: e.target.value,
+                  })
+                }
+              />
             </div>
             <div className="btns">
               <button className="back" onClick={handleBackPage}>
@@ -414,11 +516,7 @@ const BusinessForm = () => {
         ))}
       </div>
       <div className="formContainer">
-        {success ? (
-          <SuccessPage id={id} />
-        ) : (
-          pages[currentPage - 1].content
-        )}
+        {success ? <SuccessPage id={id} /> : pages[currentPage - 1].content}
       </div>
     </div>
   );
