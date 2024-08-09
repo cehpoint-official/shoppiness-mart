@@ -7,6 +7,7 @@ import { addDoc, collection, setDoc } from "firebase/firestore";
 import { db, storage } from "../../../firebase.js";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import SuccessPage from "../../Components/SuccessPage/SuccessPage";
+import Loader from "../../Components/Loader/Loader.jsx";
 
 const BusinessForm = () => {
   //states
@@ -49,8 +50,8 @@ const BusinessForm = () => {
   const handleCreateAccount = (e) => {
     e.preventDefault();
     addData();
-    handleNextPage(e);
     setSuccess(true);
+    handleNextPage(e);
   };
 
   //setting and uploading logo
@@ -158,7 +159,6 @@ const BusinessForm = () => {
                     businessName: e.target.value,
                   })
                 }
-                required
                 type="text"
               />
             </div>
@@ -171,7 +171,6 @@ const BusinessForm = () => {
                     owner: e.target.value,
                   })
                 }
-                required
                 type="text"
               />
             </div>
@@ -183,7 +182,6 @@ const BusinessForm = () => {
                 name="options"
                 type="radio"
                 value="online"
-                required
                 onClick={(e) =>
                   setBusinessDetails({
                     ...businessDetails,
@@ -197,7 +195,6 @@ const BusinessForm = () => {
                 type="radio"
                 name="options"
                 value="offline"
-                required
                 onClick={(e) =>
                   setBusinessDetails({
                     ...businessDetails,
@@ -213,7 +210,6 @@ const BusinessForm = () => {
               <p>(The number of the business man or service provider office)</p>
               <input
                 type="tel"
-                required
                 onChange={(e) =>
                   setBusinessDetails({
                     ...businessDetails,
@@ -228,7 +224,6 @@ const BusinessForm = () => {
               <p>(The number of the business man or service provider office)</p>
               <input
                 type="email"
-                required
                 onChange={(e) =>
                   setBusinessDetails({
                     ...businessDetails,
@@ -258,7 +253,6 @@ const BusinessForm = () => {
             <div className="item">
               <label>Select Category</label>
               <select
-                required
                 onChange={(e) =>
                   setBusinessDetails({
                     ...businessDetails,
@@ -274,7 +268,6 @@ const BusinessForm = () => {
             <div className="item">
               <label>Location</label>
               <input
-                required
                 type="text"
                 onChange={(e) =>
                   setBusinessDetails({
@@ -287,7 +280,6 @@ const BusinessForm = () => {
             <div className="item">
               <label>PIN Code</label>
               <input
-                required
                 type="number"
                 onChange={(e) =>
                   setBusinessDetails({
@@ -302,7 +294,6 @@ const BusinessForm = () => {
               <label>Short Description</label>
               <p>(Write a description about your business or service)</p>
               <textarea
-                required
                 onChange={(e) =>
                   setBusinessDetails({
                     ...businessDetails,
@@ -358,29 +349,29 @@ const BusinessForm = () => {
           <div className="left">
             <div className="item">
               <label>First Name</label>
-              <input required type="text" />
+              <input type="text" />
             </div>
             <div className="item">
               <label>Last Name</label>
-              <input required type="text" />
+              <input type="text" />
             </div>
             <div className="item">
               <label>Mobile number</label>
-              <input required type="text" />
+              <input type="text" />
             </div>
           </div>
           <div className="right">
             <div className="item">
               <label>Email Address</label>
-              <input required type="email" />
+              <input type="email" />
             </div>
             <div className="item">
               <label>Password</label>
-              <input required type="password" />
+              <input type="password" />
             </div>
             <div className="item">
               <label> Confirm Password</label>
-              <input required type="password" />
+              <input type="password" />
             </div>
             <div className="btns">
               <button className="back" onClick={handleBackPage}>
@@ -423,7 +414,11 @@ const BusinessForm = () => {
         ))}
       </div>
       <div className="formContainer">
-        {success ? <SuccessPage id={id} /> : pages[currentPage - 1].content}
+        {success ? (
+          <SuccessPage id={id} />
+        ) : (
+          pages[currentPage - 1].content
+        )}
       </div>
     </div>
   );

@@ -1,9 +1,17 @@
-import React from 'react'
+import Sidebar from "../../components/Sidebar/Sidebar";
+import DashboardHeader from "./../../components/DashboardHeader/DashboardHeader";
+import "./Dashboard.scss";
 
-const Dashboard = () => {
+function App() {
   return (
-    <div>Dashboard</div>
-  )
+    <div className="dashboard">
+      <Sidebar />
+      <div className="main-content">
+
+        <DashboardHeader/>
+      </div>
+    </div>
+  );
 }
 
-export default Dashboard
+export default App;

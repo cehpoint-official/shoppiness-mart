@@ -56,5 +56,12 @@ $breakpoint: 657px;
       padding: 10px 30px;
       font-size: 18px;
     }
+
+    &.disabled{
+      cursor: not-allowed;
+    background-color: gray;
+    color: white;
+
+    }
   }
 }
