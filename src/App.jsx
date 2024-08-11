@@ -32,7 +32,10 @@ import AddPrivacyPolicy from "./Admin/pages/PrivacyPolicy/AddPrivacyPolicy";
 import Newsletter from "./Admin/pages/Newsletter/Newsletter";
 import ContactMessage from "./Admin/pages/Contact/ContactMessage";
 import ContactInfo from "./Admin/pages/Contact/ContactInfo";
-import Dashboard from './Services-Dashboard/pages/Dashboard/Dashboard';
+import DashboardOutlet from "./Services-Dashboard/pages/DashboardOutlet/DashboardOutlet";
+import Products from "./Services-Dashboard/pages/Products/Products";
+import Customers from "./Services-Dashboard/pages/Customers/Customers";
+import Dashboard from "./Services-Dashboard/pages/Dashboard/Dashboard";
 const App = () => {
   const Layout = () => {
     return (
@@ -185,11 +188,29 @@ const App = () => {
       element: <ContactMessage />,
     },
 
-    //Services Dashboard 
+    //Services Dashboard
 
     {
       path: "/services-dashboard/:id",
-      element: <Dashboard />,
+      element: <DashboardOutlet />,
+      children: [
+        {
+          path: "dashboard",
+          element: <Dashboard />,
+        },
+        {
+          path: "products",
+          element: <Products />,
+        },
+        {
+          path: "customers",
+          element: <Customers />,
+        },
+        // {
+        //   path: "pos",
+        //   element: <POS />,
+        // },
+      ],
     },
   ]);
   return (
