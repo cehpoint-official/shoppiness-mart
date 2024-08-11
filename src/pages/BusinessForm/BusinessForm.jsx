@@ -3,7 +3,7 @@ import "./BusinessForm.scss";
 import { FaCircleCheck } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import logo from "../../assets/RegisterBusiness/logo.png";
-import { addDoc, collection, setDoc } from "firebase/firestore";
+import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 import { auth, db, storage } from "../../../firebase.js";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import SuccessPage from "../../Components/SuccessPage/SuccessPage";
@@ -20,7 +20,7 @@ const BusinessForm = () => {
     owner: "",
     mode: "",
     contact: "",
-    email: "",
+    businessEmail: "",
     cat: "",
     location: "",
     pincode: "",
@@ -58,33 +58,28 @@ const BusinessForm = () => {
   //create account
   const handleCreateAccount = async (e) => {
     e.preventDefault();
-  
-    // Check if passwords match
+
     if (accountDetails.password !== accountDetails.confirmPassword) {
       alert("Passwords do not match. Please try again.");
-      return; // Exit the function to prevent further execution
+      return;
     }
-  
+
     try {
-      await addData(); // Add business data to Firestore
-      
-      // Attempt to register the user
-      const isRegistered = await registration();
-  
-      // If registration is successful, show the success page
-      if (isRegistered) {
-        setSuccess(true);
-      } else {
-        // If registration failed, do not move to the success page
-        return;
-      }
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        accountDetails.email,
+        accountDetails.password
+      );
+      const user = userCredential.user;
+      setId(user.uid); // Set the user ID
+      console.log(user.uid);
+
+      await addData(user.uid);
+      setSuccess(true); // Show success page
     } catch (error) {
       alert("An error occurred while creating your account: " + error.message);
-      return; // Prevent page from moving forward
     }
   };
-  
-  
 
   //setting and uploading logo
   const handleFileChangeLogo = async (e) => {
@@ -154,46 +149,22 @@ const BusinessForm = () => {
   };
 
   //Adding All data  to firestore DB
-  const addData = async () => {
+  const addData = async (userId) => {
     try {
       const logoUrl = logoFile ? await uploadFile(logoFile) : "";
       const bannerUrl = bannerFile ? await uploadFile(bannerFile) : "";
-      const docRef = await addDoc(collection(db, "businessDetails"), {
-        ...businessDetails,
-        logoUrl,
-        bannerUrl,
-      });
 
-      await setDoc(docRef, {
+      await setDoc(doc(db, "businessDetails", userId), {
         ...businessDetails,
+        ...accountDetails,
         logoUrl,
-        id: docRef.id,
         bannerUrl,
+        id: userId, // Use the passed uid instead of state
       });
-      setId(docRef.id);
     } catch (e) {
       alert(e.message);
     }
   };
-  //Registration in Auth
-
-  const registration = async () => {
-    try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        accountDetails.email,
-        accountDetails.password
-      );
-      const user = userCredential.user;
-      console.log(user);
-      return true; // Return true if registration is successful
-    } catch (error) {
-      alert("Registration failed: " + error.message);
-      return false; // Return false if an error occurs
-    }
-  };
-  
-  
 
   const pages = [
     {
@@ -278,7 +249,7 @@ const BusinessForm = () => {
                 onChange={(e) =>
                   setBusinessDetails({
                     ...businessDetails,
-                    email: e.target.value,
+                    businessEmail: e.target.value,
                   })
                 }
               />
