@@ -1,7 +1,7 @@
 import "./SuccessPage.scss";
 import submitted from "../../assets/RegisterBusiness/submitted.png";
 import { Link } from "react-router-dom";
-const SuccessPage = () => {
+const SuccessPage = ({ id }) => {
   return (
     <div className="success">
       <img src={submitted} alt="loading" />
@@ -11,9 +11,11 @@ const SuccessPage = () => {
         board. Our team will connect with you shortly to discuss the next steps.
         Sit tight! 😊
       </p>
-      <Link to="/register-cause">Ok</Link>
+      <Link className={id ? "" : "disabled"} to={`/services-dashboard/${id}`}>
+        {id ? "OK" : "Creating..."}
+      </Link>
     </div>
   );
-}
+};
 
-export default SuccessPage
+export default SuccessPage;

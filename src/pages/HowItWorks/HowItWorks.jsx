@@ -30,7 +30,7 @@ const HowItWorks = () => {
       <div className="howitworksContainer">
         <div className="secOne">
           <div className="left">
-            <h1>How Works SHOPPINESSMART</h1>
+            <h1>How SHOPPINESSMART Works </h1>
             <p>
               SHOPPINESSMART makes it easy to turn your everyday online shopping
               into a force for good. Simply join our platform for free by

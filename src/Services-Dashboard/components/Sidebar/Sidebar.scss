@@ -1,0 +1,37 @@
+.sidebar {
+  width: 250px;
+  background-color: #048c7e;
+  color: white;
+  height: 100vh;
+
+  .logo {
+    font-size: 1.5rem;
+    width: 100%;
+    padding: 10px;
+  }
+
+  ul {
+    list-style-type: none;
+    padding: 0;
+    padding: 15px;
+
+    li {
+      margin-bottom: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 10px;
+
+      img {
+        width: 20px;
+        height: 20px;
+        object-fit: cover;
+      }
+      &:hover {
+        background-color: #ffffff33;
+      }
+    }
+  }
+}

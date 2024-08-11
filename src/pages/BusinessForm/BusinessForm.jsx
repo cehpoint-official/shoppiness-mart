@@ -3,26 +3,38 @@ import "./BusinessForm.scss";
 import { FaCircleCheck } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import logo from "../../assets/RegisterBusiness/logo.png";
-import { addDoc, collection } from "firebase/firestore";
-import { db, storage } from "../../../firebase.js";
+import { addDoc, collection, doc, setDoc } from "firebase/firestore";
+import { auth, db, storage } from "../../../firebase.js";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import SuccessPage from "../../Components/SuccessPage/SuccessPage";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
 const BusinessForm = () => {
   //states
   const [currentPage, setCurrentPage] = useState(1);
   const [success, setSuccess] = useState(false);
+  const [id, setId] = useState("");
   const [completedSteps, setCompletedSteps] = useState([false, false, false]);
   const [businessDetails, setBusinessDetails] = useState({
     businessName: "",
     owner: "",
     mode: "",
     contact: "",
-    email: "",
+    businessEmail: "",
     cat: "",
     location: "",
     pincode: "",
     shortDesc: "",
+    id: "",
+  });
+
+  const [accountDetails, setAccountDetails] = useState({
+    firstName: "",
+    lastName: "",
+    mobileNumber: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
   const [logoFile, setLogoFile] = useState(null);
   const [bannerFile, setBannerFile] = useState(null);
@@ -43,12 +55,30 @@ const BusinessForm = () => {
   //previous page
   const handleBackPage = () => setCurrentPage((prev) => prev - 1);
 
-  //create Account
-  const handleCreateAccount = (e) => {
+  //create account
+  const handleCreateAccount = async (e) => {
     e.preventDefault();
-    addData();
-    handleNextPage(e);
-    setSuccess(true);
+
+    if (accountDetails.password !== accountDetails.confirmPassword) {
+      alert("Passwords do not match. Please try again.");
+      return;
+    }
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        accountDetails.email,
+        accountDetails.password
+      );
+      const user = userCredential.user;
+      setId(user.uid); // Set the user ID
+      console.log(user.uid);
+
+      await addData(user.uid);
+      setSuccess(true); // Show success page
+    } catch (error) {
+      alert("An error occurred while creating your account: " + error.message);
+    }
   };
 
   //setting and uploading logo
@@ -119,14 +149,17 @@ const BusinessForm = () => {
   };
 
   //Adding All data  to firestore DB
-  const addData = async () => {
+  const addData = async (userId) => {
     try {
       const logoUrl = logoFile ? await uploadFile(logoFile) : "";
       const bannerUrl = bannerFile ? await uploadFile(bannerFile) : "";
-      await addDoc(collection(db, "businessDetails"), {
+
+      await setDoc(doc(db, "businessDetails", userId), {
         ...businessDetails,
+        ...accountDetails,
         logoUrl,
         bannerUrl,
+        id: userId, // Use the passed uid instead of state
       });
     } catch (e) {
       alert(e.message);
@@ -148,7 +181,6 @@ const BusinessForm = () => {
                     businessName: e.target.value,
                   })
                 }
-                required
                 type="text"
               />
             </div>
@@ -161,7 +193,6 @@ const BusinessForm = () => {
                     owner: e.target.value,
                   })
                 }
-                required
                 type="text"
               />
             </div>
@@ -173,7 +204,6 @@ const BusinessForm = () => {
                 name="options"
                 type="radio"
                 value="online"
-                required
                 onClick={(e) =>
                   setBusinessDetails({
                     ...businessDetails,
@@ -187,7 +217,6 @@ const BusinessForm = () => {
                 type="radio"
                 name="options"
                 value="offline"
-                required
                 onClick={(e) =>
                   setBusinessDetails({
                     ...businessDetails,
@@ -203,7 +232,6 @@ const BusinessForm = () => {
               <p>(The number of the business man or service provider office)</p>
               <input
                 type="tel"
-                required
                 onChange={(e) =>
                   setBusinessDetails({
                     ...businessDetails,
@@ -218,11 +246,10 @@ const BusinessForm = () => {
               <p>(The number of the business man or service provider office)</p>
               <input
                 type="email"
-                required
                 onChange={(e) =>
                   setBusinessDetails({
                     ...businessDetails,
-                    email: e.target.value,
+                    businessEmail: e.target.value,
                   })
                 }
               />
@@ -248,7 +275,6 @@ const BusinessForm = () => {
             <div className="item">
               <label>Select Category</label>
               <select
-                required
                 onChange={(e) =>
                   setBusinessDetails({
                     ...businessDetails,
@@ -264,7 +290,6 @@ const BusinessForm = () => {
             <div className="item">
               <label>Location</label>
               <input
-                required
                 type="text"
                 onChange={(e) =>
                   setBusinessDetails({
@@ -277,7 +302,6 @@ const BusinessForm = () => {
             <div className="item">
               <label>PIN Code</label>
               <input
-                required
                 type="number"
                 onChange={(e) =>
                   setBusinessDetails({
@@ -292,7 +316,6 @@ const BusinessForm = () => {
               <label>Short Description</label>
               <p>(Write a description about your business or service)</p>
               <textarea
-                required
                 onChange={(e) =>
                   setBusinessDetails({
                     ...businessDetails,
@@ -348,29 +371,80 @@ const BusinessForm = () => {
           <div className="left">
             <div className="item">
               <label>First Name</label>
-              <input required type="text" />
+              <input
+                type="text"
+                onChange={(e) =>
+                  setAccountDetails({
+                    ...accountDetails,
+                    firstName: e.target.value,
+                  })
+                }
+              />
             </div>
             <div className="item">
               <label>Last Name</label>
-              <input required type="text" />
+              <input
+                type="text"
+                onChange={(e) =>
+                  setAccountDetails({
+                    ...accountDetails,
+                    lastName: e.target.value,
+                  })
+                }
+              />
             </div>
             <div className="item">
               <label>Mobile number</label>
-              <input required type="text" />
+              <input
+                type="text"
+                onChange={(e) =>
+                  setAccountDetails({
+                    ...accountDetails,
+                    mobileNumber: e.target.value,
+                  })
+                }
+              />
             </div>
           </div>
           <div className="right">
             <div className="item">
               <label>Email Address</label>
-              <input required type="email" />
+              <input
+                required
+                type="email"
+                onChange={(e) =>
+                  setAccountDetails({
+                    ...accountDetails,
+                    email: e.target.value,
+                  })
+                }
+              />
             </div>
             <div className="item">
               <label>Password</label>
-              <input required type="password" />
+              <input
+                required
+                type="password"
+                onChange={(e) =>
+                  setAccountDetails({
+                    ...accountDetails,
+                    password: e.target.value,
+                  })
+                }
+              />
             </div>
             <div className="item">
-              <label> Confirm Password</label>
-              <input required type="password" />
+              <label>Confirm Password</label>
+              <input
+                required
+                type="password"
+                onChange={(e) =>
+                  setAccountDetails({
+                    ...accountDetails,
+                    confirmPassword: e.target.value,
+                  })
+                }
+              />
             </div>
             <div className="btns">
               <button className="back" onClick={handleBackPage}>
@@ -413,7 +487,7 @@ const BusinessForm = () => {
         ))}
       </div>
       <div className="formContainer">
-        {success ? <SuccessPage /> : pages[currentPage - 1].content}
+        {success ? <SuccessPage id={id} /> : pages[currentPage - 1].content}
       </div>
     </div>
   );
