@@ -11,7 +11,7 @@ const DashboardHeader = () => {
       <div className="profile-sec">
         <div className="search-bar">
           <CiSearch />
-          <input type="text" placeholder="Search Here" />
+          <input type="text" placeholder="Search  Here" />
         </div>
         <div className="notifications">
           <IoIosNotifications />

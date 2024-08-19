@@ -1,8 +1,10 @@
+
+$padding : 10px 40px;
 .dashboard-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 40px;
+  padding: $padding;
   .title {
     h1 {
       font-size: 29px;
@@ -23,8 +25,7 @@
       gap: 6px;
       border-radius: 10px;
 
-      input {
-        background-color: inherit;
+      >input{
         outline: none;
       }
 
