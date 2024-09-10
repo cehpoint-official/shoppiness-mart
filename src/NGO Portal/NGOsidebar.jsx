@@ -1,7 +1,7 @@
 // NGOSidebar.jsx
 import { Link } from 'react-router-dom';
 import { FiLogOut } from 'react-icons/fi'; // Import log out icon
-import ShoppingBag from './src/assets/ShoppingBag.png'; // Adjust the path if needed
+import ShoppingBag from '../../assets/ShoppingBag.png'; 
 
 const NGOsidebar = () => (
   <div className="w-64 bg-[#059d8e] min-h-screen text-white">
