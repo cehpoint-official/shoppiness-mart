@@ -10,9 +10,10 @@ const NGOSidebar = () => {
 
   return (
     <div className="w-64 bg-[#059d8e] min-h-screen text-white">
-      <div className="py-4 px-6 flex items-center">
-        <img src={ShoppingBag} alt="Shoppiness Mart" className="w-12 h-12 mr-2" />
-        <span className="text-2xl font-bold">Shoppiness Mart</span>
+      <div className="py-4 px-6">
+        <Link to="/" className="text-2xl font-bold">
+          <img src={ShoppingBag} alt="" />
+        </Link>
       </div>
       <nav className="flex flex-col py-4">
         <Link to="/pages/NGODashboard" className="py-2 px-6 hover:bg-teal-600">
