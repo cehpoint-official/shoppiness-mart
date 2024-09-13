@@ -1,0 +1,66 @@
+$gray: #777777;
+$primary: #049d8e;
+$padd: 100px;
+$font: "Roboto Slab";
+$breakpoint: 1035px;
+$breakpoint2: 736px;
+.secSix {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $padd;
+  gap: 50px;
+
+  @media (max-width: $breakpoint) {
+    flex-direction: column;
+    align-items: center;
+    gap: 50px;
+  }
+
+  @media (max-width: $breakpoint2) {
+    padding: 20px;
+  }
+  h1 {
+    font-size: 43px;
+    font-weight: 600;
+    font-family: $font;
+    width: 70%;
+    text-align: center;
+    @media (max-width: $breakpoint) {
+      font-size: 35px;
+      width: 100%;
+    }
+  }
+
+  .imgCon {
+    width: 90%;
+    height: 350px;
+    @media (max-width: $breakpoint) {
+      width: 100%;
+    }
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+
+  .seeAll {
+    font-size: 23px;
+    font-weight: 500;
+    color: $gray;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    span {
+      font-weight: 700;
+      color: black;
+    }
+
+    .arrow {
+      font-size: 40px;
+    }
+  }
+}

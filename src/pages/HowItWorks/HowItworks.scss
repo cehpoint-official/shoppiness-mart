@@ -1,0 +1,269 @@
+$gray: #777777;
+$primary: #049d8e;
+$padd: 100px;
+$padd2: 0 100px 100px 100px;
+$font: "Roboto Slab";
+$breakpoint: 1035px;
+$breakpoint2: 736px;
+.howitworks {
+  display: flex;
+  flex-direction: column;
+  .howitworksContainer {
+    display: flex;
+    flex-direction: column;
+
+    .secOne {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: $padd;
+      @media (max-width: $breakpoint) {
+        flex-direction: column;
+        align-items: center;
+        flex-direction: column-reverse;
+        gap: 50px;
+      }
+      @media (max-width: $breakpoint2) {
+        padding: 20px;
+      }
+      .left {
+        width: 60%;
+        display: flex;
+        flex-direction: column;
+        gap: 50px;
+        @media (max-width: $breakpoint) {
+          width: 100%;
+        }
+        h1 {
+          font-size: 45px;
+          font-weight: 600;
+          font-family: $font;
+          @media (max-width: $breakpoint) {
+            font-size: 30px;
+          }
+        }
+
+        > p {
+          font-size: 23px;
+          line-height: 30px;
+          color: $gray;
+          font-weight: 400;
+          width: 90%;
+          @media (max-width: $breakpoint) {
+            font-size: 18px;
+            width: 100%;
+          }
+        }
+
+        .register {
+          background-color: $primary;
+          padding: 15px 5px;
+          text-align: center;
+          font-size: 17px;
+          font-weight: 600;
+          color: white;
+          border-radius: 10px;
+          cursor: pointer;
+          width: 250px;
+        }
+      }
+
+      .right {
+        width: 40%;
+        @media (max-width: $breakpoint) {
+          width: 100%;
+        }
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+        }
+      }
+    }
+
+    .secTwo {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+      padding: $padd2;
+      gap: 30px;
+      @media (max-width: $breakpoint2) {
+        padding: 20px;
+      }
+      h1 {
+        font-size: 45px;
+        font-weight: 600;
+        font-family: $font;
+        @media (max-width: $breakpoint) {
+          font-size: 35px;
+        }
+      }
+      .container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        text-align: start;
+        gap: 40px;
+        @media (max-width: $breakpoint) {
+          flex-direction: column;
+          align-items: center;
+          gap: 50px;
+        }
+
+        .left {
+          width: 50%;
+          @media (max-width: $breakpoint) {
+            width: 100%;
+          }
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+          }
+        }
+
+        .right {
+          width: 50%;
+          @media (max-width: $breakpoint) {
+            width: 100%;
+          }
+
+          .points {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+
+            .point {
+              display: flex;
+              gap: 30px;
+              .img {
+                width: 70px;
+                height: 70px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                img {
+                  object-fit: contain;
+                  width: 100%;
+                  height: 100%;
+                }
+                svg {
+                  color: rgb(5, 5, 86);
+                }
+              }
+              > p {
+                font-size: 18px;
+                line-height: 30px;
+                color: $gray;
+                font-weight: 400;
+                width: 80%;
+              }
+              span {
+                font-weight: bold;
+                color: rgb(36, 38, 70);
+                font-size: 19px;
+              }
+            }
+          }
+        }
+      }
+    }
+    .signup {
+      background-color: #000000;
+      padding: 15px 5px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: 600;
+      color: white;
+      border-radius: 10px;
+      cursor: pointer;
+      width: 250px;
+      margin-left: 90px;
+        @media (max-width: $breakpoint2) {
+        margin: 10px 0 0 0 ;
+        align-self: center;
+      }
+    }
+    .secThree {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      padding: $padd;
+
+      @media (max-width: $breakpoint) {
+        flex-direction: column;
+        align-items: center;
+        flex-direction: column-reverse;
+        gap: 50px;
+      }
+      @media (max-width: $breakpoint2) {
+        padding: 20px;
+      }
+      .left {
+        width: 60%;
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+        @media (max-width: $breakpoint) {
+          width: 100%;
+        }
+        h5 {
+          font-size: 25px;
+          font-weight: 600;
+          font-family: $font;
+          color: $gray;
+          @media (max-width: $breakpoint) {
+            font-size: 20px;
+          }
+        }
+        h1 {
+          font-size: 45px;
+          font-weight: 600;
+          font-family: $font;
+          @media (max-width: $breakpoint) {
+            font-size: 35px;
+          }
+        }
+
+        > p {
+          font-size: 23px;
+          line-height: 30px;
+          color: $gray;
+          font-weight: 400;
+          width: 90%;
+          @media (max-width: $breakpoint) {
+            font-size: 18px;
+            width: 100%;
+          }
+        }
+
+        .shoping {
+          background-color: $primary;
+          padding: 15px 5px;
+          text-align: center;
+          font-size: 19px;
+          font-weight: 600;
+          color: white;
+          border-radius: 10px;
+          cursor: pointer;
+          width: 250px;
+        }
+      }
+
+      .right {
+        width: 40%;
+        @media (max-width: $breakpoint) {
+          width: 100%;
+        }
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+        }
+      }
+    }
+  }
+}

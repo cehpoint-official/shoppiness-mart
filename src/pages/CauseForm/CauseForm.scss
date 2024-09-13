@@ -1,0 +1,512 @@
+$gray: #777777;
+$primary: #049d8e;
+$padd: 30px 100px;
+$font: "Roboto Slab";
+$breakpoint: 1035px;
+$breakpoint2: 870px;
+$breakpoint3: 480px;
+$breakpointForm2: 675px;
+
+.form {
+  display: flex;
+  flex-direction: column;
+  margin-top: 30px;
+  gap: 20px;
+  font-weight: 600;
+  .nav {
+    display: flex;
+    align-items: center;
+    padding: $padd;
+    @media (max-width: $breakpoint2) {
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      text-align: center;
+    }
+    .logo {
+      width: 220px;
+
+      img {
+        object-fit: contain;
+        width: 100%;
+        height: 100%;
+      }
+    }
+    h1 {
+      text-align: center;
+      font-size: 32px;
+      color: $gray;
+      margin-left: 20%;
+      font-family: $font;
+      @media (max-width: $breakpoint2) {
+        font-size: 20px;
+        margin: 0;
+      }
+    }
+  }
+  .stepper {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    background-color: #f0f9ff;
+    place-items: center;
+    font-family: $font;
+    padding: $padd;
+    text-align: center;
+    @media (max-width: $breakpoint2) {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 30px;
+      padding: 50px;
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 20px;
+      @media (max-width: $breakpoint2) {
+        font-size: 15px;
+      }
+      .check {
+        border: 1px solid gray;
+        border-radius: 100%;
+        width: 25px;
+        height: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        svg {
+          color: #3ab002;
+          display: none;
+        }
+
+        &.active {
+          border: none;
+          svg {
+            font-size: 25px;
+            color: #3ab002;
+            display: flex;
+          }
+        }
+      }
+    }
+  }
+  .progress {
+    width: 100%;
+    margin-top: -20px;
+    height: 5px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    .complete {
+      transition: 0.34s all ease-in-out;
+      background-color: rgba(255, 255, 255, 0.807);
+      &.active {
+        background-color: #669bf2;
+      }
+    }
+  }
+  .formContainer {
+    width: 100%;
+    display: flex;
+    padding: $padd;
+    @media (max-width: $breakpoint2) {
+      padding: 50px;
+    }
+    .causeformFirst {
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+
+      @media (max-width: $breakpoint2) {
+        flex-direction: column;
+        gap: 40px;
+      }
+      .left {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+        width: 50%;
+        @media (max-width: $breakpoint2) {
+          width: 100%;
+        }
+        .item {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          .causeDesc {
+            border: 1px solid gray;
+            outline: none;
+            width: 70%;
+            padding: 15px 25px;
+            @media (max-width: $breakpoint3) {
+              width: 100%;
+            }
+          }
+          label {
+            font-size: 17px;
+            color: #2d393f;
+          }
+          input {
+            border: 1px solid gray;
+            width: 70%;
+            padding: 15px 25px;
+            outline: none;
+            @media (max-width: $breakpoint3) {
+              width: 100%;
+            }
+          }
+          h3 {
+            font-size: 17px;
+            color: #2d393f;
+          }
+
+          p {
+            width: 70%;
+            @media (max-width: $breakpoint3) {
+              width: 100%;
+            }
+          }
+        }
+      }
+
+      .right {
+        width: 50%;
+        display: flex;
+        gap: 30px;
+        flex-direction: column;
+        @media (max-width: $breakpoint2) {
+          width: 100%;
+        }
+        .options {
+          display: flex;
+          width: 100px;
+          gap: 10px;
+          @media (max-width: $breakpoint3) {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 20px;
+          }
+          label {
+            font-size: 17px;
+            color: #2d393f;
+            min-width: max-content;
+          }
+        }
+        .item {
+          display: flex;
+          flex-direction: column;
+          gap: 5px;
+          label {
+            font-size: 17px;
+            color: #2d393f;
+          }
+          input {
+            border: 1px solid gray;
+            outline: none;
+            width: 70%;
+            padding: 15px 25px;
+            @media (max-width: $breakpoint) {
+              width: 100%;
+            }
+          }
+
+          p {
+            font-weight: 400;
+            color: #2d393f;
+            width: 70%;
+          }
+        }
+        .btns {
+          display: flex;
+          gap: 10px;
+          margin-top: auto;
+          @media (max-width: $breakpoint3) {
+            flex-direction: column;
+            gap: 30px;
+            width: max-content;
+          }
+
+          .cancel {
+            border: 1px solid gray;
+            min-width: 100px;
+            font-size: 20px;
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+
+          .save {
+            background-color: #049d8e;
+            padding: 6px 15px;
+            color: white;
+            font-size: 20px;
+            font-weight: 400;
+          }
+        }
+      }
+    }
+
+    .formSecond {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      width: 100%;
+      @media (max-width: $breakpointForm2) {
+        flex-direction: column;
+        gap: 40px;
+      }
+      .left {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+        width: 50%;
+        @media (max-width: $breakpointForm2) {
+          width: 100%;
+        }
+        .item {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+
+          label {
+            font-size: 17px;
+          }
+          select {
+            border: 1px solid gray;
+            outline: none;
+            width: 70%;
+            padding: 15px 25px;
+            @media (max-width: $breakpointForm2) {
+              width: 100%;
+            }
+          }
+
+          input {
+            border: 1px solid gray;
+            outline: none;
+            width: 70%;
+            padding: 15px 25px;
+            @media (max-width: $breakpointForm2) {
+              width: 100%;
+            }
+          }
+
+          textarea {
+            border: 1px solid gray;
+            outline: none;
+            width: 70%;
+            padding: 15px 25px;
+            @media (max-width: $breakpointForm2) {
+              width: 100%;
+            }
+          }
+
+          p {
+            font-weight: 400;
+            color: #2d393f;
+            width: 70%;
+          }
+        }
+      }
+      .right {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+
+        gap: 30px;
+        width: 50%;
+        @media (max-width: $breakpointForm2) {
+          width: 100%;
+        }
+        .item {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+
+          label {
+            font-size: 17px;
+            border: 2px dashed #575757ba;
+            background-color: #049d8e0a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 10px;
+            padding: 40px;
+            border-radius: 5px;
+
+            .chooseFile {
+              background-color: #1f85ce;
+              color: white;
+              font-size: 18px;
+              padding: 5px 20px;
+              cursor: pointer;
+            }
+          }
+
+          > input {
+            display: none;
+          }
+        }
+        .btns {
+          display: flex;
+          gap: 20px;
+          margin-top: 30px;
+          @media (max-width: $breakpoint3) {
+            flex-direction: column;
+            gap: 30px;
+            width: max-content;
+          }
+          .next {
+            background-color: #049d8e;
+            padding: 6px 15px;
+            color: white;
+            font-size: 20px;
+            font-weight: 400;
+            min-width: 100px;
+          }
+
+          .back {
+            border: 1px solid gray;
+            min-width: 100px;
+            font-size: 20px;
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+        }
+
+        .uploadProgress{
+          background-color: rgb(237, 237, 237);
+          align-items: center;
+          justify-content: center;
+          display: flex;
+          padding: 10px;
+          color: #3ab002;
+          border-radius: 10px;
+        }
+      }
+    }
+
+    .formThird {
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+      @media (max-width: $breakpoint2) {
+        flex-direction: column;
+        gap: 40px;
+      }
+      .left {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+        width: 50%;
+        @media (max-width: $breakpoint2) {
+          width: 100%;
+        }
+        .item {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          label {
+            font-size: 17px;
+            color: #2d393f;
+          }
+          input {
+            border: 1px solid gray;
+            width: 70%;
+            padding: 15px 25px;
+            outline: none;
+            @media (max-width: $breakpoint2) {
+              width: 100%;
+            }
+          }
+          h3 {
+            font-size: 17px;
+            color: #2d393f;
+          }
+        }
+        .options {
+          display: flex;
+          width: 100px;
+          gap: 10px;
+
+          label {
+            font-size: 17px;
+            color: #2d393f;
+          }
+        }
+      }
+
+      .right {
+        width: 50%;
+        display: flex;
+        gap: 30px;
+        flex-direction: column;
+        @media (max-width: $breakpoint2) {
+          width: 100%;
+        }
+        .item {
+          display: flex;
+          flex-direction: column;
+          gap: 5px;
+          label {
+            font-size: 17px;
+            color: #2d393f;
+          }
+          input {
+            border: 1px solid gray;
+            outline: none;
+            width: 70%;
+            padding: 15px 25px;
+            @media (max-width: $breakpoint2) {
+              width: 100%;
+            }
+          }
+
+          p {
+            font-weight: 400;
+            color: #2d393f;
+          }
+        }
+        .btns {
+          display: flex;
+          gap: 20px;
+          margin-top: 30px;
+          @media (max-width: $breakpoint3) {
+            flex-direction: column;
+            gap: 30px;
+            width: max-content;
+          }
+          .next {
+            background-color: #049d8e;
+            padding: 6px 15px;
+            color: white;
+            font-size: 20px;
+            font-weight: 400;
+            min-width: 100px;
+          }
+
+          .back {
+            border: 1px solid gray;
+            min-width: 100px;
+            font-size: 20px;
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+        }
+      }
+    }
+  }
+}
