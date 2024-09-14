@@ -8,17 +8,32 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import './Dashboard.css';
-import { colors } from "@mui/material";
+import { LineChart } from "@mui/x-charts";
+import PieChart from "./Charts";
+import BasisChart from "./Charts";
+import LastPanel from "./LastPanel.jsx";
+
+
+const uData = [400,800,1600,3200,5200,6200,7000,6500,8000,9200];
+const pData = [500, 1500, 3500, 4500, 5500, 6500, 7500,8500,9500,10000];
+const xLabels = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'jun',
+  'july',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
 
 export default function Admin_Dashboard(){
     const [view, setView] = useState('Monthly');  
-  const totalCoupons = 25;  
-  const pendingCoupons = 45;  
-  const claimedCoupons = 5;  
-  const total = 25;
-
-
-  
+    const total = 25;
     return(
         <div>
       <div className="flex">
@@ -83,8 +98,45 @@ export default function Admin_Dashboard(){
                         </div>  
                     </div>
                 </div>
-                <div className="dashboard mt-7">  
-                    <h2 className="text-2xl font-semibold">Generated Coupons</h2>  
+                <div className="flex justify-evenly ">
+                    <div className="dashboard mt-7">  
+                        <h2 className="text-2xl font-semibold">Generated Coupons</h2>  
+                        <div className="view-buttons">  
+                            {['Monthly', 'Weekly', 'Today'].map((item) => (  
+                            <button  
+                                key={item}  
+                                className={view === item ? 'active' : ''}  
+                                onClick={() => handleViewChange(item)}
+                            >  
+                                {item}  
+                            </button>  
+                            ))}  
+                        </div>  
+                        <div className="coupon-card mt-10">  
+                            <div className="coupon-count">25</div>  
+                            <div className="coupon-title">All Coupons</div>  
+                            <button className="view-all-button">View All &gt;</button>  
+                        </div>  
+                        <div className="flex justify-evenly mt-10">
+                        <div className="total-container">  
+                            <h2>Total</h2>  
+                            <p className="total-value text-2xl font-semibold mt-3 ">{total}</p>  
+                        </div>
+                        <div className="total-container">  
+                            <h2>Pending</h2>  
+                            <p className="total-value text-2xl font-semibold mt-3">45</p>  
+                        </div> 
+                        <div className="total-container">  
+                            <h2>Claimed</h2>  
+                            <p className="total-value text-2xl font-semibold mt-3">05</p>  
+                        </div>
+                        </div>
+                        <div className="mt-5">
+                            <BasisChart/>
+                        </div>
+                    </div>    
+                    <div className="dashboard mt-7">  
+                    <h2 className="text-2xl font-semibold">Listed Shops</h2>  
                     <div className="view-buttons">  
                         {['Monthly', 'Weekly', 'Today'].map((item) => (  
                         <button  
@@ -96,26 +148,22 @@ export default function Admin_Dashboard(){
                         </button>  
                         ))}  
                     </div>  
-                    <div className="coupon-card mt-10">  
-                        <div className="coupon-count">25</div>  
-                        <div className="coupon-title">All Coupons</div>  
-                        <button className="view-all-button">View All &gt;</button>  
-                    </div>  
-                    <div className="flex justify-evenly mt-10">
-                    <div className="total-container">  
-                        <h2>Total</h2>  
-                        <p className="total-value text-2xl font-semibold mt-3 ">{total}</p>  
+                    <div className="mt-5">
+                    <LineChart
+                        width={650}
+                        height={400}
+                        series={[
+                            { data: pData, label: 'Offline Shops' },
+                            { data: uData, label: 'Online Shops' },
+                        ]}
+                        xAxis={[{ scaleType: 'point', data: xLabels }]}
+                        />
                     </div>
-                    <div className="total-container">  
-                        <h2>Pending</h2>  
-                        <p className="total-value text-2xl font-semibold mt-3">45</p>  
-                    </div> 
-                    <div className="total-container">  
-                        <h2>Claimed</h2>  
-                        <p className="total-value text-2xl font-semibold mt-3">05</p>  
-                    </div>
-                    </div>   
                 </div>
+                </div>
+                <div className="mt-5 ml-2">
+                    <LastPanel/>
+                </div>   
               </div>
             </div>
           </div>
