@@ -38,6 +38,8 @@ import Customers from "./Services-Dashboard/pages/Customers/Customers";
 import Dashboard from "./Services-Dashboard/pages/Dashboard/Dashboard";
 
 import Admin_Dashboard from "./Admin/Dashboard/Dashboard";
+import Edit_Pages from "./Admin/pages/EditPages/EditPages";
+import Social_Media from "./Admin/pages/SocialMedia/Social_Media";
 const App = () => {
   const Layout = () => {
     return (
@@ -167,9 +169,11 @@ const App = () => {
       ],
     },
     // ADMIN
-    { path: "admin/shopiness/dashboard", element:<Admin_Dashboard/>},
+    { path: "/admin/shoppiness/dashboard", element:<Admin_Dashboard/>},
     { path: "/admin/shoppiness/faq", element: <FaqHome /> },
     { path: "/admin/shoppiness/addfaq", element: <AddFaq /> },
+    { path: "/admin/shoppiness/editpages", element: <Edit_Pages/>},
+    { path: "/admin/shoppiness/socialmedia", element: <Social_Media/> },
     // {
     //   path: "/admin/shoppiness/privacy-policy",
     //   element: <PrivacyPolicyHome />,

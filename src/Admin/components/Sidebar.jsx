@@ -17,7 +17,7 @@ const Sidebar = () => {
         </Link>
       </div>
       <nav className="flex flex-col py-4">
-        <Link to="/dashboard" className="py-2 px-6 hover:bg-teal-600">
+        <Link to="/admin/shoppiness/dashboard" className="py-2 px-6 hover:bg-teal-600">
           DASHBOARD
         </Link>
         <div>
@@ -31,7 +31,7 @@ const Sidebar = () => {
           {isShoppinessOpen && (
             <div className="flex flex-col pl-6">
               <Link
-                to="/maast/submenu1"
+                to="/admin/shoppiness/editpages"
                 className="py-2 px-6 hover:bg-teal-600"
               >
                 Edit Pages
@@ -43,10 +43,10 @@ const Sidebar = () => {
                 Contact Info
               </Link>
               <Link
-                to="/maast/submenu2"
+                to="/admin/shoppiness/socialmedia"
                 className="py-2 px-6 hover:bg-teal-600"
               >
-                Social media
+                Social Media
               </Link>
               <Link
                 to="/maast/submenu2"
