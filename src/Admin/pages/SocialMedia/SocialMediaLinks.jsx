@@ -1,12 +1,13 @@
 import React, { useState } from 'react';  
 import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
+import './SocialMedia.css';
 export default function SocialMedia(){  
-  const [links, setLinks] = useState([  
-    { platform: 'Facebook', url: '' },  
-    { platform: 'Instagram', url: '' },  
-    { platform: 'LinkedIn', url: '' },  
-    { platform: 'Select', url: '' },  
+  const [links, setLinks] = useState([
+    { platform: 'Facebook', url: '',icon:'fa-brands fa-facebook' },
+    { platform: 'Instagram', url: '',icon:'fa-brands fa-instagram' },
+    { platform: 'LinkedIn', url: '',icon:'fa-brands fa-linkedin' },  
+    { platform: 'Select', url: '',icon:'fa-solid fa-earth-americas' },  
   ]);  
 
   const handleChange = (index, event) => {  
@@ -25,33 +26,42 @@ export default function SocialMedia(){
   };  
 
   return (  
-    <div>  
-      {links.map((link, index) => (  
-        <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>  
-          <i className="fa-brands fa-facebook"></i>
-          <span style={{ marginRight: '10px' }}>{link.platform}</span>  
+    <div className="body bg-yellow-200 mx-auto">
+            {links.map((link, index) => (  
+        <div key={index} className="flex mt-5 mb-10 items-center" > 
+          <i class={link.icon} id="icon"></i>
+          <label className="mr-10 pl-4 text-2xl" for="select">{link.platform}</label>
+          <div>  
           <input  
             type="text"  
-            placeholder="Add link"  
+            placeholder="Add link" 
+            id="select" 
             value={link.url}  
             onChange={(event) => handleChange(index, event)}  
-            className='flex mr-10 p-2 rounded-xl border-solid border-slate-300'
-          />  
-          <button style={{ marginRight: '5px', backgroundColor: '#007bff', color: '#fff', border: 'none', borderRadius: '4px', padding: '8px 12px' }}>  
-          <span class="material-symbols-outlined">
+            className='flex mr-10 p-2 border'
+          /> </div>
+          <div> 
+          <button className='mr-5 bg-blue-600 text-white text-2xl connect'>  
+          <span className="material-symbols-outlined text-2xl">
             conversion_path
-            </span>
+            </span>&nbsp;
             Connect  
           </button>  
-          
-          <IconButton aria-label="delete" onClick={() => handleRemoveLink(index)}>
-        <DeleteIcon />
-      </IconButton>
+          </div>
+          <div>
+          <IconButton aria-label="delete" class="delete" onClick={() => handleRemoveLink(index)}>
+          <DeleteIcon />
+          </IconButton>
+          </div>
         </div>  
       ))}  
-      <button onClick={handleAddLink} style={{ marginTop: '10px', padding: '10px 20px', backgroundColor: '#007bff', color: '#fff', border: 'none', borderRadius: '4px' }}>  
+      <hr></hr>
+      <div>
+      <button onClick={handleAddLink} 
+      className='addsocial text-2xl text-slate-600 font-semibold'>  
         + Add new social link  
-      </button>  
-    </div>  
+      </button> 
+      </div> 
+    </div>
   );  
 };  

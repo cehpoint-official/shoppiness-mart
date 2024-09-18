@@ -1,0 +1,30 @@
+.connect{
+    width: 200px;
+    height: 50px;
+    font-size: 20px;
+    border-radius: 30px;
+}
+.delete{
+    color: grey;
+    }
+.delete:hover{
+    color: red;
+}
+.border{
+    border: 1px solid blue;
+    width: 450px;
+    height:50px;
+    border-radius: 25px;
+}
+.addsocial{ 
+    width: 42rem;
+    height: 3.5rem;
+    background-color: rgb(241 245 249);
+    border-radius: 30px;
+    margin-top: 2.5rem;
+    margin-left:6rem;
+}
+#icon{
+    color: slategrey;
+    font-size: 2rem;
+}
