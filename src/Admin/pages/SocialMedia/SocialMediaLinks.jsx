@@ -26,7 +26,7 @@ export default function SocialMedia(){
   };  
 
   return (  
-    <div className="body bg-yellow-200 mx-auto">
+    <div className="body mx-auto">
             {links.map((link, index) => (  
         <div key={index} className="flex mt-5 mb-10 items-center" > 
           <i class={link.icon} id="icon"></i>
