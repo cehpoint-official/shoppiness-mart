@@ -1,44 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react';  
 
-const EditPagesHome = () => {
-  const [pages, setPages] = useState([
-    { title: 'Home', content: '', isActive: false },
-    { title: 'How it works', content: '', isActive: false },
-    { title: 'About Us', content: '', isActive: false },
-    { title: 'Privacy Policy', content: '', isActive: false },
-  ]);
+const MenuItem = ({ title }) => {  
+  const [isOpen, setIsOpen] = useState(false);  
 
-  const handlePageClick = (index) => {
-    const updatedPages = [...pages];
-    updatedPages[index].isActive = !updatedPages[index].isActive;
-    setPages(updatedPages);
-  };
+  const toggleDropdown = () => {  
+    setIsOpen(!isOpen);  
+  };  
 
-  const handleContentChange = (index, content) => {
-    const updatedPages = [...pages];
-    updatedPages[index].content = content;
-    setPages(updatedPages);
-  };
+  return (  
+    <div>  
+      <div onClick={toggleDropdown} style={{ cursor: 'pointer', padding: '10px', borderBottom: '1px solid #ccc' }}>  
+        {title} {isOpen ? '-' : '+'}  
+      </div>  
+      {isOpen && (  
+        <div style={{ paddingLeft: '20px', paddingBottom: '10px' }}>  
+          {/* Content for the dropdown can go here */}  
+          <p>Details about {title}</p>  
+        </div>  
+      )}  
+    </div>  
+  );  
+};  
 
-  return (
-    <div className="container">
-        <div className="edit-pages">
-          {pages.map((page, index) => (
-            <div key={index} className="edit-page" onClick={() => handlePageClick(index)}>
-              <div className="edit-page-title">{page.title}</div>
-              {page.isActive && (
-                <div
-                  className="edit-page-content"
-                  value={page.content}
-                  onChange={(e) => handleContentChange(index, e.target.value)}
-                />
-              )}
-              <div className="edit-page-plus" onClick={() => handlePageClick(index)}>+</div>
-            </div>
-          ))}
-        </div>
-      </div>
-  );
-};
+const EditPagesHome = () => {  
+  return (  
+    <div style={{ width: '900px', border: '1px solid #ccc', borderRadius: '5px', padding: '10px' }}>  
+      <MenuItem title="Home" />  
+      <MenuItem title="How it works" />  
+      <MenuItem title="About Us" />  
+      <MenuItem title="Privacy Policy" />  
+    </div>  
+  );  
+};  
 
 export default EditPagesHome;

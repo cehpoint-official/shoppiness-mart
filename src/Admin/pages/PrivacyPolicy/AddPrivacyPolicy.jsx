@@ -13,7 +13,7 @@ const AddPrivacyPolicy = () => {
           {/*ADD FAQ QUES  */}
           <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
             <div className="bg-white shadow-md rounded-lg p-8 w-7/12">
-              <Link to="/admin/shoppiness/faq">
+              <Link to="/admin/shoppiness/privacy-policy">
                 <button className="text-gray-500 flex items-center mb-6">
                   <svg
                     className="w-4 h-4 mr-2"

@@ -40,6 +40,7 @@ import Dashboard from "./Services-Dashboard/pages/Dashboard/Dashboard";
 import Admin_Dashboard from "./Admin/Dashboard/Dashboard";
 import Edit_Pages from "./Admin/pages/EditPages/EditPages";
 import Social_Media from "./Admin/pages/SocialMedia/Social_Media";
+import PrivacyPolicy from "./Admin/pages/PrivacyPolicy/PrivacyPolicy";
 const App = () => {
   const Layout = () => {
     return (
@@ -174,10 +175,10 @@ const App = () => {
     { path: "/admin/shoppiness/addfaq", element: <AddFaq /> },
     { path: "/admin/shoppiness/editpages", element: <Edit_Pages/>},
     { path: "/admin/shoppiness/socialmedia", element: <Social_Media/> },
-    // {
-    //   path: "/admin/shoppiness/privacy-policy",
-    //   element: <PrivacyPolicyHome />,
-    // },
+    {
+       path: "/admin/shoppiness/privacy-policy",
+       element: <PrivacyPolicy />,
+    },
     {
       path: "/admin/shoppiness/add/privacy-policy",
       element: <AddPrivacyPolicy />,
