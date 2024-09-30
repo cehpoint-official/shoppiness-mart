@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { FiChevronDown, FiChevronUp } from 'react-icons/fi'; // Importing icons for toggling
 import ProfilePic from '../../assets/googleicon.png'; // Replace with actual profile image
 import NotificationIcon from '../../assets/googleicon.png'; // Replace with actual notification icon
-
+import NGOsidebar from '../components/NGOsidebar';
 const NGOFAQDashboard = () => {
   // State to track the visibility of answers
   const [visibleAnswers, setVisibleAnswers] = useState({});
