@@ -3,7 +3,7 @@ import { FiChevronDown, FiChevronUp } from 'react-icons/fi'; // Importing icons 
 import ProfilePic from '../../assets/googleicon.png'; // Replace with actual profile image
 import NotificationIcon from '../../assets/googleicon.png'; // Replace with actual notification icon
 
-const FAQDashboard = () => {
+const NGOFAQDashboard = () => {
   // State to track the visibility of answers
   const [visibleAnswers, setVisibleAnswers] = useState({});
 
@@ -37,8 +37,7 @@ const FAQDashboard = () => {
 
   return (
     <div className="flex">
-      {/* Sidebar Placeholder (If you have a sidebar component, import and add here) */}
-      {/* <NGOsidebar /> */}
+      {<NGOsidebar /> }
 
       <div className="flex-1 p-6 bg-gray-100">
         {/* Header Section */}
@@ -108,4 +107,4 @@ const FAQDashboard = () => {
   );
 };
 
-export default FAQDashboard;
+export default NGOFAQDashboard;
