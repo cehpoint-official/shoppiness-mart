@@ -36,11 +36,11 @@ const home = () => {
                     </button>
                   </Link>
                 </div>
-                <div className="space-y-4">
+                <div className="mt-10">
                   {Que.map((faq) => (
                     <div
                       key={faq.id}
-                      className="flex justify-between items-center bg-gray-50 px-4 py-2 rounded-lg shadow-sm"
+                      className="flex justify-between items-center bg-gray-50 px-4 py-2 rounded-lg shadow-sm mt-5"
                     >
                       <span>Frequently Asked Questions {faq.q1}</span>
                       <button className="text-blue-500">Edit</button>

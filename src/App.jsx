@@ -41,6 +41,7 @@ import Admin_Dashboard from "./Admin/Dashboard/Dashboard";
 import Edit_Pages from "./Admin/pages/EditPages/EditPages";
 import Social_Media from "./Admin/pages/SocialMedia/Social_Media";
 import PrivacyPolicy from "./Admin/pages/PrivacyPolicy/PrivacyPolicy";
+import UploadBanner from "./Admin/pages/EditPages/UploadBanner";
 const App = () => {
   const Layout = () => {
     return (
@@ -174,6 +175,7 @@ const App = () => {
     { path: "/admin/shoppiness/faq", element: <FaqHome /> },
     { path: "/admin/shoppiness/addfaq", element: <AddFaq /> },
     { path: "/admin/shoppiness/editpages", element: <Edit_Pages/>},
+    { path:"/admin/shoppiness/banner-image", element:<UploadBanner/>},
     { path: "/admin/shoppiness/socialmedia", element: <Social_Media/> },
     {
        path: "/admin/shoppiness/privacy-policy",

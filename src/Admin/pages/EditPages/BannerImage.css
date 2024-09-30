@@ -1,0 +1,36 @@
+.upload-banner {  
+    padding: 20px;  
+    border: 1px solid #ccc;  
+    border-radius: 8px;  
+    max-width: 600px;  
+    margin: auto;  
+  }  
+  
+  .drop-area {  
+    border: 2px dashed #ccc;  
+    padding: 20px;  
+    text-align: center;  
+    margin-bottom: 20px;  
+  }  
+  
+  .file-list {  
+    margin-top: 20px;  
+  }  
+  
+  table {  
+    width: 100%;  
+    border-collapse: collapse;  
+  }  
+  
+  th, td {  
+    border: 1px solid #ccc;  
+    padding: 8px;  
+    text-align: left;  
+  }  
+  
+  button {  
+    background: none;  
+    border: none;  
+    color: red;  
+    cursor: pointer;  
+  }
