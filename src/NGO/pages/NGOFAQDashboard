@@ -1,43 +1,36 @@
+// src/NGO/pages/NGOFAQDashboard.jsx
+
 import React, { useState } from 'react';
-import { FiChevronDown, FiChevronUp } from 'react-icons/fi'; // Importing icons for toggling
-import ProfilePic from '../../assets/googleicon.png'; // Replace with actual profile image
-import NotificationIcon from '../../assets/googleicon.png'; // Replace with actual notification icon
+import { Link } from 'react-router-dom';
+import { FiLogOut, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import NGOsidebar from '../components/NGOsidebar';
+import ShoppingBag from '../../assets/googleicon.png';
+import ProfilePic from '../../assets/googleicon.png'; // Replace with actual path
+import NotificationIcon from '../../assets/googleicon.png'; // Replace with actual path
+
 const NGOFAQDashboard = () => {
-  // State to track the visibility of answers
   const [visibleAnswers, setVisibleAnswers] = useState({});
 
-  // Sample FAQ data
   const faqs = [
     {
       question: "What is Shoppiness Mart?",
-      answer: "Shoppiness Mart is an online platform for connecting NGOs with potential donors. We help manage and showcase various causes to increase support and donations."
+      answer: "Shoppiness Mart is an online platform for connecting NGOs with potential donors."
     },
     {
       question: "How can I donate?",
-      answer: "You can donate by visiting the specific cause page and clicking on the 'Donate Now' button. You'll be prompted to choose your preferred payment method."
+      answer: "You can donate by visiting the specific cause page and clicking on the 'Donate Now' button."
     },
-    {
-      question: "Is there a way to track my donations?",
-      answer: "Yes, we provide a user dashboard where you can see a history of all your donations and the causes you've supported."
-    },
-    {
-      question: "Can I volunteer for a cause?",
-      answer: "Absolutely! Visit the cause details page to see available volunteer opportunities and apply."
-    }
+    // Add more FAQs as needed
   ];
 
-  // Function to toggle answer visibility
   const toggleAnswer = (index) => {
-    setVisibleAnswers((prev) => ({
-      ...prev,
-      [index]: !prev[index]
-    }));
+    setVisibleAnswers((prev) => ({ ...prev, [index]: !prev[index] }));
   };
 
   return (
     <div className="flex">
-      {<NGOsidebar /> }
+      {/* Sidebar Component */}
+      <NGOsidebar />
 
       <div className="flex-1 p-6 bg-gray-100">
         {/* Header Section */}
