@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FiChevronDown, FiChevronUp, FiLogOut } from 'react-icons/fi'; // Import icons
+import { FiChevronDown, FiChevronUp, FiLogOut } from 'react-icons/fi';
 import ShoppingBag from '../../assets/ShoppingBag.png'; 
 
 const NGOSidebar = () => {
-  const [isNgoOpen, setIsNgoOpen] = useState(true); // Default to open for demonstration
+  const [isNgoOpen, setIsNgoOpen] = useState(true);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
 
@@ -12,7 +12,7 @@ const NGOSidebar = () => {
     <div className="w-64 bg-[#059d8e] min-h-screen text-white">
       <div className="py-4 px-6">
         <Link to="/" className="text-2xl font-bold">
-          <img src={ShoppingBag} alt="" />
+          <img src={ShoppingBag} alt="Logo" />
         </Link>
       </div>
       <nav className="flex flex-col py-4">
