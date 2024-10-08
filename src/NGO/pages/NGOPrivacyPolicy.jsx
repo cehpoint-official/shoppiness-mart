@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import NGOsidebar from '../components/NGOsidebar';
+import NGOSidebar from '../components/NGOSidebar'; // Adjust the path if necessary
+import NGONavbar from '../components/NGONavbar'; // Adjust the path if necessary
 
 const NGOPrivacyPolicy = () => {
   const [activeQuestion, setActiveQuestion] = useState(null);
@@ -34,28 +35,33 @@ const NGOPrivacyPolicy = () => {
   return (
     <div className="flex">
       {/* Sidebar Component */}
-      <NGOsidebar />
-    <div className="p-6 bg-white rounded-lg shadow">
-      <h2 className="text-2xl font-bold mb-4">Privacy Policy</h2>
-      <div>
-        {questionsAndAnswers.map((item, index) => (
-          <div key={index} className="mb-2">
-            <div
-              onClick={() => toggleQuestion(index)}
-              className="flex justify-between cursor-pointer p-4 bg-gray-100 rounded-md hover:bg-gray-200"
-            >
-              <span>{item.question}</span>
-              <span>{activeQuestion === index ? '−' : '+'}</span>
-            </div>
-            {activeQuestion === index && (
-              <div className="p-4 bg-gray-50 rounded-md mt-1">
-                {item.answer}
+      <NGOSidebar />
+      
+      <div className="flex-1 flex flex-col">
+        <NGONavbar /> {/* Include the navbar component */}
+
+        <div className="p-6 bg-white rounded-lg shadow">
+          <h2 className="text-2xl font-bold mb-4">Privacy Policy</h2>
+          <div>
+            {questionsAndAnswers.map((item, index) => (
+              <div key={index} className="mb-2">
+                <div
+                  onClick={() => toggleQuestion(index)}
+                  className="flex justify-between cursor-pointer p-4 bg-gray-100 rounded-md hover:bg-gray-200"
+                >
+                  <span>{item.question}</span>
+                  <span>{activeQuestion === index ? '−' : '+'}</span>
+                </div>
+                {activeQuestion === index && (
+                  <div className="p-4 bg-gray-50 rounded-md mt-1">
+                    {item.answer}
+                  </div>
+                )}
               </div>
-            )}
+            ))}
           </div>
-        ))}
+        </div>
       </div>
-    </div>
     </div>
   );
 };
