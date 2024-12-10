@@ -105,7 +105,7 @@ const Home = () => {
             Shop at Soppiness Mart, earn cashback to spread joy—use it for
             yourself or donate to charity, sharing kindness exponentially.
           </p>
-          <Link href="/signup">
+          <Link to="/signup">
             <button className="bg-[#049D8E] text-white py-2 px-4 rounded-lg transition duration-300">
               Sign up and Get Started
             </button>
