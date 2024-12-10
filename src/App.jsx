@@ -36,6 +36,10 @@ import DashboardOutlet from "./Services-Dashboard/pages/DashboardOutlet/Dashboar
 import Products from "./Services-Dashboard/pages/Products/Products";
 import Customers from "./Services-Dashboard/pages/Customers/Customers";
 import Dashboard from "./Services-Dashboard/pages/Dashboard/Dashboard";
+import ProtectedRoute from "./pages/RouteProtect/ProtectedRoute";
+import { Navigate } from "react-router-dom";
+import PublicRoute from "./pages/RouteProtect/PublicRoute";
+
 const App = () => {
   const Layout = () => {
     return (
@@ -59,7 +63,11 @@ const App = () => {
         },
         {
           path: "/login",
-          element: <Login />
+          element: (
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          )
         },
         // {
         //   path: "/privacy-policy",
@@ -67,7 +75,11 @@ const App = () => {
         // },
         {
           path: "/signup",
-          element: <Signup />
+          element: (
+            <PublicRoute>
+              <Signup />
+            </PublicRoute>
+          )
         },
         {
           path: "/contact",
@@ -132,7 +144,11 @@ const App = () => {
     { path: "/cause-form", element: <CauseForm /> },
     {
       path: "/user-dashboard/:userId",
-      element: <UserDashboard />
+      element: (
+        <ProtectedRoute>
+          <UserDashboard />
+        </ProtectedRoute>
+      )
     },
     {
       path: "/user-dashboard/:userId",
@@ -211,6 +227,14 @@ const App = () => {
         //   element: <POS />,
         // },
       ]
+    },
+    {
+      path: "*",
+      element: (
+        <ProtectedRoute>
+          <Navigate to="/" />
+        </ProtectedRoute>
+      )
     }
   ]);
   return (

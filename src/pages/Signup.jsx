@@ -79,6 +79,10 @@ const Signup = () => {
         email: res.user.email,
         profilePic: res.user.photoURL,
       });
+
+      const token = await res.user.getIdToken();
+      localStorage.setItem("jwtToken", token);
+      
       setLoading(false);
       navigate(`/user-dashboard/${res.user.uid}`);
     } catch (error) {
