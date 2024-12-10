@@ -4,8 +4,23 @@ import { CiSearch } from "react-icons/ci";
 import { CiLocationOn } from "react-icons/ci";
 import { Link } from "react-router-dom";
 import { IoNotifications } from "react-icons/io5";
+import { getAuth, signOut } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
 const UserDashboardNav = ({ profilePic, userId }) => {
+  const auth = getAuth();
+  const navigate = useNavigate();
+
+  const logout = async () => {
+    try {
+      await signOut(auth);
+      localStorage.removeItem("jwtToken");
+      navigate("/");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+
   return (
     <div className="UserDashboardNav">
       <div className="upperNav">
@@ -28,7 +43,7 @@ const UserDashboardNav = ({ profilePic, userId }) => {
           </div>
         </div>
 
-        <button>Logout</button>
+        <button onClick={logout}>Logout</button>
       </div>
 
       <div className="lowerNav">

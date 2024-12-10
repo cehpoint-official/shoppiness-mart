@@ -45,7 +45,7 @@ const Home = () => {
     try {
       await addDoc(collection(db, "Newsletter"), {
         email: email,
-        timestamp: new Date(),
+        timestamp: new Date()
       });
       setMessage("Successfully subscribed!");
       setInterval(() => {
@@ -168,7 +168,7 @@ const Home = () => {
         style={{
           backgroundImage: `url(${bgimg})`,
           backgroundSize: "cover",
-          backgroundPosition: "center",
+          backgroundPosition: "center"
         }}
       >
         <div className="md:w-[550px] md:mt-6  ">
