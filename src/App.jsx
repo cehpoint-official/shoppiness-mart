@@ -69,10 +69,10 @@ const App = () => {
             </PublicRoute>
           )
         },
-        // {
-        //   path: "/privacy-policy",
-        //   element: <PrivacyPolicyPage />,
-        // },
+        {
+          path: "/privacy-policy",
+          element: <PrivacyPolicyPage />
+        },
         {
           path: "/signup",
           element: (
