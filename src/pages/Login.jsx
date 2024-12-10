@@ -5,7 +5,7 @@ import ShoppingBag2 from "../assets/ShoppingBag2.png";
 import Googleicon from "../assets/googleicon.png";
 import Facebookicon from "../assets/facebookicon.png";
 import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
-import { auth, db, provider } from "../../firebase.js";
+import { auth, db, facebookProvider, provider } from "../../firebase.js";
 import { useNavigate } from "react-router-dom";
 import { doc, setDoc } from "firebase/firestore";
 
@@ -43,6 +43,29 @@ const Login = () => {
       const res = await signInWithPopup(auth, provider);
       console.log(res);
 
+      await setDoc(doc(db, "users", res.user.uid), {
+        fname: res.user.displayName,
+        email: res.user.email,
+        profilePic: res.user.photoURL
+      });
+
+      const token = await res.user.getIdToken();
+      localStorage.setItem("jwtToken", token);
+
+      setLoading(false);
+      navigate(`/user-dashboard/${res.user.uid}`);
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  const FacebookSubmitHandler = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const res = await signInWithPopup(auth, facebookProvider);
+      console.log(res);
       await setDoc(doc(db, "users", res.user.uid), {
         fname: res.user.displayName,
         email: res.user.email,
@@ -155,6 +178,7 @@ const Login = () => {
                   src={Facebookicon}
                   alt="Facebook Login"
                   className="border-2 px-8 py-2 rounded-md cursor-pointer"
+                  onClick={FacebookSubmitHandler}
                 />
               </div>
               <div className="mt-7 text-center">

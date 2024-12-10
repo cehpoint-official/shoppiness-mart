@@ -5,7 +5,7 @@ import ShoppingBag2 from "../assets/ShoppingBag2.png";
 import Signupimg from "../assets/signupimg.png";
 import Googleicon from "../assets/googleicon.png";
 import Facebookicon from "../assets/facebookicon.png";
-import { auth, db, provider } from "../../firebase.js";
+import { auth, db, provider, facebookProvider } from "../../firebase.js";
 import { useNavigate } from "react-router-dom";
 import {
   createUserWithEmailAndPassword,
@@ -146,6 +146,30 @@ const Signup = () => {
       alert(error.message);
     }
   };
+
+  const FacebookSubmitHandler = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const res = await signInWithPopup(auth, facebookProvider);
+      console.log(res);
+      await setDoc(doc(db, "users", res.user.uid), {
+        fname: res.user.displayName,
+        email: res.user.email,
+        profilePic: res.user.photoURL
+      });
+
+      const token = await res.user.getIdToken();
+      localStorage.setItem("jwtToken", token);
+
+      setLoading(false);
+      navigate(`/user-dashboard/${res.user.uid}`);
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
   return (
     <>
       <div className="overflow-hidden">
@@ -311,6 +335,7 @@ const Signup = () => {
                   src={Facebookicon}
                   alt="Facebook Login"
                   className="border-2 px-8 py-2 rounded-md cursor-pointer"
+                  onClick={FacebookSubmitHandler}
                 />
               </div>
               <div className="mt-7 text-center">
