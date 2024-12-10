@@ -55,11 +55,11 @@ const App = () => {
       children: [
         {
           path: "/",
-          element: <Home />,
+          element: <Home />
         },
         {
           path: "/login",
-          element: <Login />,
+          element: <Login />
         },
         // {
         //   path: "/privacy-policy",
@@ -67,72 +67,72 @@ const App = () => {
         // },
         {
           path: "/signup",
-          element: <Signup />,
+          element: <Signup />
         },
         {
           path: "/contact",
-          element: <ContactUs />,
+          element: <ContactUs />
         },
 
         {
           path: "/about",
-          element: <AboutUs />,
+          element: <AboutUs />
         },
         {
           path: "/blogs",
-          element: <Blogs />,
+          element: <Blogs />
         },
         {
           path: "/register-business",
-          element: <Business />,
+          element: <Business />
         },
         {
           path: "/register-cause",
-          element: <Cause />,
+          element: <Cause />
         },
         {
           path: "/support",
-          element: <SupportACause />,
+          element: <SupportACause />
         },
         {
           path: "/supportmaast",
-          element: <SupportMaast />,
+          element: <SupportMaast />
         },
         {
           path: "/howitworks",
-          element: <HowItWorks />,
+          element: <HowItWorks />
         },
         {
           path: "/cashback-charity",
-          element: <Cashback />,
+          element: <Cashback />
         },
         {
           path: "/cashback-deals",
-          element: <CashbackDeals />,
+          element: <CashbackDeals />
         },
         {
           path: "/offline-shop",
-          element: <OfflineShop />,
+          element: <OfflineShop />
         },
         {
           path: "/online-shop",
-          element: <OnlineShop />,
+          element: <OnlineShop />
         },
         {
           path: "/shop",
-          element: <Shop />,
+          element: <Shop />
         },
         {
           path: "/test",
-          element: <Test />,
-        },
-      ],
+          element: <Test />
+        }
+      ]
     },
     { path: "/business-form", element: <BusinessForm /> },
     { path: "/cause-form", element: <CauseForm /> },
     {
       path: "/user-dashboard/:userId",
-      element: <UserDashboard />,
+      element: <UserDashboard />
     },
     {
       path: "/user-dashboard/:userId",
@@ -140,29 +140,29 @@ const App = () => {
       children: [
         {
           path: "/user-dashboard/:userId/online-shop",
-          element: <OnlineShop />,
+          element: <OnlineShop />
         },
         {
           path: "/user-dashboard/:userId/offline-shop",
-          element: <OfflineShop />,
+          element: <OfflineShop />
         },
         {
           path: "/user-dashboard/:userId/howitworks",
-          element: <HowItWorks />,
+          element: <HowItWorks />
         },
         {
           path: "/user-dashboard/:userId/cashback-charity",
-          element: <Cashback />,
+          element: <Cashback />
         },
         {
           path: "/user-dashboard/:userId/supportmaast",
-          element: <SupportMaast />,
+          element: <SupportMaast />
         },
         {
           path: "/user-dashboard/:userId/profile",
-          element: <UserProfile />,
-        },
-      ],
+          element: <UserProfile />
+        }
+      ]
     },
     // ADMIN
     { path: "/admin/shoppiness/faq", element: <FaqHome /> },
@@ -173,19 +173,19 @@ const App = () => {
     // },
     {
       path: "/admin/shoppiness/add/privacy-policy",
-      element: <AddPrivacyPolicy />,
+      element: <AddPrivacyPolicy />
     },
     {
       path: "/admin/shoppiness/newsletter",
-      element: <Newsletter />,
+      element: <Newsletter />
     },
     {
       path: "/admin/shoppiness/contact",
-      element: <ContactInfo />,
+      element: <ContactInfo />
     },
     {
       path: "/admin/shoppiness/contact/message",
-      element: <ContactMessage />,
+      element: <ContactMessage />
     },
 
     //Services Dashboard
@@ -196,22 +196,22 @@ const App = () => {
       children: [
         {
           path: "dashboard",
-          element: <Dashboard />,
+          element: <Dashboard />
         },
         {
           path: "products",
-          element: <Products />,
+          element: <Products />
         },
         {
           path: "customers",
-          element: <Customers />,
-        },
+          element: <Customers />
+        }
         // {
         //   path: "pos",
         //   element: <POS />,
         // },
-      ],
-    },
+      ]
+    }
   ]);
   return (
     <div>

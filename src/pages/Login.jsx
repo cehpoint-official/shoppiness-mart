@@ -12,7 +12,7 @@ import { doc, setDoc } from "firebase/firestore";
 const Login = () => {
   const [userData, setUserData] = useState({
     email: "",
-    password: "",
+    password: ""
   });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -40,11 +40,16 @@ const Login = () => {
     try {
       const res = await signInWithPopup(auth, provider);
       console.log(res);
+
       await setDoc(doc(db, "users", res.user.uid), {
         fname: res.user.displayName,
         email: res.user.email,
-        profilePic: res.user.photoURL,
+        profilePic: res.user.photoURL
       });
+
+      const token = await res.user.getIdToken();
+      localStorage.setItem("jwtToken", token);
+
       setLoading(false);
       navigate(`/user-dashboard/${res.user.uid}`);
     } catch (error) {

@@ -26,21 +26,37 @@ import money2 from "../../assets/RegisterBusiness/money.png";
 import bag from "../../assets/RegisterBusiness/bag.jpg";
 import video from "../../assets/RegisterBusiness/vid.png";
 import { RiSearchFill } from "react-icons/ri";
+import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
 const UserDashBoard = () => {
   const [userData, setUserData] = useState({});
   const [loading, setLoading] = useState(true);
   const { userId } = useParams();
+  const navigate = useNavigate();
 
   const fetchDoc = async () => {
+    const token = localStorage.getItem("jwtToken");
+    if (!token) {
+      alert("No token found. Redirecting to login.");
+      navigate("/login");
+      return;
+    }
+
+    const decodedTokenId = jwtDecode(token).user_id;
+    if (decodedTokenId !== userId) {
+      alert("No token found. Redirecting to login.");
+      navigate("/login");
+      return;
+    }
+
     const docRef = doc(db, "users", userId);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
       setUserData(docSnap.data());
-      console.log(docSnap.data());
+      // console.log(docSnap.data());
       setLoading(false);
-      console.log(docSnap.data());
     } else {
       alert("No such document!");
     }
@@ -57,7 +73,10 @@ const UserDashBoard = () => {
       ) : (
         <>
           <div className="userDashboard">
-            <UserDashboardNav profilePic={userData.profilePic} userId={userId} />
+            <UserDashboardNav
+              profilePic={userData.profilePic}
+              userId={userId}
+            />
             <div className="userDashboardContainer">
               <div className="mainDashboard">
                 <div className="topSec">
@@ -248,68 +267,66 @@ const UserDashBoard = () => {
                   </div>
                 </div>
               </div>
-
-              
             </div>
 
             <div className="moneyRaisingSec">
-                <h1>Start raising from Online Stores</h1>
-                <div className="container">
-                  <div className="left">
-                    <img src={video} alt="loading" />
-                  </div>
-                  <div className="right">
-                    <div className="points">
-                      <div className="point">
-                        <div className="img">
-                          <img src={signup} alt="loading" />
-                        </div>
-                        <p>
-                          <span>Sign up: </span>Lorem ipsum dolor sit amet
-                          consectetur adipisicing elit. Blanditiis,commodi
-                          tempora mollitia voluptatem recusandae impedit
-                        </p>
+              <h1>Start raising from Online Stores</h1>
+              <div className="container">
+                <div className="left">
+                  <img src={video} alt="loading" />
+                </div>
+                <div className="right">
+                  <div className="points">
+                    <div className="point">
+                      <div className="img">
+                        <img src={signup} alt="loading" />
                       </div>
-                      <div className="point">
-                        <div className="img">
-                          <RiSearchFill fontSize={"40px"} />
-                        </div>
-                        <p>
-                          <span>Browse: </span>Lorem ipsum dolor sit amet
-                          consectetur adipisicing elit. Blanditiis,commodi
-                          tempora mollitia voluptatem recusandae impedit
-                        </p>
-                      </div>
-                      <div className="point">
-                        <div className="img">
-                          <img src={bag} alt="loading" />
-                        </div>
-                        <p>
-                          <span>Shop: </span>Lorem ipsum dolor sit amet
-                          consectetur adipisicing elit. Blanditiis,commodi
-                          tempora mollitia voluptatem recusandae impedit
-                        </p>
-                      </div>
-
-                      <div className="point">
-                        <div className="img">
-                          <img src={money2} alt="loading" />
-                        </div>
-                        <p>
-                          <span>Raise: </span>Lorem ipsum dolor sit amet
-                          consectetur adipisicing elit. Blanditiis,commodi
-                          tempora mollitia voluptatem recusandae impedit
-                        </p>
-                      </div>
-
-                      <Link className="signup" to="/login">
-                        SIGN UP FOR FREE
-                      </Link>
+                      <p>
+                        <span>Sign up: </span>Lorem ipsum dolor sit amet
+                        consectetur adipisicing elit. Blanditiis,commodi tempora
+                        mollitia voluptatem recusandae impedit
+                      </p>
                     </div>
+                    <div className="point">
+                      <div className="img">
+                        <RiSearchFill fontSize={"40px"} />
+                      </div>
+                      <p>
+                        <span>Browse: </span>Lorem ipsum dolor sit amet
+                        consectetur adipisicing elit. Blanditiis,commodi tempora
+                        mollitia voluptatem recusandae impedit
+                      </p>
+                    </div>
+                    <div className="point">
+                      <div className="img">
+                        <img src={bag} alt="loading" />
+                      </div>
+                      <p>
+                        <span>Shop: </span>Lorem ipsum dolor sit amet
+                        consectetur adipisicing elit. Blanditiis,commodi tempora
+                        mollitia voluptatem recusandae impedit
+                      </p>
+                    </div>
+
+                    <div className="point">
+                      <div className="img">
+                        <img src={money2} alt="loading" />
+                      </div>
+                      <p>
+                        <span>Raise: </span>Lorem ipsum dolor sit amet
+                        consectetur adipisicing elit. Blanditiis,commodi tempora
+                        mollitia voluptatem recusandae impedit
+                      </p>
+                    </div>
+
+                    <Link className="signup" to="/login">
+                      SIGN UP FOR FREE
+                    </Link>
                   </div>
                 </div>
               </div>
-              <Footer/>
+            </div>
+            <Footer />
           </div>
         </>
       )}
