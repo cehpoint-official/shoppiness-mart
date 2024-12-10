@@ -26,6 +26,8 @@ const Login = () => {
         userData.email,
         userData.password
       );
+      const token = await res.user.getIdToken();
+      localStorage.setItem("jwtToken", token);
       navigate(`/user-dashboard/${res.user.uid}`);
     } catch (error) {
       alert(error.message);

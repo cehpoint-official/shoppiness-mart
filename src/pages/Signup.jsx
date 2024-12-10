@@ -1,24 +1,67 @@
 import { doc, setDoc } from "firebase/firestore";
-import {  useState } from "react";
+import { useState } from "react";
 import Backimg from "../assets/backimg.png";
 import ShoppingBag2 from "../assets/ShoppingBag2.png";
 import Signupimg from "../assets/signupimg.png";
 import Googleicon from "../assets/googleicon.png";
 import Facebookicon from "../assets/facebookicon.png";
-import { auth, db ,provider} from "../../firebase.js";
+import { auth, db, provider } from "../../firebase.js";
 import { useNavigate } from "react-router-dom";
-import { createUserWithEmailAndPassword, updateProfile ,signInWithPopup } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  updateProfile,
+  signInWithPopup
+} from "firebase/auth";
+
+function validatePassword(password) {
+  const errors = [];
+
+  if (password.length < 8) {
+    errors.push("Password must be at least 8 characters long.");
+  }
+  if (password.length > 64) {
+    errors.push("Password must not exceed 64 characters.");
+  }
+
+  if (!/[a-z]/.test(password)) {
+    errors.push("Password must include at least one lowercase letter.");
+  }
+
+  if (!/[A-Z]/.test(password)) {
+    errors.push("Password must include at least one uppercase letter.");
+  }
+
+  if (!/[0-9]/.test(password)) {
+    errors.push("Password must include at least one number.");
+  }
+
+  if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+    errors.push("Password must include at least one special character.");
+  }
+
+  if (/^(123456|abcdef|password|qwerty|letmein)$/i.test(password)) {
+    errors.push("Password is too common and insecure.");
+  }
+
+  if (errors.length > 0) {
+    return { isValid: false, errors };
+  }
+
+  return { isValid: true, message: "Password is secure." };
+}
+
 const Signup = () => {
   const [userData, setUserData] = useState({
     fname: "",
     lname: "",
     phone: "",
     email: "",
-    password: "",
+    password: ""
   });
   const [cpassword, setcpassword] = useState("");
   const [terms, setTerms] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errorPassword, setErrorPassword] = useState([]);
   const navigate = useNavigate();
 
   const submitHandler = async (e) => {
@@ -39,6 +82,16 @@ const Signup = () => {
       alert("Passwords Do Not Match!");
       return;
     }
+
+    setErrorPassword([]);
+
+    const { isValid, errors } = validatePassword(userData.password);
+
+    if (!isValid) {
+      setErrorPassword(errors);
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -50,13 +103,17 @@ const Signup = () => {
       const user = userCredential.user;
 
       await updateProfile(userCredential.user, {
-        displayName: userData.fname,
+        displayName: userData.fname
       });
 
       await setDoc(doc(db, "users", user.uid), {
         ...userData,
-        uid: user.uid,
+        uid: user.uid
       });
+
+      const token = await user.getIdToken();
+      localStorage.setItem("jwtToken", token);
+
       navigate(`/user-dashboard/${user.uid}`);
       setcpassword("");
       console.log(user);
@@ -77,12 +134,12 @@ const Signup = () => {
       await setDoc(doc(db, "users", res.user.uid), {
         fname: res.user.displayName,
         email: res.user.email,
-        profilePic: res.user.photoURL,
+        profilePic: res.user.photoURL
       });
 
       const token = await res.user.getIdToken();
       localStorage.setItem("jwtToken", token);
-      
+
       setLoading(false);
       navigate(`/user-dashboard/${res.user.uid}`);
     } catch (error) {
@@ -200,6 +257,11 @@ const Signup = () => {
                     }
                     className="w-full p-2 border border-gray-200 bg-slate-100 rounded"
                   />
+                  <div className="text-red-600">
+                    {errorPassword.map((item, index) => {
+                      return <p key={index}>{item}</p>;
+                    })}
+                  </div>
                 </div>
                 <div>
                   <label
