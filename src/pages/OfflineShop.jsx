@@ -33,7 +33,11 @@ import Loader from "../Components/Loader/Loader";
 import { useState } from "react";
 
 const OfflineShop = () => {
+  const [location, setLocation] = useState(
+    sessionStorage.getItem("offline-shop-location") || ""
+  );
   const [loading, setLoading] = useState(true);
+  const [toggleLocation, setToggleLocation] = useState(false);
   setInterval(() => {
     setLoading(false);
   }, [3000]);
@@ -45,29 +49,29 @@ const OfflineShop = () => {
     { name: "Electronics", icon: electronicsIcon },
     { name: "Beauty", icon: beautyIcon },
     { name: "Sport", icon: sportIcon },
-    { name: "Corporate", icon: corporateIcon },
+    { name: "Corporate", icon: corporateIcon }
   ];
   const features = [
     {
       image: website,
-      text: "Visit favorite stores listed in Shopping Mart",
+      text: "Visit favorite stores listed in Shopping Mart"
     },
     {
       image: giftCard,
-      text: "Generate a coupon",
+      text: "Generate a coupon"
     },
     {
       image: shops,
-      text: "Visit offline shop",
+      text: "Visit offline shop"
     },
     {
       image: giftImage,
-      text: "Readme your coupon",
+      text: "Readme your coupon"
     },
     {
       image: cashBack,
-      text: "Get cashback; you can also give back to support an NGO or cause",
-    },
+      text: "Get cashback; you can also give back to support an NGO or cause"
+    }
   ];
   const sections = [
     {
@@ -78,27 +82,27 @@ const OfflineShop = () => {
           name: "Food Station",
           location: "Kolkata, Bow Bazar",
           cashback: "10% Cashback",
-          image: shopcard, // Replace with actual image path
+          image: shopcard // Replace with actual image path
         },
         {
           name: "Monginis",
           location: "Kolkata, Bow Bazar",
           cashback: "20% Cashback",
-          image: shopcard, // Replace with actual image path
+          image: shopcard // Replace with actual image path
         },
         {
           name: "Mother’s Kitchen",
           location: "Kolkata, Bow Bazar",
           cashback: "30% Cashback",
-          image: shopcard, // Replace with actual image path
+          image: shopcard // Replace with actual image path
         },
         {
           name: "KFC",
           location: "Kolkata, Bow Bazar",
           cashback: "30% Cashback",
-          image: shopcard, // Replace with actual image path
-        },
-      ],
+          image: shopcard // Replace with actual image path
+        }
+      ]
     },
     {
       title: "Popular Pharmacy Shops close to you",
@@ -108,27 +112,27 @@ const OfflineShop = () => {
           name: "Apollo",
           location: "Kolkata, Bow Bazar",
           cashback: "10% Cashback",
-          image: shopcard, // Replace with actual image path
+          image: shopcard // Replace with actual image path
         },
         {
           name: "Himalaya",
           location: "Kolkata, Bow Bazar",
           cashback: "10% Cashback",
-          image: shopcard, // Replace with actual image path
+          image: shopcard // Replace with actual image path
         },
         {
           name: "Save Medical",
           location: "Kolkata, Bow Bazar",
           cashback: "10% Cashback",
-          image: shopcard, // Replace with actual image path
+          image: shopcard // Replace with actual image path
         },
         {
           name: "Paul Medical",
           location: "Kolkata, Bow Bazar",
           cashback: "10% Cashback",
-          image: shopcard, // Replace with actual image path
-        },
-      ],
+          image: shopcard // Replace with actual image path
+        }
+      ]
     },
     {
       title: "Popular Fashion Shops close to you",
@@ -138,27 +142,27 @@ const OfflineShop = () => {
           name: "Fashion Shop",
           location: "Kolkata, Bow Bazar",
           cashback: "10% Cashback",
-          image: shopcard, // Replace with actual image path
+          image: shopcard // Replace with actual image path
         },
         {
           name: "Luxur",
           location: "Kolkata, Bow Bazar",
           cashback: "10% Cashback",
-          image: shopcard, // Replace with actual image path
+          image: shopcard // Replace with actual image path
         },
         {
           name: "Fashion Shop",
           location: "Kolkata, Bow Bazar",
           cashback: "10% Cashback",
-          image: shopcard, // Replace with actual image path
+          image: shopcard // Replace with actual image path
         },
         {
           name: "Fashion Shop",
           location: "Kolkata, Bow Bazar",
           cashback: "10% Cashback",
-          image: shopcard, // Replace with actual image path
-        },
-      ],
+          image: shopcard // Replace with actual image path
+        }
+      ]
     },
     {
       title: "Popular Electronic Shops close to you",
@@ -168,28 +172,51 @@ const OfflineShop = () => {
           name: "Lenovo Store",
           location: "Kolkata, Bow Bazar",
           cashback: "10% Cashback",
-          image: shopcard, // Replace with actual image path
+          image: shopcard // Replace with actual image path
         },
         {
           name: "LG Elactronic",
           location: "Kolkata, Bow Bazar",
           cashback: "10% Cashback",
-          image: shopcard, // Replace with actual image path
+          image: shopcard // Replace with actual image path
         },
         {
           name: "Jio Store",
           location: "Kolkata, Bow Bazar",
           cashback: "10% Cashback",
-          image: shopcard, // Replace with actual image path
+          image: shopcard // Replace with actual image path
         },
         {
           name: "Croma",
           location: "Kolkata, Bow Bazar",
           cashback: "10% Cashback",
-          image: shopcard, // Replace with actual image path
-        },
-      ],
-    },
+          image: shopcard // Replace with actual image path
+        }
+      ]
+    }
+  ];
+
+  const locations = [
+    "Howrah",
+    "Kolkata",
+    "Shibpur",
+    "Bally",
+    "Liluah",
+    "Belur",
+    "Dumdum",
+    "Salt Lake",
+    "New Town",
+    "Rajarhat",
+    "Alipore",
+    "Behala",
+    "Baranagar",
+    "Baguiati",
+    "Chandannagar",
+    "Serampore",
+    "Barrackpore",
+    "Batanagar",
+    "Garia",
+    "Sonarpur"
   ];
 
   return loading ? (
@@ -198,9 +225,30 @@ const OfflineShop = () => {
     <div>
       <div className="container mx-auto py-6 px-4 md:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row items-center p-2 bg-white rounded-md shadow-md max-w-full">
-          <div className="flex items-center p-2 border-b sm:border-b-0 sm:border-r border-gray-300 w-full sm:w-auto">
+          <div
+            onClick={() => setToggleLocation((prev) => !prev)}
+            className="select-none cursor-pointer relative flex items-center p-2 border-b sm:border-b-0 sm:border-r border-gray-300 w-full sm:w-auto"
+          >
             <FaMapMarkerAlt className="text-gray-500 mr-2" />
-            <span className="text-gray-500">Select Location</span>
+            <span className="text-gray-500 min-w-28">
+              {location === "" ? "Select Location" : location}
+            </span>
+            {toggleLocation && (
+              <div className="max-h-80 overflow-y-auto absolute top-14 left-0 w-full bg-white rounded-md shadow-md">
+                {locations.map((location) => (
+                  <div
+                    key={location}
+                    className="p-2 hover:bg-gray-100 cursor-pointer"
+                    onClick={() => {
+                      setLocation(location);
+                      sessionStorage.setItem("offline-shop-location", location);
+                    }}
+                  >
+                    {location}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           <input
             type="text"
