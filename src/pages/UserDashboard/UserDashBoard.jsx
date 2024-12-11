@@ -28,6 +28,7 @@ import video from "../../assets/RegisterBusiness/vid.png";
 import { RiSearchFill } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import UserDashboardProducts from "../../Components/UserDashboardProducts/UserDashboardProducts.jsx";
 
 const UserDashBoard = () => {
   const [userData, setUserData] = useState({});
@@ -326,6 +327,7 @@ const UserDashBoard = () => {
                 </div>
               </div>
             </div>
+            <UserDashboardProducts />
             <Footer />
           </div>
         </>
