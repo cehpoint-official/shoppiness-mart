@@ -9,10 +9,25 @@ import iconInvoices from "../../assets/icon-invoice.png";
 import iconSales from "../../assets/icon-sales.png";
 import iconShop from "../../assets/icon-shop.png";
 import iconLogout from "../../assets/icon-logout.png";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { signOut } from "firebase/auth";
+import { auth } from "../../../../firebase";
 
 const Sidebar = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      localStorage.removeItem("jwtToken");
+      localStorage.removeItem("role");
+      navigate("/");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+
   return (
     <div className="sidebar">
       <div className="logo">
@@ -64,7 +79,7 @@ const Sidebar = () => {
           <img src={iconShop} alt="loading" />
           Shop info
         </li>
-        <li>
+        <li onClick={handleLogout}>
           {" "}
           <img src={iconLogout} alt="loading" />
           Log Out

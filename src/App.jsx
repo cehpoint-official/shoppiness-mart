@@ -212,7 +212,11 @@ const App = () => {
 
     {
       path: "/services-dashboard/:id",
-      element: <DashboardOutlet />,
+      element: (
+        <ProtectedRoute>
+          <DashboardOutlet />
+        </ProtectedRoute>
+      ),
       children: [
         {
           path: "dashboard",

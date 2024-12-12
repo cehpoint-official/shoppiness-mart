@@ -9,7 +9,11 @@ const ProtectedRoute = ({ children }) => {
     return <Navigate to="/" replace />;
   }
 
-  if (token && location.pathname.startsWith("/user-dashboard/")) {
+  if (token && location.pathname.startsWith("/user-dashboard")) {
+    return children;
+  }
+  
+  if (token && location.pathname.startsWith("/services-dashboard")) {
     return children;
   }
 };

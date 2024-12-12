@@ -15,6 +15,7 @@ const UserDashboardNav = ({ profilePic, userId }) => {
     try {
       await signOut(auth);
       localStorage.removeItem("jwtToken");
+      localStorage.removeItem("role");
       navigate("/");
     } catch (error) {
       console.error("Error signing out:", error);
