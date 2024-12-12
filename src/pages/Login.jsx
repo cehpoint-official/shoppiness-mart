@@ -7,7 +7,7 @@ import Facebookicon from "../assets/facebookicon.png";
 import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { auth, db, facebookProvider, provider } from "../../firebase.js";
 import { useNavigate } from "react-router-dom";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 const Login = () => {
   const [userData, setUserData] = useState({
@@ -26,8 +26,20 @@ const Login = () => {
         userData.email,
         userData.password
       );
+
+      const docRef = doc(db, "businessDetails", res.user.uid);
+      const docSnap = await getDoc(docRef);
+
       const token = await res.user.getIdToken();
       localStorage.setItem("jwtToken", token);
+
+      if (docSnap.exists()) {
+        localStorage.setItem("role", "service");
+        navigate(`/services-dashboard/${res.user.uid}`);
+        return;
+      }
+
+      localStorage.setItem("role", "user");
       navigate(`/user-dashboard/${res.user.uid}`);
     } catch (error) {
       alert(error.message);
@@ -51,6 +63,7 @@ const Login = () => {
 
       const token = await res.user.getIdToken();
       localStorage.setItem("jwtToken", token);
+      localStorage.setItem("role", "user");
 
       setLoading(false);
       navigate(`/user-dashboard/${res.user.uid}`);
@@ -65,7 +78,7 @@ const Login = () => {
 
     try {
       const res = await signInWithPopup(auth, facebookProvider);
-      console.log(res);
+
       await setDoc(doc(db, "users", res.user.uid), {
         fname: res.user.displayName,
         email: res.user.email,
@@ -74,6 +87,7 @@ const Login = () => {
 
       const token = await res.user.getIdToken();
       localStorage.setItem("jwtToken", token);
+      localStorage.setItem("role", "user");
 
       setLoading(false);
       navigate(`/user-dashboard/${res.user.uid}`);
