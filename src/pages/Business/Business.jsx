@@ -13,7 +13,7 @@ import boyImg from "../../assets/RegisterBusiness/boy.png";
 import convoImg from "../../assets/RegisterBusiness/convo.png";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../../firebase";
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 
 const Business = () => {
   const [roundedCardsData, setRoundedCardsData] = useState([]);
@@ -93,9 +93,7 @@ const Business = () => {
           </div>
         </div>
 
-        <RoundedCards
-          data={roundedCardsData}
-        />
+        <RoundedCards data={roundedCardsData} />
 
         <div className="secFive">
           <div className="left">

@@ -55,7 +55,11 @@ const App = () => {
   const router = createBrowserRouter([
     {
       path: "/",
-      element: <Layout />,
+      element: (
+        <PublicRoute>
+          <Layout />
+        </PublicRoute>
+      ),
       children: [
         {
           path: "/",

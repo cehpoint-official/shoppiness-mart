@@ -25,7 +25,7 @@ const BusinessForm = () => {
     location: "",
     pincode: "",
     shortDesc: "",
-    id: "",
+    id: ""
   });
 
   const [accountDetails, setAccountDetails] = useState({
@@ -34,7 +34,7 @@ const BusinessForm = () => {
     mobileNumber: "",
     email: "",
     password: "",
-    confirmPassword: "",
+    confirmPassword: ""
   });
   const [logoFile, setLogoFile] = useState(null);
   const [bannerFile, setBannerFile] = useState(null);
@@ -103,7 +103,7 @@ const BusinessForm = () => {
   const uploadFile = (file) => {
     return new Promise((resolve, reject) => {
       const metadata = {
-        contentType: "image/jpeg",
+        contentType: "image/jpeg"
       };
       const storageRef = ref(storage, "images/" + file.name);
       const uploadTask = uploadBytesResumable(storageRef, file, metadata);
@@ -159,7 +159,7 @@ const BusinessForm = () => {
         ...accountDetails,
         logoUrl,
         bannerUrl,
-        id: userId, // Use the passed uid instead of state
+        id: userId // Use the passed uid instead of state
       });
     } catch (e) {
       alert(e.message);
@@ -178,7 +178,7 @@ const BusinessForm = () => {
                 onChange={(e) =>
                   setBusinessDetails({
                     ...businessDetails,
-                    businessName: e.target.value,
+                    businessName: e.target.value
                   })
                 }
                 type="text"
@@ -190,7 +190,7 @@ const BusinessForm = () => {
                 onChange={(e) =>
                   setBusinessDetails({
                     ...businessDetails,
-                    owner: e.target.value,
+                    owner: e.target.value
                   })
                 }
                 type="text"
@@ -207,7 +207,7 @@ const BusinessForm = () => {
                 onClick={(e) =>
                   setBusinessDetails({
                     ...businessDetails,
-                    mode: e.target.value,
+                    mode: e.target.value
                   })
                 }
               />
@@ -220,7 +220,7 @@ const BusinessForm = () => {
                 onClick={(e) =>
                   setBusinessDetails({
                     ...businessDetails,
-                    mode: e.target.value,
+                    mode: e.target.value
                   })
                 }
               />
@@ -235,7 +235,7 @@ const BusinessForm = () => {
                 onChange={(e) =>
                   setBusinessDetails({
                     ...businessDetails,
-                    contact: e.target.value,
+                    contact: e.target.value
                   })
                 }
               />
@@ -249,7 +249,7 @@ const BusinessForm = () => {
                 onChange={(e) =>
                   setBusinessDetails({
                     ...businessDetails,
-                    businessEmail: e.target.value,
+                    businessEmail: e.target.value
                   })
                 }
               />
@@ -265,7 +265,7 @@ const BusinessForm = () => {
             </div>
           </div>
         </form>
-      ),
+      )
     },
     {
       title: "Shop Details",
@@ -278,7 +278,7 @@ const BusinessForm = () => {
                 onChange={(e) =>
                   setBusinessDetails({
                     ...businessDetails,
-                    cat: e.target.value,
+                    cat: e.target.value
                   })
                 }
               >
@@ -294,7 +294,7 @@ const BusinessForm = () => {
                 onChange={(e) =>
                   setBusinessDetails({
                     ...businessDetails,
-                    location: e.target.value,
+                    location: e.target.value
                   })
                 }
               />
@@ -306,7 +306,7 @@ const BusinessForm = () => {
                 onChange={(e) =>
                   setBusinessDetails({
                     ...businessDetails,
-                    pincode: e.target.value,
+                    pincode: e.target.value
                   })
                 }
               />
@@ -319,7 +319,7 @@ const BusinessForm = () => {
                 onChange={(e) =>
                   setBusinessDetails({
                     ...businessDetails,
-                    shortDesc: e.target.value,
+                    shortDesc: e.target.value
                   })
                 }
               ></textarea>
@@ -362,7 +362,7 @@ const BusinessForm = () => {
             </div>
           </div>
         </form>
-      ),
+      )
     },
     {
       title: "Create your account",
@@ -376,7 +376,7 @@ const BusinessForm = () => {
                 onChange={(e) =>
                   setAccountDetails({
                     ...accountDetails,
-                    firstName: e.target.value,
+                    firstName: e.target.value
                   })
                 }
               />
@@ -388,7 +388,7 @@ const BusinessForm = () => {
                 onChange={(e) =>
                   setAccountDetails({
                     ...accountDetails,
-                    lastName: e.target.value,
+                    lastName: e.target.value
                   })
                 }
               />
@@ -400,7 +400,7 @@ const BusinessForm = () => {
                 onChange={(e) =>
                   setAccountDetails({
                     ...accountDetails,
-                    mobileNumber: e.target.value,
+                    mobileNumber: e.target.value
                   })
                 }
               />
@@ -415,7 +415,7 @@ const BusinessForm = () => {
                 onChange={(e) =>
                   setAccountDetails({
                     ...accountDetails,
-                    email: e.target.value,
+                    email: e.target.value
                   })
                 }
               />
@@ -428,7 +428,7 @@ const BusinessForm = () => {
                 onChange={(e) =>
                   setAccountDetails({
                     ...accountDetails,
-                    password: e.target.value,
+                    password: e.target.value
                   })
                 }
               />
@@ -441,7 +441,7 @@ const BusinessForm = () => {
                 onChange={(e) =>
                   setAccountDetails({
                     ...accountDetails,
-                    confirmPassword: e.target.value,
+                    confirmPassword: e.target.value
                   })
                 }
               />
@@ -454,8 +454,8 @@ const BusinessForm = () => {
             </div>
           </div>
         </form>
-      ),
-    },
+      )
+    }
   ];
 
   return (
