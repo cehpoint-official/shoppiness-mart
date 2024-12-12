@@ -9,11 +9,14 @@ const PublicRoute = ({ children }) => {
   if (!token) {
     return children;
   }
-  
+
   const decodedTokenId = jwtDecode(token).user_id;
 
   if (token) {
-    return <Navigate to={`/user-dashboard/${decodedTokenId}`} replace />;
+    const type = localStorage.getItem("role");
+    if (type === "service")
+      return <Navigate to={`/services-dashboard/${decodedTokenId}`} replace />;
+    else return <Navigate to={`/user-dashboard/${decodedTokenId}`} replace />;
   }
 
   return children;

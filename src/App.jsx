@@ -36,9 +36,9 @@ import DashboardOutlet from "./Services-Dashboard/pages/DashboardOutlet/Dashboar
 import Products from "./Services-Dashboard/pages/Products/Products";
 import Customers from "./Services-Dashboard/pages/Customers/Customers";
 import Dashboard from "./Services-Dashboard/pages/Dashboard/Dashboard";
-import ProtectedRoute from "./pages/RouteProtect/ProtectedRoute";
+import ProtectedRoute from "./Components/RouteProtect/ProtectedRoute";
 import { Navigate } from "react-router-dom";
-import PublicRoute from "./pages/RouteProtect/PublicRoute";
+import PublicRoute from "./Components/RouteProtect/PublicRoute";
 
 const App = () => {
   const Layout = () => {
