@@ -30,9 +30,12 @@ import imaoffshop7 from "../assets/Shop/image 82.png";
 import { FaArrowRight } from "react-icons/fa";
 import shopcard from "../assets/Shop/shopcard.png";
 import Loader from "../Components/Loader/Loader";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../firebase";
 
 const OfflineShop = () => {
+  const [offlineShopList, setOfflineShopList] = useState([]);
   const [location, setLocation] = useState(
     sessionStorage.getItem("offline-shop-location") || ""
   );
@@ -219,6 +222,27 @@ const OfflineShop = () => {
     "Sonarpur"
   ];
 
+  useEffect(() => {
+    const fetchBusinessDetails = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "businessDetails"));
+        const businessArray = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setOfflineShopList(businessArray);
+      } catch (error) {
+        console.error("Error getting documents: ", error);
+      }
+    };
+
+    fetchBusinessDetails();
+  }, []);
+
+  useEffect(() => {
+    console.log(offlineShopList);
+  }, [offlineShopList]);
+
   return loading ? (
     <Loader />
   ) : (
@@ -332,7 +356,7 @@ const OfflineShop = () => {
       </div>
       {/* {5th Component} */}
       <div className="p-8">
-        {sections.map((section, index) => (
+        {/* {sections.map((section, index) => (
           <div key={index} className="my-10">
             <h2 className="text-2xl font-bold my-8 text-center">
               {section.title}
@@ -363,7 +387,34 @@ const OfflineShop = () => {
               </div>
             </div>
           </div>
-        ))}
+        ))} */}
+        <h2 className="text-2xl font-bold my-8 text-center mb-10">
+          Popular Shops Near to You
+        </h2>
+
+        <div className="flex flex-wrap gap-8 px-8">
+          {offlineShopList.map((item, idx) => {
+            return (
+              <div
+                key={idx}
+                className="flex-none bg-white shadow-md rounded-2xl overflow-hidden w-72"
+              >
+                <img
+                  src={item.bannerUrl}
+                  alt={item.businessName}
+                  className="w-full h-32 object-cover"
+                />
+                <div className="p-4">
+                  <h3 className="text-lg font-bold">{item.businessName}</h3>
+                  <p className="text-gray-600">{item.location}</p>
+                  <div className="rounded-full text-sm px-4 mt-4 py-1 bg-blue-600 text-white w-fit">
+                    Cashback 10%
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
