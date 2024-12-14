@@ -33,8 +33,11 @@ import Loader from "../Components/Loader/Loader";
 import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebase";
+import { Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 const OfflineShop = () => {
+  const { userId } = useParams();
   const [offlineShopList, setOfflineShopList] = useState([]);
   const [location, setLocation] = useState(
     sessionStorage.getItem("offline-shop-location") || ""
@@ -395,23 +398,28 @@ const OfflineShop = () => {
         <div className="flex flex-wrap gap-8 px-8">
           {offlineShopList.map((item, idx) => {
             return (
-              <div
+              <Link
+                to={`/user-dashboard/${userId}/shop-info/${item.id}`}
                 key={idx}
-                className="flex-none bg-white shadow-md rounded-2xl overflow-hidden w-72"
               >
-                <img
-                  src={item.bannerUrl}
-                  alt={item.businessName}
-                  className="w-full h-32 object-cover"
-                />
-                <div className="p-4">
-                  <h3 className="text-lg font-bold">{item.businessName}</h3>
-                  <p className="text-gray-600">{item.location}</p>
-                  <div className="rounded-full text-sm px-4 mt-4 py-1 bg-blue-600 text-white w-fit">
-                    Cashback 10%
+                <div
+                  key={idx}
+                  className="cursor-pointer flex-none bg-white shadow-md rounded-2xl overflow-hidden w-72"
+                >
+                  <img
+                    src={item.bannerUrl}
+                    alt={item.businessName}
+                    className="w-full h-32 object-cover"
+                  />
+                  <div className="p-4">
+                    <h3 className="text-lg font-bold">{item.businessName}</h3>
+                    <p className="text-gray-600">{item.location}</p>
+                    <div className="rounded-full text-sm px-4 mt-4 py-1 bg-blue-600 text-white w-fit">
+                      Cashback 10%
+                    </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>

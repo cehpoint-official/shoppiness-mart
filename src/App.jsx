@@ -39,6 +39,7 @@ import Dashboard from "./Services-Dashboard/pages/Dashboard/Dashboard";
 import ProtectedRoute from "./Components/RouteProtect/ProtectedRoute";
 import { Navigate } from "react-router-dom";
 import PublicRoute from "./Components/RouteProtect/PublicRoute";
+import ShopInfo from "./Components/ShopInfo/ShopInfo";
 
 const App = () => {
   const Layout = () => {
@@ -181,6 +182,10 @@ const App = () => {
         {
           path: "/user-dashboard/:userId/profile",
           element: <UserProfile />
+        },
+        {
+          path: "/user-dashboard/:userId/shop-info/:shopId",
+          element: <ShopInfo />
         }
       ]
     },
