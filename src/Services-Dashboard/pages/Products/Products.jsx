@@ -14,6 +14,7 @@ import CategorySection from "./CategorySection";
 import { ArrowLeft } from "lucide-react";
 import AddCategoryModal from "./AddCategoryModal";
 import { useParams } from "react-router-dom";
+import AddProductSection from "./AddProductSection";
 
 const services = [
   {
@@ -49,8 +50,10 @@ const services = [
 ];
 const Products = () => {
   const { id } = useParams();
-  const [tabs, setTabs] = useState(0);
-  const [refetchCategories, setRefetchCategories] = useState(false)
+  const [tabs, setTabs] = useState(
+    Number(sessionStorage.getItem("service-portal-tabs")) || 0
+  );
+  const [refetchCategories, setRefetchCategories] = useState(false);
   return (
     <div className="products">
       <div className="top-section">
@@ -60,7 +63,10 @@ const Products = () => {
           ) : (
             <h1
               className="flex items-center gap-1 cursor-pointer"
-              onClick={() => setTabs(0)}
+              onClick={() => {
+                setTabs(0);
+                sessionStorage.setItem("service-portal-tabs", 0);
+              }}
             >
               <ArrowLeft className="relative top-[2px]" /> Back
             </h1>
@@ -69,13 +75,30 @@ const Products = () => {
         <div className="buttons">
           {tabs === 0 && (
             <div className="flex gap-4">
-              <button onClick={() => setTabs(1)}>+Add Category</button>
-              <button>+Add New</button>
+              <button
+                onClick={() => {
+                  setTabs(1);
+                  sessionStorage.setItem("service-portal-tabs", 1);
+                }}
+              >
+                +Add Category
+              </button>
+              <button
+                onClick={() => {
+                  setTabs(2);
+                  sessionStorage.setItem("service-portal-tabs", 2);
+                }}
+              >
+                +Add New
+              </button>
             </div>
           )}
           {tabs === 1 && (
             <div className="flex gap-4">
-              <AddCategoryModal id={id} setRefetchCategories={setRefetchCategories}/>
+              <AddCategoryModal
+                id={id}
+                setRefetchCategories={setRefetchCategories}
+              />
               <button className="hidden">+Add New</button>
             </div>
           )}
@@ -147,7 +170,10 @@ const Products = () => {
             </Table>
           </div>
         )}
-        {tabs === 1 && <CategorySection id={id} refetchCategories={refetchCategories}/>}
+        {tabs === 1 && (
+          <CategorySection id={id} refetchCategories={refetchCategories} />
+        )}
+        {tabs === 2 && <AddProductSection id={id} />}
       </div>
     </div>
   );

@@ -4,5 +4,7 @@
   .main-content {
     width: 100%;
     background-color: #efefef;
+    overflow-y: auto;
+    max-height: 100vh;
   }
 }
