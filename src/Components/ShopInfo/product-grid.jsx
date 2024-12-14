@@ -39,27 +39,30 @@ const products = [
   }
 ];
 
-export default function ProductGrid() {
+export default function ProductGrid({ productList }) {
   return (
-    <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 lg:grid-cols-3">
-      {products.map((product) => (
-        <Card key={product.id} className="overflow-hidden">
-          <CardContent className="p-0">
-            <div className="relative aspect-video">
-              <img
-                src={product.image}
-                alt={product.name}
-                fill
-                className="object-cover"
-              />
-            </div>
+    <div className="flex justify-between p-4">
+      {productList.map((product) => (
+        <Card key={product.id}>
+          <CardContent className="p-4">
+            <img
+              src={product.imageUrl}
+              alt={product.name}
+              fill
+              className="object-cover h-40 w-80"
+            />
             <div className="p-4">
-              <h3 className="line-clamp-2 text-sm font-medium">
-                {product.name}
-              </h3>
+              <h3 className="text-base font-medium">{product.name}</h3>
               <div className="mt-2 flex items-center gap-2">
+                <span className="text-lg text-gray-500 opacity-50 line-through">
+                  ₹
+                  {Number(product.price) +
+                    Number((product.price * product.discount) / 100)}
+                </span>
                 <span className="text-lg font-bold">₹{product.price}</span>
-                <span className="text-sm text-green-600">Save ₹2000</span>
+                <span className="text-sm text-green-600 font-medium">
+                  {product.discount}% off
+                </span>
               </div>
             </div>
           </CardContent>
