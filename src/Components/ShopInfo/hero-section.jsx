@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 
 export default function HeroSection({ shopDetail }) {
-  console.log(shopDetail);
 
   return (
     <div className="border-b pb-6">

@@ -36,14 +36,11 @@ export default function CategoryTable({ id, refetchCategories }) {
     const getCategoriesByShop = async (shopid) => {
       if (!shopid) return;
       try {
-        // Create a query to filter categories by shopName
         const categoriesRef = collection(db, "categories");
         const q = query(categoriesRef, where("shop", "==", shopid));
 
-        // Execute the query
         const querySnapshot = await getDocs(q);
 
-        // Extract and log the documents
         const categories = [];
         querySnapshot.forEach((doc) => {
           categories.push({ id: doc.id, ...doc.data() });

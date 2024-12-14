@@ -9,12 +9,14 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CategorySection from "./CategorySection";
 import { ArrowLeft } from "lucide-react";
 import AddCategoryModal from "./AddCategoryModal";
 import { useParams } from "react-router-dom";
 import AddProductSection from "./AddProductSection";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { db } from "../../../../firebase";
 
 const services = [
   {
@@ -54,6 +56,30 @@ const Products = () => {
     Number(sessionStorage.getItem("service-portal-tabs")) || 0
   );
   const [refetchCategories, setRefetchCategories] = useState(false);
+  const [productlist, setproductlist] = useState([]);
+
+  useEffect(() => {
+    const getProductsByShop = async (id) => {
+      if (!id) return;
+      try {
+        const categoriesRef = collection(db, "productDetails");
+        const q = query(categoriesRef, where("shop", "==", id));
+
+        const querySnapshot = await getDocs(q);
+
+        const services = [];
+        querySnapshot.forEach((doc) => {
+          services.push({ id: doc.id, ...doc.data() });
+        });
+
+        setproductlist(services);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+    getProductsByShop(id);
+  }, [id]);
+
   return (
     <div className="products">
       <div className="top-section">
@@ -124,32 +150,32 @@ const Products = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {services.map((service) => (
+                {productlist.map((service) => (
                   <TableRow key={service.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <img
-                          src={
-                            "https://content.jdmagicbox.com/comp/def_content/salons/default-salons-9.jpg"
-                          }
+                          src={service.imageUrl}
                           alt={service.name}
                           className="rounded-lg object-cover h-20 w-20"
                         />
                         <div className="flex flex-col">
                           <span className="font-medium">{service.name}</span>
                           <div className="flex items-center gap-2">
-                            <span className="text-gray-500">
+                            <span className="text-gray-500 text-base font-medium">
                               ₹ {service.price}
                             </span>
-                            <span className="text-green-600">
-                              {service.discount}
+                            <span className="text-green-600 text-base font-medium">
+                              {service.discount}% off
                             </span>
                           </div>
                         </div>
                       </div>
                     </TableCell>
                     <TableCell className="font-medium">
-                      {service.createOn}
+                      {service.createdAt
+                        ? service.createdAt.toDate().toLocaleDateString()
+                        : "Date not available"}
                     </TableCell>
                     <TableCell className="font-medium">
                       {service.category}

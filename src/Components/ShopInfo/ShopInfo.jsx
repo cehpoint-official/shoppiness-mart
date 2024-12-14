@@ -10,6 +10,7 @@ export default function Page() {
   const { shopId } = useParams();
   const [shopDetail, setShopDetail] = useState({});
   const [isLoading, setIsLoading] = useState(true);
+  const [categoryList, setCategoryList] = useState([]);
 
   useEffect(() => {
     async function getShopInfo() {
@@ -37,7 +38,7 @@ export default function Page() {
 
   return (
     <main className="min-h-screen bg-background p-20">
-      <HeroSection shopDetail={shopDetail} />
+      <HeroSection shopDetail={shopDetail} categoryList={categoryList}/>
       <ProductGrid />
     </main>
   );

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,9 +10,103 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
+import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { db, storage } from "../../../../firebase";
 
-export default function AddProductForm() {
-  function handleImageUpload(event) {}
+export default function AddProductForm({ id }) {
+  const [categoryList, setCategoryList] = useState([]);
+  const [formData, setFormData] = useState({
+    name: "",
+    price: "",
+    category: "",
+    discountType: "",
+    discount: "",
+    description: "",
+    imageUrl: ""
+  });
+  const [imageFile, setImageFile] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const getCategoriesByShop = async (id) => {
+      if (!id) return;
+      try {
+        const categoriesRef = collection(db, "categories");
+        const q = query(categoriesRef, where("shop", "==", id));
+
+        const querySnapshot = await getDocs(q);
+        const categories = [];
+        querySnapshot.forEach((doc) => {
+          categories.push({ id: doc.id, ...doc.data() });
+        });
+
+        setCategoryList(categories);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+    getCategoriesByShop(id);
+  }, [id]);
+
+  const handleInputChange = (e) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [id]: value
+    }));
+  };
+
+  const handleImageUpload = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setImageFile(e.target.files[0]);
+    }
+  };
+
+  const handleFormSubmit = async () => {
+    setIsSubmitting(true);
+
+    try {
+      let imageUrl = formData.imageUrl;
+
+      if (imageFile) {
+        const storageRef = ref(storage, `products/${imageFile.name}`);
+        await uploadBytes(storageRef, imageFile);
+        imageUrl = await getDownloadURL(storageRef);
+      }
+
+      const productData = {
+        ...formData,
+        shop: id,
+        imageUrl,
+        createdAt: new Date(),
+        status: "Active"
+      };
+
+      await addDoc(collection(db, "productDetails"), productData);
+      // alert("Product added successfully!");
+      setFormData({
+        name: "",
+        price: "",
+        category: "",
+        discountType: "",
+        discount: "",
+        description: "",
+        imageUrl: ""
+      });
+      setImageFile(null);
+    } catch (error) {
+      console.error("Error adding product:", error);
+      alert("Failed to add product. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  useEffect(() => {
+    console.log(imageFile);
+  }, [imageFile]);
+
   return (
     <div className="px-20">
       <h1 className="text-xl font-medium mb-8 text-center">
@@ -22,10 +116,20 @@ export default function AddProductForm() {
       <div className="flex w-full justify-between gap-8">
         <div className="space-y-4">
           <div className="border-2 w-[300px] h-[300px] border-dashed rounded-lg p-4 text-center flex flex-col items-center justify-center bg-muted/10">
-            <img src="" alt="" className="" />
+            {imageFile ? (
+              <img
+                src={URL.createObjectURL(
+                  new Blob([imageFile], { type: imageFile.type })
+                )}
+                alt="Product"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <span>Upload Product Image</span>
+            )}
           </div>
           <div className="text-sm text-muted-foreground text-center">
-            (Upload Format - jpg, png,jpeg ; )
+            (Upload Format - jpg, png, jpeg)
           </div>
           <div className="flex justify-center">
             <Button
@@ -39,7 +143,7 @@ export default function AddProductForm() {
               id="file-upload"
               type="file"
               className="hidden"
-              accept="image/jpeg,image/png"
+              accept="image/jpeg,image/png,image/jpg"
               onChange={handleImageUpload}
             />
           </div>
@@ -50,28 +154,46 @@ export default function AddProductForm() {
             <Label htmlFor="name" className="w-1/4">
               Product/Service Name
             </Label>
-            <Input id="name" placeholder="Add name" className="w-1/2" />
+            <Input
+              id="name"
+              placeholder="Add name"
+              value={formData.name}
+              onChange={handleInputChange}
+              className="w-1/2"
+            />
           </div>
 
           <div className="gap-12 flex items-center justify-end">
             <Label htmlFor="price" className="w-1/4">
               Price
             </Label>
-            <Input id="price" placeholder="Add price" className="w-1/2" />
+            <Input
+              id="price"
+              placeholder="Add price"
+              value={formData.price}
+              onChange={handleInputChange}
+              className="w-1/2"
+            />
           </div>
 
           <div className="gap-12 flex items-center justify-end">
             <Label htmlFor="category" className="w-1/4">
               Select Category
             </Label>
-            <Select>
+            <Select
+              onValueChange={(value) =>
+                setFormData((prev) => ({ ...prev, category: value }))
+              }
+            >
               <SelectTrigger className="w-1/2">
                 <SelectValue placeholder="Select one" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="category1">Category 1</SelectItem>
-                <SelectItem value="category2">Category 2</SelectItem>
-                <SelectItem value="category3">Category 3</SelectItem>
+                {categoryList.map((category) => (
+                  <SelectItem key={category.id} value={category.name}>
+                    {category.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -80,7 +202,11 @@ export default function AddProductForm() {
             <Label htmlFor="discountType" className="w-1/4">
               Discount Type
             </Label>
-            <Select>
+            <Select
+              onValueChange={(value) =>
+                setFormData((prev) => ({ ...prev, discountType: value }))
+              }
+            >
               <SelectTrigger className="w-1/2">
                 <SelectValue placeholder="Select one" />
               </SelectTrigger>
@@ -95,16 +221,24 @@ export default function AddProductForm() {
             <Label htmlFor="discount" className="w-1/4">
               Discount
             </Label>
-            <Input id="discount" placeholder="Add discount" className="w-1/2" />
+            <Input
+              id="discount"
+              placeholder="Add discount"
+              value={formData.discount}
+              onChange={handleInputChange}
+              className="w-1/2"
+            />
           </div>
 
-          <div className="flex items-center justify-end gap-12 ">
-            <Label htmlFor="description " className="w-1/4">
+          <div className="flex items-center justify-end gap-12">
+            <Label htmlFor="description" className="w-1/4">
               Product Description
             </Label>
             <Textarea
               id="description"
               placeholder="Explain about your item"
+              value={formData.description}
+              onChange={handleInputChange}
               className="min-h-[100px] w-1/2"
             />
           </div>
@@ -112,8 +246,12 @@ export default function AddProductForm() {
       </div>
 
       <div className="mt-8 flex justify-center">
-        <Button className="bg-green-600 hover:bg-green-700 text-white px-8">
-          Add new Product/Service
+        <Button
+          className="bg-green-600 hover:bg-green-700 text-white px-8"
+          onClick={handleFormSubmit}
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? "Adding..." : "Add new Product/Service"}
         </Button>
       </div>
     </div>
