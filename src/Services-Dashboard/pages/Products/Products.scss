@@ -25,16 +25,12 @@ $padding: 10px 40px;
         color: #fff;
         padding: 8px 20px;
         min-width: 170px;
-
-        &:last-child {
-          background-color: #0c90c9;
-        }
       }
     }
   }
 
   .bottom-section {
-    max-height: 500px;
+    height: 500px;
     overflow: auto;
     padding: 20px;
     background-color: #fff;
