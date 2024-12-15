@@ -1,4 +1,4 @@
-import { Card } from "@/components/ui/card";
+import { Card } from "../../../Components/ui/card";
 import { Users, Tag, Ticket, UserPlus } from "lucide-react";
 import {
   Select,
