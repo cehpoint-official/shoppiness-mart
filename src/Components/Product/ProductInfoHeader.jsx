@@ -54,8 +54,8 @@ export default function ProductInfoHeader({ shopId, productId }) {
   if (loader1 || loader2) return <Loader />;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
-      <Card className="mx-auto max-w-7xl">
+    <div className="min-h-screen">
+      <Card className="mx-auto ">
         <CardContent className="px-16 py-4">
           {/* Header */}
           <div className="mb-8 flex justify-end">

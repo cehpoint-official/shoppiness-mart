@@ -5,21 +5,27 @@ export default function ProductGrid({ productList }) {
   const { userId, shopId } = useParams();
 
   return (
-    <div className="flex justify-between p-4">
+    <div className="flex justify-start gap-8">
       {productList.map((product) => (
         <Link
           to={`/user-dashboard/${userId}/shop-info/${shopId}/product-info/${product.id}`}
         >
           <Card key={product.id} className="cursor-pointer">
             <CardContent className="p-4">
-              <img
-                src={product.imageUrl}
-                alt={product.name}
-                fill
-                className="object-cover h-40 w-80"
-              />
-              <div className="p-4">
-                <h3 className="text-base font-medium">{product.name}</h3>
+              <div className="w-full flex justify-center">
+                <img
+                  src={product.imageUrl}
+                  alt={product.name}
+                  fill
+                  className="object-cover h-60 w-80 overflow-hidden"
+                />
+              </div>
+              <div className="p-4 w-full">
+                <h3 className="text-base font-medium text-wrap max-w-80 h-12">
+                  {product.name.length > 40
+                    ? product.name.slice(0, 40) + "..."
+                    : product.name}
+                </h3>
                 <div className="mt-2 flex items-center gap-2">
                   <span className="text-lg text-gray-500 opacity-50 line-through">
                     ₹

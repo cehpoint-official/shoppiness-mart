@@ -69,6 +69,7 @@ export default function Page() {
   return (
     <main className="min-h-screen bg-background p-20">
       <HeroSection shopDetail={shopDetail} categoryList={categoryList} />
+      <div className="my-10"></div>
       <ProductGrid productList={productList} />
     </main>
   );

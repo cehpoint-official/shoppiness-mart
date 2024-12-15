@@ -32,19 +32,19 @@ export default function HeroSection({ shopDetail }) {
       </div>
       <div className="mt-4 flex flex-wrap gap-2 px-4">
         <Button variant="outline" size="sm">
-          FB
+          Chair
         </Button>
         <Button variant="outline" size="sm">
-          Get Connected
+          Table
         </Button>
         <Button variant="outline" size="sm">
-          Instagram
+          Bed
         </Button>
         <Button variant="outline" size="sm">
           Electronic
         </Button>
         <Button variant="outline" size="sm">
-          Twitter
+          Light
         </Button>
       </div>
     </div>
