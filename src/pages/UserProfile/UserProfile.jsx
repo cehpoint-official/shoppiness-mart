@@ -119,7 +119,7 @@ const UserProfile = () => {
                       {item.platformDiscount}% <br /> Cashback at Shoppiness
                       Mart!
                     </p>
-                    <div className="flex items-center gap-2 text-blue-700 text-xl font-medium">
+                    <div className="text-nowrap flex items-center gap-2 text-blue-700 text-xl font-medium">
                       Coupon code - {item.code}
                       <IoCopyOutline className="cursor-pointer" />
                     </div>

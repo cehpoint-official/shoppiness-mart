@@ -1,5 +1,12 @@
 import "./UserDashBoard.scss";
-import { doc, getDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  where
+} from "firebase/firestore";
 import { db } from "../../../firebase.js";
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -32,6 +39,7 @@ import UserDashboardProducts from "../../Components/UserDashboardProducts/UserDa
 
 const UserDashBoard = () => {
   const [userData, setUserData] = useState({});
+  const [couponsList, setCouponsList] = useState([]);
   const [loading, setLoading] = useState(true);
   const { userId } = useParams();
   const navigate = useNavigate();
@@ -66,6 +74,25 @@ const UserDashBoard = () => {
   useEffect(() => {
     fetchDoc();
   }, []);
+
+  useEffect(() => {
+    async function getCoupons(userId) {
+      if (!userId) return;
+      try {
+        const collectionRef = collection(db, "coupons");
+        const q = query(collectionRef, where("user", "==", userId));
+        const querySnapshot = await getDocs(q);
+        const result = [];
+        querySnapshot.forEach((doc) => {
+          result.push({ id: doc.id, ...doc.data() });
+        });
+        setCouponsList(result);
+      } catch (error) {
+        console.log("Error getting Coupons:", error);
+      }
+    }
+    getCoupons(userId);
+  }, [userId]);
 
   return (
     <div className="userDashboard">
@@ -130,14 +157,18 @@ const UserDashBoard = () => {
               <div className="widgets">
                 <Widget
                   title="Collected Cash backs"
-                  heading="RS 2500"
+                  heading="RS 0"
                   icon={money}
                 />
-                <Widget title="Collected Coupon " heading="04" icon={tag} />
-                <Widget title="Give Back" heading="500" icon={giveback} />
+                <Widget
+                  title="Collected Coupon "
+                  heading={couponsList.length}
+                  icon={tag}
+                />
+                <Widget title="Give Back" heading="0" icon={giveback} />
                 <Widget
                   title="Cash back requests"
-                  heading="02"
+                  heading="0"
                   icon={cashback}
                 />
               </div>
