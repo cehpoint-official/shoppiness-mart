@@ -143,6 +143,14 @@ const App = () => {
         {
           path: "/test",
           element: <Test />
+        },
+        {
+          path: "/shop-info/:shopId",
+          element: <ShopInfo />
+        },
+        {
+          path: "/shop-info/:shopId/product-info/:productId",
+          element: <ProductInfo />
         }
       ]
     },

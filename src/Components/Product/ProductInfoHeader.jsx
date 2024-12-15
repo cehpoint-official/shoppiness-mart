@@ -5,12 +5,14 @@ import { useEffect, useState } from "react";
 import { db } from "../../../firebase";
 import Loader from "../Loader/Loader";
 import CouponModal from "./CouponFormModal";
+import { useParams } from "react-router-dom";
 
-export default function ProductInfoHeader({ shopId, productId, userId }) {
+export default function ProductInfoHeader({ shopId, productId }) {
   const [productDetail, setProductDetail] = useState({});
   const [shopDetail, setShopDetail] = useState({});
   const [loader1, setLoader1] = useState(true);
   const [loader2, setLoader2] = useState(true);
+  const { userId } = useParams();
 
   useEffect(() => {
     async function getProductDetail(productId) {
@@ -113,12 +115,23 @@ export default function ProductInfoHeader({ shopId, productId, userId }) {
                 <p className="text-sm text-gray-600">
                   Get cashback by generating Coupon
                 </p>
-                <CouponModal
-                  productDetail={productDetail}
-                  shopDetail={shopDetail}
-                  userId={userId}
-                  productId={productId}
-                />
+                <div
+                  className=""
+                  style={{
+                    opacity: userId ? 1 : 0.7,
+                    pointerEvents: userId ? "auto" : "none"
+                  }}
+                >
+                  <CouponModal
+                    productDetail={productDetail}
+                    shopDetail={shopDetail}
+                    productId={productId}
+                  />
+                </div>
+
+                {!userId && (
+                  <p className="text-sm font-medium">Login to Generate</p>
+                )}
               </div>
             </div>
           </div>

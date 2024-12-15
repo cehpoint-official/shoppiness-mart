@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import CouponCard from "./Coupon";
 import { addDoc, collection } from "firebase/firestore";
 import { db } from "../../../firebase";
+import { useNavigate, useParams } from "react-router-dom";
 
 function generateRandomCode() {
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -23,12 +24,7 @@ function generateRandomCode() {
   return randomCode;
 }
 
-export default function CouponModal({
-  userId,
-  shopDetail,
-  productDetail,
-  productId
-}) {
+export default function CouponModal({ shopDetail, productDetail, productId }) {
   const [open, setOpen] = useState(false);
   const [isCoupon, setIsCoupon] = useState(false);
   const [couponData, setCouponData] = useState({});
@@ -38,6 +34,8 @@ export default function CouponModal({
     email: "",
     phone: ""
   });
+  const { userId } = useParams();
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -72,6 +70,12 @@ export default function CouponModal({
       setIsLoading(false);
     }
   };
+
+  // if (!userId) {
+  //   alert("No token found. Redirecting to login.");
+  //   navigate("/login");
+  //   return;
+  // }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

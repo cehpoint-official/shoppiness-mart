@@ -399,7 +399,11 @@ const OfflineShop = () => {
           {offlineShopList.map((item, idx) => {
             return (
               <Link
-                to={`/user-dashboard/${userId}/shop-info/${item.id}`}
+                to={
+                  userId
+                    ? `/user-dashboard/${userId}/shop-info/${item.id}`
+                    : `/shop-info/${item.id}`
+                }
                 key={idx}
               >
                 <div

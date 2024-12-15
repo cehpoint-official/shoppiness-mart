@@ -6,7 +6,7 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../../firebase";
 
 const ProductInfo = () => {
-  const { userId, shopId, productId } = useParams();
+  const { shopId, productId } = useParams();
   const [productList, setProductList] = useState([]);
 
   useEffect(() => {
@@ -33,11 +33,7 @@ const ProductInfo = () => {
 
   return (
     <div className="max-w-7xl m-auto py-10">
-      <ProductInfoHeader
-        shopId={shopId}
-        productId={productId}
-        userId={userId}
-      />
+      <ProductInfoHeader shopId={shopId} productId={productId} />
       <h2 className="font-medium text-xl mb-4">Similer Items</h2>
       <ProductGrid productList={productList} />
     </div>
