@@ -40,6 +40,7 @@ import ProtectedRoute from "./Components/RouteProtect/ProtectedRoute";
 import { Navigate } from "react-router-dom";
 import PublicRoute from "./Components/RouteProtect/PublicRoute";
 import ShopInfo from "./Components/ShopInfo/ShopInfo";
+import ProductInfo from "./Components/Product/ProductInfo";
 
 const App = () => {
   const Layout = () => {
@@ -186,6 +187,10 @@ const App = () => {
         {
           path: "/user-dashboard/:userId/shop-info/:shopId",
           element: <ShopInfo />
+        },
+        {
+          path: "/user-dashboard/:userId/shop-info/:shopId/product-info/:productId",
+          element: <ProductInfo />
         }
       ]
     },
