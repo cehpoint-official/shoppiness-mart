@@ -4,8 +4,9 @@ import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { db } from "../../../firebase";
 import Loader from "../Loader/Loader";
+import CouponModal from "./CouponFormModal";
 
-export default function ProductInfoHeader({ shopId, productId }) {
+export default function ProductInfoHeader({ shopId, productId, userId }) {
   const [productDetail, setProductDetail] = useState({});
   const [shopDetail, setShopDetail] = useState({});
   const [loader1, setLoader1] = useState(true);
@@ -112,9 +113,12 @@ export default function ProductInfoHeader({ shopId, productId }) {
                 <p className="text-sm text-gray-600">
                   Get cashback by generating Coupon
                 </p>
-                <Button className="w-full bg-blue-600 hover:bg-blue-700 rounded-full sm:w-auto">
-                  Generate Coupon
-                </Button>
+                <CouponModal
+                  productDetail={productDetail}
+                  shopDetail={shopDetail}
+                  userId={userId}
+                  productId={productId}
+                />
               </div>
             </div>
           </div>

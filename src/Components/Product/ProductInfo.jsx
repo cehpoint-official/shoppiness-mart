@@ -33,7 +33,7 @@ const ProductInfo = () => {
 
   return (
     <div className="max-w-7xl m-auto py-10">
-      <ProductInfoHeader shopId={shopId} productId={productId} />
+      <ProductInfoHeader shopId={shopId} productId={productId} userId={userId}/>
       <h2 className="font-medium text-xl mb-4">Similer Items</h2>
       <ProductGrid productList={productList} />
     </div>
