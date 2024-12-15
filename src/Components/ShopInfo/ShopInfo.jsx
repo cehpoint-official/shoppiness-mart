@@ -1,5 +1,5 @@
-import HeroSection from "@/Components/ShopInfo/hero-section";
-import ProductGrid from "@/components/ShopInfo/product-grid";
+import HeroSection from "./hero-section";
+import ProductGrid from "./product-grid";
 import { useParams } from "react-router-dom";
 import Loader from "../Loader/Loader";
 import { useEffect, useState } from "react";

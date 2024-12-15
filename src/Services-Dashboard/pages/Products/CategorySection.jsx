@@ -6,7 +6,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue
-} from "@/components/ui/select";
+} from "../../../Components/ui/select";
 import {
   Table,
   TableBody,
@@ -14,8 +14,8 @@ import {
   TableHead,
   TableHeader,
   TableRow
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
+} from "../../../Components/ui/table";
+import { Button } from "../../../Components/ui/button";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../../../firebase";
 

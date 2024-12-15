@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "../../../Components/ui/button";
+import { Input } from "../../../Components/ui/input";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle
-} from "@/components/ui/dialog";
+} from "../../../Components/ui/dialog";
 import { addDoc, collection } from "firebase/firestore";
 import { db } from "../../../../firebase";
 

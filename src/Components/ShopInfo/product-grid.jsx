@@ -1,4 +1,4 @@
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "../../Components/ui/card";
 import { Link, useParams } from "react-router-dom";
 
 export default function ProductGrid({ productList }) {

@@ -3,7 +3,7 @@ import "./UserProfile.scss";
 import { IoCopyOutline } from "react-icons/io5";
 import CashbackGiveback from "./../Cashback&GiveBack/CashbackGiveback";
 import { useParams } from "react-router-dom";
-import Loader from "@/Components/Loader/Loader";
+import Loader from "../../Components/Loader/Loader";
 import { db } from "../../../firebase";
 import {
   collection,
