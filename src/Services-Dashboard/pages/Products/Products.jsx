@@ -8,7 +8,7 @@ import {
   TableHead,
   TableHeader,
   TableRow
-} from "@/components/ui/table";
+} from "../../../Components/ui/table";
 import { useEffect, useState } from "react";
 import CategorySection from "./CategorySection";
 import { ArrowLeft } from "lucide-react";
