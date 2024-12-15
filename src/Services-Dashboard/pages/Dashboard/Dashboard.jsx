@@ -6,8 +6,12 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue
-} from "@/components/ui/select";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+} from "../../../Components/ui/select";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage
+} from "../../../Components/ui/avatar";
 
 export default function Dashboard() {
   return (
@@ -162,27 +166,35 @@ export default function Dashboard() {
                 {
                   name: "Taki Uchiha",
                   email: "email@gmail.com",
-                  image: "https://cdn.pixabay.com/photo/2020/05/01/08/29/portrait-5115894_1280.jpg"
+                  image:
+                    "https://cdn.pixabay.com/photo/2020/05/01/08/29/portrait-5115894_1280.jpg"
                 },
                 {
                   name: "Mia Nohara",
                   email: "email@gmail.com",
-                  image: "https://plus.unsplash.com/premium_photo-1669138512601-e3f00b684edc?q=80&w=1885&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                  image:
+                    "https://plus.unsplash.com/premium_photo-1669138512601-e3f00b684edc?q=80&w=1885&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                 },
                 {
                   name: "Raj Roy",
                   email: "email@gmail.com",
-                  image: "https://cdn.pixabay.com/photo/2023/04/21/15/42/portrait-7942151_1280.jpg"
+                  image:
+                    "https://cdn.pixabay.com/photo/2023/04/21/15/42/portrait-7942151_1280.jpg"
                 },
                 {
                   name: "Pihu Prajapati",
                   email: "email@gmail.com",
-                  image: "https://plus.unsplash.com/premium_photo-1673792686302-7555a74de717?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                  image:
+                    "https://plus.unsplash.com/premium_photo-1673792686302-7555a74de717?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                 }
               ].map((customer) => (
                 <div key={customer.name} className="flex items-center gap-3">
                   <Avatar>
-                    <AvatarImage src={customer.image} alt={customer.name} className="object-cover"/>
+                    <AvatarImage
+                      src={customer.image}
+                      alt={customer.name}
+                      className="object-cover"
+                    />
                     <AvatarFallback>
                       {customer.name
                         .split(" ")
