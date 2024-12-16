@@ -177,7 +177,7 @@ export default function CouponModal({ shopDetail, productDetail, productId }) {
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
-                  disabled={true}
+                  // disabled={true}
                   id="email"
                   name="email"
                   type="email"
