@@ -7,39 +7,42 @@ import { FiSearch } from "react-icons/fi";
 import { Link } from "react-router-dom";
 
 const OnlineShop = () => {
-  const [loading, setLoading] = useState(true);
-  const [stores, setStores] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("store");
-  const [offers, setOffers] = useState(null);
+  const [stores, setStores] = useState([]);
+  const [coupons, setCoupons] = useState([]);
+  const [isStoreExpand, setIsStoreExpand] = useState(false);
 
   useEffect(() => {
     const fetchStores = async () => {
       try {
         const response = await axios.get(
-          "https://proxy-server-4er9.onrender.com"
+          "http://13.201.98.0:3000/inrdeals/stores"
         );
-        setLoading(false);
-        setStores(response.data.stores);
+        setStores(response.data.data.stores);
       } catch (error) {
         console.log(error);
       }
     };
     fetchStores();
   }, []);
+  // useEffect(() => {
+  //   const fetchStores = async () => {
+  //     try {
+  //       const response = await axios.get(
+  //         "http://13.201.98.0:3000/inrdeals/coupons"
+  //       );
+  //       console.log(response.data.data.data);
 
-  useEffect(() => {
-    const fetchOffers = async () => {
-      try {
-        const response = await axios.get(
-          "https://proxy-server-4er9.onrender.com/offers"
-        );
-        setOffers(response.data.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchOffers();
-  }, []);
+  //       // setCoupons(response.data.data.stores);
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
+  //   fetchStores();
+  // }, []);
+
+  const displayedStores = isStoreExpand ? stores : stores.slice(0, 14);
 
   return loading ? (
     <Loader />
@@ -92,62 +95,55 @@ const OnlineShop = () => {
       {/* 3rd page */}
       {activeTab === "store" ? (
         <div>
-          {stores === null ? (
-            <div className="text-center">Loading...</div>
-          ) : (
-            <div className="flex flex-wrap items-center justify-center gap-4 p-4 md:p-10">
-              {stores?.map((item) => (
+          <div className="flex flex-wrap items-center justify-center gap-6 md:px-24 py-10">
+            {displayedStores.map((item, index) => {
+              return (
                 <div
-                  className="p-5 w-full md:w-[200px]"
-                  style={{
-                    boxShadow:
-                      "rgba(17, 17, 26, 0.05) 0px 1px 0px, rgba(17, 17, 26, 0.1) 0px 0px 8px",
+                  key={index}
+                  onClick={() => {
+                    window.location.href = item.url;
                   }}
-                  key={item.id}
+                  className="relative text-center shadow-md p-4 rounded-sm cursor-pointer w-40 h-44 flex flex-col gap-4"
                 >
-                  <Link to={item?.url}>
-                    <div>
-                      <img
-                        src={item.logo}
-                        alt=""
-                        className="w-full h-20 md:w-40"
-                      />
-                    </div>
-                    <p className="text-center font-bold text-base m-2">
-                      {item?.merchant}
+                  <div className="flex w-full justify-center">
+                    <img
+                      src={item.logo}
+                      alt=""
+                      className="h-16 w-16 object-contain"
+                    />
+                  </div>
+                  <h3 className="font-medium text-sm">
+                    {item.merchant.length > 16
+                      ? item.merchant.slice(0, 16) + "..."
+                      : item.merchant}
+                  </h3>
+                  <div className="bg-green-500 text-white rounded-md text-sm py-[1px]">
+                    <p>
+                      {item.payout.startsWith("₹")
+                        ? `${item.payout} cashback`
+                        : `${item.payout} discount`}
                     </p>
-                    <button className="bg-[#0F9B03] text-white rounded-md px-2 m-auto flex">
-                      {item?.payout} cashback
-                    </button>
-                  </Link>
+                  </div>
                 </div>
-              ))}
-            </div>
-          )}
+              );
+            })}
+            {!isStoreExpand && (
+              <button
+                onClick={() => setIsStoreExpand(!isStoreExpand)}
+                className="text-blue-600 border border-blue-600 px-20 py-1 font-normal mt-10"
+              >
+                View All Offers
+              </button>
+            )}
+          </div>
+          <div className="w-full">
+            <p className="font-medium text-xl bg-[#EEFAF9] py-1 text-center my-8">
+              Best Online Store Offers
+            </p>
+          </div>
         </div>
       ) : (
-        <div>
-          {offers == null ? (
-            <div className="text-center">Loading...</div>
-          ) : (
-            <div className="flex flex-wrap justify-center items-center gap-4 md:gap-10 mt-10">
-              {offers?.map((item) => (
-                <div key={item.id} className="text-center">
-                  <div>
-                    <img src={shopcard} alt="" className="w-full md:w-22" />
-                  </div>
-                  <div className="mt-4">
-                    <p className="font-semibold text-xl">Food Station</p>
-                    <p className="my-2 text-lg ">Kolkata, Bow Bazar</p>
-                    <button className="bg-[#0059DE] text-white rounded-lg p-1 text-sm">
-                      10% Cashback
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <div></div>
       )}
     </div>
   );

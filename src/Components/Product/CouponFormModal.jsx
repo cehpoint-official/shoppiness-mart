@@ -97,7 +97,7 @@ export default function CouponModal({ shopDetail, productDetail, productId }) {
       threeDaysLater.setDate(couponData.createdAt.getDate() + 3);
 
       await addDoc(collection(db, "coupons"), couponData);
-      await axios.post("https://email-server-nu-nine.vercel.app/send-email", {
+      await axios.post("http://13.201.98.0:3000/send-email", {
         email: formData.email,
         title: "Coupon Generated Shoppiness Mart",
         body: couponEmailTemplate(
