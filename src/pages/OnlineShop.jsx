@@ -17,7 +17,7 @@ const OnlineShop = () => {
     const fetchStores = async () => {
       try {
         const response = await axios.get(
-          "https://13.201.98.0:443/inrdeals/stores"
+          "http://13.201.98.0:443/inrdeals/stores"
         );
         setStores(response.data.data.stores);
       } catch (error) {
