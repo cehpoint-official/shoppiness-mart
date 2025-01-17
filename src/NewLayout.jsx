@@ -1,4 +1,3 @@
-import React from "react";
 import Footer from "./Components/Footer";
 import { Outlet, useParams } from "react-router-dom";
 import UserDashboardNav from "./Components/UserDashboardNav/UserDashboardNav";
