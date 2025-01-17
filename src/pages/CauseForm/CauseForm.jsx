@@ -13,13 +13,18 @@ const CauseForm = () => {
   const [success, setSuccess] = useState(false);
   const [completedSteps, setCompletedSteps] = useState([false, false, false]);
   const [causeDetails, setCauseDetails] = useState({
+    // Page 1 fields
     causeName: "",
     aboutCause: "",
     type: "",
+
+    // Page 2 fields
     cat: "",
     location: "",
     pincode: "",
     shortDesc: "",
+
+    // Page 3 fields
     firstName: "",
     lastName: "",
     mobileNumber: "",
@@ -31,37 +36,70 @@ const CauseForm = () => {
   const [bannerFile, setBannerFile] = useState(null);
   const [uploadProgress, setUploadProgress] = useState("");
 
-  //next page
+  const handleInputChange = (e, field) => {
+    const { value } = e.target;
+
+    setCauseDetails((prevState) => ({
+      ...prevState,
+      [field]: value,
+    }));
+  };
+
   const handleNextPage = (e) => {
     e.preventDefault();
 
-    setCompletedSteps((prev) => {
-      const updatedSteps = [...prev];
-      updatedSteps[currentPage - 1] = true;
-      return updatedSteps;
-    });
+    // Validate current page fields
+    if (validateCurrentPage()) {
+      setCompletedSteps((prev) => {
+        const updatedSteps = [...prev];
+        updatedSteps[currentPage - 1] = true;
+        return updatedSteps;
+      });
 
-    setCurrentPage((prev) => prev + 1);
+      setCurrentPage((prev) => prev + 1);
+    }
   };
 
-  //previous page
+  const validateCurrentPage = () => {
+    switch (currentPage) {
+      case 1:
+        return (
+          causeDetails.causeName && causeDetails.aboutCause && causeDetails.type
+        );
+      case 2:
+        return (
+          causeDetails.cat &&
+          causeDetails.location &&
+          causeDetails.pincode &&
+          causeDetails.shortDesc
+        );
+      case 3:
+        return (
+          causeDetails.firstName &&
+          causeDetails.lastName &&
+          causeDetails.mobileNumber &&
+          causeDetails.email &&
+          causeDetails.password &&
+          causeDetails.confirmPassword
+        );
+      default:
+        return true;
+    }
+  };
+
+  // Rest of your existing functions remain the same
   const handleBackPage = () => setCurrentPage((prev) => prev - 1);
 
-  //create Account
   const handleCreateAccount = (e) => {
     e.preventDefault();
-    //debugging
-    // console.log("Collected Data:", {
-    //   ...causeDetails,
-    //   logoFile,
-    //   bannerFile,
-    // });
-    addData();
-    handleNextPage(e);
-    setSuccess(true);
+    if (validateCurrentPage()) {
+      addData();
+      handleNextPage(e);
+      setSuccess(true);
+    }
   };
 
-  //setting and uploading logo
+  // Your existing file handling functions remain the same
   const handleFileChangeLogo = async (e) => {
     const file = e.target.files[0];
     setLogoFile(file);
@@ -70,7 +108,6 @@ const CauseForm = () => {
     }
   };
 
-  //setting and uploading banner
   const handleFileChangeBanner = async (e) => {
     const file = e.target.files[0];
     setBannerFile(file);
@@ -153,12 +190,8 @@ const CauseForm = () => {
               <label>Cause/NGO Name</label>
               <input
                 required
-                onChange={(e) =>
-                  setCauseDetails({
-                    ...causeDetails,
-                    causeName: e.target.value,
-                  })
-                }
+                value={causeDetails.causeName}
+                onChange={(e) => handleInputChange(e, "causeName")}
                 type="text"
               />
             </div>
@@ -168,12 +201,8 @@ const CauseForm = () => {
               <textarea
                 required
                 className="causeDesc"
-                onChange={(e) =>
-                  setCauseDetails({
-                    ...causeDetails,
-                    aboutCause: e.target.value,
-                  })
-                }
+                value={causeDetails.aboutCause}
+                onChange={(e) => handleInputChange(e, "aboutCause")}
               ></textarea>
             </div>
           </div>
@@ -187,12 +216,8 @@ const CauseForm = () => {
                 type="radio"
                 value="individual"
                 required
-                onClick={(e) =>
-                  setCauseDetails({
-                    ...causeDetails,
-                    type: e.target.value,
-                  })
-                }
+                checked={causeDetails.type === "individual"}
+                onChange={(e) => handleInputChange(e, "type")}
               />
               <label htmlFor="organisation">Group / Organisation</label>
               <input
@@ -201,12 +226,8 @@ const CauseForm = () => {
                 name="options"
                 value="organisation"
                 required
-                onClick={(e) =>
-                  setCauseDetails({
-                    ...causeDetails,
-                    type: e.target.value,
-                  })
-                }
+                checked={causeDetails.type === "organisation"}
+                onChange={(e) => handleInputChange(e, "type")}
               />
             </div>
             <div className="btns">
@@ -230,13 +251,10 @@ const CauseForm = () => {
               <label>Select Category</label>
               <select
                 required
-                onChange={(e) =>
-                  setCauseDetails({
-                    ...causeDetails,
-                    cat: e.target.value,
-                  })
-                }
+                value={causeDetails.cat}
+                onChange={(e) => handleInputChange(e, "cat")}
               >
+                <option value="">Select category</option>
                 <option value="one">One</option>
                 <option value="two">Two</option>
                 <option value="three">Three</option>
@@ -247,12 +265,8 @@ const CauseForm = () => {
               <input
                 type="text"
                 required
-                onChange={(e) =>
-                  setCauseDetails({
-                    ...causeDetails,
-                    location: e.target.value,
-                  })
-                }
+                value={causeDetails.location}
+                onChange={(e) => handleInputChange(e, "location")}
               />
             </div>
             <div className="item">
@@ -260,34 +274,23 @@ const CauseForm = () => {
               <input
                 type="number"
                 required
-                onChange={(e) =>
-                  setCauseDetails({
-                    ...causeDetails,
-                    pincode: e.target.value,
-                  })
-                }
+                value={causeDetails.pincode}
+                onChange={(e) => handleInputChange(e, "pincode")}
               />
             </div>
-
             <div className="item">
               <label>Short Description</label>
               <p>(Write a description about your Cause/NGO)</p>
               <textarea
                 required
-                onChange={(e) =>
-                  setCauseDetails({
-                    ...causeDetails,
-                    shortDesc: e.target.value,
-                  })
-                }
+                value={causeDetails.shortDesc}
+                onChange={(e) => handleInputChange(e, "shortDesc")}
               ></textarea>
             </div>
           </div>
           <div className="right">
-            {uploadProgress !== "" ? (
+            {uploadProgress !== "" && (
               <p className="uploadProgress">{uploadProgress.slice(0, 12)}</p>
-            ) : (
-              ""
             )}
             <div className="item">
               <h3>Upload Logo</h3>
@@ -296,10 +299,8 @@ const CauseForm = () => {
                 or
                 <p className="chooseFile">Choose File</p>
               </label>
-
               <input type="file" id="file1" onChange={handleFileChangeLogo} />
             </div>
-
             <div className="item">
               <h3>Add Banner</h3>
               <label htmlFor="file2">
@@ -314,7 +315,6 @@ const CauseForm = () => {
                 onChange={handleFileChangeBanner}
               />
             </div>
-
             <div className="btns">
               <button className="back" onClick={handleBackPage}>
                 Back
@@ -337,12 +337,8 @@ const CauseForm = () => {
               <input
                 required
                 type="text"
-                onChange={(e) =>
-                  setCauseDetails({
-                    ...causeDetails,
-                    firstName: e.target.value,
-                  })
-                }
+                value={causeDetails.firstName}
+                onChange={(e) => handleInputChange(e, "firstName")}
               />
             </div>
             <div className="item">
@@ -350,12 +346,8 @@ const CauseForm = () => {
               <input
                 required
                 type="text"
-                onChange={(e) => {
-                  setCauseDetails({
-                    ...causeDetails,
-                    lastName: e.target.value,
-                  });
-                }}
+                value={causeDetails.lastName}
+                onChange={(e) => handleInputChange(e, "lastName")}
               />
             </div>
             <div className="item">
@@ -363,12 +355,8 @@ const CauseForm = () => {
               <input
                 required
                 type="number"
-                onChange={(e) =>
-                  setCauseDetails({
-                    ...causeDetails,
-                    mobileNumber: e.target.value,
-                  })
-                }
+                value={causeDetails.mobileNumber}
+                onChange={(e) => handleInputChange(e, "mobileNumber")}
               />
             </div>
           </div>
@@ -378,12 +366,8 @@ const CauseForm = () => {
               <input
                 required
                 type="email"
-                onChange={(e) =>
-                  setCauseDetails({
-                    ...causeDetails,
-                    email: e.target.value,
-                  })
-                }
+                value={causeDetails.email}
+                onChange={(e) => handleInputChange(e, "email")}
               />
             </div>
             <div className="item">
@@ -391,25 +375,17 @@ const CauseForm = () => {
               <input
                 required
                 type="password"
-                onChange={(e) =>
-                  setCauseDetails({
-                    ...causeDetails,
-                    password: e.target.value,
-                  })
-                }
+                value={causeDetails.password}
+                onChange={(e) => handleInputChange(e, "password")}
               />
             </div>
             <div className="item">
-              <label> Confirm Password</label>
+              <label>Confirm Password</label>
               <input
                 required
                 type="password"
-                onChange={(e) =>
-                  setCauseDetails({
-                    ...causeDetails,
-                    confirmPassword: e.target.value,
-                  })
-                }
+                value={causeDetails.confirmPassword}
+                onChange={(e) => handleInputChange(e, "confirmPassword")}
               />
             </div>
             <div className="btns">
@@ -434,7 +410,6 @@ const CauseForm = () => {
             <img src={logo} alt="Logo" />
           </Link>
         </div>
-
         <h1>Register a Cause/NGO</h1>
       </div>
       <div className="stepper">

@@ -10,25 +10,26 @@ import SuccessPage from "../../Components/SuccessPage/SuccessPage";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 
 const BusinessForm = () => {
-  //states
   const [currentPage, setCurrentPage] = useState(1);
   const [success, setSuccess] = useState(false);
   const [id, setId] = useState("");
   const [completedSteps, setCompletedSteps] = useState([false, false, false]);
-  const [businessDetails, setBusinessDetails] = useState({
+
+  const [formData, setFormData] = useState({
+    // Business Details (Page 1)
     businessName: "",
     owner: "",
     mode: "",
     contact: "",
     businessEmail: "",
+
+    // Shop Details (Page 2)
     cat: "",
     location: "",
     pincode: "",
     shortDesc: "",
-    id: "",
-  });
 
-  const [accountDetails, setAccountDetails] = useState({
+    // Account Details (Page 3)
     firstName: "",
     lastName: "",
     mobileNumber: "",
@@ -36,30 +37,71 @@ const BusinessForm = () => {
     password: "",
     confirmPassword: "",
   });
+
   const [logoFile, setLogoFile] = useState(null);
   const [bannerFile, setBannerFile] = useState(null);
   const [uploadProgress, setUploadProgress] = useState("");
-  //next page
-  const handleNextPage = (e) => {
-    e.preventDefault();
 
-    setCompletedSteps((prev) => {
-      const updatedSteps = [...prev];
-      updatedSteps[currentPage - 1] = true;
-      return updatedSteps;
-    });
-
-    setCurrentPage((prev) => prev + 1);
+  const handleInputChange = (e, field) => {
+    const { value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
   };
 
-  //previous page
-  const handleBackPage = () => setCurrentPage((prev) => prev - 1);
+  const validateCurrentPage = () => {
+    switch (currentPage) {
+      case 1:
+        return (
+          formData.businessName &&
+          formData.owner &&
+          formData.mode &&
+          formData.contact &&
+          formData.businessEmail
+        );
+      case 2:
+        return (
+          formData.cat &&
+          formData.location &&
+          formData.pincode &&
+          formData.shortDesc
+        );
+      case 3:
+        return (
+          formData.firstName &&
+          formData.lastName &&
+          formData.mobileNumber &&
+          formData.email &&
+          formData.password &&
+          formData.confirmPassword
+        );
+      default:
+        return true;
+    }
+  };
 
-  //create account
+  const handleNextPage = (e) => {
+    e.preventDefault();
+    if (validateCurrentPage()) {
+      setCompletedSteps((prev) => {
+        const updatedSteps = [...prev];
+        updatedSteps[currentPage - 1] = true;
+        return updatedSteps;
+      });
+      setCurrentPage((prev) => prev + 1);
+    }
+  };
+
+  const handleBackPage = (e) => {
+    e.preventDefault();
+    setCurrentPage((prev) => prev - 1);
+  };
+
   const handleCreateAccount = async (e) => {
     e.preventDefault();
 
-    if (accountDetails.password !== accountDetails.confirmPassword) {
+    if (formData.password !== formData.confirmPassword) {
       alert("Passwords do not match. Please try again.");
       return;
     }
@@ -67,21 +109,19 @@ const BusinessForm = () => {
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
-        accountDetails.email,
-        accountDetails.password
+        formData.email,
+        formData.password
       );
       const user = userCredential.user;
-      setId(user.uid); // Set the user ID
-      console.log(user.uid);
+      setId(user.uid);
 
       await addData(user.uid);
-      setSuccess(true); // Show success page
+      setSuccess(true);
     } catch (error) {
       alert("An error occurred while creating your account: " + error.message);
     }
   };
 
-  //setting and uploading logo
   const handleFileChangeLogo = async (e) => {
     const file = e.target.files[0];
     setLogoFile(file);
@@ -90,7 +130,6 @@ const BusinessForm = () => {
     }
   };
 
-  //setting and uploading banner
   const handleFileChangeBanner = async (e) => {
     const file = e.target.files[0];
     setBannerFile(file);
@@ -99,7 +138,6 @@ const BusinessForm = () => {
     }
   };
 
-  // uplod photo function with percentage
   const uploadFile = (file) => {
     return new Promise((resolve, reject) => {
       const metadata = {
@@ -119,8 +157,7 @@ const BusinessForm = () => {
               setUploadProgress(progress);
               break;
             case "running":
-              setUploadProgress(`Uploded ${progress}%`);
-
+              setUploadProgress(`Uploaded ${progress}%`);
               break;
           }
         },
@@ -148,18 +185,16 @@ const BusinessForm = () => {
     });
   };
 
-  //Adding All data  to firestore DB
   const addData = async (userId) => {
     try {
       const logoUrl = logoFile ? await uploadFile(logoFile) : "";
       const bannerUrl = bannerFile ? await uploadFile(bannerFile) : "";
 
       await setDoc(doc(db, "businessDetails", userId), {
-        ...businessDetails,
-        ...accountDetails,
+        ...formData,
         logoUrl,
         bannerUrl,
-        id: userId, // Use the passed uid instead of state
+        id: userId,
       });
     } catch (e) {
       alert(e.message);
@@ -175,25 +210,19 @@ const BusinessForm = () => {
             <div className="item">
               <label>Business/Services Name</label>
               <input
-                onChange={(e) =>
-                  setBusinessDetails({
-                    ...businessDetails,
-                    businessName: e.target.value,
-                  })
-                }
+                required
                 type="text"
+                value={formData.businessName}
+                onChange={(e) => handleInputChange(e, "businessName")}
               />
             </div>
             <div className="item">
               <label>Business/Services Owner Name</label>
               <input
-                onChange={(e) =>
-                  setBusinessDetails({
-                    ...businessDetails,
-                    owner: e.target.value,
-                  })
-                }
+                required
                 type="text"
+                value={formData.owner}
+                onChange={(e) => handleInputChange(e, "owner")}
               />
             </div>
             <h3>Business/Services Type</h3>
@@ -204,12 +233,9 @@ const BusinessForm = () => {
                 name="options"
                 type="radio"
                 value="online"
-                onClick={(e) =>
-                  setBusinessDetails({
-                    ...businessDetails,
-                    mode: e.target.value,
-                  })
-                }
+                required
+                checked={formData.mode === "online"}
+                onChange={(e) => handleInputChange(e, "mode")}
               />
               <label htmlFor="offline">Offline</label>
               <input
@@ -217,12 +243,9 @@ const BusinessForm = () => {
                 type="radio"
                 name="options"
                 value="offline"
-                onClick={(e) =>
-                  setBusinessDetails({
-                    ...businessDetails,
-                    mode: e.target.value,
-                  })
-                }
+                required
+                checked={formData.mode === "offline"}
+                onChange={(e) => handleInputChange(e, "mode")}
               />
             </div>
           </div>
@@ -231,30 +254,22 @@ const BusinessForm = () => {
               <label>Contact number</label>
               <p>(The number of the business man or service provider office)</p>
               <input
+                required
                 type="tel"
-                onChange={(e) =>
-                  setBusinessDetails({
-                    ...businessDetails,
-                    contact: e.target.value,
-                  })
-                }
+                value={formData.contact}
+                onChange={(e) => handleInputChange(e, "contact")}
               />
             </div>
-
             <div className="item">
               <label>Email Id</label>
-              <p>(The number of the business man or service provider office)</p>
+              <p>(The email of the business or service provider)</p>
               <input
+                required
                 type="email"
-                onChange={(e) =>
-                  setBusinessDetails({
-                    ...businessDetails,
-                    businessEmail: e.target.value,
-                  })
-                }
+                value={formData.businessEmail}
+                onChange={(e) => handleInputChange(e, "businessEmail")}
               />
             </div>
-
             <div className="btns">
               <Link className="cancel" to="/register-business">
                 Cancel
@@ -275,13 +290,11 @@ const BusinessForm = () => {
             <div className="item">
               <label>Select Category</label>
               <select
-                onChange={(e) =>
-                  setBusinessDetails({
-                    ...businessDetails,
-                    cat: e.target.value,
-                  })
-                }
+                required
+                value={formData.cat}
+                onChange={(e) => handleInputChange(e, "cat")}
               >
+                <option value="">Select category</option>
                 <option value="one">One</option>
                 <option value="two">Two</option>
                 <option value="three">Three</option>
@@ -290,46 +303,34 @@ const BusinessForm = () => {
             <div className="item">
               <label>Location</label>
               <input
+                required
                 type="text"
-                onChange={(e) =>
-                  setBusinessDetails({
-                    ...businessDetails,
-                    location: e.target.value,
-                  })
-                }
+                value={formData.location}
+                onChange={(e) => handleInputChange(e, "location")}
               />
             </div>
             <div className="item">
               <label>PIN Code</label>
               <input
+                required
                 type="number"
-                onChange={(e) =>
-                  setBusinessDetails({
-                    ...businessDetails,
-                    pincode: e.target.value,
-                  })
-                }
+                value={formData.pincode}
+                onChange={(e) => handleInputChange(e, "pincode")}
               />
             </div>
-
             <div className="item">
               <label>Short Description</label>
               <p>(Write a description about your business or service)</p>
               <textarea
-                onChange={(e) =>
-                  setBusinessDetails({
-                    ...businessDetails,
-                    shortDesc: e.target.value,
-                  })
-                }
+                required
+                value={formData.shortDesc}
+                onChange={(e) => handleInputChange(e, "shortDesc")}
               ></textarea>
             </div>
           </div>
           <div className="right">
-            {uploadProgress !== "" ? (
+            {uploadProgress !== "" && (
               <p className="uploadProgress">{uploadProgress.slice(0, 12)}</p>
-            ) : (
-              ""
             )}
             <div className="item">
               <h3>Add Logo</h3>
@@ -338,10 +339,8 @@ const BusinessForm = () => {
                 or
                 <p className="chooseFile">Choose File</p>
               </label>
-
               <input type="file" id="file1" onChange={handleFileChangeLogo} />
             </div>
-
             <div className="item">
               <h3>Add Banner</h3>
               <label htmlFor="file2">
@@ -351,9 +350,8 @@ const BusinessForm = () => {
               </label>
               <input type="file" id="file2" onChange={handleFileChangeBanner} />
             </div>
-
             <div className="btns">
-              <button className="back" onClick={handleBackPage}>
+              <button type="button" className="back" onClick={handleBackPage}>
                 Back
               </button>
               <button type="submit" className="next">
@@ -372,37 +370,28 @@ const BusinessForm = () => {
             <div className="item">
               <label>First Name</label>
               <input
+                required
                 type="text"
-                onChange={(e) =>
-                  setAccountDetails({
-                    ...accountDetails,
-                    firstName: e.target.value,
-                  })
-                }
+                value={formData.firstName}
+                onChange={(e) => handleInputChange(e, "firstName")}
               />
             </div>
             <div className="item">
               <label>Last Name</label>
               <input
+                required
                 type="text"
-                onChange={(e) =>
-                  setAccountDetails({
-                    ...accountDetails,
-                    lastName: e.target.value,
-                  })
-                }
+                value={formData.lastName}
+                onChange={(e) => handleInputChange(e, "lastName")}
               />
             </div>
             <div className="item">
               <label>Mobile number</label>
               <input
-                type="text"
-                onChange={(e) =>
-                  setAccountDetails({
-                    ...accountDetails,
-                    mobileNumber: e.target.value,
-                  })
-                }
+                required
+                type="tel"
+                value={formData.mobileNumber}
+                onChange={(e) => handleInputChange(e, "mobileNumber")}
               />
             </div>
           </div>
@@ -412,12 +401,8 @@ const BusinessForm = () => {
               <input
                 required
                 type="email"
-                onChange={(e) =>
-                  setAccountDetails({
-                    ...accountDetails,
-                    email: e.target.value,
-                  })
-                }
+                value={formData.email}
+                onChange={(e) => handleInputChange(e, "email")}
               />
             </div>
             <div className="item">
@@ -425,12 +410,8 @@ const BusinessForm = () => {
               <input
                 required
                 type="password"
-                onChange={(e) =>
-                  setAccountDetails({
-                    ...accountDetails,
-                    password: e.target.value,
-                  })
-                }
+                value={formData.password}
+                onChange={(e) => handleInputChange(e, "password")}
               />
             </div>
             <div className="item">
@@ -438,19 +419,17 @@ const BusinessForm = () => {
               <input
                 required
                 type="password"
-                onChange={(e) =>
-                  setAccountDetails({
-                    ...accountDetails,
-                    confirmPassword: e.target.value,
-                  })
-                }
+                value={formData.confirmPassword}
+                onChange={(e) => handleInputChange(e, "confirmPassword")}
               />
             </div>
             <div className="btns">
-              <button className="back" onClick={handleBackPage}>
+              <button type="button" className="back" onClick={handleBackPage}>
                 Back
               </button>
-              <button className="next">Create Your Account</button>
+              <button type="submit" className="next">
+                Create Your Account
+              </button>
             </div>
           </div>
         </form>
