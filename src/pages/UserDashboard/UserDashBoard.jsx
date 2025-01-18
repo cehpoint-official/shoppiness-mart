@@ -1,5 +1,5 @@
 import "./UserDashBoard.scss";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../../../firebase.js";
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -26,23 +26,49 @@ import money2 from "../../assets/RegisterBusiness/money.png";
 import bag from "../../assets/RegisterBusiness/bag.jpg";
 import video from "../../assets/RegisterBusiness/vid.png";
 import { RiSearchFill } from "react-icons/ri";
+import EditProfileDialog from "./EditProfileDialog.jsx";
+import { useDispatch } from "react-redux";
+import { userExist, userNotExist } from "../../redux/reducer/userReducer.js";
 
 const UserDashBoard = () => {
+  const dispatch = useDispatch();
   const [userData, setUserData] = useState({});
   const [loading, setLoading] = useState(true);
-  const { userId } = useParams();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+  const { userId } = useParams();
+  const handleSave = async (updatedData) => {
+    try {
+      // Update the Firestore document with the new data
+      await setDoc(doc(db, "users", userData.uid), updatedData, {
+        merge: true,
+      });
+
+      // Dispatch the updated user data to Redux
+      dispatch(userExist(updatedData));
+
+      // Update local state
+      setUserData(updatedData);
+
+      console.log("User data updated successfully!");
+      setIsDialogOpen(false);
+    } catch (error) {
+      console.error("Error updating user data:", error);
+    }
+  };
   const fetchDoc = async () => {
     const docRef = doc(db, "users", userId);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
-      setUserData(docSnap.data());
-      console.log(docSnap.data());
+      const data = docSnap.data();
+      setUserData(data);
+      dispatch(userExist(data));
       setLoading(false);
-      console.log(docSnap.data());
+      console.log(data);
     } else {
       alert("No such document!");
+      dispatch(userNotExist());
     }
   };
 
@@ -57,7 +83,10 @@ const UserDashBoard = () => {
       ) : (
         <>
           <div className="userDashboard">
-            <UserDashboardNav profilePic={userData.profilePic} userId={userId} />
+            <UserDashboardNav
+              profilePic={userData.profilePic}
+              userId={userId}
+            />
             <div className="userDashboardContainer">
               <div className="mainDashboard">
                 <div className="topSec">
@@ -68,7 +97,7 @@ const UserDashBoard = () => {
                           userData.profilePic ||
                           "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8oghbsuzggpkknQSSU-Ch_xep_9v3m6EeBQ&s"
                         }
-                        alt="err"
+                        alt="user profile"
                       />
                     </div>
                     <div className="info">
@@ -84,11 +113,23 @@ const UserDashBoard = () => {
                         <FaPhoneAlt />
                         <p>{userData.phone || "Not Added!"}</p>
                       </div>
-                      <button>Edit Profile</button>
+                      <button
+                        onClick={() => setIsDialogOpen(true)}
+                        className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+                      >
+                        Edit Profile
+                      </button>
+                      {isDialogOpen && (
+                        <EditProfileDialog
+                          userData={userData}
+                          onClose={() => setIsDialogOpen(false)}
+                          onSave={handleSave}
+                        />
+                      )}
                     </div>
                   </div>
                   <div className="right">
-                    <h2>Let's start Shopping!</h2>
+                    <h2>Let&apos;s start Shopping!</h2>
                     <div className="links">
                       <Link to="/online-shop">
                         <div className="link">
@@ -248,68 +289,66 @@ const UserDashBoard = () => {
                   </div>
                 </div>
               </div>
-
-              
             </div>
 
             <div className="moneyRaisingSec">
-                <h1>Start raising from Online Stores</h1>
-                <div className="container">
-                  <div className="left">
-                    <img src={video} alt="loading" />
-                  </div>
-                  <div className="right">
-                    <div className="points">
-                      <div className="point">
-                        <div className="img">
-                          <img src={signup} alt="loading" />
-                        </div>
-                        <p>
-                          <span>Sign up: </span>Lorem ipsum dolor sit amet
-                          consectetur adipisicing elit. Blanditiis,commodi
-                          tempora mollitia voluptatem recusandae impedit
-                        </p>
+              <h1>Start raising from Online Stores</h1>
+              <div className="container">
+                <div className="left">
+                  <img src={video} alt="loading" />
+                </div>
+                <div className="right">
+                  <div className="points">
+                    <div className="point">
+                      <div className="img">
+                        <img src={signup} alt="loading" />
                       </div>
-                      <div className="point">
-                        <div className="img">
-                          <RiSearchFill fontSize={"40px"} />
-                        </div>
-                        <p>
-                          <span>Browse: </span>Lorem ipsum dolor sit amet
-                          consectetur adipisicing elit. Blanditiis,commodi
-                          tempora mollitia voluptatem recusandae impedit
-                        </p>
-                      </div>
-                      <div className="point">
-                        <div className="img">
-                          <img src={bag} alt="loading" />
-                        </div>
-                        <p>
-                          <span>Shop: </span>Lorem ipsum dolor sit amet
-                          consectetur adipisicing elit. Blanditiis,commodi
-                          tempora mollitia voluptatem recusandae impedit
-                        </p>
-                      </div>
-
-                      <div className="point">
-                        <div className="img">
-                          <img src={money2} alt="loading" />
-                        </div>
-                        <p>
-                          <span>Raise: </span>Lorem ipsum dolor sit amet
-                          consectetur adipisicing elit. Blanditiis,commodi
-                          tempora mollitia voluptatem recusandae impedit
-                        </p>
-                      </div>
-
-                      <Link className="signup" to="/login">
-                        SIGN UP FOR FREE
-                      </Link>
+                      <p>
+                        <span>Sign up: </span>Lorem ipsum dolor sit amet
+                        consectetur adipisicing elit. Blanditiis,commodi tempora
+                        mollitia voluptatem recusandae impedit
+                      </p>
                     </div>
+                    <div className="point">
+                      <div className="img">
+                        <RiSearchFill fontSize={"40px"} />
+                      </div>
+                      <p>
+                        <span>Browse: </span>Lorem ipsum dolor sit amet
+                        consectetur adipisicing elit. Blanditiis,commodi tempora
+                        mollitia voluptatem recusandae impedit
+                      </p>
+                    </div>
+                    <div className="point">
+                      <div className="img">
+                        <img src={bag} alt="loading" />
+                      </div>
+                      <p>
+                        <span>Shop: </span>Lorem ipsum dolor sit amet
+                        consectetur adipisicing elit. Blanditiis,commodi tempora
+                        mollitia voluptatem recusandae impedit
+                      </p>
+                    </div>
+
+                    <div className="point">
+                      <div className="img">
+                        <img src={money2} alt="loading" />
+                      </div>
+                      <p>
+                        <span>Raise: </span>Lorem ipsum dolor sit amet
+                        consectetur adipisicing elit. Blanditiis,commodi tempora
+                        mollitia voluptatem recusandae impedit
+                      </p>
+                    </div>
+
+                    <Link className="signup" to="/login">
+                      SIGN UP FOR FREE
+                    </Link>
                   </div>
                 </div>
               </div>
-              <Footer/>
+            </div>
+            <Footer />
           </div>
         </>
       )}

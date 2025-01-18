@@ -52,11 +52,11 @@ const CauseForm = () => {
     if (validateCurrentPage()) {
       setCompletedSteps((prev) => {
         const updatedSteps = [...prev];
-        updatedSteps[currentPage - 1] = true;
+        updatedSteps[currentPage - 1] = true; // Mark current step as completed
         return updatedSteps;
       });
 
-      setCurrentPage((prev) => prev + 1);
+      setCurrentPage((prev) => prev + 1); // Move to the next page
     }
   };
 
@@ -87,19 +87,18 @@ const CauseForm = () => {
     }
   };
 
-  // Rest of your existing functions remain the same
-  const handleBackPage = () => setCurrentPage((prev) => prev - 1);
+  const handleBackPage = () => {
+    setCurrentPage((prev) => prev - 1); // Move to the previous page
+  };
 
   const handleCreateAccount = (e) => {
     e.preventDefault();
     if (validateCurrentPage()) {
       addData();
-      handleNextPage(e);
       setSuccess(true);
     }
   };
 
-  // Your existing file handling functions remain the same
   const handleFileChangeLogo = async (e) => {
     const file = e.target.files[0];
     setLogoFile(file);
@@ -116,7 +115,7 @@ const CauseForm = () => {
     }
   };
 
-  //upload photo function with percentage
+  // Upload photo function with percentage
   const uploadFile = async (file) => {
     return new Promise((resolve, reject) => {
       const metadata = {
@@ -164,7 +163,7 @@ const CauseForm = () => {
     });
   };
 
-  // Adding All data to firestore DB (commented out)
+  // Adding All data to firestore DB
   const addData = async () => {
     try {
       const logoUrl = logoFile ? await uploadFile(logoFile) : "";

@@ -1,10 +1,14 @@
 import { useState } from "react";
 import "./UserProfile.scss";
 import { IoCopyOutline } from "react-icons/io5";
-import CashbackGiveback from './../Cashback&GiveBack/CashbackGiveback';
+import CashbackGiveback from "./../Cashback&GiveBack/CashbackGiveback";
+import { useSelector } from "react-redux";
+import ProfileInfo from "../ProfileInfo";
 
 const UserProfile = () => {
-  const [currentPage, setCurrentPage] = useState('coupons');
+  const [currentPage, setCurrentPage] = useState("coupons");
+  const userData = useSelector((state) => state.userReducer.user);
+  console.log("user profile", userData);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -16,24 +20,44 @@ const UserProfile = () => {
         <div className="top">
           <div className="profile">
             <img
-              src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1964&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-              alt=""
+              src={
+                userData.profilePic ||
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8oghbsuzggpkknQSSU-Ch_xep_9v3m6EeBQ&s"
+              }
+              alt="user profile"
             />
           </div>
           <div className="details">
             <p>Hello,</p>
-            <p>Sara K</p>
+            <p>
+              {userData.fname} {userData.lname}
+            </p>
           </div>
         </div>
         <div className="bottom">
-          <div className="item" onClick={() => handlePageChange('coupons')}>My Coupons</div>
-          <div className="item" onClick={() => handlePageChange('cashback')}>Cashback & Giveback</div>
-          <div className="item" onClick={() => handlePageChange('settings')}>Account Settings</div>
+          <div className="item" onClick={() => handlePageChange("coupons")}>
+            My Coupons
+          </div>
+          <div className="item" onClick={() => handlePageChange("cashback")}>
+            Cashback & Giveback
+          </div>
+          <div className="item" onClick={() => handlePageChange("settings")}>
+            Account Settings
+          </div>
+          <div className="item" onClick={() => handlePageChange("profileinfo")}>
+            Profile Info
+          </div>
+          <div className="item" onClick={() => handlePageChange("settings")}>
+            Manage Address
+          </div>
+          <div className="item" onClick={() => handlePageChange("settings")}>
+            Payment Method
+          </div>
         </div>
       </div>
 
       <div className="right">
-        {currentPage === 'coupons' && (
+        {currentPage === "coupons" && (
           <div className="availableCoupons">
             <h1>Available Coupons</h1>
             <div className="coupon">
@@ -72,16 +96,15 @@ const UserProfile = () => {
           </div>
         )}
 
-        {currentPage === 'cashback' && (
-          <CashbackGiveback/>
-        )}
+        {currentPage === "cashback" && <CashbackGiveback />}
 
-        {currentPage === 'settings' && (
+        {currentPage === "settings" && (
           <div className="settings">
             <h1>Account Settings</h1>
             <p>Your account settings details go here...</p>
           </div>
         )}
+        {currentPage === "profileinfo" && <ProfileInfo userData={userData} />}
       </div>
     </div>
   );

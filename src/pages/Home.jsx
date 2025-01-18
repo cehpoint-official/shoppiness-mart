@@ -84,7 +84,7 @@ const Home = () => {
   };
 
   // console.log(roundedCardsData);
-  console.log(blogsData);
+  // console.log(blogsData);
 
   useEffect(() => {
     fetchData();
@@ -309,7 +309,9 @@ const Home = () => {
                 {blogsData[1].desc}{" "}
                 <span className="text-[#049D8E] font-medium">Read More...</span>
               </p>
-              <p className="text-gray-400 mt-4">By Tithi Mondal, 10 Mar 2024</p>
+              <p className="text-gray-400 mt-4">
+                By {blogsData[0].auther}, 10 Mar 2024
+              </p>
             </div>
           </div>
 
@@ -326,7 +328,7 @@ const Home = () => {
                   </span>
                 </p>
                 <p className="text-gray-400 mt-4">
-                  By Fahim Abdullah, 15 July 2024
+                  By {blogsData[1].auther}, 15 July 2024
                 </p>
               </div>
             </div>
@@ -342,7 +344,7 @@ const Home = () => {
                   </span>
                 </p>
                 <p className="text-gray-400 mt-4">
-                  By Furkan Ahmed, 09 April 2024
+                  By {blogsData[2].auther}, 09 April 2024
                 </p>
               </div>
             </div>
@@ -364,7 +366,7 @@ const Home = () => {
             Subscribe to Our Newsletter
           </p>
           <p className="text-gray-600 text-sm md:text-base mx-auto mt-2 max-w-lg">
-            Improving your small business's growth through Onir app. It also
+            Improving your small businesses growth through Onir app. It also
           </p>
           <div className="w-full max-w-lg mx-auto">
             <form

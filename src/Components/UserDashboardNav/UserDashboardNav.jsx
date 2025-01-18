@@ -51,13 +51,15 @@ const UserDashboardNav = ({ profilePic, userId }) => {
         <div className="profile">
           <IoNotifications />
           <div className="profilePic">
-            <img
-              src={
-                profilePic ||
-                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8oghbsuzggpkknQSSU-Ch_xep_9v3m6EeBQ&s"
-              }
-              alt=""
-            />
+            <Link to={`/user-dashboard/${userId}`}>
+              <img
+                src={
+                  profilePic ||
+                  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8oghbsuzggpkknQSSU-Ch_xep_9v3m6EeBQ&s"
+                }
+                alt="profilePic"
+              />
+            </Link>
           </div>
         </div>
       </div>
