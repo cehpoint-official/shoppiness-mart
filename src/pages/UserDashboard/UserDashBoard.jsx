@@ -65,7 +65,7 @@ const UserDashBoard = () => {
       setUserData(data);
       dispatch(userExist(data));
       setLoading(false);
-      console.log(data);
+      // console.log(data);
     } else {
       alert("No such document!");
       dispatch(userNotExist());

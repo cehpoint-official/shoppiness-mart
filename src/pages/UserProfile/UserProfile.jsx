@@ -4,11 +4,13 @@ import { IoCopyOutline } from "react-icons/io5";
 import CashbackGiveback from "./../Cashback&GiveBack/CashbackGiveback";
 import { useSelector } from "react-redux";
 import ProfileInfo from "../ProfileInfo";
+import ManageAddress from "../ManageAddress";
+import Payment from "../Payment";
 
 const UserProfile = () => {
   const [currentPage, setCurrentPage] = useState("coupons");
   const userData = useSelector((state) => state.userReducer.user);
-  console.log("user profile", userData);
+  // console.log("user profile", userData);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -47,10 +49,10 @@ const UserProfile = () => {
           <div className="item" onClick={() => handlePageChange("profileinfo")}>
             Profile Info
           </div>
-          <div className="item" onClick={() => handlePageChange("settings")}>
+          <div className="item" onClick={() => handlePageChange("manageaddress")}>
             Manage Address
           </div>
-          <div className="item" onClick={() => handlePageChange("settings")}>
+          <div className="item" onClick={() => handlePageChange("payment")}>
             Payment Method
           </div>
         </div>
@@ -105,6 +107,8 @@ const UserProfile = () => {
           </div>
         )}
         {currentPage === "profileinfo" && <ProfileInfo userData={userData} />}
+        {currentPage === "manageaddress" && <ManageAddress userData={userData} />}
+        {currentPage === "payment" && <Payment userData={userData} />}
       </div>
     </div>
   );
