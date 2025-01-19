@@ -3,11 +3,10 @@ import "./BusinessForm.scss";
 import { FaCircleCheck } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import logo from "../../assets/RegisterBusiness/logo.png";
-import { addDoc, collection, doc, setDoc } from "firebase/firestore";
-import { auth, db, storage } from "../../../firebase.js";
+import { addDoc, collection } from "firebase/firestore";
+import { db, storage } from "../../../firebase.js";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import SuccessPage from "../../Components/SuccessPage/SuccessPage";
-import { createUserWithEmailAndPassword } from "firebase/auth";
 
 const BusinessForm = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -100,25 +99,9 @@ const BusinessForm = () => {
 
   const handleCreateAccount = async (e) => {
     e.preventDefault();
-
-    if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match. Please try again.");
-      return;
-    }
-
-    try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        formData.email,
-        formData.password
-      );
-      const user = userCredential.user;
-      setId(user.uid);
-
-      await addData(user.uid);
+    if (validateCurrentPage()) {
+      addData();
       setSuccess(true);
-    } catch (error) {
-      alert("An error occurred while creating your account: " + error.message);
     }
   };
 
@@ -185,17 +168,17 @@ const BusinessForm = () => {
     });
   };
 
-  const addData = async (userId) => {
+  const addData = async () => {
     try {
       const logoUrl = logoFile ? await uploadFile(logoFile) : "";
       const bannerUrl = bannerFile ? await uploadFile(bannerFile) : "";
 
-      await setDoc(doc(db, "businessDetails", userId), {
+      const res = await addDoc(collection(db, "businessDetails"), {
         ...formData,
         logoUrl,
         bannerUrl,
-        id: userId,
       });
+      setId(res.id);
     } catch (e) {
       alert(e.message);
     }

@@ -5,19 +5,19 @@ const initialState = {
   loading: false,
 };
 
-export const userReducer = createSlice({
-  name: "userReducer",
+export const ngoUserReducer = createSlice({
+  name: "ngoUserReducer",
   initialState,
   reducers: {
-    userExist: (state, action) => {
+    ngoUserExist: (state, action) => {
       state.loading = false;
       state.user = action.payload;
     },
-    userNotExist: (state) => {
+    ngoUserNotExist: (state) => {
       state.loading = false;
       state.user = null;
     },
   },
 });
 
-export const { userExist, userNotExist } = userReducer.actions;
+export const { ngoUserExist, ngoUserNotExist } = ngoUserReducer.actions;

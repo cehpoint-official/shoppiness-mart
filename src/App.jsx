@@ -33,6 +33,7 @@ import Newsletter from "./Admin/pages/Newsletter/Newsletter";
 import ContactMessage from "./Admin/pages/Contact/ContactMessage";
 import ContactInfo from "./Admin/pages/Contact/ContactInfo";
 import DashboardOutlet from "./Services-Dashboard/pages/DashboardOutlet/DashboardOutlet";
+import NgoDashboardOutlet from "./NGO-Dashboard/pages/NgoDashboardOutlet/NgoDashboardOutlet";
 import Products from "./Services-Dashboard/pages/Products/Products";
 import Customers from "./Services-Dashboard/pages/Customers/Customers";
 import Dashboard from "./Services-Dashboard/pages/Dashboard/Dashboard";
@@ -58,7 +59,7 @@ const App = () => {
           element: <Home />,
         },
         {
-          path: "/login",
+          path: "/login/:userType", 
           element: <Login />,
         },
         // {
@@ -212,6 +213,30 @@ const App = () => {
         // },
       ],
     },
+        //NGo Dashboard
+
+        {
+          path: "/ngo-dashboard/:id",
+          element: <NgoDashboardOutlet />,
+          children: [
+            {
+              path: "dashboard",
+              element: <Dashboard />,
+            },
+            {
+              path: "products",
+              element: <Products />,
+            },
+            {
+              path: "customers",
+              element: <Customers />,
+            },
+            // {
+            //   path: "pos",
+            //   element: <POS />,
+            // },
+          ],
+        },
   ]);
   return (
     <div>

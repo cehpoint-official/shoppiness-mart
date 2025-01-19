@@ -7,6 +7,7 @@ import "./Navbar.scss";
 
 const Navbar = () => {
   const [active, setActive] = useState(false);
+  const [showLoginDropdown, setShowLoginDropdown] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -17,6 +18,10 @@ const Navbar = () => {
     return location.pathname === path ? "active" : "";
   };
 
+  const toggleLoginDropdown = () => {
+    setShowLoginDropdown((prev) => !prev);
+  };
+
   return (
     <div className="navbar">
       <div className="top">
@@ -24,10 +29,38 @@ const Navbar = () => {
           <img src={ShoppingBag} className="h-11" alt="Loading..." />
         </Link>
         <div className="links">
-          <Link to="/login" className="login">
-            <i className="bi bi-arrow-right-circle-fill text-white"></i>
-            Login
-          </Link>
+          <div className="relative">
+            <button
+              onClick={toggleLoginDropdown}
+              className="border-2 border-white px-5 py-2 rounded-[6px] flex items-center justify-center gap-2.5 text-white font-medium text-lg"
+            >
+              <i className="bi bi-arrow-right-circle-fill text-white"></i>
+              Login
+            </button>
+
+            {showLoginDropdown && (
+              <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-50">
+                <Link
+                  to="/login/cause"
+                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                >
+                  Login as Cause/NGO
+                </Link>
+                <Link
+                  to="/login/business"
+                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                >
+                  Login as Business/Service
+                </Link>
+                <Link
+                  to="/login/user"
+                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                >
+                  Login as User
+                </Link>
+              </div>
+            )}
+          </div>
           <Link to="/signup" className="register">
             <i className="bi bi-pencil-fill text-[#049D8E] text-lg"></i>
             Signup
@@ -82,10 +115,34 @@ const Navbar = () => {
           <Link to="/register-cause">Register a Cause/NGO</Link>
           <Link to="/register-business">Register a business/Service</Link>
           <Link to="/supportmaast">Support Maast</Link>
-          <Link to="/login" className="login">
-            <i className="bi bi-arrow-right-circle-fill text-white"></i>
-            Login
-          </Link>
+          <div className="relative">
+            <button onClick={toggleLoginDropdown} className="login w-full">
+              <i className="bi bi-arrow-right-circle-fill text-white"></i>
+              Login
+            </button>
+            {showLoginDropdown && (
+              <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-50">
+                <Link
+                  to="/login/cause"
+                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                >
+                  Login as Cause/NGO
+                </Link>
+                <Link
+                  to="/login/business"
+                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                >
+                  Login as Business/Service
+                </Link>
+                <Link
+                  to="/login/user"
+                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                >
+                  Login as User
+                </Link>
+              </div>
+            )}
+          </div>
           <Link to="/signup" className="register">
             <i className="bi bi-pencil-fill text-[#049D8E] text-lg"></i>
             Signup

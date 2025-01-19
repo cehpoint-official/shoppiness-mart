@@ -6,7 +6,7 @@ const DashboardHeader = () => {
   return (
     <div className="dashboard-header">
       <div className="title">
-        <h1>Welcome Basit👋 its a service dashboard</h1>
+        <h1>Welcome Basit👋 Ngo dashboard</h1>
       </div>
       <div className="profile-sec">
         <div className="search-bar">

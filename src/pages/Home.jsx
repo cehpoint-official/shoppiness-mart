@@ -83,9 +83,6 @@ const Home = () => {
     }
   };
 
-  // console.log(roundedCardsData);
-  // console.log(blogsData);
-
   useEffect(() => {
     fetchData();
   }, []);

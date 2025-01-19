@@ -1,16 +1,41 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./UserProfile.scss";
-import { IoCopyOutline } from "react-icons/io5";
+import { IoCopyOutline, IoReload } from "react-icons/io5"; // Import IoReload for the loader
 import CashbackGiveback from "./../Cashback&GiveBack/CashbackGiveback";
-import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import ProfileInfo from "../ProfileInfo";
 import ManageAddress from "../ManageAddress";
 import Payment from "../Payment";
+import { useParams } from "react-router-dom";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../../firebase";
+import { userExist, userNotExist } from "../../redux/reducer/userReducer";
 
 const UserProfile = () => {
+  const dispatch = useDispatch();
   const [currentPage, setCurrentPage] = useState("coupons");
-  const userData = useSelector((state) => state.userReducer.user);
-  // console.log("user profile", userData);
+  const [userData, setUserData] = useState({});
+  const [isLoading, setIsLoading] = useState(true); // Add loading state
+  const { userId } = useParams();
+
+  const fetchDoc = async () => {
+    const docRef = doc(db, "users", userId);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      setUserData(data);
+      dispatch(userExist(data));
+    } else {
+      alert("No such document!");
+      dispatch(userNotExist());
+    }
+    setIsLoading(false); // Set loading to false after data is fetched
+  };
+
+  useEffect(() => {
+    fetchDoc();
+  }, []);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -20,21 +45,29 @@ const UserProfile = () => {
     <div className="userProfile">
       <div className="left">
         <div className="top">
-          <div className="profile">
-            <img
-              src={
-                userData.profilePic ||
-                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8oghbsuzggpkknQSSU-Ch_xep_9v3m6EeBQ&s"
-              }
-              alt="user profile"
-            />
-          </div>
-          <div className="details">
-            <p>Hello,</p>
-            <p>
-              {userData.fname} {userData.lname}
-            </p>
-          </div>
+          {isLoading ? (
+            <div className="loader">
+              <IoReload className="spin" /> {/* Spinning icon */}
+            </div>
+          ) : (
+            <>
+              <div className="profile">
+                <img
+                  src={
+                    userData.profilePic ||
+                    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8oghbsuzggpkknQSSU-Ch_xep_9v3m6EeBQ&s"
+                  }
+                  alt="user profile"
+                />
+              </div>
+              <div className="details">
+                <p>Hello,</p>
+                <p>
+                  {userData.fname} {userData.lname}
+                </p>
+              </div>
+            </>
+          )}
         </div>
         <div className="bottom">
           <div className="item" onClick={() => handlePageChange("coupons")}>
@@ -49,7 +82,10 @@ const UserProfile = () => {
           <div className="item" onClick={() => handlePageChange("profileinfo")}>
             Profile Info
           </div>
-          <div className="item" onClick={() => handlePageChange("manageaddress")}>
+          <div
+            className="item"
+            onClick={() => handlePageChange("manageaddress")}
+          >
             Manage Address
           </div>
           <div className="item" onClick={() => handlePageChange("payment")}>
@@ -59,56 +95,68 @@ const UserProfile = () => {
       </div>
 
       <div className="right">
-        {currentPage === "coupons" && (
-          <div className="availableCoupons">
-            <h1>Available Coupons</h1>
-            <div className="coupon">
-              <div className="top">
-                <p className="title">Pizza Hut</p>
-                <p>15 Jun, 2024</p>
-              </div>
-              <div className="bottom">
-                <p className="desc">
-                  Enjoy 25% Off In-Store Purchases + 1% Cashback at Shoppiness
-                  Mart!
-                </p>
-                <div className="code">
-                  Coupon code - #878583
-                  <IoCopyOutline />
+        {isLoading ? (
+          <div className="loader">
+            <IoReload className="spin" /> {/* Spinning icon */}
+          </div>
+        ) : (
+          <>
+            {currentPage === "coupons" && (
+              <div className="availableCoupons">
+                <h1>Available Coupons</h1>
+                <div className="coupon">
+                  <div className="top">
+                    <p className="title">Pizza Hut</p>
+                    <p>15 Jun, 2024</p>
+                  </div>
+                  <div className="bottom">
+                    <p className="desc">
+                      Enjoy 25% Off In-Store Purchases + 1% Cashback at
+                      Shoppiness Mart!
+                    </p>
+                    <div className="code">
+                      Coupon code - #878583
+                      <IoCopyOutline />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="coupon">
+                  <div className="top">
+                    <p className="title">Pizza Hut</p>
+                    <p>15 Jun, 2024</p>
+                  </div>
+                  <div className="bottom">
+                    <p className="desc">
+                      Enjoy 25% Off In-Store Purchases + 1% Cashback at
+                      Shoppiness Mart!
+                    </p>
+                    <div className="code">
+                      Coupon code - #878583
+                      <IoCopyOutline />
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
-            <div className="coupon">
-              <div className="top">
-                <p className="title">Pizza Hut</p>
-                <p>15 Jun, 2024</p>
+            {currentPage === "cashback" && <CashbackGiveback />}
+
+            {currentPage === "settings" && (
+              <div className="settings">
+                <h1>Account Settings</h1>
+                <p>Your account settings details go here...</p>
               </div>
-              <div className="bottom">
-                <p className="desc">
-                  Enjoy 25% Off In-Store Purchases + 1% Cashback at Shoppiness
-                  Mart!
-                </p>
-                <div className="code">
-                  Coupon code - #878583
-                  <IoCopyOutline />
-                </div>
-              </div>
-            </div>
-          </div>
+            )}
+            {currentPage === "profileinfo" && (
+              <ProfileInfo userData={userData} />
+            )}
+            {currentPage === "manageaddress" && (
+              <ManageAddress userData={userData} />
+            )}
+            {currentPage === "payment" && <Payment userData={userData} />}
+          </>
         )}
-
-        {currentPage === "cashback" && <CashbackGiveback />}
-
-        {currentPage === "settings" && (
-          <div className="settings">
-            <h1>Account Settings</h1>
-            <p>Your account settings details go here...</p>
-          </div>
-        )}
-        {currentPage === "profileinfo" && <ProfileInfo userData={userData} />}
-        {currentPage === "manageaddress" && <ManageAddress userData={userData} />}
-        {currentPage === "payment" && <Payment userData={userData} />}
       </div>
     </div>
   );

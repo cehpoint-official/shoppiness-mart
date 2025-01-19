@@ -11,6 +11,7 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 const CauseForm = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [success, setSuccess] = useState(false);
+  const [id, setId] = useState("");
   const [completedSteps, setCompletedSteps] = useState([false, false, false]);
   const [causeDetails, setCauseDetails] = useState({
     // Page 1 fields
@@ -44,22 +45,6 @@ const CauseForm = () => {
       [field]: value,
     }));
   };
-
-  const handleNextPage = (e) => {
-    e.preventDefault();
-
-    // Validate current page fields
-    if (validateCurrentPage()) {
-      setCompletedSteps((prev) => {
-        const updatedSteps = [...prev];
-        updatedSteps[currentPage - 1] = true; // Mark current step as completed
-        return updatedSteps;
-      });
-
-      setCurrentPage((prev) => prev + 1); // Move to the next page
-    }
-  };
-
   const validateCurrentPage = () => {
     switch (currentPage) {
       case 1:
@@ -86,9 +71,24 @@ const CauseForm = () => {
         return true;
     }
   };
+  const handleNextPage = (e) => {
+    e.preventDefault();
 
-  const handleBackPage = () => {
-    setCurrentPage((prev) => prev - 1); // Move to the previous page
+    // Validate current page fields
+    if (validateCurrentPage()) {
+      setCompletedSteps((prev) => {
+        const updatedSteps = [...prev];
+        updatedSteps[currentPage - 1] = true; // Mark current step as completed
+        return updatedSteps;
+      });
+
+      setCurrentPage((prev) => prev + 1); // Move to the next page
+    }
+  };
+
+  const handleBackPage = (e) => {
+    e.preventDefault();
+    setCurrentPage((prev) => prev - 1);
   };
 
   const handleCreateAccount = (e) => {
@@ -169,11 +169,12 @@ const CauseForm = () => {
       const logoUrl = logoFile ? await uploadFile(logoFile) : "";
       const bannerUrl = bannerFile ? await uploadFile(bannerFile) : "";
 
-      await addDoc(collection(db, "causeDetails"), {
+      const res = await addDoc(collection(db, "causeDetails"), {
         ...causeDetails,
         logoUrl,
         bannerUrl,
       });
+      setId(res.id);
     } catch (e) {
       alert(e.message);
     }
@@ -430,7 +431,7 @@ const CauseForm = () => {
         ))}
       </div>
       <div className="formContainer">
-        {success ? <SuccessPage /> : pages[currentPage - 1].content}
+        {success ? <SuccessPage id={id} /> : pages[currentPage - 1].content}
       </div>
     </div>
   );
