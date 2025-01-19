@@ -449,7 +449,11 @@ const BusinessForm = () => {
         ))}
       </div>
       <div className="formContainer">
-        {success ? <SuccessPage id={id} /> : pages[currentPage - 1].content}
+        {success ? (
+          <SuccessPage id={id} link={`/services-dashboard/${id}`} />
+        ) : (
+          pages[currentPage - 1].content
+        )}
       </div>
     </div>
   );
