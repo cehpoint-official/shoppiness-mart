@@ -37,6 +37,8 @@ import NgoDashboardOutlet from "./NGO-Dashboard/pages/NgoDashboardOutlet/NgoDash
 import Products from "./Services-Dashboard/pages/Products/Products";
 import Customers from "./Services-Dashboard/pages/Customers/Customers";
 import Dashboard from "./Services-Dashboard/pages/Dashboard/Dashboard";
+import ShopInfo from "./Services-Dashboard/pages/ShopInfo/ShopInfo";
+import NgoDetails from "./NGO-Dashboard/pages/NgoDetails/NgoDetails";
 const App = () => {
   const Layout = () => {
     return (
@@ -59,7 +61,7 @@ const App = () => {
           element: <Home />,
         },
         {
-          path: "/login/:userType", 
+          path: "/login/:userType",
           element: <Login />,
         },
         // {
@@ -207,36 +209,40 @@ const App = () => {
           path: "customers",
           element: <Customers />,
         },
+        {
+          path: "shopinfo",
+          element: <ShopInfo />,
+        },
         // {
         //   path: "pos",
         //   element: <POS />,
         // },
       ],
     },
-        //NGo Dashboard
+    //NGo Dashboard
 
+    {
+      path: "/ngo-dashboard/:id",
+      element: <NgoDashboardOutlet />,
+      children: [
         {
-          path: "/ngo-dashboard/:id",
-          element: <NgoDashboardOutlet />,
-          children: [
-            {
-              path: "dashboard",
-              element: <Dashboard />,
-            },
-            {
-              path: "products",
-              element: <Products />,
-            },
-            {
-              path: "customers",
-              element: <Customers />,
-            },
-            // {
-            //   path: "pos",
-            //   element: <POS />,
-            // },
-          ],
+          path: "dashboard",
+          element: <Dashboard />,
         },
+        {
+          path: "details",
+          element: <NgoDetails />,
+        },
+        {
+          path: "customers",
+          element: <Customers />,
+        },
+        // {
+        //   path: "pos",
+        //   element: <POS />,
+        // },
+      ],
+    },
   ]);
   return (
     <div>

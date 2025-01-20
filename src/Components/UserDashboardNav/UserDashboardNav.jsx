@@ -2,10 +2,14 @@ import "./UserDashboardNav.scss";
 import logo from "../../assets/RegisterBusiness/logo.png";
 import { CiSearch } from "react-icons/ci";
 import { CiLocationOn } from "react-icons/ci";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { IoNotifications } from "react-icons/io5";
+import { useDispatch } from "react-redux";
+import { userNotExist } from "../../redux/reducer/userReducer";
 
 const UserDashboardNav = ({ profilePic, userId }) => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   return (
     <div className="UserDashboardNav">
       <div className="upperNav">
@@ -28,7 +32,14 @@ const UserDashboardNav = ({ profilePic, userId }) => {
           </div>
         </div>
 
-        <button>Logout</button>
+        <button
+          onClick={() => {
+            dispatch(userNotExist());
+            navigate("/login/user");
+          }}
+        >
+          Logout
+        </button>
       </div>
 
       <div className="lowerNav">

@@ -98,14 +98,14 @@ const CauseForm = () => {
       setSuccess(true);
     }
   };
-
   const handleFileChangeLogo = async (e) => {
     const file = e.target.files[0];
     setLogoFile(file);
     if (file) {
-      await uploadFile(file);
+      await uploadFile(file); 
     }
   };
+
 
   const handleFileChangeBanner = async (e) => {
     const file = e.target.files[0];

@@ -59,11 +59,12 @@ const Sidebar = () => {
           <img src={iconSales} alt="loading" />
           Sales record
         </li>
-        <li>
-          {" "}
-          <img src={iconShop} alt="loading" />
-          Shop info
-        </li>
+        <Link to={`/services-dashboard/${id}/shopinfo`}>
+          <li>
+            <img src={iconCustomers} alt="loading" />
+           Shop Info
+          </li>
+        </Link>
         <li>
           {" "}
           <img src={iconLogout} alt="loading" />

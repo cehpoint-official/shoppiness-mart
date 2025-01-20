@@ -10,14 +10,20 @@ export const ngoUserReducer = createSlice({
   initialState,
   reducers: {
     ngoUserExist: (state, action) => {
-      state.loading = false;
+      state.loading = false; 
       state.user = action.payload;
     },
     ngoUserNotExist: (state) => {
-      state.loading = false;
+      state.loading = false; 
       state.user = null;
+    },
+    setLoading: (state, action) => {
+      state.loading = action.payload; 
     },
   },
 });
 
-export const { ngoUserExist, ngoUserNotExist } = ngoUserReducer.actions;
+export const { ngoUserExist, ngoUserNotExist, setLoading } =
+  ngoUserReducer.actions;
+
+export default ngoUserReducer.reducer;

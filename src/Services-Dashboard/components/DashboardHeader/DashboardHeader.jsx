@@ -1,12 +1,13 @@
-import React from "react";
 import "./DashboardHeader.scss";
 import { CiSearch } from "react-icons/ci";
 import { IoIosNotifications } from "react-icons/io";
-const DashboardHeader = () => {
+const DashboardHeader = ({ userData }) => {
+
+
   return (
     <div className="dashboard-header">
       <div className="title">
-        <h1>Welcome Basit👋 its a service dashboard</h1>
+        <h1>Welcome {userData.firstName}🤚</h1>
       </div>
       <div className="profile-sec">
         <div className="search-bar">
@@ -18,8 +19,11 @@ const DashboardHeader = () => {
         </div>
         <div className="profile">
           <img
-            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1964&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            alt=""
+            src={
+              userData.logoUrl ||
+              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8oghbsuzggpkknQSSU-Ch_xep_9v3m6EeBQ&s"
+            }
+            alt="user profile"
           />
         </div>
       </div>

@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import Googleicon from "../../assets/googleicon.png";
 import Facebookicon from "../../assets/facebookicon.png";
 import { signInWithPopup } from "firebase/auth";
 import { auth, db, provider } from "../../../firebase";
+
 import {
   collection,
   query,
@@ -12,9 +14,13 @@ import {
   doc,
   setDoc,
 } from "firebase/firestore";
-
+import {
+  ngoUserExist,
+  ngoUserNotExist,
+} from "../../redux/reducer/ngoUserReducer";
 
 const CauseLoginForm = () => {
+  const dispatch = useDispatch();
   const [userData, setUserData] = useState({
     email: "",
     password: "",
@@ -48,10 +54,11 @@ const CauseLoginForm = () => {
       if (user.password !== userData.password) {
         throw new Error("Incorrect password.");
       }
-
+      dispatch(ngoUserExist(user));
       // If everything is valid, navigate to the dashboard
       navigate(`/ngo-dashboard/${userDoc.id}`);
     } catch (error) {
+      dispatch(ngoUserNotExist(null));
       setError(error.message);
     } finally {
       setLoading(false);
