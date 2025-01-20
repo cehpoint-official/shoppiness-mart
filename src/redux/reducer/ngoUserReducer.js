@@ -23,7 +23,4 @@ export const ngoUserReducer = createSlice({
   },
 });
 
-export const { ngoUserExist, ngoUserNotExist, setLoading } =
-  ngoUserReducer.actions;
-
-export default ngoUserReducer.reducer;
+export const { ngoUserExist, ngoUserNotExist, setLoading } = ngoUserReducer.actions;

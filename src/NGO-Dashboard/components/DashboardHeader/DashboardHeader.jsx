@@ -8,14 +8,15 @@ import { ImSpinner8 } from "react-icons/im";
 import {
   ngoUserExist,
   setLoading,
-} from "../../../redux/reducer/ngoUserReducer"; 
+} from "../../../redux/reducer/ngoUserReducer";
 import { doc, setDoc } from "firebase/firestore";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 
 const DashboardHeader = () => {
-  const { user, loading } = useSelector((state) => state.ngoUserReducer); 
+  const { user, loading } = useSelector((state) => state.ngoUserReducer);
   const { id } = useParams();
+  const dispatch = useDispatch();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   // Remove local state for `image` and directly use `user.logoUrl`
@@ -25,7 +26,7 @@ const DashboardHeader = () => {
     const file = e.target.files[0];
     if (!file) return;
 
-    dispatch(setLoading(true)); 
+    dispatch(setLoading(true));
 
     try {
       const metadata = {
@@ -38,7 +39,7 @@ const DashboardHeader = () => {
         "state_changed",
         (error) => {
           console.error("Error uploading image:", error);
-          dispatch(setLoading(false)); 
+          dispatch(setLoading(false));
         },
         () => {
           // Upload completed successfully, now we can get the download URL
