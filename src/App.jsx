@@ -1,51 +1,75 @@
-import Home from "./pages/Home";
-import Signup from "./pages/Signup";
-import Login from "./pages/Login";
-import Business from "./pages/Business/Business";
-import Footer from "./Components/Footer";
-import Test from "./Components/Test";
-import ScrollToTop from "./Components/ScrollToTop/ScrollToTop";
-import SupportACause from "./pages/SupportACause";
-import SupportMaast from "./pages/SupportMaast";
-import Cause from "./pages/Cause/Cause";
-import HowItWorks from "./pages/HowItWorks/HowItWorks";
-import Cashback from "./pages/Cashback";
-import Shop from "./pages/Shop";
-import Navbar from "./Components/Navbar/Navbar";
-import CashbackDeals from "./pages/CashbackDeals/CashbackDeals";
-import BusinessForm from "./pages/BusinessForm/BusinessForm";
-import CauseForm from "./pages/CauseForm/CauseForm";
-import ContactUs from "./pages/ContactUs";
-import AboutUs from "./pages/AboutUs";
-import Blogs from "./pages/Blogs";
-import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
-import UserDashboard from "./pages/UserDashboard/UserDashBoard";
+import React, { Suspense, lazy } from "react";
 import { Outlet, createBrowserRouter, RouterProvider } from "react-router-dom";
-import OnlineShop from "./pages/OnlineShop";
-import OfflineShop from "./pages/OfflineShop";
-import NewLayout from "./NewLayout";
-import UserProfile from "./pages/UserProfile/UserProfile";
-import FaqHome from "./Admin/pages/FAQ/home";
-import AddFaq from "./Admin/pages/FAQ/AddFaq";
-// import PrivacyPolicyHome from "./Admin/pages/PrivacyPolicy/PrivacyPolicy";
-import AddPrivacyPolicy from "./Admin/pages/PrivacyPolicy/AddPrivacyPolicy";
-import Newsletter from "./Admin/pages/Newsletter/Newsletter";
-import ContactMessage from "./Admin/pages/Contact/ContactMessage";
-import ContactInfo from "./Admin/pages/Contact/ContactInfo";
-import DashboardOutlet from "./Services-Dashboard/pages/DashboardOutlet/DashboardOutlet";
-import NgoDashboardOutlet from "./NGO-Dashboard/pages/NgoDashboardOutlet/NgoDashboardOutlet";
-import Products from "./Services-Dashboard/pages/Products/Products";
-import Customers from "./Services-Dashboard/pages/Customers/Customers";
-import Dashboard from "./Services-Dashboard/pages/Dashboard/Dashboard";
-import ShopInfo from "./Services-Dashboard/pages/ShopInfo/ShopInfo";
-import NgoDetails from "./NGO-Dashboard/pages/NgoDetails/NgoDetails";
+import Footer from "./Components/Footer";
+import Navbar from "./Components/Navbar/Navbar";
+import ScrollToTop from "./Components/ScrollToTop/ScrollToTop";
+import Test from "./Components/Test";
+import Home from "./pages/Home"; // Home is loaded immediately since it's the main page
+import Loader from "./Components/Loader/Loader";
+
+// Lazy load all other components
+const Signup = lazy(() => import("./pages/Signup"));
+const Login = lazy(() => import("./pages/Login"));
+const Business = lazy(() => import("./pages/Business/Business"));
+const SupportACause = lazy(() => import("./pages/SupportACause"));
+const SupportMaast = lazy(() => import("./pages/SupportMaast"));
+const Cause = lazy(() => import("./pages/Cause/Cause"));
+const HowItWorks = lazy(() => import("./pages/HowItWorks/HowItWorks"));
+const Cashback = lazy(() => import("./pages/Cashback"));
+const Shop = lazy(() => import("./pages/Shop"));
+const CashbackDeals = lazy(() => import("./pages/CashbackDeals/CashbackDeals"));
+const BusinessForm = lazy(() => import("./pages/BusinessForm/BusinessForm"));
+const CauseForm = lazy(() => import("./pages/CauseForm/CauseForm"));
+const ContactUs = lazy(() => import("./pages/ContactUs"));
+const AboutUs = lazy(() => import("./pages/AboutUs"));
+const Blogs = lazy(() => import("./pages/Blogs"));
+const PrivacyPolicyPage = lazy(() => import("./pages/PrivacyPolicyPage"));
+const UserDashboard = lazy(() => import("./pages/UserDashboard/UserDashBoard"));
+const OnlineShop = lazy(() => import("./pages/OnlineShop"));
+const OfflineShop = lazy(() => import("./pages/OfflineShop"));
+const NewLayout = lazy(() => import("./NewLayout"));
+const UserProfile = lazy(() => import("./pages/UserProfile/UserProfile"));
+const FaqHome = lazy(() => import("./Admin/pages/FAQ/home"));
+const AddFaq = lazy(() => import("./Admin/pages/FAQ/AddFaq"));
+const AddPrivacyPolicy = lazy(() =>
+  import("./Admin/pages/PrivacyPolicy/AddPrivacyPolicy")
+);
+const Newsletter = lazy(() => import("./Admin/pages/Newsletter/Newsletter"));
+const ContactMessage = lazy(() =>
+  import("./Admin/pages/Contact/ContactMessage")
+);
+const ContactInfo = lazy(() => import("./Admin/pages/Contact/ContactInfo"));
+const DashboardOutlet = lazy(() =>
+  import("./Services-Dashboard/pages/DashboardOutlet/DashboardOutlet")
+);
+const NgoDashboardOutlet = lazy(() =>
+  import("./NGO-Dashboard/pages/NgoDashboardOutlet/NgoDashboardOutlet")
+);
+const Products = lazy(() =>
+  import("./Services-Dashboard/pages/Products/Products")
+);
+const Customers = lazy(() =>
+  import("./Services-Dashboard/pages/Customers/Customers")
+);
+const Dashboard = lazy(() =>
+  import("./Services-Dashboard/pages/Dashboard/Dashboard")
+);
+const ShopInfo = lazy(() =>
+  import("./Services-Dashboard/pages/ShopInfo/ShopInfo")
+);
+const NgoDetails = lazy(() =>
+  import("./NGO-Dashboard/pages/NgoDetails/NgoDetails")
+);
+
 const App = () => {
   const Layout = () => {
     return (
       <div className="app">
         <ScrollToTop />
         <Navbar />
-        <Outlet />
+        <Suspense fallback={<Loader />}>
+          <Outlet />
+        </Suspense>
         <Footer />
       </div>
     );
@@ -64,10 +88,6 @@ const App = () => {
           path: "/login/:userType",
           element: <Login />,
         },
-        // {
-        //   path: "/privacy-policy",
-        //   element: <PrivacyPolicyPage />,
-        // },
         {
           path: "/signup",
           element: <Signup />,
@@ -76,7 +96,6 @@ const App = () => {
           path: "/contact",
           element: <ContactUs />,
         },
-
         {
           path: "/about",
           element: <AboutUs />,
@@ -170,10 +189,6 @@ const App = () => {
     // ADMIN
     { path: "/admin/shoppiness/faq", element: <FaqHome /> },
     { path: "/admin/shoppiness/addfaq", element: <AddFaq /> },
-    // {
-    //   path: "/admin/shoppiness/privacy-policy",
-    //   element: <PrivacyPolicyHome />,
-    // },
     {
       path: "/admin/shoppiness/add/privacy-policy",
       element: <AddPrivacyPolicy />,
@@ -191,8 +206,7 @@ const App = () => {
       element: <ContactMessage />,
     },
 
-    //Services Dashboard
-
+    // Services Dashboard
     {
       path: "/services-dashboard/:id",
       element: <DashboardOutlet />,
@@ -213,14 +227,9 @@ const App = () => {
           path: "shopinfo",
           element: <ShopInfo />,
         },
-        // {
-        //   path: "pos",
-        //   element: <POS />,
-        // },
       ],
     },
-    //NGo Dashboard
-
+    // NGO Dashboard
     {
       path: "/ngo-dashboard/:id",
       element: <NgoDashboardOutlet />,
@@ -237,13 +246,10 @@ const App = () => {
           path: "customers",
           element: <Customers />,
         },
-        // {
-        //   path: "pos",
-        //   element: <POS />,
-        // },
       ],
     },
   ]);
+
   return (
     <div>
       <RouterProvider router={router} />
