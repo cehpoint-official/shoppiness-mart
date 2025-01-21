@@ -17,7 +17,10 @@ export const businessUserReducer = createSlice({
       state.loading = false;
       state.user = null;
     },
+    setLoading: (state, action) => {
+      state.loading = action.payload;
+    },
   },
 });
 
-export const { businessUserExist, businessUserNotExist } = businessUserReducer.actions;
+export const { businessUserExist, businessUserNotExist, setLoading } = businessUserReducer.actions;

@@ -16,7 +16,7 @@ function DashboardOutlet() {
   const dispatch = useDispatch();
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
-  const [userData, setUserData] = useState(null);
+
 
   // Fetch business details from Firestore
   const fetchBusinessDetails = async () => {
@@ -26,7 +26,6 @@ function DashboardOutlet() {
 
       if (docSnap.exists()) {
         const data = docSnap.data();
-        setUserData(data);
         dispatch(businessUserExist(data));
       } else {
         console.error("No such document!");
@@ -45,18 +44,15 @@ function DashboardOutlet() {
     fetchBusinessDetails();
   }, [id]);
 
-  // Memoize userData to avoid unnecessary re-renders
-  const memoizedUserData = useMemo(() => userData, [userData]);
-
   if (loading) {
     return <Loader />;
   }
 
   return (
     <div className="dashboardOutlet">
-      <Sidebar userData={memoizedUserData} />
-      <div className="main-content">
-        <DashboardHeader userData={memoizedUserData} />
+      <Sidebar className="fixed" />
+      <div className="main-content overflow-y-auto h-screen">
+        <DashboardHeader />
         <Outlet /> {/* This renders the nested routes */}
       </div>
     </div>

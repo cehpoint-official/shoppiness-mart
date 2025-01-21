@@ -37,21 +37,32 @@ const DashboardHeader = () => {
 
       uploadTask.on(
         "state_changed",
+        (snapshot) => {
+          // Handle upload progress here if needed
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log("Upload is " + progress + "% done");
+        },
         (error) => {
+          // Handle actual errors here
           console.error("Error uploading image:", error);
           dispatch(setLoading(false));
         },
-        () => {
-          // Upload completed successfully, now we can get the download URL
-          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+        async () => {
+          try {
+            // Upload completed successfully, now we can get the download URL
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+
             // Update the user data in Firestore and Redux
             const updatedData = { ...user, logoUrl: downloadURL };
+            await handleSave(updatedData);
 
-            handleSave(updatedData);
-            // Dispatch the updated user data to Redux
             dispatch(ngoUserExist(updatedData));
-            dispatch(setLoading(false)); // Set loading state to false after upload
-          });
+          } catch (error) {
+            console.error("Error getting download URL:", error);
+          } finally {
+            dispatch(setLoading(false));
+          }
         }
       );
     } catch (error) {

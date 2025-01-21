@@ -111,26 +111,62 @@ const Sidebar = () => {
             </li>
           </Link>
 
-          <li className={activeLink === "/support" ? "bg-[#ffffff33]" : ""}>
-            <img src={iconPOS} alt="loading" />
-            Support
-          </li>
-          <li className={activeLink === "/about-us" ? "bg-[#ffffff33]" : ""}>
-            <img src={iconInvoices} alt="loading" />
-            About Us
-          </li>
-          <li className={activeLink === "/faqs" ? "bg-[#ffffff33]" : ""}>
-            <img src={iconSales} alt="loading" />
-            FAQs
-          </li>
+          <Link to={`/ngo-dashboard/${id}/support`}>
+            <li
+              className={
+                activeLink === `/ngo-dashboard/${id}/support`
+                  ? "bg-[#ffffff33]"
+                  : ""
+              }
+            >
+              <img src={iconPOS} alt="loading" />
+              Support
+            </li>
+          </Link>
+
+          <Link to={`/ngo-dashboard/${id}/about-us`}>
+            <li
+              className={
+                activeLink === `/ngo-dashboard/${id}/about-us`
+                  ? "bg-[#ffffff33]"
+                  : ""
+              }
+            >
+              <img src={iconInvoices} alt="loading" />
+              About Us
+            </li>
+          </Link>
+
+          <Link to={`/ngo-dashboard/${id}/faqs`}>
+            <li
+              className={
+                activeLink === `/ngo-dashboard/${id}/faqs`
+                  ? "bg-[#ffffff33]"
+                  : ""
+              }
+            >
+              <img src={iconSales} alt="loading" />
+              FAQs
+            </li>
+          </Link>
+
+          <Link to={`/ngo-dashboard/${id}/privacy-policy`}>
+            <li
+              className={
+                activeLink === `/ngo-dashboard/${id}/privacy-policy`
+                  ? "bg-[#ffffff33]"
+                  : ""
+              }
+            >
+              <img src={iconShop} alt="loading" />
+              Privacy Policy
+            </li>
+          </Link>
+
           <li
-            className={activeLink === "/privacy-policy" ? "bg-[#ffffff33]" : ""}
-          >
-            <img src={iconShop} alt="loading" />
-            Private policy
-          </li>
-          <li
-            className={activeLink === "/logout" ? "bg-[#ffffff33]" : ""}
+            className={
+              activeLink === `/ngo-dashboard/${id}/logout` ? "bg-[#ffffff33]" : ""
+            }
             onClick={() => setShowLogoutDialog(true)}
           >
             <img src={iconLogout} alt="loading" />

@@ -16,7 +16,6 @@ function App() {
   const dispatch = useDispatch();
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
-  const [userData, setUserData] = useState(null);
 
   // Fetch NGO details from Firestore
   const fetchCauseDetails = async () => {
@@ -26,8 +25,6 @@ function App() {
 
       if (docSnap.exists()) {
         const data = docSnap.data();
-        setUserData(data);
-
         dispatch(ngoUserExist(data));
       } else {
         console.error("No such document!");
@@ -46,18 +43,15 @@ function App() {
     fetchCauseDetails();
   }, [id]);
 
-  // Memoize userData to avoid unnecessary re-renders
-  const memoizedUserData = useMemo(() => userData, [userData]);
-  console.log(memoizedUserData);
   if (loading) {
     return <Loader />;
   }
   return (
     <div className="dashboardOutlet">
-      <Sidebar userData={memoizedUserData} className="fixed" />
+      <Sidebar className="fixed" />
       <div className="main-content overflow-y-auto h-screen">
-        <DashboardHeader userData={memoizedUserData} />
-        <Outlet /> {/* This renders the nested routes */}
+        <DashboardHeader />
+        <Outlet />
       </div>
     </div>
   );
