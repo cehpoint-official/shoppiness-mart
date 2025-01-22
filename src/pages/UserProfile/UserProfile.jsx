@@ -16,6 +16,7 @@ const UserProfile = () => {
   const [currentPage, setCurrentPage] = useState("coupons");
   const [userData, setUserData] = useState({});
   const [isLoading, setIsLoading] = useState(true); // Add loading state
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // State for dropdown visibility
   const { userId } = useParams();
 
   const fetchDoc = async () => {
@@ -39,6 +40,10 @@ const UserProfile = () => {
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
+  };
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
   };
 
   return (
@@ -76,20 +81,33 @@ const UserProfile = () => {
           <div className="item" onClick={() => handlePageChange("cashback")}>
             Cashback & Giveback
           </div>
-          <div className="item" onClick={() => handlePageChange("settings")}>
+          <div className="item" onClick={toggleDropdown}>
             Account Settings
           </div>
-          <div className="item" onClick={() => handlePageChange("profileinfo")}>
-            Profile Info
-          </div>
+          {/* Dropdown items */}
           <div
-            className="item"
-            onClick={() => handlePageChange("manageaddress")}
+            className={`transition-all duration-300 ease-in-out ${
+              isDropdownOpen ? "max-h-40" : "max-h-0"
+            } overflow-hidden`}
           >
-            Manage Address
-          </div>
-          <div className="item" onClick={() => handlePageChange("payment")}>
-            Payment Method
+            <div
+              className="item pl-8"
+              onClick={() => handlePageChange("profileinfo")}
+            >
+              Profile Info
+            </div>
+            <div
+              className="item mt-4 pl-8"
+              onClick={() => handlePageChange("manageaddress")}
+            >
+              Manage Address
+            </div>
+            <div
+              className="item mt-4 pl-8"
+              onClick={() => handlePageChange("payment")}
+            >
+              Payment Method
+            </div>
           </div>
         </div>
       </div>
