@@ -39,6 +39,8 @@ import Customers from "./Services-Dashboard/pages/Customers/Customers";
 import Dashboard from "./Services-Dashboard/pages/Dashboard/Dashboard";
 import ShopInfo from "./Services-Dashboard/pages/ShopInfo/ShopInfo";
 import NgoDetails from "./NGO-Dashboard/pages/NgoDetails/NgoDetails";
+import POS from "./Services-Dashboard/pages/POS/POS";
+import MainPos from "./Services-Dashboard/pages/POS/MainPos";
 
 const App = () => {
   const Layout = () => {
@@ -214,10 +216,10 @@ const App = () => {
           path: "shopinfo",
           element: <ShopInfo />,
         },
-        // {
-        //   path: "pos",
-        //   element: <POS />,
-        // },
+        {
+          path: "pos",
+          element: <MainPos/>,
+        },
       ],
     },
     //NGo Dashboard
