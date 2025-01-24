@@ -41,6 +41,7 @@ import ShopInfo from "./Services-Dashboard/pages/ShopInfo/ShopInfo";
 import NgoDetails from "./NGO-Dashboard/pages/NgoDetails/NgoDetails";
 import POS from "./Services-Dashboard/pages/POS/POS";
 import MainPos from "./Services-Dashboard/pages/POS/MainPos";
+import Invoice from "./Services-Dashboard/pages/Invoices/Invoice";
 
 const App = () => {
   const Layout = () => {
@@ -218,7 +219,11 @@ const App = () => {
         },
         {
           path: "pos",
-          element: <MainPos/>,
+          element: <MainPos />,
+        },
+        {
+          path: "invoices",
+          element: <Invoice />,
         },
       ],
     },

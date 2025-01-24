@@ -118,7 +118,7 @@ const DashboardHeader = () => {
           </div>
 
           {isDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg">
+            <div className="absolute z-50 right-0 mt-2 w-64 bg-white rounded-xl shadow-lg">
               <div className="p-6 flex flex-col items-center">
                 <div className="relative">
                   {loading ? (

@@ -50,7 +50,7 @@ const BusinessLoginForm = () => {
       }
 
       // If everything is valid, navigate to the dashboard
-      navigate(`/services-dashboard/${userDoc.id}`);
+      navigate(`/services-dashboard/${userDoc.id}/dashboard`);
     } catch (error) {
       setError(error.message);
     } finally {

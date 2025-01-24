@@ -101,12 +101,12 @@ const Sidebar = () => {
             </li>
           </Link>
 
-          <Link to={`/services-dashboard/${id}/sales-record`}>
+          {/* <Link to={`/services-dashboard/${id}/sales-record`}>
             <li>
               <img src={iconSales} alt="loading" />
               Sales Record
             </li>
-          </Link>
+          </Link> */}
 
           <Link to={`/services-dashboard/${id}/shopinfo`}>
             <li>
