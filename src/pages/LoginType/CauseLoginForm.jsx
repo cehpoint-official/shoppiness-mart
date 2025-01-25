@@ -56,7 +56,7 @@ const CauseLoginForm = () => {
       }
       dispatch(ngoUserExist(user));
       // If everything is valid, navigate to the dashboard
-      navigate(`/ngo-dashboard/${userDoc.id}`);
+      navigate(`/ngo-dashboard/${userDoc.id}/dashboard`);
     } catch (error) {
       dispatch(ngoUserNotExist(null));
       setError(error.message);

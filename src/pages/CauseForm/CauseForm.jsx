@@ -432,7 +432,7 @@ const CauseForm = () => {
       </div>
       <div className="formContainer">
         {success ? (
-          <SuccessPage id={id} link={`/ngo-dashboard/${id}`} />
+          <SuccessPage id={id} link={`/ngo-dashboard/${id}/dashboard`} />
         ) : (
           pages[currentPage - 1].content
         )}

@@ -98,10 +98,10 @@ const Sidebar = () => {
             </li>
           </Link>
 
-          <Link to={`/ngo-dashboard/${id}/customers`}>
+          <Link to={`/ngo-dashboard/${id}/performance`}>
             <li
               className={
-                activeLink === `/ngo-dashboard/${id}/customers`
+                activeLink === `/ngo-dashboard/${id}/performance`
                   ? "bg-[#ffffff33]"
                   : ""
               }
@@ -120,7 +120,7 @@ const Sidebar = () => {
               }
             >
               <img src={iconPOS} alt="loading" />
-              Support
+              Help & Support
             </li>
           </Link>
 
@@ -165,7 +165,9 @@ const Sidebar = () => {
 
           <li
             className={
-              activeLink === `/ngo-dashboard/${id}/logout` ? "bg-[#ffffff33]" : ""
+              activeLink === `/ngo-dashboard/${id}/logout`
+                ? "bg-[#ffffff33]"
+                : ""
             }
             onClick={() => setShowLogoutDialog(true)}
           >

@@ -39,9 +39,15 @@ import Customers from "./Services-Dashboard/pages/Customers/Customers";
 import Dashboard from "./Services-Dashboard/pages/Dashboard/Dashboard";
 import ShopInfo from "./Services-Dashboard/pages/ShopInfo/ShopInfo";
 import NgoDetails from "./NGO-Dashboard/pages/NgoDetails/NgoDetails";
+import NgoDashboard from "./NGO-Dashboard/pages/Dashboard/Dashboard";
 import POS from "./Services-Dashboard/pages/POS/POS";
 import MainPos from "./Services-Dashboard/pages/POS/MainPos";
 import Invoice from "./Services-Dashboard/pages/Invoices/Invoice";
+import HelpSupport from "./NGO-Dashboard/pages/Help&Support/HelpSupport";
+import NgoPerformance from "./NGO-Dashboard/pages/NgoPerformance/NgoPerformance";
+import About from "./NGO-Dashboard/pages/AboutUs/About";
+import FAQ from "./NGO-Dashboard/pages/FAQ/FAQ";
+import PrivacyPolicies from "./NGO-Dashboard/pages/Privacy-Policy/PrivacyPolicies";
 
 const App = () => {
   const Layout = () => {
@@ -235,20 +241,32 @@ const App = () => {
       children: [
         {
           path: "dashboard",
-          element: <Dashboard />,
+          element: <NgoDashboard />,
         },
         {
           path: "details",
           element: <NgoDetails />,
         },
         {
-          path: "customers",
-          element: <Customers />,
+          path: "performance",
+          element: <NgoPerformance />,
         },
-        // {
-        //   path: "pos",
-        //   element: <POS />,
-        // },
+        {
+          path: "support",
+          element: <HelpSupport />,
+        },
+        {
+          path: "about-us",
+          element: <About />,
+        },
+        {
+          path: "faqs",
+          element: <FAQ />,
+        },
+        {
+          path: "privacy-policy",
+          element: <PrivacyPolicies />,
+        },
       ],
     },
   ]);
