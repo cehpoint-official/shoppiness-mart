@@ -7,6 +7,7 @@ import { addDoc, collection } from "firebase/firestore";
 import { db, storage } from "../../../firebase.js";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import SuccessPage from "../../Components/SuccessPage/SuccessPage";
+import toast from "react-hot-toast"; // Import toast
 
 const BusinessForm = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -100,31 +101,56 @@ const BusinessForm = () => {
   const handleCreateAccount = async (e) => {
     e.preventDefault();
     if (validateCurrentPage()) {
-      addData();
-      setSuccess(true);
+      try {
+        await addData(); // Add data to Firebase
+        setSuccess(true);
+        toast.success("Business registered successfully!"); 
+      } catch (error) {
+        toast.error("Registration failed. Please try again."); 
+      }
     }
+  };
+
+  // Validate file format
+  const validateFileFormat = (file) => {
+    const allowedFormats = ["image/png", "image/jpeg", "image/jpg"];
+    if (!allowedFormats.includes(file.type)) {
+      toast.error("Only .png, .jpeg, and .jpg formats are allowed.");
+      return false;
+    }
+    return true;
   };
 
   const handleFileChangeLogo = async (e) => {
     const file = e.target.files[0];
-    setLogoFile(file);
-    if (file) {
-      await uploadFile(file);
+    if (!file) return;
+
+    // Validate file format
+    if (!validateFileFormat(file)) {
+      return; // Stop if the file format is invalid
     }
+
+    setLogoFile(file);
+    await uploadFile(file);
   };
 
   const handleFileChangeBanner = async (e) => {
     const file = e.target.files[0];
-    setBannerFile(file);
-    if (file) {
-      await uploadFile(file);
+    if (!file) return;
+
+    // Validate file format
+    if (!validateFileFormat(file)) {
+      return; 
     }
+
+    setBannerFile(file);
+    await uploadFile(file);
   };
 
   const uploadFile = (file) => {
     return new Promise((resolve, reject) => {
       const metadata = {
-        contentType: "image/jpeg",
+        contentType: file.type, 
       };
       const storageRef = ref(storage, "images/" + file.name);
       const uploadTask = uploadBytesResumable(storageRef, file, metadata);
@@ -180,7 +206,7 @@ const BusinessForm = () => {
       });
       setId(res.id);
     } catch (e) {
-      alert(e.message);
+      throw new Error(e.message); 
     }
   };
 

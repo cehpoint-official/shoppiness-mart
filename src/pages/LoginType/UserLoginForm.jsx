@@ -5,6 +5,8 @@ import Facebookicon from "../../assets/facebookicon.png";
 import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { auth, db, provider } from "../../../firebase";
 import { doc, setDoc } from "firebase/firestore";
+import toast from "react-hot-toast";
+
 const UserLoginForm = () => {
   const [userData, setUserData] = useState({
     email: "",
@@ -22,9 +24,12 @@ const UserLoginForm = () => {
         userData.email,
         userData.password
       );
-      navigate(`/user-dashboard/${res.user.uid}`);
+      toast.success("Login successful!");
+      setTimeout(() => {
+        navigate(`/user-dashboard/${res.user.uid}`);
+      }, 1000);
     } catch (error) {
-      alert(error.message);
+      toast.error(error.message);
     }
     setLoading(false);
   };
@@ -32,7 +37,7 @@ const UserLoginForm = () => {
   const GoogleSubmitHandler = async (e) => {
     e.preventDefault();
     setLoading(true);
-
+    toast.loading("Signing in with Google...");
     try {
       const res = await signInWithPopup(auth, provider);
       console.log(res);
@@ -42,9 +47,12 @@ const UserLoginForm = () => {
         profilePic: res.user.photoURL,
       });
       setLoading(false);
-      navigate(`/user-dashboard/${res.user.uid}`);
+      toast.success("Google sign-in successful!");
+      setTimeout(() => {
+        navigate(`/user-dashboard/${res.user.uid}`);
+      }, 1000);
     } catch (error) {
-      alert(error.message);
+      toast.error(error.message);
     }
   };
   return (

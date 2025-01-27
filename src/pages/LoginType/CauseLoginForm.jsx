@@ -5,7 +5,7 @@ import Googleicon from "../../assets/googleicon.png";
 import Facebookicon from "../../assets/facebookicon.png";
 import { signInWithPopup } from "firebase/auth";
 import { auth, db, provider } from "../../../firebase";
-
+import toast from "react-hot-toast";
 import {
   collection,
   query,
@@ -32,10 +32,9 @@ const CauseLoginForm = () => {
   const submitHandler = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
+    setError(""); // Show loading toast
 
     try {
-      // Query Firestore for the user with the provided email
       const q = query(
         collection(db, "causeDetails"),
         where("email", "==", userData.email)
@@ -46,20 +45,24 @@ const CauseLoginForm = () => {
         throw new Error("No user found with this email.");
       }
 
-      // Get the first matching document
       const userDoc = Userquery.docs[0];
       const user = userDoc.data();
 
-      // Validate the password (if you're not using Firebase Authentication)
       if (user.password !== userData.password) {
         throw new Error("Incorrect password.");
       }
+
+      toast.success("Login successful!"); 
       dispatch(ngoUserExist(user));
-      // If everything is valid, navigate to the dashboard
-      navigate(`/ngo-dashboard/${userDoc.id}/dashboard`);
+
+      // Delay navigation to ensure toast is visible
+      setTimeout(() => {
+        navigate(`/ngo-dashboard/${userDoc.id}/dashboard`);
+      }, 1000);
     } catch (error) {
       dispatch(ngoUserNotExist(null));
       setError(error.message);
+      toast.error(error.message); // Show error toast
     } finally {
       setLoading(false);
     }
@@ -69,22 +72,24 @@ const CauseLoginForm = () => {
     e.preventDefault();
     setLoading(true);
     setError("");
-
-    e.preventDefault();
-    setLoading(true);
+    toast.loading("Signing in with Google...");
 
     try {
       const res = await signInWithPopup(auth, provider);
-      console.log(res);
+
       await setDoc(doc(db, "causeDetails", res.user.uid), {
         fname: res.user.displayName,
         email: res.user.email,
         profilePic: res.user.photoURL,
       });
 
-      navigate(`/ngo-dashboard/${res.id}`);
+      toast.success("Google sign-in successful!");
+      setTimeout(() => {
+        navigate(`/ngo-dashboard/${res.user.uid}`);
+      }, 1000);
     } catch (error) {
       setError(error.message);
+      toast.error(error.message);
     } finally {
       setLoading(false);
     }

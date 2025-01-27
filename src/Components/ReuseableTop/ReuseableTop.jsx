@@ -8,8 +8,19 @@ const ReuseableTop = (props) => {
         <h1>{title}</h1>
         <p>{paragraph}</p>
         <div className="links">
-          <Link to={name === "Business/Services" ? "/business-form" : "/cause-form" } className="register">Register your {name}</Link>
-          <Link to="/login">Log in to your Account</Link>
+          <Link
+            to={name === "Business/Services" ? "/business-form" : "/cause-form"}
+            className="register"
+          >
+            Register your {name}
+          </Link>
+          <Link
+            to={
+              name === "Business/Services" ? "/login/business" : "/login/cause"
+            }
+          >
+            Log in to your Account
+          </Link>
         </div>
       </div>
       <div className="right">

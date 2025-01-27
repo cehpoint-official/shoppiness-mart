@@ -1,13 +1,18 @@
 import { doc, setDoc } from "firebase/firestore";
-import {  useState } from "react";
+import { useState } from "react";
 import Backimg from "../assets/backimg.png";
 import ShoppingBag2 from "../assets/ShoppingBag2.png";
 import Signupimg from "../assets/signupimg.png";
 import Googleicon from "../assets/googleicon.png";
 import Facebookicon from "../assets/facebookicon.png";
-import { auth, db ,provider} from "../../firebase.js";
+import { auth, db, provider } from "../../firebase.js";
 import { useNavigate } from "react-router-dom";
-import { createUserWithEmailAndPassword, updateProfile ,signInWithPopup } from "firebase/auth";
+import toast from "react-hot-toast";
+import {
+  createUserWithEmailAndPassword,
+  updateProfile,
+  signInWithPopup,
+} from "firebase/auth";
 const Signup = () => {
   const [userData, setUserData] = useState({
     fname: "",
@@ -32,11 +37,11 @@ const Signup = () => {
       !cpassword ||
       terms == false
     ) {
-      alert("Please fill in all required fields.");
+      toast.error("Please fill in all required fields.");
       return;
     }
     if (userData.password !== cpassword) {
-      alert("Passwords Do Not Match!");
+      toast.error("Passwords do not match!");
       return;
     }
     setLoading(true);
@@ -57,32 +62,41 @@ const Signup = () => {
         ...userData,
         uid: user.uid,
       });
-      navigate(`/user-dashboard/${user.uid}`);
+      toast.success("Account created successfully!");
       setcpassword("");
-      console.log(user);
       setUserData({ fname: "", lname: "", phone: "", password: "", email: "" });
+
+      setTimeout(() => {
+        navigate(`/user-dashboard/${user.uid}`);
+      }, 1000);
     } catch (err) {
-      alert(err.message);
+      toast.error(err.message);
     } finally {
       setLoading(false);
     }
   };
+
   const GoogleSubmitHandler = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
       const res = await signInWithPopup(auth, provider);
-      console.log(res);
       await setDoc(doc(db, "users", res.user.uid), {
         fname: res.user.displayName,
         email: res.user.email,
         profilePic: res.user.photoURL,
       });
       setLoading(false);
-      navigate(`/user-dashboard/${res.user.uid}`);
+      toast.success("Successfully signed in with Google!");
+
+      // Delayed navigation
+      setTimeout(() => {
+        navigate(`/user-dashboard/${res.user.uid}`);
+      }, 1000);
     } catch (error) {
-      alert(error.message);
+      toast.error(error.message);
+      setLoading(false);
     }
   };
   return (

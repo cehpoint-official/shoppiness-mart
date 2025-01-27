@@ -7,6 +7,7 @@ import SuccessPage from "../../Components/SuccessPage/SuccessPage";
 import { db, storage } from "../../../firebase.js";
 import { addDoc, collection } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import toast from "react-hot-toast";
 
 const CauseForm = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -45,6 +46,7 @@ const CauseForm = () => {
       [field]: value,
     }));
   };
+
   const validateCurrentPage = () => {
     switch (currentPage) {
       case 1:
@@ -71,6 +73,7 @@ const CauseForm = () => {
         return true;
     }
   };
+
   const handleNextPage = (e) => {
     e.preventDefault();
 
@@ -91,35 +94,61 @@ const CauseForm = () => {
     setCurrentPage((prev) => prev - 1);
   };
 
-  const handleCreateAccount = (e) => {
+  const handleCreateAccount = async (e) => {
     e.preventDefault();
     if (validateCurrentPage()) {
-      addData();
-      setSuccess(true);
-    }
-  };
-  const handleFileChangeLogo = async (e) => {
-    const file = e.target.files[0];
-    setLogoFile(file);
-    if (file) {
-      await uploadFile(file); 
+      try {
+        await addData(); // Add data to Firebase
+        setSuccess(true);
+        toast.success("NGO registered successful!");
+      } catch (error) {
+        toast.error("Registration failed. Please try again.");
+      }
     }
   };
 
+  // Validate file format
+  const validateFileFormat = (file) => {
+    const allowedFormats = ["image/png", "image/jpeg", "image/jpg"];
+
+    if (!allowedFormats.includes(file.type)) {
+      toast.error("Only .png, .jpeg, and .jpg formats are allowed.");
+      return false;
+    }
+    return true;
+  };
+
+  const handleFileChangeLogo = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate file format
+    if (!validateFileFormat(file)) {
+      return; 
+    }
+
+    setLogoFile(file);
+    await uploadFile(file);
+  };
 
   const handleFileChangeBanner = async (e) => {
     const file = e.target.files[0];
-    setBannerFile(file);
-    if (file) {
-      await uploadFile(file);
+    if (!file) return;
+
+    // Validate file format
+    if (!validateFileFormat(file)) {
+      return; 
     }
+
+    setBannerFile(file);
+    await uploadFile(file);
   };
 
   // Upload photo function with percentage
   const uploadFile = async (file) => {
     return new Promise((resolve, reject) => {
       const metadata = {
-        contentType: "image/jpeg",
+        contentType: file.type, // Use the file's MIME type
       };
       const storageRef = ref(storage, "images/" + file.name);
       const uploadTask = uploadBytesResumable(storageRef, file, metadata);
@@ -176,7 +205,7 @@ const CauseForm = () => {
       });
       setId(res.id);
     } catch (e) {
-      alert(e.message);
+      throw new Error(e.message); // Throw error to handle in handleCreateAccount
     }
   };
 

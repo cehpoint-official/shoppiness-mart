@@ -4,6 +4,7 @@ import Googleicon from "../../assets/googleicon.png";
 import Facebookicon from "../../assets/facebookicon.png";
 import { signInWithPopup } from "firebase/auth";
 import { auth, db, provider } from "../../../firebase";
+import toast from "react-hot-toast";
 import {
   collection,
   query,
@@ -42,17 +43,19 @@ const BusinessLoginForm = () => {
       // Get the first matching document
       const userDoc = Userquery.docs[0];
       const user = userDoc.data();
-      console.log(user);
 
       // Validate the password (if you're not using Firebase Authentication)
       if (user.password !== userData.password) {
         throw new Error("Incorrect password.");
       }
 
-      // If everything is valid, navigate to the dashboard
-      navigate(`/services-dashboard/${userDoc.id}/dashboard`);
+      toast.success("Login successful!");
+      setTimeout(() => {
+        navigate(`/services-dashboard/${userDoc.id}/dashboard`);
+      }, 1000);
     } catch (error) {
       setError(error.message);
+      toast.error(error.message);
     } finally {
       setLoading(false);
     }
@@ -62,9 +65,7 @@ const BusinessLoginForm = () => {
     e.preventDefault();
     setLoading(true);
     setError("");
-
-    e.preventDefault();
-    setLoading(true);
+    toast.loading("Signing in with Google...");
 
     try {
       const res = await signInWithPopup(auth, provider);
@@ -74,10 +75,13 @@ const BusinessLoginForm = () => {
         email: res.user.email,
         profilePic: res.user.photoURL,
       });
-
-      navigate(`/services-dashboard/${res.id}`);
+      toast.success("Login successful!");
+      setTimeout(() => {
+        navigate(`/services-dashboard/${res.id}`);
+      }, 1000);
     } catch (error) {
       setError(error.message);
+      toast.error(error.message);
     } finally {
       setLoading(false);
     }
