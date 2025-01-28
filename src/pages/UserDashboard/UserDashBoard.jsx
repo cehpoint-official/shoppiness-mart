@@ -131,14 +131,14 @@ const UserDashBoard = () => {
                   <div className="right">
                     <h2>Let&apos;s start Shopping!</h2>
                     <div className="links">
-                      <Link to="/online-shop">
+                      <Link to={`/user-dashboard/${userId}/online-shop`}>
                         <div className="link">
                           Online Shop
                           <IoArrowRedoSharp />
                         </div>
                       </Link>
 
-                      <Link to="/offline-shop">
+                      <Link to={`/user-dashboard/${userId}/offline-shop`}>
                         <div className="link">
                           Offline Shop
                           <IoArrowRedoSharp />

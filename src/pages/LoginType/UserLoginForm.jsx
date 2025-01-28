@@ -26,7 +26,7 @@ const UserLoginForm = () => {
       );
       toast.success("Login successful!");
       setTimeout(() => {
-        navigate(`/user-dashboard/${res.user.uid}`);
+        navigate(`/user-dashboard/${res.user.uid}/dashboard`);
       }, 1000);
     } catch (error) {
       toast.error(error.message);

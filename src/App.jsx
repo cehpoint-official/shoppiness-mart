@@ -4,7 +4,7 @@ import { Toaster } from "react-hot-toast";
 import Footer from "./Components/Footer";
 import Navbar from "./Components/Navbar/Navbar";
 import Loader from "./Components/Loader/Loader";
-
+import NewLayout from "./NewLayout";
 // Lazy-loaded components
 const Home = lazy(() => import("./pages/Home"));
 const Signup = lazy(() => import("./pages/Signup"));
@@ -124,15 +124,37 @@ const router = createBrowserRouter([
   },
 
   {
-    path: "/user-dashboard/:userId",
+    path: "/user-dashboard/:userId/dashboard",
     element: <UserDashboard />,
+  },
+  {
+    path: "/user-dashboard/:userId",
+    element: <NewLayout />,
     children: [
-      { path: "online-shop", element: <OnlineShop /> },
-      { path: "offline-shop", element: <OfflineShop /> },
-      { path: "howitworks", element: <HowItWorks /> },
-      { path: "cashback-charity", element: <Cashback /> },
-      { path: "supportmaast", element: <SupportMaast /> },
-      { path: "profile", element: <UserProfile /> },
+      {
+        path: "/user-dashboard/:userId/online-shop",
+        element: <OnlineShop />,
+      },
+      {
+        path: "/user-dashboard/:userId/offline-shop",
+        element: <OfflineShop />,
+      },
+      {
+        path: "/user-dashboard/:userId/howitworks",
+        element: <HowItWorks />,
+      },
+      {
+        path: "/user-dashboard/:userId/cashback-charity",
+        element: <Cashback />,
+      },
+      {
+        path: "/user-dashboard/:userId/supportmaast",
+        element: <SupportMaast />,
+      },
+      {
+        path: "/user-dashboard/:userId/profile",
+        element: <UserProfile />,
+      },
     ],
   },
   // Admin routes

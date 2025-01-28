@@ -104,9 +104,9 @@ const BusinessForm = () => {
       try {
         await addData(); // Add data to Firebase
         setSuccess(true);
-        toast.success("Business registered successfully!"); 
+        toast.success("Business registered successfully!");
       } catch (error) {
-        toast.error("Registration failed. Please try again."); 
+        toast.error("Registration failed. Please try again.");
       }
     }
   };
@@ -140,7 +140,7 @@ const BusinessForm = () => {
 
     // Validate file format
     if (!validateFileFormat(file)) {
-      return; 
+      return;
     }
 
     setBannerFile(file);
@@ -150,7 +150,7 @@ const BusinessForm = () => {
   const uploadFile = (file) => {
     return new Promise((resolve, reject) => {
       const metadata = {
-        contentType: file.type, 
+        contentType: file.type,
       };
       const storageRef = ref(storage, "images/" + file.name);
       const uploadTask = uploadBytesResumable(storageRef, file, metadata);
@@ -206,7 +206,7 @@ const BusinessForm = () => {
       });
       setId(res.id);
     } catch (e) {
-      throw new Error(e.message); 
+      throw new Error(e.message);
     }
   };
 
@@ -304,9 +304,14 @@ const BusinessForm = () => {
                 onChange={(e) => handleInputChange(e, "cat")}
               >
                 <option value="">Select category</option>
-                <option value="one">One</option>
-                <option value="two">Two</option>
-                <option value="three">Three</option>
+                <option value="Food">Food</option>
+                <option value="Grocery">Grocery</option>
+                <option value="Pharmacy">Pharmacy</option>
+                <option value="Fashion">Fashion</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Beauty">Beauty</option>
+                <option value="Sport">Sport</option>
+                <option value="Corporate">Corporate</option>
               </select>
             </div>
             <div className="item">

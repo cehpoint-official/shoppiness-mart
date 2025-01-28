@@ -293,7 +293,7 @@ const Home = () => {
           </p>
           <p className="text-gray-600 text-sm md:text-lg text-center mx-auto mt-2">
             Share stories of how Shoppinessmart donations have made a difference
-            in people's lives.
+            in people&apos;s lives.
           </p>
         </div>
 
