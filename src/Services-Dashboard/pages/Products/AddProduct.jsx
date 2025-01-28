@@ -6,7 +6,7 @@ import { addDoc, collection, getDocs } from "firebase/firestore";
 import { useParams } from "react-router-dom";
 import { FaImage, FaSpinner } from "react-icons/fa"; // Import icons from react-icons
 
-const AddProduct = ({ onBack }) => {
+const AddProduct = ({ onBack, onProductAdded }) => {
   const { id } = useParams();
   const [formData, setFormData] = useState({
     name: "",
@@ -131,10 +131,11 @@ const AddProduct = ({ onBack }) => {
       await addDoc(collection(db, "productDetails"), {
         ...formData,
         imageUrl,
-        id: id,
+        businessId: id,
       });
 
       toast.success("Product added successfully!");
+      onProductAdded();
       onBack(); // Navigate back after successful submission
     } catch (error) {
       toast.error("Failed to add product: " + error.message);

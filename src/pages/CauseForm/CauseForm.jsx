@@ -124,7 +124,7 @@ const CauseForm = () => {
 
     // Validate file format
     if (!validateFileFormat(file)) {
-      return; 
+      return;
     }
 
     setLogoFile(file);
@@ -137,7 +137,7 @@ const CauseForm = () => {
 
     // Validate file format
     if (!validateFileFormat(file)) {
-      return; 
+      return;
     }
 
     setBannerFile(file);
@@ -328,7 +328,12 @@ const CauseForm = () => {
                 or
                 <p className="chooseFile">Choose File</p>
               </label>
-              <input type="file" id="file1" onChange={handleFileChangeLogo} />
+              <input
+                type="file"
+                id="file1"
+                accept="image/*"
+                onChange={handleFileChangeLogo}
+              />
             </div>
             <div className="item">
               <h3>Add Banner</h3>
@@ -339,6 +344,7 @@ const CauseForm = () => {
               </label>
               <input
                 required
+                accept="image/*"
                 type="file"
                 id="file2"
                 onChange={handleFileChangeBanner}

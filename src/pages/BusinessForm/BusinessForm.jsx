@@ -353,7 +353,7 @@ const BusinessForm = () => {
                 or
                 <p className="chooseFile">Choose File</p>
               </label>
-              <input type="file" id="file1" onChange={handleFileChangeLogo} />
+              <input type="file" id="file1" accept="image/*" onChange={handleFileChangeLogo} />
             </div>
             <div className="item">
               <h3>Add Banner</h3>
@@ -362,7 +362,7 @@ const BusinessForm = () => {
                 or
                 <p className="chooseFile">Choose File</p>
               </label>
-              <input type="file" id="file2" onChange={handleFileChangeBanner} />
+              <input type="file" id="file2" accept="image/*" onChange={handleFileChangeBanner} />
             </div>
             <div className="btns">
               <button type="button" className="back" onClick={handleBackPage}>
