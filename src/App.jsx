@@ -25,6 +25,7 @@ const Blogs = lazy(() => import("./pages/Blogs"));
 const UserDashboard = lazy(() => import("./pages/UserDashboard/UserDashBoard"));
 const OnlineShop = lazy(() => import("./pages/OnlineShop"));
 const OfflineShop = lazy(() => import("./pages/OfflineShop"));
+const CatagoryBasedShops = lazy(() => import("./pages/CatagoryBasedShops"));
 const UserProfile = lazy(() => import("./pages/UserProfile/UserProfile"));
 const FaqHome = lazy(() => import("./Admin/pages/FAQ/home"));
 const AddFaq = lazy(() => import("./Admin/pages/FAQ/AddFaq"));
@@ -82,8 +83,9 @@ const toastOptions = {
   duration: 4000,
 };
 
-const Layout = () => (
-  <div className="app">
+// Root wrapper that includes Toaster for all routes
+const RootWrapper = () => (
+  <>
     <Toaster
       position="top-right"
       toastOptions={toastOptions}
@@ -91,6 +93,13 @@ const Layout = () => (
         zIndex: 10000,
       }}
     />
+    <Outlet />
+  </>
+);
+
+// Main layout for home and related pages
+const Layout = () => (
+  <div className="app">
     <Navbar />
     <Outlet />
     <Footer />
@@ -99,103 +108,115 @@ const Layout = () => (
 
 const router = createBrowserRouter([
   {
-    path: "/",
-    element: <Layout />,
-    children: [
-      { path: "/", element: <Home /> },
-      { path: "/login/:userType", element: <Login /> },
-      { path: "/signup", element: <Signup /> },
-      { path: "/contact", element: <ContactUs /> },
-      { path: "/about", element: <AboutUs /> },
-      { path: "/blogs", element: <Blogs /> },
-      { path: "/register-business", element: <Business /> },
-      { path: "/register-cause", element: <Cause /> },
-      { path: "/support", element: <SupportACause /> },
-      { path: "/supportmaast", element: <SupportMaast /> },
-      { path: "/howitworks", element: <HowItWorks /> },
-      { path: "/cashback-charity", element: <Cashback /> },
-      { path: "/cashback-deals", element: <CashbackDeals /> },
-      { path: "/offline-shop", element: <OfflineShop /> },
-      { path: "/online-shop", element: <OnlineShop /> },
-      { path: "/shop", element: <Shop /> },
-      { path: "/business-form", element: <BusinessForm /> },
-      { path: "/cause-form", element: <CauseForm /> },
-    ],
-  },
-
-  {
-    path: "/user-dashboard/:userId/dashboard",
-    element: <UserDashboard />,
-  },
-  {
-    path: "/user-dashboard/:userId",
-    element: <NewLayout />,
+    element: <RootWrapper />, // Wrap everything with RootWrapper
     children: [
       {
-        path: "/user-dashboard/:userId/online-shop",
-        element: <OnlineShop />,
+        path: "/",
+        element: <Layout />,
+        children: [
+          { path: "/", element: <Home /> },
+          { path: "/login/:userType", element: <Login /> },
+          { path: "/signup", element: <Signup /> },
+          { path: "/contact", element: <ContactUs /> },
+          { path: "/about", element: <AboutUs /> },
+          { path: "/blogs", element: <Blogs /> },
+          { path: "/register-business", element: <Business /> },
+          { path: "/register-cause", element: <Cause /> },
+          { path: "/support", element: <SupportACause /> },
+          { path: "/supportmaast", element: <SupportMaast /> },
+          { path: "/howitworks", element: <HowItWorks /> },
+          { path: "/cashback-charity", element: <Cashback /> },
+          { path: "/cashback-deals", element: <CashbackDeals /> },
+          { path: "/offline-shop", element: <OfflineShop /> },
+          { path: "/offline-shop/:catagory", element: <CatagoryBasedShops /> },
+          { path: "/online-shop", element: <OnlineShop /> },
+          { path: "/shop", element: <Shop /> },
+          { path: "/business-form", element: <BusinessForm /> },
+          { path: "/cause-form", element: <CauseForm /> },
+        ],
       },
       {
-        path: "/user-dashboard/:userId/offline-shop",
-        element: <OfflineShop />,
+        path: "/user-dashboard/:userId/dashboard",
+        element: <UserDashboard />,
       },
       {
-        path: "/user-dashboard/:userId/howitworks",
-        element: <HowItWorks />,
+        path: "/user-dashboard/:userId",
+        element: <NewLayout />,
+        children: [
+          {
+            path: "/user-dashboard/:userId/online-shop",
+            element: <OnlineShop />,
+          },
+          {
+            path: "/user-dashboard/:userId/offline-shop",
+            element: <OfflineShop />,
+          },
+          {
+            path: "offline-shop/:catagory",
+            element: <CatagoryBasedShops />,
+          },
+          {
+            path: "/user-dashboard/:userId/howitworks",
+            element: <HowItWorks />,
+          },
+          {
+            path: "/user-dashboard/:userId/cashback-charity",
+            element: <Cashback />,
+          },
+          {
+            path: "/user-dashboard/:userId/supportmaast",
+            element: <SupportMaast />,
+          },
+          {
+            path: "/user-dashboard/:userId/profile",
+            element: <UserProfile />,
+          },
+        ],
       },
+      // Admin routes
+      { path: "/admin/shoppiness/faq", element: <FaqHome /> },
+      { path: "/admin/shoppiness/addfaq", element: <AddFaq /> },
       {
-        path: "/user-dashboard/:userId/cashback-charity",
-        element: <Cashback />,
+        path: "/admin/shoppiness/add/privacy-policy",
+        element: <AddPrivacyPolicy />,
       },
+      { path: "/admin/shoppiness/newsletter", element: <Newsletter /> },
+      { path: "/admin/shoppiness/contact", element: <ContactInfo /> },
       {
-        path: "/user-dashboard/:userId/supportmaast",
-        element: <SupportMaast />,
+        path: "/admin/shoppiness/contact/message",
+        element: <ContactMessage />,
       },
+      // Services Dashboard
       {
-        path: "/user-dashboard/:userId/profile",
-        element: <UserProfile />,
+        path: "/services-dashboard/:id",
+        element: <DashboardOutlet />,
+        children: [
+          { path: "dashboard", element: <Dashboard /> },
+          { path: "products", element: <Products /> },
+          { path: "customers", element: <Customers /> },
+          { path: "shopinfo", element: <ShopInfo /> },
+          { path: "pos", element: <MainPos /> },
+          { path: "invoices", element: <Invoice /> },
+        ],
       },
+      // NGO Dashboard
+      {
+        path: "/ngo-dashboard/:id",
+        element: <NgoDashboardOutlet />,
+        children: [
+          { path: "dashboard", element: <NgoDashboard /> },
+          { path: "details", element: <NgoDetails /> },
+          { path: "performance", element: <NgoPerformance /> },
+          { path: "support", element: <HelpSupport /> },
+          { path: "about-us", element: <About /> },
+          { path: "faqs", element: <FAQ /> },
+          { path: "privacy-policy", element: <PrivacyPolicies /> },
+        ],
+      },
+      // Fallback route (404 page)
+      { path: "*", element: <div>404 Not Found</div> },
     ],
   },
-  // Admin routes
-  { path: "/admin/shoppiness/faq", element: <FaqHome /> },
-  { path: "/admin/shoppiness/addfaq", element: <AddFaq /> },
-  {
-    path: "/admin/shoppiness/add/privacy-policy",
-    element: <AddPrivacyPolicy />,
-  },
-  { path: "/admin/shoppiness/newsletter", element: <Newsletter /> },
-  { path: "/admin/shoppiness/contact", element: <ContactInfo /> },
-  { path: "/admin/shoppiness/contact/message", element: <ContactMessage /> },
-  // Services Dashboard
-  {
-    path: "/services-dashboard/:id",
-    element: <DashboardOutlet />,
-    children: [
-      { path: "dashboard", element: <Dashboard /> },
-      { path: "products", element: <Products /> },
-      { path: "customers", element: <Customers /> },
-      { path: "shopinfo", element: <ShopInfo /> },
-      { path: "pos", element: <MainPos /> },
-      { path: "invoices", element: <Invoice /> },
-    ],
-  },
-  // NGO Dashboard
-  {
-    path: "/ngo-dashboard/:id",
-    element: <NgoDashboardOutlet />,
-    children: [
-      { path: "dashboard", element: <NgoDashboard /> },
-      { path: "details", element: <NgoDetails /> },
-      { path: "performance", element: <NgoPerformance /> },
-      { path: "support", element: <HelpSupport /> },
-      { path: "about-us", element: <About /> },
-      { path: "faqs", element: <FAQ /> },
-      { path: "privacy-policy", element: <PrivacyPolicies /> },
-    ],
-  },
-  // Fallback route (404 page)
-  { path: "*", element: <div>404 Not Found</div> },
 ]);
 
 const App = () => (

@@ -32,6 +32,8 @@ import imaoffshop6 from "../assets/Shop/image 79.png";
 import imaoffshop9 from "../assets/Shop/image 80.png";
 import imaoffshop5 from "../assets/Shop/image 80.png";
 import imaoffshop7 from "../assets/Shop/image 82.png";
+import { Link } from "react-router-dom";
+import CatagoryBasedShops from "./CatagoryBasedShops";
 
 const OfflineShop = () => {
   const [shops, setShops] = useState([]);
@@ -41,6 +43,8 @@ const OfflineShop = () => {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentView, setCurrentView] = useState("offlineShop");
+  const [selectedCategory, setSelectedCategory] = useState(null); // Add this line
 
   const fetchData = useCallback(async () => {
     try {
@@ -48,14 +52,12 @@ const OfflineShop = () => {
       const data = [];
       querySnapshot.forEach((doc) => {
         const shopData = doc.data();
-        // Only include shops with mode === "offline"
         if (shopData.mode === "offline") {
           data.push({ id: doc.id, ...shopData });
         }
       });
       setShops(data);
 
-      // Group all offline shops by category initially
       const grouped = data.reduce((acc, shop) => {
         if (shop.cat && shop.cat.trim() !== "") {
           if (!acc[shop.cat]) {
@@ -73,7 +75,6 @@ const OfflineShop = () => {
       setLoading(false);
     }
   }, []);
-  console.log(shops);
 
   useEffect(() => {
     fetchData();
@@ -83,20 +84,17 @@ const OfflineShop = () => {
     if (!shops.length) return [];
 
     return shops.filter((shop) => {
-      // Location filtering
       const locationMatch =
         !selectedLocation ||
         shop.location
           ?.toLowerCase()
           .includes(selectedLocation.name.toLowerCase());
 
-      // Search term filtering
       const searchMatch =
         !searchTerm ||
         shop.businessName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         shop.cat.toLowerCase().includes(searchTerm.toLowerCase());
 
-      // Category filtering
       const categoryMatch =
         selectedCategories.length === 0 ||
         selectedCategories.includes(shop.cat);
@@ -172,6 +170,21 @@ const OfflineShop = () => {
     ],
     []
   );
+
+  const handleViewMore = useCallback((category) => {
+    setCurrentView("catagorybasedshops");
+    setSelectedCategory(category);
+  }, []);
+
+  if (currentView === "catagorybasedshops") {
+    return (
+      <CatagoryBasedShops
+        category={selectedCategory}
+        shops={groupedShops[selectedCategory] || []}
+        onBack={() => setCurrentView("offlineShop")}
+      />
+    );
+  }
 
   if (error) {
     return <div className="text-center text-red-500">{error}</div>;
@@ -292,10 +305,13 @@ const OfflineShop = () => {
                     </div>
                   </div>
                 ))}
-                <div className="flex-none flex flex-col justify-center items-center bg-gray-100 shadow-md rounded-2xl w-28 cursor-pointer">
+                <button
+                  className="flex-none flex flex-col justify-center items-center bg-gray-100 shadow-md rounded-2xl w-28 cursor-pointer"
+                  onClick={() => handleViewMore(category)}
+                >
                   <p className="text-orange-500 font-bold">View More</p>
                   <FaArrowRight className="text-orange-500 mt-2" />
-                </div>
+                </button>
               </div>
             </div>
           ))}

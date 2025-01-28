@@ -107,7 +107,7 @@ const LocationSelector = ({ onLocationSelect }) => {
             </div>
 
             <button
-              className="w-full bg-teal-600 text-white rounded-lg py-3 px-4 mb-4 flex items-center justify-center gap-2"
+              className="w-full bg-teal-600 text-white rounded-lg py-3 mb-4 flex items-center justify-center gap-2"
               onClick={detectCurrentLocation}
               disabled={loading}
             >
