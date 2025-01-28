@@ -47,11 +47,15 @@ const OfflineShop = () => {
       const querySnapshot = await getDocs(collection(db, "businessDetails"));
       const data = [];
       querySnapshot.forEach((doc) => {
-        data.push({ id: doc.id, ...doc.data() });
+        const shopData = doc.data();
+        // Only include shops with mode === "offline"
+        if (shopData.mode === "offline") {
+          data.push({ id: doc.id, ...shopData });
+        }
       });
       setShops(data);
 
-      // Group all shops by category initially
+      // Group all offline shops by category initially
       const grouped = data.reduce((acc, shop) => {
         if (shop.cat && shop.cat.trim() !== "") {
           if (!acc[shop.cat]) {
@@ -69,6 +73,7 @@ const OfflineShop = () => {
       setLoading(false);
     }
   }, []);
+  console.log(shops);
 
   useEffect(() => {
     fetchData();
