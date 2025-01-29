@@ -32,8 +32,7 @@ import imaoffshop6 from "../assets/Shop/image 79.png";
 import imaoffshop9 from "../assets/Shop/image 80.png";
 import imaoffshop5 from "../assets/Shop/image 80.png";
 import imaoffshop7 from "../assets/Shop/image 82.png";
-import { Link } from "react-router-dom";
-import CatagoryBasedShops from "./CatagoryBasedShops";
+import { Link, useLocation, useParams } from "react-router-dom";
 
 const OfflineShop = () => {
   const [shops, setShops] = useState([]);
@@ -43,9 +42,8 @@ const OfflineShop = () => {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentView, setCurrentView] = useState("offlineShop");
-  const [selectedCategory, setSelectedCategory] = useState(null); // Add this line
-
+  const { userId } = useParams();
+  const location = useLocation();
   const fetchData = useCallback(async () => {
     try {
       const querySnapshot = await getDocs(collection(db, "businessDetails"));
@@ -171,21 +169,6 @@ const OfflineShop = () => {
     []
   );
 
-  const handleViewMore = useCallback((category) => {
-    setCurrentView("catagorybasedshops");
-    setSelectedCategory(category);
-  }, []);
-
-  if (currentView === "catagorybasedshops") {
-    return (
-      <CatagoryBasedShops
-        category={selectedCategory}
-        shops={groupedShops[selectedCategory] || []}
-        onBack={() => setCurrentView("offlineShop")}
-      />
-    );
-  }
-
   if (error) {
     return <div className="text-center text-red-500">{error}</div>;
   }
@@ -287,7 +270,12 @@ const OfflineShop = () => {
               </h2>
               <div className="flex overflow-x-auto space-x-4 w-full justify-around p-10">
                 {categoryShops.map((shop) => (
-                  <div
+                  <Link
+                    to={
+                      location.pathname.includes("/user-dashboard")
+                        ? `/user-dashboard/${userId}/offline-shop/${category}/${shop.id}`
+                        : `/offline-shop/${category}/${shop.id}`
+                    }
                     key={shop.id}
                     className="flex-none bg-white shadow-md rounded-2xl overflow-hidden w-72"
                   >
@@ -303,15 +291,19 @@ const OfflineShop = () => {
                         5% Off
                       </span>
                     </div>
-                  </div>
+                  </Link>
                 ))}
-                <button
+                <Link
+                  to={
+                    location.pathname.includes("/user-dashboard")
+                      ? `/user-dashboard/${userId}/offline-shop/${category}`
+                      : `/offline-shop/${category}`
+                  }
                   className="flex-none flex flex-col justify-center items-center bg-gray-100 shadow-md rounded-2xl w-28 cursor-pointer"
-                  onClick={() => handleViewMore(category)}
                 >
                   <p className="text-orange-500 font-bold">View More</p>
                   <FaArrowRight className="text-orange-500 mt-2" />
-                </button>
+                </Link>
               </div>
             </div>
           ))}

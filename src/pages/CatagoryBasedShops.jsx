@@ -1,13 +1,37 @@
-import React, { useCallback, useMemo, useState } from "react";
-import { FaMapMarkerAlt, FaTimes, FaSearch } from "react-icons/fa";
-import { HiArrowLeft } from "react-icons/hi";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { FaSearch } from "react-icons/fa";
 import LocationSelector from "../Components/LocationSelector";
-import { Link } from "react-router-dom";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../firebase";
+import { Link, useLocation, useParams } from "react-router-dom";
 
-const CatagoryBasedShops = ({ category, shops, onBack }) => {
+const CatagoryBasedShops = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedLocation, setSelectedLocation] = useState(null);
+  const [shops, setShops] = useState([]);
+  const { category,userId } = useParams();
+  const location = useLocation();
+  const fetchData = useCallback(async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "businessDetails"));
+      const data = [];
+      querySnapshot.forEach((doc) => {
+        const shopData = doc.data();
+        if (shopData.mode === "offline" && shopData.cat === category) {
+          data.push({ id: doc.id, ...shopData });
+        }
+      });
+      console.log(data);
 
+      setShops(data);
+    } catch (error) {
+      console.log("Error getting documents: ", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
   const filteredShops = useMemo(() => {
     if (!shops.length) return [];
 
@@ -34,12 +58,6 @@ const CatagoryBasedShops = ({ category, shops, onBack }) => {
   return (
     <div className="min-h-screen py-8 px-4">
       <div className="container mx-auto py-6 px-4 md:px-6 lg:px-8">
-        <button
-          onClick={onBack}
-          className="hover:bg-gray-100 p-2 rounded-full flex items-center gap-2 text-lg"
-        >
-          <HiArrowLeft className="text-xl" /> <span>Back</span>
-        </button>
         <div className="flex flex-col sm:flex-row items-center p-2 bg-white rounded-md shadow-md max-w-full">
           <LocationSelector onLocationSelect={handleLocationSelect} />
           <input
@@ -63,12 +81,19 @@ const CatagoryBasedShops = ({ category, shops, onBack }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {filteredShops.length > 0 ? (
             filteredShops.map((item) => (
-              <Link to={`/shop/${item.id}`} key={item.id}>
+              <Link
+                to={
+                  location.pathname.includes("/user-dashboard")
+                    ? `/user-dashboard/${userId}/offline-shop/${category}/${item.id}`
+                    : `/offline-shop/${category}/${item.id}`
+                }
+                key={item.id}
+              >
                 <div>
                   <img
                     src={item.bannerUrl}
                     alt={item.businessName}
-                    className="w-full md:w-22 rounded-3xl"
+                    className="w-full md:w-22 object-cover rounded-3xl"
                   />
                 </div>
                 <div className="mt-4">

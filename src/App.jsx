@@ -5,6 +5,8 @@ import Footer from "./Components/Footer";
 import Navbar from "./Components/Navbar/Navbar";
 import Loader from "./Components/Loader/Loader";
 import NewLayout from "./NewLayout";
+import BusinessDetails from "./pages/BusinessDetails";
+import ProductDetails from "./pages/ProductDetails";
 // Lazy-loaded components
 const Home = lazy(() => import("./pages/Home"));
 const Signup = lazy(() => import("./pages/Signup"));
@@ -128,7 +130,15 @@ const router = createBrowserRouter([
           { path: "/cashback-charity", element: <Cashback /> },
           { path: "/cashback-deals", element: <CashbackDeals /> },
           { path: "/offline-shop", element: <OfflineShop /> },
-          { path: "/offline-shop/:catagory", element: <CatagoryBasedShops /> },
+          { path: "/offline-shop/:category", element: <CatagoryBasedShops /> },
+          {
+            path: "/offline-shop/:category/:businessId",
+            element: <BusinessDetails />,
+          },
+          {
+            path: "/offline-shop/:category/:businessId/:productId",
+            element: <ProductDetails />,
+          },
           { path: "/online-shop", element: <OnlineShop /> },
           { path: "/shop", element: <Shop /> },
           { path: "/business-form", element: <BusinessForm /> },
@@ -152,8 +162,16 @@ const router = createBrowserRouter([
             element: <OfflineShop />,
           },
           {
-            path: "offline-shop/:catagory",
+            path: "/user-dashboard/:userId/offline-shop/:category",
             element: <CatagoryBasedShops />,
+          },
+          {
+            path: "/user-dashboard/:userId/offline-shop/:category/:businessId",
+            element: <BusinessDetails />,
+          },
+          {
+            path: "/user-dashboard/:userId/offline-shop/:category/:businessId/:productId",
+            element: <ProductDetails />,
           },
           {
             path: "/user-dashboard/:userId/howitworks",
