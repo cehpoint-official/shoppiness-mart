@@ -8,12 +8,13 @@ import {
   businessUserExist,
   setLoading,
 } from "../../../redux/reducer/businessUserReducer";
+import ShopInfoUpdate from "../../components/ShopInfo/ShopInfoUpdate";
 
 const ShopInfo = () => {
-  const { user} = useSelector((state) => state.businessUserReducer);
+  const { user } = useSelector((state) => state.businessUserReducer);
   const { id } = useParams();
   const dispatch = useDispatch();
-
+  const [currentView, setCurrentView] = useState("shopInfo");
   // State for password visibility and modal
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -83,12 +84,19 @@ const ShopInfo = () => {
       dispatch(setLoading(false));
     }
   };
-
+  if (currentView === "shopInfoUpdate") {
+    return (
+      <ShopInfoUpdate
+        onBack={() => setCurrentView("shopInfo")}
+        shopData={user}
+      />
+    );
+  }
   return (
-    <div className="min-h-screen py-8">
-      <div className="container max-w-7xl mx-auto">
+    <div className="min-h-screen p-8">
+      <div className=" bg-white rounded-xl p-6">
         {/* SHOP Info */}
-        <div className="bg-white rounded-xl shadow-card p-6 mb-6">
+        <div>
           <div className="flex items-start gap-6">
             <img
               src={user.bannerUrl}
@@ -152,16 +160,10 @@ const ShopInfo = () => {
               </div>
             </div>
           </div>
-          <div className="flex justify-end mt-6">
-            <button className="flex bg-blue-600 items-center gap-2 bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-hover transition-colors">
-              <MdModeEdit className="w-4 h-4" />
-              Edit Shop Info
-            </button>
-          </div>
         </div>
 
         {/* SHOP DETAILS */}
-        <div className="bg-white rounded-xl shadow-card p-6 mt-6">
+        <div>
           <h2 className="text-lg font-semibold text-textPrimary mb-6">
             SHOP DETAILS
           </h2>
@@ -204,7 +206,7 @@ const ShopInfo = () => {
                     Commission rate
                   </h3>
                   <div className="bg-gray-50 p-3 rounded-md text-textPrimary">
-                    5%
+                    {user.rate}%
                   </div>
                 </div>
                 <div>
@@ -244,7 +246,10 @@ const ShopInfo = () => {
             </div>
           </div>
           <div className="flex justify-end mt-6">
-            <button className="flex bg-blue-600 items-center gap-2 bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-hover transition-colors">
+            <button
+              onClick={() => setCurrentView("shopInfoUpdate")}
+              className="flex bg-blue-600 items-center gap-2 bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-hover transition-colors"
+            >
               <MdModeEdit className="w-4 h-4" />
               Edit Shop Details
             </button>

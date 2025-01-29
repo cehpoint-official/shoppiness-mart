@@ -1,16 +1,25 @@
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, addDoc, collection } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { db } from "../../firebase";
 import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
-import Loader from "../Components/Loader/Loader";
+import {
+  AiOutlineLoading3Quarters,
+  AiOutlineCopy,
+  AiOutlineSave,
+} from "react-icons/ai";
 
 const ProductDetails = () => {
-  const { productId } = useParams();
+  const { productId, businessId, userId } = useParams();
+  const [business, setBusiness] = useState(null);
   const [productsDetails, setProductsDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showDialog, setShowDialog] = useState(false);
   const [showCouponDialog, setShowCouponDialog] = useState(false);
+  const [generatingCoupon, setGeneratingCoupon] = useState(false);
+  const [savingCoupon, setSavingCoupon] = useState(false);
+  const [generatedCouponCode, setGeneratedCouponCode] = useState("");
+
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -25,20 +34,92 @@ const ProductDetails = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Handle form submission logic here
-    console.log("Form submitted:", formData);
-    setShowDialog(false);
-  };
-  const handleCopyCode = () => {
-    navigator.clipboard.writeText("#SHOP627");
+  const generateUniqueCouponCode = (businessName) => {
+    const specialChars = ["#", "@", "$", "&", "*"];
+    const randomSpecialChar =
+      specialChars[Math.floor(Math.random() * specialChars.length)];
+    const randomDigits = Math.floor(Math.random() * 90000) + 10000; // 5 digit number
+    const cleanBusinessName = businessName
+      .replace(/[^a-zA-Z0-9]/g, "")
+      .toUpperCase()
+      .substring(0, 5);
+    return `${randomSpecialChar}${cleanBusinessName}${randomDigits}`;
   };
 
-  const handleSaveCoupon = () => {
-    setShowCouponDialog(false);
-    // Add save coupon logic here
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setGeneratingCoupon(true);
+
+    try {
+      // Generate unique coupon code
+      const couponCode = generateUniqueCouponCode(business.businessName);
+      setGeneratedCouponCode(couponCode);
+
+      // Close form dialog and open coupon dialog
+      setShowDialog(false);
+      setShowCouponDialog(true);
+    } catch (error) {
+      toast.error("Failed to generate coupon");
+      console.error("Error generating coupon:", error);
+    } finally {
+      setGeneratingCoupon(false);
+    }
   };
+
+  const handleCopyCode = () => {
+    navigator.clipboard.writeText(generatedCouponCode);
+    toast.success("Coupon code copied to clipboard!");
+  };
+
+  const handleSaveCoupon = async () => {
+    setSavingCoupon(true);
+
+    try {
+      await addDoc(collection(db, "coupons"), {
+        ...formData,
+        businessId,
+        userId,
+        productId,
+        createdAt: new Date().toISOString(),
+        inStoreDiscount: business.rate,
+        code: generatedCouponCode,
+        businessName: business.businessName,
+        productName: productsDetails.name,
+        productDiscount: productsDetails.discount
+      });
+
+      toast.success("Coupon saved successfully!");
+      setShowCouponDialog(false);
+      // Reset form data
+      setFormData({
+        fullName: "",
+        email: "",
+        phoneNumber: "",
+      });
+    } catch (error) {
+      toast.error("Failed to save coupon");
+      console.error("Error saving coupon:", error);
+    } finally {
+      setSavingCoupon(false);
+    }
+  };
+
+  const fetchBusinessDetails = async () => {
+    try {
+      const businessRef = doc(db, "businessDetails", businessId);
+      const businessDoc = await getDoc(businessRef);
+
+      if (businessDoc.exists()) {
+        setBusiness({ id: businessDoc.id, ...businessDoc.data() });
+      } else {
+        toast.error("Business not found");
+      }
+    } catch (error) {
+      console.error("Error getting business details: ", error);
+      toast.error("Failed to load business details");
+    }
+  };
+
   const fetchProductDetails = async () => {
     try {
       const productRef = doc(db, "productDetails", productId);
@@ -58,15 +139,26 @@ const ProductDetails = () => {
   };
 
   useEffect(() => {
+    fetchBusinessDetails();
     fetchProductDetails();
-  }, [productId]);
+  }, [productId, businessId]);
 
   if (loading) {
-    return <Loader />;
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <AiOutlineLoading3Quarters className="w-8 h-8 animate-spin text-blue-600" />
+      </div>
+    );
   }
 
-  if (!productsDetails) {
-    return <div>Product not found</div>; // Handle case where product is not found
+  if (!productsDetails || !business) {
+    return (
+      <div className="max-w-7xl mx-auto p-4">
+        <div className="text-center text-gray-600">
+          Product or business not found
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -87,17 +179,14 @@ const ProductDetails = () => {
 
           {/* Product Info */}
           <div className="md:w-1/2 space-y-4">
-            {/* Product Title */}
             <h1 className="text-xl md:text-2xl font-bold text-gray-900">
               {productsDetails.name}
             </h1>
 
-            {/* Product Description */}
             <p className="text-gray-600 text-sm">
               {productsDetails.description}
             </p>
 
-            {/* Price Section */}
             <div className="flex items-center gap-3">
               <span className="text-2xl font-bold">
                 ₹{productsDetails.price}
@@ -107,7 +196,6 @@ const ProductDetails = () => {
               </span>
             </div>
 
-            {/* Coupon Button */}
             <div className="space-y-2 flex items-center gap-4">
               <p className="text-gray-700">Get cashback by generating Coupon</p>
               <button
@@ -120,7 +208,6 @@ const ProductDetails = () => {
           </div>
         </div>
       </div>
-
       {/* Similar Items Section */}
 
       {/* <div className="space-y-4">
@@ -234,11 +321,18 @@ const ProductDetails = () => {
               </div>
 
               <button
-                onClick={() => setShowCouponDialog(true)}
                 type="submit"
-                className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors"
+                disabled={generatingCoupon}
+                className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
               >
-                generate Coupon
+                {generatingCoupon ? (
+                  <>
+                    <AiOutlineLoading3Quarters className="w-4 h-4 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  "Generate Coupon"
+                )}
               </button>
             </form>
           </div>
@@ -261,35 +355,47 @@ const ProductDetails = () => {
             </div>
 
             <div className="relative z-20 flex flex-col items-center">
-              {/* Coupon Card */}
               <div className="bg-emerald-500 text-white p-6 rounded-xl w-64 relative mb-4">
-                {/* Coupon content */}
                 <div className="text-center">
-                  <div className="text-5xl font-bold mb-4">20%</div>
+                  <div className="text-5xl font-bold mb-4">
+                    {productsDetails.discount}%
+                  </div>
                   <div className="text-2xl font-bold mb-1">Off</div>
                   <div className="text-sm opacity-90 mb-2">
-                    2.5%
+                    {business.rate}%
                     <br />
                     Cashback from shoppinesssmart
                   </div>
                   <div className="bg-white/10 rounded-lg p-2 flex items-center justify-between">
-                    <span className="text-lg font-bold text-[#FFDE50]">#SHOP627</span>
+                    <span className="text-lg font-bold text-[#FFDE50]">
+                      {generatedCouponCode}
+                    </span>
                     <button
                       onClick={handleCopyCode}
                       className="text-white hover:text-white/80"
                     >
-                      📋
+                      <AiOutlineCopy className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
               </div>
 
-              {/* Save Button */}
               <button
                 onClick={handleSaveCoupon}
-                className="bg-green-500 text-white px-8 py-2 rounded-full hover:bg-green-600 transition-colors"
+                disabled={savingCoupon}
+                className="bg-green-500 text-white px-8 py-2 rounded-full hover:bg-green-600 transition-colors flex items-center gap-2"
               >
-                Save Coupon
+                {savingCoupon ? (
+                  <>
+                    <AiOutlineLoading3Quarters className="w-4 h-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <AiOutlineSave className="w-4 h-4" />
+                    Save Coupon
+                  </>
+                )}
               </button>
             </div>
           </div>

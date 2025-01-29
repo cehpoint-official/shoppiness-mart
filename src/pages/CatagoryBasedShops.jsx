@@ -17,7 +17,7 @@ const CatagoryBasedShops = () => {
       const data = [];
       querySnapshot.forEach((doc) => {
         const shopData = doc.data();
-        if (shopData.mode === "offline" && shopData.cat === category) {
+        if (shopData.mode === "Offline" && shopData.cat === category) {
           data.push({ id: doc.id, ...shopData });
         }
       });

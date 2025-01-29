@@ -236,24 +236,24 @@ const BusinessForm = () => {
             </div>
             <h3>Business/Services Type</h3>
             <div className="options">
-              <label htmlFor="online">Online</label>
+              <label htmlFor="Online">Online</label>
               <input
                 id="online"
                 name="options"
                 type="radio"
-                value="online"
+                value="Online"
                 required
-                checked={formData.mode === "online"}
+                checked={formData.mode === "Online"}
                 onChange={(e) => handleInputChange(e, "mode")}
               />
-              <label htmlFor="offline">Offline</label>
+              <label htmlFor="Offline">Offline</label>
               <input
                 id="offline"
                 type="radio"
                 name="options"
-                value="offline"
+                value="Offline"
                 required
-                checked={formData.mode === "offline"}
+                checked={formData.mode === "Offline"}
                 onChange={(e) => handleInputChange(e, "mode")}
               />
             </div>
@@ -353,7 +353,12 @@ const BusinessForm = () => {
                 or
                 <p className="chooseFile">Choose File</p>
               </label>
-              <input type="file" id="file1" accept="image/*" onChange={handleFileChangeLogo} />
+              <input
+                type="file"
+                id="file1"
+                accept="image/*"
+                onChange={handleFileChangeLogo}
+              />
             </div>
             <div className="item">
               <h3>Add Banner</h3>
@@ -362,7 +367,12 @@ const BusinessForm = () => {
                 or
                 <p className="chooseFile">Choose File</p>
               </label>
-              <input type="file" id="file2" accept="image/*" onChange={handleFileChangeBanner} />
+              <input
+                type="file"
+                id="file2"
+                accept="image/*"
+                onChange={handleFileChangeBanner}
+              />
             </div>
             <div className="btns">
               <button type="button" className="back" onClick={handleBackPage}>

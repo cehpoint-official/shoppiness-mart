@@ -50,7 +50,7 @@ const OfflineShop = () => {
       const data = [];
       querySnapshot.forEach((doc) => {
         const shopData = doc.data();
-        if (shopData.mode === "offline") {
+        if (shopData.mode === "Offline") {
           data.push({ id: doc.id, ...shopData });
         }
       });
@@ -288,7 +288,7 @@ const OfflineShop = () => {
                       <h3 className="text-lg font-bold">{shop.businessName}</h3>
                       <p className="text-gray-600">{shop.location}</p>
                       <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 mt-2 rounded">
-                        5% Off
+                        {shop.rate}% Cashback
                       </span>
                     </div>
                   </Link>
