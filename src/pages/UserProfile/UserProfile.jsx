@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import "./UserProfile.scss";
-import { IoCopyOutline, IoReload } from "react-icons/io5"; // Import IoReload for the loader
+import { IoReload } from "react-icons/io5"; // Import IoReload for the loader
 import CashbackGiveback from "./../Cashback&GiveBack/CashbackGiveback";
 import { useDispatch } from "react-redux";
 import ProfileInfo from "../ProfileInfo";
