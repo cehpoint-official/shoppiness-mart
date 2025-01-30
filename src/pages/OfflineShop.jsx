@@ -1,4 +1,4 @@
-import { FaMapMarkerAlt, FaSearch, FaArrowRight } from "react-icons/fa";
+import {FaSearch, FaArrowRight } from "react-icons/fa";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebase";

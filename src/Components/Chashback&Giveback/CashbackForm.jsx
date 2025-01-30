@@ -1,7 +1,27 @@
-import { useState } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import { useCallback, useEffect, useState } from "react";
+import { db } from "../../../firebase";
 
 const CashbackForm = () => {
   const [selectedFile, setSelectedFile] = useState(null);
+  const [shops, setShops] = useState([]);
+  const fetchData = useCallback(async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "businessDetails"));
+      const data = [];
+      querySnapshot.forEach((doc) => {
+        const shopData = doc.data();
+        data.push({ id: doc.id, ...shopData });
+      });
+      setShops(data);
+    } catch (error) {
+      console.log("Error getting documents: ", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const handleFileChange = (e) => {
     setSelectedFile(e.target.files[0]);
@@ -14,6 +34,11 @@ const CashbackForm = () => {
           <label className="block text-sm mb-2">Select Shop</label>
           <select className="w-full bg-gray-200 rounded p-2 text-sm border-0">
             <option>Select a shop...</option>
+            {shops.map((shop, index) => (
+              <option key={index} value={shop.businessName}>
+                {shop.businessName}
+              </option>
+            ))}
           </select>
         </div>
 

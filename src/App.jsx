@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
 import { Outlet, createBrowserRouter, RouterProvider } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { Toaster } from "react-hot-toast";
 import Footer from "./Components/Footer";
 import Navbar from "./Components/Navbar/Navbar";
@@ -7,6 +8,8 @@ import Loader from "./Components/Loader/Loader";
 import NewLayout from "./NewLayout";
 import BusinessDetails from "./pages/BusinessDetails";
 import ProductDetails from "./pages/ProductDetails";
+import ProtectedRoute from "./Components/ProtectedRoute"; // Adjust the path as needed
+
 // Lazy-loaded components
 const Home = lazy(() => import("./pages/Home"));
 const Signup = lazy(() => import("./pages/Signup"));
@@ -79,6 +82,7 @@ const PrivacyPolicies = lazy(() =>
   import("./NGO-Dashboard/pages/Privacy-Policy/PrivacyPolicies")
 );
 
+// Toast options
 const toastOptions = {
   success: { style: { background: "#4CAF50", color: "white" } },
   error: { style: { background: "#F44336", color: "white" } },
@@ -108,6 +112,36 @@ const Layout = () => (
   </div>
 );
 
+// Protected Route Wrappers
+const UserProtectedRoute = ({ children }) => {
+  const { user } = useSelector((state) => state.userReducer);
+  
+  return (
+    <ProtectedRoute isAuthenticated={!!user} redirect="/login/user">
+      {children}
+    </ProtectedRoute>
+  );
+};
+
+const NgoProtectedRoute = ({ children }) => {
+  const { user } = useSelector((state) => state.ngoUserReducer);
+  return (
+    <ProtectedRoute isAuthenticated={!!user} redirect="/login/cause">
+      {children}
+    </ProtectedRoute>
+  );
+};
+
+const BusinessProtectedRoute = ({ children }) => {
+  const { user } = useSelector((state) => state.businessUserReducer);
+  return (
+    <ProtectedRoute isAuthenticated={!!user} redirect="/login/business">
+      {children}
+    </ProtectedRoute>
+  );
+};
+
+// Router configuration
 const router = createBrowserRouter([
   {
     element: <RootWrapper />, // Wrap everything with RootWrapper
@@ -145,13 +179,22 @@ const router = createBrowserRouter([
           { path: "/cause-form", element: <CauseForm /> },
         ],
       },
+      // Protected User Dashboard Routes
       {
         path: "/user-dashboard/:userId/dashboard",
-        element: <UserDashboard />,
+        element: (
+          <UserProtectedRoute>
+            <UserDashboard />
+          </UserProtectedRoute>
+        ),
       },
       {
         path: "/user-dashboard/:userId",
-        element: <NewLayout />,
+        element: (
+          <UserProtectedRoute>
+            <NewLayout />
+          </UserProtectedRoute>
+        ),
         children: [
           {
             path: "/user-dashboard/:userId/online-shop",
@@ -191,6 +234,24 @@ const router = createBrowserRouter([
           },
         ],
       },
+      // Protected NGO Dashboard Routes
+      {
+        path: "/ngo-dashboard/:id",
+        element: (
+          <NgoProtectedRoute>
+            <NgoDashboardOutlet />
+          </NgoProtectedRoute>
+        ),
+        children: [
+          { path: "dashboard", element: <NgoDashboard /> },
+          { path: "details", element: <NgoDetails /> },
+          { path: "performance", element: <NgoPerformance /> },
+          { path: "support", element: <HelpSupport /> },
+          { path: "about-us", element: <About /> },
+          { path: "faqs", element: <FAQ /> },
+          { path: "privacy-policy", element: <PrivacyPolicies /> },
+        ],
+      },
       // Admin routes
       { path: "/admin/shoppiness/faq", element: <FaqHome /> },
       { path: "/admin/shoppiness/addfaq", element: <AddFaq /> },
@@ -204,10 +265,14 @@ const router = createBrowserRouter([
         path: "/admin/shoppiness/contact/message",
         element: <ContactMessage />,
       },
-      // Services Dashboard
+      // Protected Services Dashboard Routes
       {
         path: "/services-dashboard/:id",
-        element: <DashboardOutlet />,
+        element: (
+          <BusinessProtectedRoute>
+            <DashboardOutlet />
+          </BusinessProtectedRoute>
+        ),
         children: [
           { path: "dashboard", element: <Dashboard /> },
           { path: "products", element: <Products /> },
@@ -217,26 +282,13 @@ const router = createBrowserRouter([
           { path: "invoices", element: <Invoice /> },
         ],
       },
-      // NGO Dashboard
-      {
-        path: "/ngo-dashboard/:id",
-        element: <NgoDashboardOutlet />,
-        children: [
-          { path: "dashboard", element: <NgoDashboard /> },
-          { path: "details", element: <NgoDetails /> },
-          { path: "performance", element: <NgoPerformance /> },
-          { path: "support", element: <HelpSupport /> },
-          { path: "about-us", element: <About /> },
-          { path: "faqs", element: <FAQ /> },
-          { path: "privacy-policy", element: <PrivacyPolicies /> },
-        ],
-      },
       // Fallback route (404 page)
       { path: "*", element: <div>404 Not Found</div> },
     ],
   },
 ]);
 
+// App Component
 const App = () => (
   <Suspense fallback={<Loader />}>
     <RouterProvider router={router} />

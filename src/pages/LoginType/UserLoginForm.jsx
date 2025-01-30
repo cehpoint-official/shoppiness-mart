@@ -6,6 +6,8 @@ import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { auth, db, provider } from "../../../firebase";
 import { doc, setDoc } from "firebase/firestore";
 import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { userExist } from "../../redux/reducer/userReducer";
 
 const UserLoginForm = () => {
   const [userData, setUserData] = useState({
@@ -14,6 +16,7 @@ const UserLoginForm = () => {
   });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -24,12 +27,21 @@ const UserLoginForm = () => {
         userData.email,
         userData.password
       );
+      const user = res.user;
+
+      // Dispatch user data to Redux
+      dispatch(userExist(user));
+
       toast.success("Login successful!");
       setTimeout(() => {
-        navigate(`/user-dashboard/${res.user.uid}/dashboard`);
+        navigate(`/user-dashboard/${user.uid}/dashboard`);
       }, 1000);
     } catch (error) {
-      toast.error(error.message);
+      toast.error(
+        error.code === "auth/wrong-password"
+          ? "Incorrect password"
+          : error.message
+      );
     }
     setLoading(false);
   };
@@ -40,21 +52,28 @@ const UserLoginForm = () => {
     toast.loading("Signing in with Google...");
     try {
       const res = await signInWithPopup(auth, provider);
-      console.log(res);
-      await setDoc(doc(db, "users", res.user.uid), {
-        fname: res.user.displayName,
-        email: res.user.email,
-        profilePic: res.user.photoURL,
+      const user = res.user;
+
+      // Save user data to Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        fname: user.displayName,
+        email: user.email,
+        profilePic: user.photoURL,
       });
+
+      // Dispatch user data to Redux
+      dispatch(userExist(user));
+
       setLoading(false);
       toast.success("Google sign-in successful!");
       setTimeout(() => {
-        navigate(`/user-dashboard/${res.user.uid}`);
+        navigate(`/user-dashboard/${user.uid}`);
       }, 1000);
     } catch (error) {
       toast.error(error.message);
     }
   };
+
   return (
     <form className="w-full max-w-md mx-auto">
       <div className="flex flex-col gap-4">
@@ -67,7 +86,6 @@ const UserLoginForm = () => {
         {loading && (
           <span className="text-green-500 font-semibold">Logging in...</span>
         )}
-
         <div className="mt-3">
           <label htmlFor="email" className="block mb-1 text-gray-600">
             Email Address
@@ -96,10 +114,9 @@ const UserLoginForm = () => {
             className="w-full p-2 border border-gray-200 bg-slate-100 rounded"
           />
         </div>
-        <a href="#" className="text-blue-700  text-center">
+        <a href="#" className="text-blue-700 text-center">
           Forgot password?
         </a>
-
         <button
           onClick={submitHandler}
           type="submit"
@@ -109,7 +126,6 @@ const UserLoginForm = () => {
         </button>
         <div className="text-gray-500 text-center mt-5">or</div>
       </div>
-
       <div className="mt-5 flex justify-center gap-5">
         <img
           src={Googleicon}

@@ -9,6 +9,8 @@ import {
   AiOutlineCopy,
   AiOutlineSave,
 } from "react-icons/ai";
+import { useSelector } from "react-redux";
+
 const BusinessDetails = () => {
   const [business, setBusiness] = useState(null);
   const [products, setProducts] = useState([]);
@@ -20,6 +22,7 @@ const BusinessDetails = () => {
   const [generatingCoupon, setGeneratingCoupon] = useState(false);
   const [savingCoupon, setSavingCoupon] = useState(false);
   const [generatedCouponCode, setGeneratedCouponCode] = useState("");
+  const { user } = useSelector((state) => state.userReducer);
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -63,7 +66,13 @@ const BusinessDetails = () => {
       setGeneratingCoupon(false);
     }
   };
-
+  const handleCouponButtonClick = () => {
+    if (!user) {
+      toast.error("Please login as user to generate coupon");
+      return;
+    }
+    setShowDialog(true);
+  };
   const handleCopyCode = () => {
     navigator.clipboard.writeText(generatedCouponCode);
     toast.success("Coupon code copied to clipboard!");
@@ -201,7 +210,7 @@ const BusinessDetails = () => {
           <div className="space-y-2 flex items-center gap-4">
             <p className="text-gray-700">Get cashback by generating Coupon</p>
             <button
-              onClick={() => setShowDialog(true)}
+              onClick={handleCouponButtonClick}
               className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-colors"
             >
               Generate Coupon

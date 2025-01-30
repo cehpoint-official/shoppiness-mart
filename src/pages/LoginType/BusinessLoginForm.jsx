@@ -13,6 +13,8 @@ import {
   doc,
   setDoc,
 } from "firebase/firestore";
+import { useDispatch } from "react-redux";
+import { businessUserExist } from "../../redux/reducer/businessUserReducer";
 
 const BusinessLoginForm = () => {
   const [userData, setUserData] = useState({
@@ -22,7 +24,7 @@ const BusinessLoginForm = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();
   const submitHandler = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -48,7 +50,9 @@ const BusinessLoginForm = () => {
       if (user.password !== userData.password) {
         throw new Error("Incorrect password.");
       }
+      dispatch(businessUserExist(user));
 
+      
       toast.success("Login successful!");
       setTimeout(() => {
         navigate(`/services-dashboard/${userDoc.id}/dashboard`);
@@ -69,12 +73,13 @@ const BusinessLoginForm = () => {
 
     try {
       const res = await signInWithPopup(auth, provider);
-      console.log(res);
+      const user = res.user;
       await setDoc(doc(db, "causeDetails", res.user.uid), {
         fname: res.user.displayName,
         email: res.user.email,
         profilePic: res.user.photoURL,
       });
+      dispatch(businessUserExist(user));
       toast.success("Login successful!");
       setTimeout(() => {
         navigate(`/services-dashboard/${res.id}`);

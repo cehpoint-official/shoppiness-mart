@@ -16,7 +16,6 @@ import {
 } from "firebase/firestore";
 import {
   ngoUserExist,
-  ngoUserNotExist,
 } from "../../redux/reducer/ngoUserReducer";
 
 const CauseLoginForm = () => {
@@ -51,16 +50,15 @@ const CauseLoginForm = () => {
       if (user.password !== userData.password) {
         throw new Error("Incorrect password.");
       }
-
-      toast.success("Login successful!"); 
       dispatch(ngoUserExist(user));
 
+
+      toast.success("Login successful!"); 
       // Delay navigation to ensure toast is visible
       setTimeout(() => {
         navigate(`/ngo-dashboard/${userDoc.id}/dashboard`);
       }, 1000);
     } catch (error) {
-      dispatch(ngoUserNotExist(null));
       setError(error.message);
       toast.error(error.message); // Show error toast
     } finally {
@@ -76,13 +74,13 @@ const CauseLoginForm = () => {
 
     try {
       const res = await signInWithPopup(auth, provider);
-
+      const user = res.user;
       await setDoc(doc(db, "causeDetails", res.user.uid), {
         fname: res.user.displayName,
         email: res.user.email,
         profilePic: res.user.photoURL,
       });
-
+      dispatch(ngoUserExist(user));
       toast.success("Google sign-in successful!");
       setTimeout(() => {
         navigate(`/ngo-dashboard/${res.user.uid}`);
