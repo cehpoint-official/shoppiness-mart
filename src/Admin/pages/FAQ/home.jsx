@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
-import Navbar from "../../components/Navbar";
-import Sidebar from "../../components/Sidebar";
+
 
 const home = () => {
   const Que = [
@@ -20,9 +19,8 @@ const home = () => {
   return (
     <div>
       <div className="flex">
-        <Sidebar />
         <div className="flex-1 flex flex-col">
-          <Navbar />
+      
 
           {/* FAQ QUES  */}
           <div className="p-6 bg-gray-100 flex-1">

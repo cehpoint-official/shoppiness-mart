@@ -1,14 +1,10 @@
 import { Link } from "react-router-dom";
-import Navbar from "../../components/Navbar";
-import Sidebar from "../../components/Sidebar";
 
 const AddFaq = () => {
   return (
     <div>
       <div className="flex">
-        <Sidebar />
         <div className="flex-1 flex flex-col">
-          <Navbar />
 
           {/*ADD FAQ QUES  */}
           <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">

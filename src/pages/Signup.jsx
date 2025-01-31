@@ -61,6 +61,7 @@ const Signup = () => {
       await setDoc(doc(db, "users", user.uid), {
         ...userData,
         uid: user.uid,
+        role: "user",
       });
       toast.success("Account created successfully!");
       setcpassword("");
@@ -86,6 +87,7 @@ const Signup = () => {
         fname: res.user.displayName,
         email: res.user.email,
         profilePic: res.user.photoURL,
+        role: "user",
       });
       setLoading(false);
       toast.success("Successfully signed in with Google!");

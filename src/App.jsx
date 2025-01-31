@@ -9,7 +9,13 @@ import NewLayout from "./NewLayout";
 import BusinessDetails from "./pages/BusinessDetails";
 import ProductDetails from "./pages/ProductDetails";
 import ProtectedRoute from "./Components/ProtectedRoute"; // Adjust the path as needed
+import AdminDashboard from "./Admin/pages/AdminDashboard/AdminDashboard";
+import AdminDashboardOutlet from "./Admin/pages/AdminDashboardOutlet/AdminDashboardOutlet";
+import Coupons from "./Admin/pages/Users/Coupons/Coupons";
+import Givebacks from "./Admin/pages/Users/Give Backs/Givebacks";
 
+import CashbackStatus from "./Admin/pages/Users/Cashback Status/CashbackStatus";
+import CashbackRequests from "./Admin/pages/Users/Cashback Requests/CashbackRequests";
 // Lazy-loaded components
 const Home = lazy(() => import("./pages/Home"));
 const Signup = lazy(() => import("./pages/Signup"));
@@ -115,7 +121,7 @@ const Layout = () => (
 // Protected Route Wrappers
 const UserProtectedRoute = ({ children }) => {
   const { user } = useSelector((state) => state.userReducer);
-  
+
   return (
     <ProtectedRoute isAuthenticated={!!user} redirect="/login/user">
       {children}
@@ -253,17 +259,19 @@ const router = createBrowserRouter([
         ],
       },
       // Admin routes
-      { path: "/admin/shoppiness/faq", element: <FaqHome /> },
-      { path: "/admin/shoppiness/addfaq", element: <AddFaq /> },
       {
-        path: "/admin/shoppiness/add/privacy-policy",
-        element: <AddPrivacyPolicy />,
-      },
-      { path: "/admin/shoppiness/newsletter", element: <Newsletter /> },
-      { path: "/admin/shoppiness/contact", element: <ContactInfo /> },
-      {
-        path: "/admin/shoppiness/contact/message",
-        element: <ContactMessage />,
+        path: "/admin/shoppiness/",
+        element: <AdminDashboardOutlet />,
+        children: [
+          { path: "dashboard", element: <AdminDashboard /> },
+          { path: "users/coupons", element: <Coupons /> },
+           { path: "users/cashback-requests", element: <CashbackRequests />},
+          { path: "users/cashback-status", element: <CashbackStatus /> },
+          { path: "users/givebacks", element: <Givebacks /> },
+          // { path: "/contact", element: <ContactInfo /> },
+          // { path: "/contact/message", element: <ContactMessage />},
+          
+        ],
       },
       // Protected Services Dashboard Routes
       {

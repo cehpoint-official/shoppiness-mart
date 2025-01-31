@@ -1,15 +1,10 @@
 import { Link } from "react-router-dom";
-import Navbar from "../../components/Navbar";
-import Sidebar from "../../components/Sidebar";
+
 
 const AddPrivacyPolicy = () => {
   return (
     <div>
-      <div className="flex">
-        <Sidebar />
-        <div className="flex-1 flex flex-col">
-          <Navbar />
-
+        <div className="flex-1">
           {/*ADD FAQ QUES  */}
           <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
             <div className="bg-white shadow-md rounded-lg p-8 w-7/12">
@@ -61,7 +56,6 @@ const AddPrivacyPolicy = () => {
             </div>
           </div>
         </div>
-      </div>
     </div>
   );
 };
