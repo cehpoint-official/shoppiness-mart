@@ -52,11 +52,9 @@ const BusinessLoginForm = () => {
       }
       dispatch(businessUserExist(user));
 
-      
       toast.success("Login successful!");
-      setTimeout(() => {
-        navigate(`/services-dashboard/${userDoc.id}/dashboard`);
-      }, 1000);
+
+      navigate(`/services-dashboard/${userDoc.id}/dashboard`);
     } catch (error) {
       setError(error.message);
       toast.error(error.message);

@@ -13,6 +13,8 @@ import {
   updateProfile,
   signInWithPopup,
 } from "firebase/auth";
+import { userExist } from "../redux/reducer/userReducer.js";
+import { useDispatch } from "react-redux";
 const Signup = () => {
   const [userData, setUserData] = useState({
     fname: "",
@@ -25,7 +27,7 @@ const Signup = () => {
   const [terms, setTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();
   const submitHandler = async (e) => {
     e.preventDefault();
     if (
@@ -63,6 +65,7 @@ const Signup = () => {
         uid: user.uid,
         role: "user",
       });
+      dispatch(userExist(user));
       toast.success("Account created successfully!");
       setcpassword("");
       setUserData({ fname: "", lname: "", phone: "", password: "", email: "" });
@@ -80,9 +83,9 @@ const Signup = () => {
   const GoogleSubmitHandler = async (e) => {
     e.preventDefault();
     setLoading(true);
-
     try {
       const res = await signInWithPopup(auth, provider);
+      const user = res.user;
       await setDoc(doc(db, "users", res.user.uid), {
         fname: res.user.displayName,
         email: res.user.email,
@@ -90,6 +93,9 @@ const Signup = () => {
         role: "user",
       });
       setLoading(false);
+
+      dispatch(userExist(user));
+
       toast.success("Successfully signed in with Google!");
 
       // Delayed navigation

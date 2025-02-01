@@ -8,6 +8,8 @@ import { db, storage } from "../../../firebase.js";
 import { addDoc, collection } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { ngoUserExist } from "../../redux/reducer/ngoUserReducer.js";
 
 const CauseForm = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -37,7 +39,7 @@ const CauseForm = () => {
   const [logoFile, setLogoFile] = useState(null);
   const [bannerFile, setBannerFile] = useState(null);
   const [uploadProgress, setUploadProgress] = useState("");
-
+  const dispatch = useDispatch();
   const handleInputChange = (e, field) => {
     const { value } = e.target;
 
@@ -203,6 +205,7 @@ const CauseForm = () => {
         logoUrl,
         bannerUrl,
       });
+      dispatch(ngoUserExist(res));
       setId(res.id);
     } catch (e) {
       throw new Error(e.message); // Throw error to handle in handleCreateAccount

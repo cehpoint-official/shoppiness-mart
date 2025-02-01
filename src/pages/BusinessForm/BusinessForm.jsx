@@ -8,13 +8,15 @@ import { db, storage } from "../../../firebase.js";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import SuccessPage from "../../Components/SuccessPage/SuccessPage";
 import toast from "react-hot-toast"; // Import toast
+import { useDispatch } from "react-redux";
+import { businessUserExist } from "../../redux/reducer/businessUserReducer.js";
 
 const BusinessForm = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [success, setSuccess] = useState(false);
   const [id, setId] = useState("");
   const [completedSteps, setCompletedSteps] = useState([false, false, false]);
-
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     // Business Details (Page 1)
     businessName: "",
@@ -204,6 +206,7 @@ const BusinessForm = () => {
         logoUrl,
         bannerUrl,
       });
+      dispatch(businessUserExist(res));
       setId(res.id);
     } catch (e) {
       throw new Error(e.message);

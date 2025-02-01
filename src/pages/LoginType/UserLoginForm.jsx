@@ -66,9 +66,7 @@ const UserLoginForm = () => {
 
       setLoading(false);
       toast.success("Google sign-in successful!");
-      setTimeout(() => {
-        navigate(`/user-dashboard/${user.uid}`);
-      }, 1000);
+      navigate(`/user-dashboard/${user.uid}`);
     } catch (error) {
       toast.error(error.message);
     }

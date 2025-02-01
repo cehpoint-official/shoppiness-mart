@@ -14,9 +14,7 @@ import {
   doc,
   setDoc,
 } from "firebase/firestore";
-import {
-  ngoUserExist,
-} from "../../redux/reducer/ngoUserReducer";
+import { ngoUserExist } from "../../redux/reducer/ngoUserReducer";
 
 const CauseLoginForm = () => {
   const dispatch = useDispatch();
@@ -52,12 +50,9 @@ const CauseLoginForm = () => {
       }
       dispatch(ngoUserExist(user));
 
+      toast.success("Login successful!");
 
-      toast.success("Login successful!"); 
-      // Delay navigation to ensure toast is visible
-      setTimeout(() => {
-        navigate(`/ngo-dashboard/${userDoc.id}/dashboard`);
-      }, 1000);
+      navigate(`/ngo-dashboard/${userDoc.id}/dashboard`);
     } catch (error) {
       setError(error.message);
       toast.error(error.message); // Show error toast

@@ -38,16 +38,16 @@ const OnlineShop = lazy(() => import("./pages/OnlineShop"));
 const OfflineShop = lazy(() => import("./pages/OfflineShop"));
 const CatagoryBasedShops = lazy(() => import("./pages/CatagoryBasedShops"));
 const UserProfile = lazy(() => import("./pages/UserProfile/UserProfile"));
-const FaqHome = lazy(() => import("./Admin/pages/FAQ/home"));
-const AddFaq = lazy(() => import("./Admin/pages/FAQ/AddFaq"));
-const AddPrivacyPolicy = lazy(() =>
-  import("./Admin/pages/PrivacyPolicy/AddPrivacyPolicy")
-);
-const Newsletter = lazy(() => import("./Admin/pages/Newsletter/Newsletter"));
-const ContactInfo = lazy(() => import("./Admin/pages/Contact/ContactInfo"));
-const ContactMessage = lazy(() =>
-  import("./Admin/pages/Contact/ContactMessage")
-);
+// const FaqHome = lazy(() => import("./Admin/pages/FAQ/home"));
+// const AddFaq = lazy(() => import("./Admin/pages/FAQ/AddFaq"));
+// const AddPrivacyPolicy = lazy(() =>
+//   import("./Admin/pages/PrivacyPolicy/AddPrivacyPolicy")
+// );
+// const Newsletter = lazy(() => import("./Admin/pages/Newsletter/Newsletter"));
+// const ContactInfo = lazy(() => import("./Admin/pages/Contact/ContactInfo"));
+// const ContactMessage = lazy(() =>
+//   import("./Admin/pages/Contact/ContactMessage")
+// );
 const DashboardOutlet = lazy(() =>
   import("./Services-Dashboard/pages/DashboardOutlet/DashboardOutlet")
 );
