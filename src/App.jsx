@@ -276,9 +276,9 @@ const router = createBrowserRouter([
       {
         path: "/services-dashboard/:id",
         element: (
-          // <BusinessProtectedRoute>
-          <DashboardOutlet />
-          // </BusinessProtectedRoute>
+          <BusinessProtectedRoute>
+            <DashboardOutlet />
+          </BusinessProtectedRoute>
         ),
         children: [
           { path: "dashboard", element: <Dashboard /> },
