@@ -265,21 +265,20 @@ const router = createBrowserRouter([
         children: [
           { path: "dashboard", element: <AdminDashboard /> },
           { path: "users/coupons", element: <Coupons /> },
-           { path: "users/cashback-requests", element: <CashbackRequests />},
+          { path: "users/cashback-requests", element: <CashbackRequests /> },
           { path: "users/cashback-status", element: <CashbackStatus /> },
           { path: "users/givebacks", element: <Givebacks /> },
           // { path: "/contact", element: <ContactInfo /> },
           // { path: "/contact/message", element: <ContactMessage />},
-          
         ],
       },
       // Protected Services Dashboard Routes
       {
         path: "/services-dashboard/:id",
         element: (
-          <BusinessProtectedRoute>
-            <DashboardOutlet />
-          </BusinessProtectedRoute>
+          // <BusinessProtectedRoute>
+          <DashboardOutlet />
+          // </BusinessProtectedRoute>
         ),
         children: [
           { path: "dashboard", element: <Dashboard /> },

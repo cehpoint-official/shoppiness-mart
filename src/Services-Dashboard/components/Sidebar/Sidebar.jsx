@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { IoLogOutOutline } from "react-icons/io5";
@@ -9,8 +9,6 @@ import iconProducts from "../../assets/icon-products.png";
 import iconCustomers from "../../assets/icon-customers.png";
 import iconPOS from "../../assets/icon-pos.png";
 import iconInvoices from "../../assets/icon-invoice.png";
-import iconSales from "../../assets/icon-sales.png";
-import iconShop from "../../assets/icon-shop.png";
 import iconLogout from "../../assets/icon-logout.png";
 import { businessUserExist } from "../../../redux/reducer/businessUserReducer";
 
