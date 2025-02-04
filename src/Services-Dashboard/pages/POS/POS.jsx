@@ -5,7 +5,6 @@ import { db } from "../../../../firebase";
 import { useParams } from "react-router-dom";
 
 const POS = ({ onGenerateInvoice }) => {
-  
   const [products, setProducts] = useState([]);
   const [productName, setProductName] = useState("");
   const [productPrice, setProductPrice] = useState("");
@@ -13,7 +12,6 @@ const POS = ({ onGenerateInvoice }) => {
   const [discountType, setDiscountType] = useState("percent");
   const [discountValue, setDiscountValue] = useState("");
   const [coupons, setCoupons] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [couponCode, setCouponCode] = useState("");
   const [matchedCoupon, setMatchedCoupon] = useState(null);
   const { id } = useParams();
@@ -51,16 +49,14 @@ const POS = ({ onGenerateInvoice }) => {
       const data = [];
       querySnapshot.forEach((doc) => {
         const couponsData = doc.data();
-        if (couponsData.businessId === id) {
+        if (couponsData.businessId === id && couponsData.status === "Pending") {
           data.push({ id: doc.id, ...couponsData });
         }
       });
       setCoupons(data);
     } catch (error) {
       console.log("Error getting documents: ", error);
-    } finally {
-      setLoading(false);
-    }
+    } 
   }, [id]);
 
   useEffect(() => {
@@ -91,6 +87,11 @@ const POS = ({ onGenerateInvoice }) => {
       time: new Date().toLocaleTimeString(),
       invoiceId: `IN-${Math.floor(Math.random() * 100000)}`,
       cashback: matchedCoupon?.inStoreDiscount || 0,
+      matchedCouponCode: matchedCoupon?.code || "",
+      matchedCouponEmail: matchedCoupon?.email || "",
+      matchedCouponName: matchedCoupon?.fullName || "",
+      matchedCouponId: matchedCoupon?.id || "",
+      businessId: id,
     };
     onGenerateInvoice(invoiceData);
   };
@@ -141,8 +142,6 @@ const POS = ({ onGenerateInvoice }) => {
 
   // Calculate grand total
   const grandTotal = totalPrice + taxAmount - cashCollected;
-  
-  
 
   return (
     <div className="flex flex-col gap-6 p-10">
@@ -423,9 +422,7 @@ const POS = ({ onGenerateInvoice }) => {
               </div>
               <div>
                 <div className="flex flex-col gap-2">
-                  <p className="text-gray-600">
-                    Cash collected: Rs.
-                  </p>
+                  <p className="text-gray-600">Cash collected: Rs.</p>
                   <input
                     type="number"
                     value={cashCollected}

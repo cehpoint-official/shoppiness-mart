@@ -17,7 +17,7 @@ const Coupons = () => {
       const data = [];
       querySnapshot.forEach((doc) => {
         const couponsData = doc.data();
-        if (couponsData.userId === userId) {
+        if (couponsData.userId === userId && couponsData.status === "Pending") {
           data.push({ id: doc.id, ...couponsData });
         }
       });
@@ -25,7 +25,7 @@ const Coupons = () => {
     } catch (error) {
       console.log("Error getting documents: ", error);
     } finally {
-      setLoading(false); // Set loading to false after data is fetched
+      setLoading(false); 
     }
   }, [userId]);
 

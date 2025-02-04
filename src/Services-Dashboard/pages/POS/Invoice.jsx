@@ -1,50 +1,153 @@
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import headerLogo from "../../assets/header-logo.png";
 import { Link } from "react-router-dom";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { addDoc, collection, doc, setDoc } from "firebase/firestore";
+import { db, storage } from "../../../../firebase";
+import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import toast from "react-hot-toast";
+import { FaSpinner } from "react-icons/fa";
 
 const Invoice = ({ data, onBack }) => {
-  const { user} = useSelector((state) => state.businessUserReducer);
+  const { user } = useSelector((state) => state.businessUserReducer);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
-  const handleSave = () => {
-    
+  const generatePdf = async (elementId) => {
+    const invoiceContent = document.getElementById(elementId);
+    const canvas = await html2canvas(invoiceContent, {
+      scale: 3,
+      useCORS: true,
+    });
+    const imgData = canvas.toDataURL("image/png", 1.0);
+    const pdf = new jsPDF("p", "mm", "a4");
+    const imgWidth = 210;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+    return pdf;
   };
 
-  const handleDownloadPDF = () => {
-    const invoiceContent = document.getElementById("invoice-content");
+  const generatePdfBlob = async () => {
+    const pdf = await generatePdf("invoice-content");
+    return pdf.output("blob");
+  };
 
-    html2canvas(invoiceContent, {
-      scale: 2, // Increase scale for better quality
-      useCORS: true, // Allow cross-origin images
-    }).then((canvas) => {
-      const imgData = canvas.toDataURL("image/png", 1.0);
-      const pdf = new jsPDF("p", "mm", "a4");
-      const imgWidth = 210; // A4 width in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+  const uploadPdf = async (file) => {
+    const metadata = {
+      contentType: "application/pdf",
+    };
+    const storageRef = ref(storage, "invoices/" + data.invoiceId + ".pdf");
+    const uploadTask = uploadBytesResumable(storageRef, file, metadata);
 
-      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
-      pdf.save("invoice.pdf");
+    return new Promise((resolve, reject) => {
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log("Upload is " + progress + "% done");
+        },
+        (error) => {
+          console.error("Upload failed:", error);
+          reject(error);
+        },
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref)
+            .then((downloadURL) => {
+              resolve(downloadURL);
+            })
+            .catch((error) => {
+              console.error("Failed to get download URL:", error);
+              reject(error);
+            });
+        }
+      );
     });
+  };
+
+  const handleSave = async () => {
+    setIsLoading(true);
+    try {
+      const pdfBlob = await generatePdfBlob();
+      const pdfUrl = await uploadPdf(pdfBlob);
+
+      // First, attempt to add the claimed coupon details
+      const claimedCouponRef = await addDoc(
+        collection(db, "claimedCouponsDetails"),
+        {
+          claimedCouponCode: data.matchedCouponCode,
+          claimedCouponCodeUserName: data.matchedCouponName,
+          claimedCouponCodeUserEmail: data.matchedCouponEmail,
+          claimedDate: data.billingDate,
+          discount: data.cashback,
+          pdfUrl,
+          invoiceNum: data.invoiceId,
+          businessId:data.businessId
+        }
+      );
+
+      // Only if document addition is successful, update the coupon status
+      if (claimedCouponRef.id) {
+        await setDoc(
+          doc(db, "coupons", data.matchedCouponId),
+          {
+            status: "Claimed",
+          },
+          { merge: true }
+        );
+
+        toast.success("Invoice saved and coupon claimed successfully!");
+      } else {
+        throw new Error("Failed to add claimed coupon document");
+      }
+    } catch (error) {
+      console.error("Error saving invoice:", error);
+      toast.error("Failed to save invoice.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDownloadPDF = async () => {
+    setIsDownloading(true);
+    try {
+      const pdf = await generatePdf("invoice-content");
+      pdf.save("invoice.pdf");
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast.error("Failed to download PDF.");
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   return (
     <div>
       <div className="print:hidden mx-10 mb-6 flex justify-between items-center">
-        <button onClick={onBack} className="text-lg flex items-center gap-2">
+        <button
+          onClick={onBack}
+          className="text-lg flex items-center gap-2"
+          aria-label="Go back"
+        >
           ← Back
         </button>
         <div className="flex gap-4">
           <button
             onClick={handleSave}
-            className="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600"
+            disabled={isLoading}
+            className="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 flex items-center gap-2"
           >
+            {isLoading ? <FaSpinner className="animate-spin" /> : null}
             Save
           </button>
           <button
             onClick={handleDownloadPDF}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            disabled={isDownloading}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center gap-2"
           >
+            {isDownloading ? <FaSpinner className="animate-spin" /> : null}
             Download PDF
           </button>
         </div>

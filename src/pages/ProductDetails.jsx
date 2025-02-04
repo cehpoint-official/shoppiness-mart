@@ -85,7 +85,8 @@ const ProductDetails = () => {
         code: generatedCouponCode,
         businessName: business.businessName,
         productName: productsDetails.name,
-        productDiscount: productsDetails.discount
+        productDiscount: productsDetails.discount,
+        status: "Pending",
       });
 
       toast.success("Coupon saved successfully!");
