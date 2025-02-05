@@ -90,6 +90,7 @@ const BusinessDetails = () => {
         inStoreDiscount: business.rate,
         code: generatedCouponCode,
         businessName: business.businessName,
+        status: "Pending",
       });
 
       toast.success("Coupon saved successfully!");

@@ -16,6 +16,12 @@ import Givebacks from "./Admin/pages/Users/Give Backs/Givebacks";
 
 import CashbackStatus from "./Admin/pages/Users/Cashback Status/CashbackStatus";
 import CashbackRequests from "./Admin/pages/Users/Cashback Requests/CashbackRequests";
+import GiveBackRecord from "./Admin/pages/Ngo/GiveBackRecord/GiveBackRecord";
+import AllNgos from "./Admin/pages/Ngo/AllNgos/AllNgos";
+import NgoRequest from "./Admin/pages/Ngo/NgoRequest/NgoRequest";
+import EditPage from "./Admin/pages/Maast/EditPage/EditPage";
+import AllDonations from "./Admin/pages/Maast/ViewDonations/AllDonations";
+import Events from "./Admin/pages/Maast/NewEvents/Events";
 // Lazy-loaded components
 const Home = lazy(() => import("./pages/Home"));
 const Signup = lazy(() => import("./pages/Signup"));
@@ -264,10 +270,17 @@ const router = createBrowserRouter([
         element: <AdminDashboardOutlet />,
         children: [
           { path: "dashboard", element: <AdminDashboard /> },
+          { path: "maast/edit", element: <EditPage /> },
+          { path: "maast/donations", element: <AllDonations /> },
+          { path: "maast/events", element: <Events /> },
+          { path: "ngo/ngo-requests", element: <NgoRequest />},
+          { path: "ngo/all-ngo", element: <AllNgos /> },
+          { path: "ngo/giveback-request", element: <GiveBackRecord /> },
           { path: "users/coupons", element: <Coupons /> },
           { path: "users/cashback-requests", element: <CashbackRequests /> },
           { path: "users/cashback-status", element: <CashbackStatus /> },
           { path: "users/givebacks", element: <Givebacks /> },
+
           // { path: "/contact", element: <ContactInfo /> },
           // { path: "/contact/message", element: <ContactMessage />},
         ],
@@ -276,9 +289,9 @@ const router = createBrowserRouter([
       {
         path: "/services-dashboard/:id",
         element: (
-        //  <BusinessProtectedRoute>
-            <DashboardOutlet />
-     //     </BusinessProtectedRoute>
+          //  <BusinessProtectedRoute>
+          <DashboardOutlet />
+          //     </BusinessProtectedRoute>
         ),
         children: [
           { path: "dashboard", element: <Dashboard /> },

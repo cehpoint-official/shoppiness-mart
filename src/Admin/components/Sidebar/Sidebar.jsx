@@ -104,19 +104,19 @@ const Sidebar = () => {
           {openSections.maast && (
             <div className="flex flex-col pl-6 bg-teal-700/20">
               <Link
-                to="/maast/edit"
+                to="/admin/shoppiness/maast/edit"
                 className="py-2 px-6 hover:bg-teal-600 transition-colors"
               >
                 Edit Page
               </Link>
               <Link
-                to="/maast/donations"
+                to="/admin/shoppiness/maast/donations"
                 className="py-2 px-6 hover:bg-teal-600 transition-colors"
               >
                 View Donations
               </Link>
               <Link
-                to="/maast/events"
+                to="/admin/shoppiness/maast/events"
                 className="py-2 px-6 hover:bg-teal-600 transition-colors"
               >
                 Events
@@ -176,22 +176,22 @@ const Sidebar = () => {
           {openSections.ngo && (
             <div className="flex flex-col pl-6 bg-teal-700/20">
               <Link
-                to="/ngo/requests"
+                to="/admin/shoppiness/ngo/ngo-requests"
                 className="py-2 px-6 hover:bg-teal-600 transition-colors"
               >
                 NGO/Causes Requests
               </Link>
               <Link
-                to="/ngo/all"
+                to="/admin/shoppiness/ngo/all-ngo"
                 className="py-2 px-6 hover:bg-teal-600 transition-colors"
               >
                 All NGO/Causes
               </Link>
               <Link
-                to="/ngo/add"
+                to="/admin/shoppiness/ngo/giveback-request"
                 className="py-2 px-6 hover:bg-teal-600 transition-colors"
               >
-                Add NGO/Causes
+                Give Back Record
               </Link>
             </div>
           )}

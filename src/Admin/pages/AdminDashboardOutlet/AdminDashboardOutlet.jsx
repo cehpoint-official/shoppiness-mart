@@ -7,7 +7,7 @@ const AdminDashboardOutlet = () => {
   return (
     <div className="dashboardOutlet flex">
     <Sidebar/>
-    <div className="main-content w-full overflow-y-auto h-screen">
+    <div className="main-content bg-gray-50 w-full overflow-y-auto h-screen">
       <Navbar />
       <Outlet />
     </div>
