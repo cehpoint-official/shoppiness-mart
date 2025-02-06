@@ -137,28 +137,34 @@ const Sidebar = () => {
           {openSections.product && (
             <div className="flex flex-col pl-6 bg-teal-700/20">
               <Link
-                to="/products/requests"
+                to="/admin/shoppiness/services/offlineshop-requests"
                 className="py-2 px-6 hover:bg-teal-600 transition-colors"
               >
-                Product & Services Requests
+                Offline Shop Requests
               </Link>
               <Link
-                to="/products/all"
+                to="/admin/shoppiness/services/onlineshop-requests"
                 className="py-2 px-6 hover:bg-teal-600 transition-colors"
               >
-                All Product & Services
+                Online Shop Requests
               </Link>
               <Link
-                to="/products/categories"
+                to="/admin/shoppiness/services/all-offlineshops"
+                className="py-2 px-6 hover:bg-teal-600 transition-colors"
+              >
+                All Offline Shops
+              </Link>
+              <Link
+                to="/admin/shoppiness/services/all-onlineshops"
+                className="py-2 px-6 hover:bg-teal-600 transition-colors"
+              >
+                All Online Shops
+              </Link>
+              <Link
+                to="/admin/shoppiness/services/add-categories"
                 className="py-2 px-6 hover:bg-teal-600 transition-colors"
               >
                 Add Categories
-              </Link>
-              <Link
-                to="/products/add"
-                className="py-2 px-6 hover:bg-teal-600 transition-colors"
-              >
-                Add Product & Services
               </Link>
             </div>
           )}
@@ -218,13 +224,13 @@ const Sidebar = () => {
                 to="/admin/shoppiness/users/cashback-requests"
                 className="py-2 px-6 hover:bg-teal-600 transition-colors"
               >
-                 Cashback Requests
+                Cashback Requests
               </Link>
               <Link
                 to="/admin/shoppiness/users/cashback-status"
                 className="py-2 px-6 hover:bg-teal-600 transition-colors"
               >
-               Cashback Status
+                Cashback Status
               </Link>
               <Link
                 to="/admin/shoppiness/users/givebacks"

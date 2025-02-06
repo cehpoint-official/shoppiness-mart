@@ -22,6 +22,11 @@ import NgoRequest from "./Admin/pages/Ngo/NgoRequest/NgoRequest";
 import EditPage from "./Admin/pages/Maast/EditPage/EditPage";
 import AllDonations from "./Admin/pages/Maast/ViewDonations/AllDonations";
 import Events from "./Admin/pages/Maast/NewEvents/Events";
+import OfflineShopRequests from "./Admin/pages/Product&Services/OfflineShopRequests/OfflineShopRequests";
+import OnlineShopRequests from "./Admin/pages/Product&Services/OnlineShopRequests/OnlineShopRequests";
+import AllOfflineShops from "./Admin/pages/Product&Services/AllOfflineShops/AllOfflineShops";
+import AllOnlineShops from "./Admin/pages/Product&Services/AllOnlineShops/AllOnlineShops";
+import AddCategories from "./Admin/pages/Product&Services/AddCategories/AddCategories";
 // Lazy-loaded components
 const Home = lazy(() => import("./pages/Home"));
 const Signup = lazy(() => import("./pages/Signup"));
@@ -276,10 +281,16 @@ const router = createBrowserRouter([
           { path: "ngo/ngo-requests", element: <NgoRequest />},
           { path: "ngo/all-ngo", element: <AllNgos /> },
           { path: "ngo/giveback-request", element: <GiveBackRecord /> },
+          { path: "services/offlineshop-requests", element: <OfflineShopRequests /> },
+          { path: "services/onlineshop-requests", element: <OnlineShopRequests /> },
+          { path: "services/all-offlineshops", element: <AllOfflineShops /> },
+          { path: "services/all-onlineshops", element: <AllOnlineShops /> },
+          { path: "services/add-categories", element: <AddCategories /> },
           { path: "users/coupons", element: <Coupons /> },
           { path: "users/cashback-requests", element: <CashbackRequests /> },
           { path: "users/cashback-status", element: <CashbackStatus /> },
           { path: "users/givebacks", element: <Givebacks /> },
+         
 
           // { path: "/contact", element: <ContactInfo /> },
           // { path: "/contact/message", element: <ContactMessage />},
