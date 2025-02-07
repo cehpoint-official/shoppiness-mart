@@ -4,16 +4,18 @@ import headerLogo from "../../assets/header-logo.png";
 import { Link } from "react-router-dom";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import { addDoc, collection, doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db, storage } from "../../../../firebase";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import toast from "react-hot-toast";
 import { FaSpinner } from "react-icons/fa";
 
-const Invoice = ({ data, onBack }) => {
+const SingleInvoice = ({ invoice, onBack, onUpdate }) => {
   const { user } = useSelector((state) => state.businessUserReducer);
   const [isLoading, setIsLoading] = useState(false);
+  const [localDueAmount, setLocalDueAmount] = useState(invoice.dueAmount);
   const [isDownloading, setIsDownloading] = useState(false);
+  console.log(invoice);
 
   const generatePdf = async (elementId) => {
     const invoiceContent = document.getElementById(elementId);
@@ -38,7 +40,10 @@ const Invoice = ({ data, onBack }) => {
     const metadata = {
       contentType: "application/pdf",
     };
-    const storageRef = ref(storage, "invoices/" + data.invoiceId + ".pdf");
+    const storageRef = ref(
+      storage,
+      "updatedInvoice/" + invoice.invoiceNum + ".pdf"
+    );
     const uploadTask = uploadBytesResumable(storageRef, file, metadata);
 
     return new Promise((resolve, reject) => {
@@ -70,53 +75,57 @@ const Invoice = ({ data, onBack }) => {
   const handleSave = async () => {
     setIsLoading(true);
     try {
+      if (invoice.dueAmount == 0) {
+        throw new Error("No amount is Due");
+      }
       const pdfBlob = await generatePdfBlob();
       const pdfUrl = await uploadPdf(pdfBlob);
 
-      // First, attempt to add the claimed coupon details
-      const claimedCouponRef = await setDoc(
-        doc(db, "claimedCouponsDetails", data.id),
+      // Update invoice document
+      await setDoc(
+        doc(db, "claimedCouponsDetails", invoice.id),
         {
-          userCashback: data.userCashback + data.remainingCashback,
+          userCashback:
+            (invoice.userCashback || 0) + (invoice.remainingCashback || 0),
           remainingCashback: 0,
-
+          dueAmount: 0,
+          paidAmount: invoice.totalAmount,
           pdfUrl: pdfUrl,
         },
         { merge: true }
       );
 
-      // Only if document addition is successful, update the coupon status and user's collectedCashback
-      if (claimedCouponRef.id) {
-        // Fetch the current collectedCashback value from Firestore
-        const userDocRef = doc(db, "users", data.userId);
-        const userDoc = await getDoc(userDocRef);
+      // Update local due amount state
+      setLocalDueAmount(0);
 
-        if (userDoc.exists()) {
-          const currentCollectedCashback =
-            userDoc.data().collectedCashback || 0;
+      // Update user's collected cashback
+      const userDocRef = doc(db, "users", invoice.userId);
+      const userDoc = await getDoc(userDocRef);
 
-          // Update the collectedCashback by adding the new userCashback
-          await setDoc(
-            userDocRef,
-            {
-              collectedCashback: currentCollectedCashback + data.remainingCashback,
-            },
-            { merge: true }
-          );
-        }
-        toast.success("Invoice Updated and Remaining Cashback Send successfully!");
-        onBack();
-      } else {
-        throw new Error("Failed to add claimed coupon document");
+      if (userDoc.exists()) {
+        const currentCollectedCashback = userDoc.data().collectedCashback || 0;
+        await setDoc(
+          userDocRef,
+          {
+            collectedCashback:
+              currentCollectedCashback + (invoice.remainingCashback || 0),
+          },
+          { merge: true }
+        );
       }
+
+      toast.success(
+        "Invoice Updated and Remaining Cashback Sent successfully!"
+      );
+      onUpdate();
+      onBack();
     } catch (error) {
       console.error("Error saving invoice:", error);
-      toast.error("Failed to save invoice.");
+      toast.error(error.message || "Failed to save invoice.");
     } finally {
       setIsLoading(false);
     }
   };
-
   const handleDownloadPDF = async () => {
     setIsDownloading(true);
     try {
@@ -147,7 +156,7 @@ const Invoice = ({ data, onBack }) => {
             className="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 flex items-center gap-2"
           >
             {isLoading ? <FaSpinner className="animate-spin" /> : null}
-            Save
+            Update
           </button>
           <button
             onClick={handleDownloadPDF}
@@ -203,15 +212,17 @@ const Invoice = ({ data, onBack }) => {
           <div className="grid grid-cols-2 gap-8">
             <div>
               <h3 className="text-gray-600 mb-1">Bill To</h3>
-              <p className="font-medium mb-1">{data.customerName}</p>
+              <p className="font-medium mb-1">
+                {invoice.claimedCouponCodeUserName}
+              </p>
               <p className="text-sm text-gray-600 mb-1">Phone No.</p>
-              <p className="font-medium">{data.phoneNumber}</p>
+              <p className="font-medium">{invoice.userPhoneNumber}</p>
             </div>
             <div className="text-right">
               <p className="text-gray-600 mb-1">Invoice#</p>
-              <p className="font-medium">{data.invoiceId}</p>
+              <p className="font-medium">{invoice.invoiceNum}</p>
               <p className="text-gray-600 mt-2 mb-1">Biller</p>
-              <p className="font-medium">{data.billerName}</p>
+              <p className="font-medium">{invoice.billerName}</p>
             </div>
           </div>
 
@@ -227,9 +238,11 @@ const Invoice = ({ data, onBack }) => {
               </thead>
               <tbody>
                 <tr className="border-b">
-                  <td className="py-3 px-4">{data.billingDate}</td>
-                  <td className="py-3 px-4">{data.time}</td>
-                  <td className="py-3 px-4 text-center">{data.dueDate}</td>
+                  <td className="py-3 px-4">{invoice.claimedDate}</td>
+                  <td className="py-3 px-4">
+                    {new Date().toLocaleTimeString()}
+                  </td>
+                  <td className="py-3 px-4 text-center">{invoice.dueDate}</td>
                 </tr>
               </tbody>
             </table>
@@ -248,7 +261,7 @@ const Invoice = ({ data, onBack }) => {
                 </tr>
               </thead>
               <tbody>
-                {data.products.map((product, index) => (
+                {invoice.products.map((product, index) => (
                   <tr key={index} className="border-b">
                     <td className="py-3 px-4">{index + 1}.</td>
                     <td className="py-3 px-4">{product.name}</td>
@@ -272,35 +285,31 @@ const Invoice = ({ data, onBack }) => {
             <div className="w-64 space-y-2">
               <div className="flex justify-between">
                 <span>Sub Total</span>
-                <span>Rs. {data.totalPrice.toLocaleString()}</span>
+                <span>Rs. {invoice.subTotal.toLocaleString()}</span>
               </div>
               <div className="flex justify-between text-gray-600">
                 <span>Tax Rate</span>
-                <span>
-                  {((data.taxAmount / data.totalPrice) * 100).toFixed(1) > 0
-                    ? ((data.taxAmount / data.totalPrice) * 100).toFixed(1)
-                    : 0}
-                  %
-                </span>
+                <span>{invoice.taxRate}%</span>
               </div>
               <div className="flex justify-between font-medium">
                 <span>Total</span>
-                <span>Rs. {data.grandTotal.toLocaleString()}</span>
+                <span>Rs. {invoice.totalAmount.toLocaleString()}</span>
               </div>
               <div className="flex justify-between bg-gray-50 py-2 rounded">
                 <span>Cash Collected</span>
-                <span>Rs. {data.cashCollected.toLocaleString()}</span>
+                <span>Rs. {invoice.paidAmount.toLocaleString()}</span>
               </div>
+              {/* Due Amount Field */}
               {/* Due Amount Field */}
               <div
                 className={`flex justify-between py-2 rounded border-l-4 ${
-                  data.dueAmount > 0
+                  localDueAmount > 0
                     ? "border-red-500 bg-red-50 text-red-600"
                     : "border-green-500 bg-green-50 text-green-600"
                 }`}
               >
                 <span>Due Amount</span>
-                <span>Rs. {data.dueAmount.toLocaleString()}</span>
+                <span>Rs. {localDueAmount.toLocaleString()}</span>
               </div>
             </div>
           </div>
@@ -309,7 +318,7 @@ const Invoice = ({ data, onBack }) => {
           <div className="mt-8 bg-orange-50 border border-orange-100 rounded-lg p-4">
             <p className="text-sm">
               <span className="font-medium">Cashback Details: </span>
-              Earn {data.userCashback || 0}% cashback at Shopinesmart! Visit{" "}
+              Earn {invoice.discount || 0}% cashback at Shopinesmart! Visit{" "}
               <Link to="https://shopinesmart.com" className="text-blue-600">
                 shopinesmart.com
               </Link>
@@ -333,4 +342,4 @@ const Invoice = ({ data, onBack }) => {
   );
 };
 
-export default Invoice;
+export default SingleInvoice;

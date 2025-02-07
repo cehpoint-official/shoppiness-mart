@@ -130,15 +130,15 @@ const Layout = () => (
 );
 
 // Protected Route Wrappers
-const UserProtectedRoute = ({ children }) => {
-  const { user } = useSelector((state) => state.userReducer);
+// const UserProtectedRoute = ({ children }) => {
+//   const { user } = useSelector((state) => state.userReducer);
 
-  return (
-    <ProtectedRoute isAuthenticated={!!user} redirect="/login/user">
-      {children}
-    </ProtectedRoute>
-  );
-};
+//   return (
+//     <ProtectedRoute isAuthenticated={!!user} redirect="/login/user">
+//       {children}
+//     </ProtectedRoute>
+//   );
+// };
 
 const NgoProtectedRoute = ({ children }) => {
   const { user } = useSelector((state) => state.ngoUserReducer);
@@ -149,14 +149,14 @@ const NgoProtectedRoute = ({ children }) => {
   );
 };
 
-const BusinessProtectedRoute = ({ children }) => {
-  const { user } = useSelector((state) => state.businessUserReducer);
-  return (
-    <ProtectedRoute isAuthenticated={!!user} redirect="/login/business">
-      {children}
-    </ProtectedRoute>
-  );
-};
+// const BusinessProtectedRoute = ({ children }) => {
+//   const { user } = useSelector((state) => state.businessUserReducer);
+//   return (
+//     <ProtectedRoute isAuthenticated={!!user} redirect="/login/business">
+//       {children}
+//     </ProtectedRoute>
+//   );
+// };
 
 // Router configuration
 const router = createBrowserRouter([
@@ -200,17 +200,17 @@ const router = createBrowserRouter([
       {
         path: "/user-dashboard/:userId/dashboard",
         element: (
-          <UserProtectedRoute>
+         // <UserProtectedRoute>
             <UserDashboard />
-          </UserProtectedRoute>
+       //   </UserProtectedRoute>
         ),
       },
       {
         path: "/user-dashboard/:userId",
         element: (
-          <UserProtectedRoute>
+      //    <UserProtectedRoute>
             <NewLayout />
-          </UserProtectedRoute>
+     //     </UserProtectedRoute>
         ),
         children: [
           {

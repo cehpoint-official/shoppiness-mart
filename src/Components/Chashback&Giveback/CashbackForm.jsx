@@ -16,6 +16,7 @@ const CashbackForm = () => {
   const [shops, setShops] = useState([]);
   const [selectedShop, setSelectedShop] = useState("");
   const [paidAmount, setPaidAmount] = useState("");
+  const [loadingPayment, setLoadingPayment] = useState(true);
 
   const fetchData = useCallback(async () => {
     try {
@@ -94,6 +95,8 @@ const CashbackForm = () => {
         } else if (upis.length > 0) {
           setSelectedPayment(upis[0]);
         }
+
+        setLoadingPayment(false);
       } catch (error) {
         console.error("Error fetching payment methods:", error);
       }
@@ -167,39 +170,15 @@ const CashbackForm = () => {
           />
         </div>
 
-        <div className="flex gap-5 items-center">
-          <label className="block text-sm mb-2">Upload Invoice</label>
-          <div className="flex gap-2 items-center">
-            <label className="bg-gray-200 text-sm px-4 py-2 rounded cursor-pointer flex items-center gap-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
-                />
-              </svg>
-              Upload
-              <input
-                type="file"
-                className="hidden"
-                onChange={handleFileChange}
-              />
-            </label>
-          </div>
-        </div>
-
         <div className="flex justify-between items-center text-sm">
           <div>
-            {selectedPayment
-              ? getPaymentDisplayText(selectedPayment)
-              : "No payment method selected"}
+            {loadingPayment ? (
+              <div className="w-40 h-4 bg-gray-300 rounded animate-pulse"></div>
+            ) : selectedPayment ? (
+              getPaymentDisplayText(selectedPayment)
+            ) : (
+              "No payment method selected"
+            )}
           </div>
           <button
             type="button"

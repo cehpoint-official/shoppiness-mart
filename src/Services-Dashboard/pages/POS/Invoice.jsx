@@ -14,6 +14,7 @@ const Invoice = ({ data, onBack }) => {
   const { user } = useSelector((state) => state.businessUserReducer);
   const [isLoading, setIsLoading] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+console.log(data);
 
   const generatePdf = async (elementId) => {
     const invoiceContent = document.getElementById(elementId);
@@ -137,12 +138,15 @@ const Invoice = ({ data, onBack }) => {
           userPhoneNumber: data.phoneNumber,
           billerName: data.billerName,
           dueDate: data.dueDate,
+          subTotal:data.totalPrice,
           discount: data.userCashback,
+          taxRate:((data.taxAmount / data.totalPrice) * 100).toFixed(1),
           userCashbackPercentage:data.userCashback,
           userCashback,
           platformCashback,
           remainingCashback,
           products: data.products,
+          userId:data.userId,
           pdfUrl,
           totalAmount: data.grandTotal,
           paidAmount: data.cashCollected,

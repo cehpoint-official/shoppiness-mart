@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { AiOutlineEye } from "react-icons/ai";
-import { BiSortAlt2 } from "react-icons/bi";
+import { BiSortAlt2, BiSearch } from "react-icons/bi";
 import SingleInvoice from "./SingleInvoice";
 import { useParams } from "react-router-dom";
 import { collection, getDocs } from "firebase/firestore";
@@ -21,10 +21,13 @@ const Invoice = () => {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortOrder, setSortOrder] = useState("asc"); // 'asc' or 'desc'
   const customersPerPage = 5;
   const { id } = useParams();
 
   const fetchData = useCallback(async () => {
+    setLoading(true);
     try {
       const querySnapshot = await getDocs(
         collection(db, "claimedCouponsDetails")
@@ -48,16 +51,36 @@ const Invoice = () => {
     fetchData();
   }, [fetchData]);
 
+  // Filter customers based on search term
+  const filteredCustomers = customers.filter((customer) => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      customer.invoiceNum?.toString().toLowerCase().includes(searchLower) ||
+      customer.claimedCouponCodeUserName?.toLowerCase().includes(searchLower)
+    );
+  });
+
+  // Sort customers by date
+  const sortedCustomers = filteredCustomers.sort((a, b) => {
+    const dateA = new Date(a.claimedDate);
+    const dateB = new Date(b.claimedDate);
+    return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+  });
+
   // Pagination calculations
   const indexOfLastCustomer = currentPage * customersPerPage;
   const indexOfFirstCustomer = indexOfLastCustomer - customersPerPage;
-  const currentCustomers = customers.slice(
+  const currentCustomers = sortedCustomers.slice(
     indexOfFirstCustomer,
     indexOfLastCustomer
   );
-  const totalPages = Math.ceil(customers.length / customersPerPage);
+  const totalPages = Math.ceil(sortedCustomers.length / customersPerPage);
 
-  // Pagination handlers
+  // Reset to first page when search term changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
   const nextPage = () => {
     if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
@@ -70,20 +93,26 @@ const Invoice = () => {
     }
   };
 
-  // View invoice handler
   const handleViewInvoice = (invoice) => {
     setSelectedInvoice(invoice);
   };
 
-  // Back from single invoice
   const handleBackToInvoices = () => {
     setSelectedInvoice(null);
+    fetchData(); // Refresh data when returning to list
   };
 
-  // If an invoice is selected, render SingleInvoice
+  const toggleSortOrder = () => {
+    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+  };
+
   if (selectedInvoice) {
     return (
-      <SingleInvoice invoice={selectedInvoice} onBack={handleBackToInvoices} />
+      <SingleInvoice 
+        invoice={selectedInvoice} 
+        onBack={handleBackToInvoices}
+        onUpdate={fetchData}
+      />
     );
   }
 
@@ -93,12 +122,27 @@ const Invoice = () => {
         <h1 className="text-2xl font-normal text-gray-900">
           Customer Invoices
         </h1>
-        <button className="px-4 py-2 text-blue-500 border border-blue-500 font-bold rounded-md flex items-center gap-2">
-          <BiSortAlt2 className="w-5 h-5" />
-          Sort by
-        </button>
+        <div className="flex gap-4">
+          {/* Search Input */}
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search by invoice no. or name..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 pr-4 py-2 border rounded-md w-64"
+            />
+            <BiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          </div>
+          <button 
+            onClick={toggleSortOrder}
+            className="px-4 py-2 text-blue-500 border border-blue-500 font-bold rounded-md flex items-center gap-2"
+          >
+            <BiSortAlt2 className="w-5 h-5" />
+            Sort by Date {sortOrder === "asc" ? "↑" : "↓"}
+          </button>
+        </div>
       </div>
-
       <div className="bg-white rounded-lg shadow-sm overflow-hidden">
         {loading ? (
           <table className="w-full">
@@ -130,7 +174,7 @@ const Invoice = () => {
               ))}
             </tbody>
           </table>
-        ) : customers.length === 0 ? (
+        ) : filteredCustomers.length === 0 ? (
           <div className="text-center py-10 text-gray-500">
             No invoices available
           </div>
