@@ -64,6 +64,9 @@ const Signup = () => {
         ...userData,
         uid: user.uid,
         role: "user",
+        collectedCashback: 0,
+        withdrawAmount: 0,
+        givebackAmount: 0,
       });
       dispatch(userExist(user));
       toast.success("Account created successfully!");

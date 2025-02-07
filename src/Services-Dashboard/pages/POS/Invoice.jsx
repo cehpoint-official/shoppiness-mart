@@ -4,7 +4,7 @@ import headerLogo from "../../assets/header-logo.png";
 import { Link } from "react-router-dom";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import { addDoc, collection, doc, setDoc } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, setDoc } from "firebase/firestore";
 import { db, storage } from "../../../../firebase";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import toast from "react-hot-toast";
@@ -66,32 +66,117 @@ const Invoice = ({ data, onBack }) => {
       );
     });
   };
+  const calculateCashbackAndEarnings = (
+    grandTotal,
+    cashCollected,
+    userCashbackPercentage,
+    platformEarningsPercentage
+  ) => {
+    // Calculate due percentage
 
+    const duePercentage = ((grandTotal - cashCollected) / grandTotal) * 100;
+
+    // Calculate full cashback amount before due adjustment
+    const fullUserCashback = Number(
+      ((userCashbackPercentage / 100) * grandTotal).toFixed(1)
+    );
+
+    // Calculate platform earnings
+    const platformCashback = Number(
+      ((platformEarningsPercentage / 100) * grandTotal).toFixed(1)
+    );
+
+    // Determine user cashback and remaining cashback based on due percentage
+    let userCashback, remainingCashback;
+
+    if (duePercentage === 100) {
+      // If completely due, no cashback
+      userCashback = 0;
+      remainingCashback = 0;
+    } else if (duePercentage === 0) {
+      // If fully paid, user gets full cashback
+      userCashback = fullUserCashback;
+      remainingCashback = 0;
+    } else {
+      // If partially due, calculate adjusted cashback
+      userCashback = Number(
+        (fullUserCashback * ((100 - duePercentage) / 100)).toFixed(1)
+      );
+      remainingCashback = Number((fullUserCashback - userCashback).toFixed(1));
+    }
+
+    return {
+      platformCashback,
+      userCashback,
+      remainingCashback,
+    };
+  };
   const handleSave = async () => {
     setIsLoading(true);
     try {
       const pdfBlob = await generatePdfBlob();
       const pdfUrl = await uploadPdf(pdfBlob);
 
+      // Calculate cashback and earnings
+      const { platformCashback, userCashback, remainingCashback } =
+        calculateCashbackAndEarnings(
+          data.grandTotal,
+          data.dueAmount,
+          data.userCashback,
+          data.platformEarnings
+        );
+
       // First, attempt to add the claimed coupon details
       const claimedCouponRef = await addDoc(
         collection(db, "claimedCouponsDetails"),
         {
-          claimedCouponCode: data.matchedCouponCode,
-          claimedCouponCodeUserName: data.matchedCouponName,
-          claimedCouponCodeUserEmail: data.matchedCouponEmail,
+          claimedCouponCode: data.code,
+          claimedCouponCodeUserName: data.fullName,
+          claimedCouponCodeUserEmail: data.email,
           claimedDate: data.billingDate,
-          discount: data.cashback,
+          userPhoneNumber: data.phoneNumber,
+          billerName: data.billerName,
+          dueDate: data.dueDate,
+          discount: data.userCashback,
+          userCashbackPercentage:data.userCashback,
+          userCashback,
+          platformCashback,
+          remainingCashback,
+          products: data.products,
           pdfUrl,
+          totalAmount: data.grandTotal,
+          paidAmount: data.cashCollected,
+          dueAmount: data.dueAmount,
           invoiceNum: data.invoiceId,
-          businessId:data.businessId
+          businessId: data.businessId,
         }
       );
 
-      // Only if document addition is successful, update the coupon status
+      // Only if document addition is successful, update the coupon status and user's collectedCashback
       if (claimedCouponRef.id) {
+        // Fetch the current collectedCashback value from Firestore
+        const userDocRef = doc(db, "users", data.userId);
+        const userDoc = await getDoc(userDocRef);
+
+        if (userDoc.exists()) {
+          const currentCollectedCashback =
+            userDoc.data().collectedCashback || 0;
+
+          // Update the collectedCashback by adding the new userCashback
+          await setDoc(
+            userDocRef,
+            {
+              collectedCashback: currentCollectedCashback + userCashback,
+            },
+            { merge: true }
+          );
+        } else {
+          throw new Error("User document not found");
+        }
+
+        // Update the coupon status to "Claimed"
         await setDoc(
-          doc(db, "coupons", data.matchedCouponId),
+          doc(db, "coupons", data.id),
           {
             status: "Claimed",
           },
@@ -99,6 +184,7 @@ const Invoice = ({ data, onBack }) => {
         );
 
         toast.success("Invoice saved and coupon claimed successfully!");
+        onBack();
       } else {
         throw new Error("Failed to add claimed coupon document");
       }
@@ -270,7 +356,10 @@ const Invoice = ({ data, onBack }) => {
               <div className="flex justify-between text-gray-600">
                 <span>Tax Rate</span>
                 <span>
-                  {((data.taxAmount / data.totalPrice) * 100).toFixed(1)}%
+                  {((data.taxAmount / data.totalPrice) * 100).toFixed(1) > 0
+                    ? ((data.taxAmount / data.totalPrice) * 100).toFixed(1)
+                    : 0}
+                  %
                 </span>
               </div>
               <div className="flex justify-between font-medium">
@@ -281,6 +370,17 @@ const Invoice = ({ data, onBack }) => {
                 <span>Cash Collected</span>
                 <span>Rs. {data.cashCollected.toLocaleString()}</span>
               </div>
+              {/* Due Amount Field */}
+              <div
+                className={`flex justify-between py-2 rounded border-l-4 ${
+                  data.dueAmount > 0
+                    ? "border-red-500 bg-red-50 text-red-600"
+                    : "border-green-500 bg-green-50 text-green-600"
+                }`}
+              >
+                <span>Due Amount</span>
+                <span>Rs. {data.dueAmount.toLocaleString()}</span>
+              </div>
             </div>
           </div>
 
@@ -288,7 +388,7 @@ const Invoice = ({ data, onBack }) => {
           <div className="mt-8 bg-orange-50 border border-orange-100 rounded-lg p-4">
             <p className="text-sm">
               <span className="font-medium">Cashback Details: </span>
-              Earn {data.cashback}% cashback at Shopinesmart! Visit{" "}
+              Earn {data.userCashback || 0}% cashback at Shopinesmart! Visit{" "}
               <Link to="https://shopinesmart.com" className="text-blue-600">
                 shopinesmart.com
               </Link>

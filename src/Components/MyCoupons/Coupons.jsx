@@ -8,7 +8,7 @@ import toast from "react-hot-toast";
 const Coupons = () => {
   const [copiedCode, setCopiedCode] = useState(null);
   const [coupons, setCoupons] = useState([]);
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
   const { userId } = useParams();
 
   const fetchData = useCallback(async () => {
@@ -25,7 +25,7 @@ const Coupons = () => {
     } catch (error) {
       console.log("Error getting documents: ", error);
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   }, [userId]);
 
@@ -42,9 +42,9 @@ const Coupons = () => {
 
   const getOfferText = (coupon) => {
     if (coupon.productDiscount) {
-      return `Enjoy ${coupon.productDiscount}% Off In-Store ${coupon.productName} Purchase + ${coupon.inStoreDiscount}% Cashback at Shoppiness Mart!`;
+      return `Enjoy ${coupon.productDiscount}% Off In-Store ${coupon.productName} Purchase + ${coupon.userCashback}% Cashback at Shoppiness Mart!`;
     }
-    return `For all purchase from ${coupon.businessName} you will get ${coupon.inStoreDiscount}% Cashback at Shoppiness Mart!`;
+    return `For all purchase from ${coupon.businessName} you will get ${coupon.userCashback}% Cashback at Shoppiness Mart!`;
   };
 
   const formatDate = (dateString) => {
@@ -80,7 +80,7 @@ const Coupons = () => {
           Array.from({ length: 3 }).map((_, index) => (
             <SkeletonCoupon key={index} />
           ))
-        ) : (
+        ) : coupons.length > 0 ? (
           // Show actual coupons once data is loaded
           coupons.map((coupon) => (
             <div
@@ -124,6 +124,10 @@ const Coupons = () => {
               </div>
             </div>
           ))
+        ) : (
+          <p className="text-gray-500 text-center text-lg">
+            You haven&apos;t generated any coupons yet.
+          </p>
         )}
       </div>
     </div>

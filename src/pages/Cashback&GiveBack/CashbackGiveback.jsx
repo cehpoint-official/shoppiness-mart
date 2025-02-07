@@ -5,7 +5,8 @@ import GiveBackForm from "../../Components/Chashback&Giveback/GiveBackForm";
 import { HiOutlineArrowNarrowLeft } from "react-icons/hi";
 import CashbackRequests from "../../Components/Chashback&Giveback/CashbackRequests";
 import GiveBackHistory from "../../Components/Chashback&Giveback/GiveBackHistory";
-const CashbackGiveback = () => {
+
+const CashbackGiveback = ({ userData }) => {
   const [activeTab, setActiveTab] = useState("claim");
   const [showCashbackRequests, setShowCashbackRequests] = useState(false);
   const [showGiveBackHistory, setShowGiveBackHistory] = useState(false);
@@ -42,6 +43,7 @@ const CashbackGiveback = () => {
       </div>
     );
   }
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -66,11 +68,19 @@ const CashbackGiveback = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <CashbackCard
           title="Collected Cash backs"
-          amount="RS.2500"
+          amount={userData.collectedCashback}
           link="View Details"
         />
-        <CashbackCard title="Withdraw" amount="RS.500" link="View Details" />
-        <CashbackCard title="Give Back" amount="RS.500" link="View Details" />
+        <CashbackCard
+          title="Withdraw"
+          amount={userData.withdrawAmount}
+          link="View Details"
+        />
+        <CashbackCard
+          title="Give Back"
+          amount={userData.givebackAmount}
+          link="View Details"
+        />
       </div>
 
       <div className="flex flex-col">
@@ -109,10 +119,18 @@ const CashbackGiveback = () => {
 export default CashbackGiveback;
 
 const CashbackCard = ({ title, amount, link }) => {
+  const isLoading = amount === undefined || amount === null;
+  
   return (
     <div className="bg-white p-4 rounded shadow-md border border-gray-100">
       <div className="text-sm text-text-gray mb-2">{title}</div>
-      <div className="font-medium mb-2">{amount}</div>
+      <div className="font-medium mb-2">
+        {isLoading ? (
+          <div className="animate-pulse h-6 w-20 bg-gray-200 rounded"></div>
+        ) : (
+          amount
+        )}
+      </div>
       <a href="#" className="text-blue-600 text-sm">
         {link}
       </a>

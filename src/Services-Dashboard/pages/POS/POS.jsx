@@ -3,6 +3,7 @@ import { RxCross2 } from "react-icons/rx";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../../../firebase";
 import { useParams } from "react-router-dom";
+import { FaSpinner } from "react-icons/fa"; // Import the spinner icon
 
 const POS = ({ onGenerateInvoice }) => {
   const [products, setProducts] = useState([]);
@@ -31,6 +32,9 @@ const POS = ({ onGenerateInvoice }) => {
     dueDate: "",
   });
 
+  // Spinner state for coupon verification
+  const [isVerifying, setIsVerifying] = useState(false);
+
   // Handle customer info form changes
   const handleCustomerInfoChange = (e) => {
     const { name, value } = e.target;
@@ -39,6 +43,7 @@ const POS = ({ onGenerateInvoice }) => {
       [name]: value,
     }));
   };
+
   const handleDeleteProduct = (productId) => {
     setProducts(products.filter((product) => product.id !== productId));
   };
@@ -56,23 +61,27 @@ const POS = ({ onGenerateInvoice }) => {
       setCoupons(data);
     } catch (error) {
       console.log("Error getting documents: ", error);
-    } 
+    }
   }, [id]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
-  const handleVerify = () => {
+  const handleVerify = async () => {
+    setIsVerifying(true);
     const found = coupons.find((coupon) => coupon.code === couponCode);
-    setMatchedCoupon(found || null);
+    setTimeout(() => {
+      setMatchedCoupon(found || null);
+      setIsVerifying(false);
+    }, 1000); // Simulate a delay for verification
   };
 
   const getOfferText = (coupon) => {
     if (coupon.productDiscount) {
-      return `Name: ${coupon.fullName}, Email: ${coupon.email}, Phone No. ${coupon.phoneNumber}, will get  ${coupon.productDiscount}% Off In-Store ${coupon.productName} Purchase + ${coupon.inStoreDiscount}% Cashback at Shoppiness Mart!`;
+      return `Name: ${coupon.fullName}, Email: ${coupon.email}, Phone No. ${coupon.phoneNumber}, will get  ${coupon.productDiscount}% Off In-Store ${coupon.productName} Purchase + ${coupon.userCashback}% Cashback at Shoppiness Mart!`;
     }
-    return `For all purchase from your shop  Name: ${coupon.fullName}, Email: ${coupon.email}, Phone No. ${coupon.phoneNumber}, will get ${coupon.inStoreDiscount}% Cashback at Shoppiness Mart!`;
+    return `For all purchase from your shop  Name: ${coupon.fullName}, Email: ${coupon.email}, Phone No. ${coupon.phoneNumber}, will get ${coupon.userCashback}% Cashback at Shoppiness Mart!`;
   };
 
   const handleGenerateInvoice = () => {
@@ -84,13 +93,10 @@ const POS = ({ onGenerateInvoice }) => {
       grandTotal,
       taxAmount,
       cashCollected,
+      dueAmount: dueAmount,
       time: new Date().toLocaleTimeString(),
       invoiceId: `IN-${Math.floor(Math.random() * 100000)}`,
-      cashback: matchedCoupon?.inStoreDiscount || 0,
-      matchedCouponCode: matchedCoupon?.code || "",
-      matchedCouponEmail: matchedCoupon?.email || "",
-      matchedCouponName: matchedCoupon?.fullName || "",
-      matchedCouponId: matchedCoupon?.id || "",
+      ...matchedCoupon,
       businessId: id,
     };
     onGenerateInvoice(invoiceData);
@@ -141,7 +147,8 @@ const POS = ({ onGenerateInvoice }) => {
   }, [taxPercentage, totalPrice]);
 
   // Calculate grand total
-  const grandTotal = totalPrice + taxAmount - cashCollected;
+  const grandTotal = totalPrice + taxAmount;
+  const dueAmount = grandTotal - cashCollected;
 
   return (
     <div className="flex flex-col gap-6 p-10">
@@ -160,8 +167,13 @@ const POS = ({ onGenerateInvoice }) => {
               <button
                 onClick={handleVerify}
                 className="absolute inset-y-0 right-0 px-4 text-blue-500 hover:text-blue-700"
+                disabled={isVerifying}
               >
-                Verify
+                {isVerifying ? (
+                  <FaSpinner className="animate-spin" />
+                ) : (
+                  "Verify"
+                )}
               </button>
             </div>
           </div>
@@ -170,7 +182,9 @@ const POS = ({ onGenerateInvoice }) => {
               <p>{getOfferText(matchedCoupon)}</p>
             ) : (
               <p>
-                No coupon details to display. Please verify a valid coupon code.
+                {isVerifying
+                  ? "Verifying..."
+                  : "No coupon details to display. Please verify a valid coupon code."}
               </p>
             )}
           </div>
@@ -396,13 +410,13 @@ const POS = ({ onGenerateInvoice }) => {
 
           {/* Summary Section */}
           <div className="mt-8 bg-gray-50 p-6 rounded-lg">
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-6 gap-6">
               <div>
                 <p className="text-gray-600 mb-1">Total Items</p>
                 <p className="text-2xl font-semibold">{totalItems}</p>
               </div>
               <div>
-                <p className="text-gray-600 mb-1">Total Price Rs.</p>
+                <p className="text-gray-600 mb-1">Total Price:</p>
                 <p className="text-2xl font-semibold">
                   {totalPrice.toLocaleString()}
                 </p>
@@ -422,7 +436,7 @@ const POS = ({ onGenerateInvoice }) => {
               </div>
               <div>
                 <div className="flex flex-col gap-2">
-                  <p className="text-gray-600">Cash collected: Rs.</p>
+                  <p className="text-gray-600">Cash collected:</p>
                   <input
                     type="number"
                     value={cashCollected}
@@ -437,6 +451,12 @@ const POS = ({ onGenerateInvoice }) => {
                 <p className="text-lg font-semibold">Grand Total</p>
                 <p className="text-2xl font-bold text-blue-600">
                   Rs. {grandTotal.toLocaleString()}
+                </p>
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                <p className="text-lg font-semibold">Due Amount</p>
+                <p className="text-2xl font-bold text-red-600">
+                  Rs. {dueAmount.toLocaleString()}
                 </p>
               </div>
             </div>

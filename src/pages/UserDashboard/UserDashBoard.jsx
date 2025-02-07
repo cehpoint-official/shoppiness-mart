@@ -56,26 +56,26 @@ const UserDashBoard = () => {
       console.error("Error updating user data:", error);
     }
   };
-  const fetchDoc = async () => {
-    const docRef = doc(db, "users", userId);
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-      setUserData(data);
-      dispatch(userExist(data));
-      setLoading(false);
-      // console.log(data);
-    } else {
-      alert("No such document!");
-      dispatch(userNotExist());
-    }
-  };
-
   useEffect(() => {
-    fetchDoc();
-  }, []);
+    const fetchDoc = async () => {
+      const docRef = doc(db, "users", userId);
+      const docSnap = await getDoc(docRef);
 
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setUserData(data);
+        dispatch(userExist(data));
+        setLoading(false);
+        // console.log(data);
+      } else {
+        alert("No such document!");
+        dispatch(userNotExist());
+      }
+    };
+
+    fetchDoc();
+  }, [userId, dispatch]);
+ 
   return (
     <div className="userDashboard">
       {loading ? (

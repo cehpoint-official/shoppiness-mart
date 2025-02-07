@@ -8,6 +8,7 @@ import { db } from "../../../../firebase";
 export default function Dashboard() {
   const [customers, setCustomers] = useState([]);
   const [products, setProducts] = useState([]);
+  const [allCustomer, setAllCustomer] = useState([]);
   const [loading, setLoading] = useState(true);
   const { id } = useParams();
 
@@ -26,6 +27,33 @@ export default function Dashboard() {
       console.log("Error getting documents: ", error);
     } finally {
       setLoading(false);
+    }
+  }, [id]);
+
+  const fetchCustomerData = useCallback(async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "coupons"));
+      const data = [];
+      const uniqueEmails = new Set(); // To track unique emails
+
+      querySnapshot.forEach((doc) => {
+        const couponsData = doc.data();
+        if (
+          couponsData.businessId === id &&
+          !uniqueEmails.has(couponsData.email)
+        ) {
+          uniqueEmails.add(couponsData.email); // Add email to the set
+          data.push({
+            avatar: couponsData.userProfilePic,
+            name: couponsData.fullName,
+            email: couponsData.email,
+          });
+        }
+      });
+
+      setAllCustomer(data);
+    } catch (error) {
+      console.log("Error getting documents: ", error);
     }
   }, [id]);
 
@@ -51,17 +79,18 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchProductData();
+    fetchCustomerData();
     fetchClaimedCouponsDetailsData();
-  }, [fetchProductData, fetchClaimedCouponsDetailsData]);
+  }, [fetchProductData, fetchCustomerData, fetchClaimedCouponsDetailsData]);
 
   return (
     <div className="p-6 min-h-screen">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-xl font-medium">Dashboard</h1>
-        <button className="px-4 py-1.5 bg-gray-100 rounded flex items-center gap-1 border border-black">
+        {/* <button className="px-4 py-1.5 bg-gray-100 rounded flex items-center gap-1 border border-black">
           Today <IoMdArrowDropdown className="text-lg" />
-        </button>
+        </button> */}
       </div>
 
       {/* Stats Grid */}
@@ -77,21 +106,21 @@ export default function Dashboard() {
             <StatCard
               icon={<FaUsers className="text-white" />}
               title="Total Customer"
-              value="10"
+              value={allCustomer.length > 0 ? allCustomer.length : 0}
               color="bg-teal-600"
               border="border-teal-600"
             />
             <StatCard
               icon={<FaBox className="text-white" />}
               title="Total Product"
-              value={products.length}
+              value={products.length > 0 ? products.length : 0}
               color="bg-orange-400"
               border="border-orange-400"
             />
             <StatCard
               icon={<FaTicketAlt className="text-white" />}
               title="Claimed Coupons"
-              value={customers.length}
+              value={customers.length > 0 ? customers.length : 0}
               color="bg-red-400"
               border="border-red-400"
             />
@@ -130,7 +159,11 @@ export default function Dashboard() {
         ) : (
           <ClaimedCoupons customers={customers} />
         )}
-        {loading ? <NewCustomersSkeleton /> : <NewCustomers />}
+        {loading ? (
+          <NewCustomersSkeleton />
+        ) : (
+          <NewCustomers customers={allCustomer} />
+        )}
       </div>
     </div>
   );
@@ -176,33 +209,37 @@ function ClaimedCoupons({ customers }) {
       <div className="flex items-center gap-2 mb-6">
         <h2 className="text-lg font-medium">Claimed Coupons</h2>
         <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
-          {customers.length}
+          {customers.length > 0 ? customers.length : 0}
         </span>
       </div>
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead className="text-left text-sm text-gray-600">
-            <tr>
-              <th className="pb-4">Coupon ID</th>
-              <th className="pb-4">Name</th>
-              <th className="pb-4">Contact</th>
-              <th className="pb-4">Offer</th>
-            </tr>
-          </thead>
-          <tbody className="text-sm">
-            {customers.map((customer, index) => (
-              <tr key={index} className="border-t">
-                <td className="py-4">{customer.claimedCouponCode}</td>
-                <td>{customer.claimedCouponCodeUserName}</td>
-                <td className="whitespace-pre-line">
-                  {customer.claimedCouponCodeUserEmail}
-                </td>
-                <td>{customer.discount}%</td>
+      {customers.length > 0 ? (
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="text-left text-sm text-gray-600">
+              <tr>
+                <th className="pb-4">Coupon ID</th>
+                <th className="pb-4">Name</th>
+                <th className="pb-4">Contact</th>
+                <th className="pb-4">Offer</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className="text-sm">
+              {customers.map((customer, index) => (
+                <tr key={index} className="border-t">
+                  <td className="py-4">{customer.claimedCouponCode}</td>
+                  <td>{customer.claimedCouponCodeUserName}</td>
+                  <td className="whitespace-pre-line">
+                    {customer.claimedCouponCodeUserEmail}
+                  </td>
+                  <td>{customer.discount}%</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <p className="text-gray-600">No claimed coupons.</p>
+      )}
     </div>
   );
 }
@@ -226,53 +263,34 @@ function TableRowSkeleton() {
   );
 }
 
-function NewCustomers() {
-  const customers = [
-    {
-      name: "Taki Uchiha",
-      email: "email@gmail.com",
-      avatar: "https://v0.dev/placeholder.svg",
-    },
-    {
-      name: "Mia Nohara",
-      email: "email@gmail.com",
-      avatar: "https://v0.dev/placeholder.svg",
-    },
-    {
-      name: "Raj Roy",
-      email: "email@gmail.com",
-      avatar: "https://v0.dev/placeholder.svg",
-    },
-    {
-      name: "Pihu Prajapati",
-      email: "email@gmail.com",
-      avatar: "https://v0.dev/placeholder.svg",
-    },
-  ];
-
+function NewCustomers({ customers }) {
   return (
     <div className="bg-white p-6 rounded-lg shadow-sm col-span-1">
       <div className="flex items-center gap-2 mb-6">
         <h2 className="text-lg font-medium">New Customers</h2>
         <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
-          7
+          {customers.length > 0 ? customers.length : 0}
         </span>
       </div>
-      <div className="space-y-4">
-        {customers.map((customer, index) => (
-          <div key={index} className="flex items-center gap-3">
-            <img
-              src={customer.avatar || "/placeholder.svg"}
-              alt=""
-              className="w-10 h-10 rounded-full"
-            />
-            <div>
-              <p className="font-medium">{customer.name}</p>
-              <p className="text-sm text-gray-600">{customer.email}</p>
+      {customers.length > 0 ? (
+        <div className="space-y-4">
+          {customers.map((customer, index) => (
+            <div key={index} className="flex items-center gap-3">
+              <img
+                src={customer.avatar || "/placeholder.svg"}
+                alt=""
+                className="w-10 h-10 rounded-full"
+              />
+              <div>
+                <p className="font-medium">{customer.name}</p>
+                <p className="text-sm text-gray-600">{customer.email}</p>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <p className="text-gray-600">No new customers.</p>
+      )}
     </div>
   );
 }

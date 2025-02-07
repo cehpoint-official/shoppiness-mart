@@ -1,59 +1,98 @@
-import React, { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AiOutlineEye } from "react-icons/ai";
 import { BiSortAlt2 } from "react-icons/bi";
 import SingleInvoice from "./SingleInvoice";
+import { useParams } from "react-router-dom";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../../../firebase";
+
+const InvoiceSkeleton = () => (
+  <tr className="animate-pulse">
+    {[...Array(9)].map((_, index) => (
+      <td key={index} className="p-4">
+        <div className="h-4 bg-gray-200 rounded"></div>
+      </td>
+    ))}
+  </tr>
+);
 
 const Invoice = () => {
-  const invoices = [
-    {
-      id: "#AB65768",
-      name: "Tithi Mondal",
-      amount: "Rs.5000",
-      paid: "Rs.5000",
-      due: "Rs.0",
-      date: "22Apr, 2024",
-    },
-    {
-      id: "#AB65768",
-      name: "Tithi Mondal",
-      amount: "Rs.5000",
-      paid: "Rs.5000",
-      due: "Rs.0",
-      date: "22Apr, 2024",
-    },
-    {
-      id: "#AB65768",
-      name: "Tithi Mondal",
-      amount: "Rs.5000",
-      paid: "Rs.5000",
-      due: "Rs.0",
-      date: "22Apr, 2024",
-    },
-    {
-      id: "#AB65768",
-      name: "Tithi Mondal",
-      amount: "Rs.5000",
-      paid: "Rs.5000",
-      due: "Rs.0",
-      date: "22Apr, 2024",
-    },
-    {
-      id: "#AB65768",
-      name: "Tithi Mondal",
-      amount: "Rs.5000",
-      paid: "Rs.5000",
-      due: "Rs.0",
-      date: "22Apr, 2024",
-    },
-  ];
-  const [currentView, setCurrentView] = useState("invoices");
-  if (currentView === "invoice") {
-    return <SingleInvoice onBack={() => setCurrentView("invoices")} />;
+  const [customers, setCustomers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const customersPerPage = 5;
+  const { id } = useParams();
+
+  const fetchData = useCallback(async () => {
+    try {
+      const querySnapshot = await getDocs(
+        collection(db, "claimedCouponsDetails")
+      );
+      const data = [];
+      querySnapshot.forEach((doc) => {
+        const customersData = doc.data();
+        if (customersData.businessId === id) {
+          data.push({ id: doc.id, ...customersData });
+        }
+      });
+      setCustomers(data);
+    } catch (error) {
+      console.log("Error getting documents: ", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  // Pagination calculations
+  const indexOfLastCustomer = currentPage * customersPerPage;
+  const indexOfFirstCustomer = indexOfLastCustomer - customersPerPage;
+  const currentCustomers = customers.slice(
+    indexOfFirstCustomer,
+    indexOfLastCustomer
+  );
+  const totalPages = Math.ceil(customers.length / customersPerPage);
+
+  // Pagination handlers
+  const nextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const prevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  // View invoice handler
+  const handleViewInvoice = (invoice) => {
+    setSelectedInvoice(invoice);
+  };
+
+  // Back from single invoice
+  const handleBackToInvoices = () => {
+    setSelectedInvoice(null);
+  };
+
+  // If an invoice is selected, render SingleInvoice
+  if (selectedInvoice) {
+    return (
+      <SingleInvoice invoice={selectedInvoice} onBack={handleBackToInvoices} />
+    );
   }
+
   return (
     <div className="p-10">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-normal text-gray-900">Customer</h1>
+        <h1 className="text-2xl font-normal text-gray-900">
+          Customer Invoices
+        </h1>
         <button className="px-4 py-2 text-blue-500 border border-blue-500 font-bold rounded-md flex items-center gap-2">
           <BiSortAlt2 className="w-5 h-5" />
           Sort by
@@ -61,46 +100,130 @@ const Invoice = () => {
       </div>
 
       <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-gray-100">
-              <th className="text-left p-4 text-gray-500 font-normal">
-                Invoice No.
-              </th>
-              <th className="text-left p-4 text-gray-500 font-normal">Name</th>
-              <th className="text-left p-4 text-gray-500 font-normal">
-                Amount
-              </th>
-              <th className="text-left p-4 text-gray-500 font-normal">Paid</th>
-              <th className="text-left p-4 text-gray-500 font-normal">Due</th>
-              <th className="text-left p-4 text-gray-500 font-normal">Date</th>
-              <th className="text-left p-4 text-gray-500 font-normal">
-                Invoice
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {invoices.map((invoice, index) => (
-              <tr
-                key={index}
-                className="border-b border-gray-100 last:border-b-0 hover:bg-gray-50"
-              >
-                <td className="p-4 text-gray-900">{invoice.id}</td>
-                <td className="p-4 text-gray-900">{invoice.name}</td>
-                <td className="p-4 text-gray-900">{invoice.amount}</td>
-                <td className="p-4 text-gray-900">{invoice.paid}</td>
-                <td className="p-4 text-gray-900">{invoice.due}</td>
-                <td className="p-4 text-gray-900">{invoice.date}</td>
-                <td className="p-4">
-                  <button onClick={() => setCurrentView("invoice")} className="px-4 py-2 text-blue-500 border border-blue-500 rounded-md flex items-center gap-2">
-                    <AiOutlineEye className="w-4 h-4" />
-                    View
-                  </button>
-                </td>
+        {loading ? (
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-gray-100">
+                {[
+                  "Invoice No.",
+                  "Name",
+                  "Amount",
+                  "Paid",
+                  "Due",
+                  "Cashback Given",
+                  "Remaining Cashback",
+                  "Date",
+                  "Invoice",
+                ].map((header) => (
+                  <th
+                    key={header}
+                    className="text-left p-4 text-gray-500 font-normal"
+                  >
+                    {header}
+                  </th>
+                ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {[...Array(5)].map((_, index) => (
+                <InvoiceSkeleton key={index} />
+              ))}
+            </tbody>
+          </table>
+        ) : customers.length === 0 ? (
+          <div className="text-center py-10 text-gray-500">
+            No invoices available
+          </div>
+        ) : (
+          <>
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-100">
+                  <th className="text-left p-4 text-gray-500 font-normal">
+                    Invoice No.
+                  </th>
+                  <th className="text-left p-4 text-gray-500 font-normal">
+                    Name
+                  </th>
+                  <th className="text-left p-4 text-gray-500 font-normal">
+                    Amount
+                  </th>
+                  <th className="text-left p-4 text-gray-500 font-normal">
+                    Paid
+                  </th>
+                  <th className="text-left p-4 text-gray-500 font-normal">
+                    Due
+                  </th>
+                  <th className="text-left p-4 text-gray-500 font-normal">
+                    Cashback Given
+                  </th>
+                  <th className="text-left p-4 text-gray-500 font-normal">
+                    Remaining Cashback
+                  </th>
+                  <th className="text-left p-4 text-gray-500 font-normal">
+                    Date
+                  </th>
+                  <th className="text-left p-4 text-gray-500 font-normal">
+                    Invoice
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentCustomers.map((invoice, index) => (
+                  <tr
+                    key={index}
+                    className="border-b border-gray-100 last:border-b-0 hover:bg-gray-50"
+                  >
+                    <td className="p-4 text-gray-900">#{invoice.invoiceNum}</td>
+                    <td className="p-4 text-gray-900">
+                      {invoice.claimedCouponCodeUserName}
+                    </td>
+                    <td className="p-4 text-gray-900">{invoice.totalAmount}</td>
+                    <td className="p-4 text-gray-900">{invoice.paidAmount}</td>
+                    <td className="p-4 text-gray-900">{invoice.dueAmount}</td>
+                    <td className="p-4 text-gray-900">
+                      {invoice.userCashback}
+                    </td>
+                    <td className="p-4 text-gray-900">
+                      {invoice.remainingCashback}
+                    </td>
+                    <td className="p-4 text-gray-900">{invoice.claimedDate}</td>
+                    <td className="p-4">
+                      <button
+                        onClick={() => handleViewInvoice(invoice)}
+                        className="px-4 py-2 text-blue-500 border border-blue-500 rounded-md flex items-center gap-2"
+                      >
+                        <AiOutlineEye className="w-4 h-4" />
+                        View
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {/* Pagination Controls */}
+            <div className="flex justify-between items-center p-4">
+              <button
+                onClick={prevPage}
+                disabled={currentPage === 1}
+                className="px-4 py-2 border rounded-md disabled:opacity-50"
+              >
+                Previous
+              </button>
+              <span>
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                onClick={nextPage}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 border rounded-md disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

@@ -8,6 +8,7 @@ import {
   AiOutlineCopy,
   AiOutlineSave,
 } from "react-icons/ai";
+import { useSelector } from "react-redux";
 
 const ProductDetails = () => {
   const { productId, businessId, userId } = useParams();
@@ -19,7 +20,9 @@ const ProductDetails = () => {
   const [generatingCoupon, setGeneratingCoupon] = useState(false);
   const [savingCoupon, setSavingCoupon] = useState(false);
   const [generatedCouponCode, setGeneratedCouponCode] = useState("");
-
+  const { user } = useSelector((state) => state.userReducer);
+ 
+  
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -81,10 +84,13 @@ const ProductDetails = () => {
         userId,
         productId,
         createdAt: new Date().toISOString(),
-        inStoreDiscount: business.rate,
+        businessRate: business.rate,
+        userCashback: business.rate / 2,  
+        platformEarnings: business.rate / 2,
         code: generatedCouponCode,
         businessName: business.businessName,
         productName: productsDetails.name,
+        userProfilePic: user.profilePic,
         productDiscount: productsDetails.discount,
         status: "Pending",
       });

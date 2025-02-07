@@ -122,7 +122,7 @@ const UserProfile = () => {
           <>
             {currentPage === "coupons" && <Coupons />}
 
-            {currentPage === "cashback" && <CashbackGiveback />}
+            {currentPage === "cashback" && <CashbackGiveback userData={userData}/>}
 
             {currentPage === "settings" && (
               <div className="settings">
