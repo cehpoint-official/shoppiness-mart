@@ -87,9 +87,7 @@ const Home = () => {
     fetchData();
   }, []);
 
-  return loading ? (
-    <Loader />
-  ) : (
+  return (
     <div className=" overflow-hidden">
       {/* carousel  */}
       {/* <Carousel img1={Home1} img2={Home1} img3={Home1} /> */}
@@ -102,7 +100,7 @@ const Home = () => {
             Shop at Soppiness Mart, earn cashback to spread joy—use it for
             yourself or donate to charity, sharing kindness exponentially.
           </p>
-          <Link href="/signup">
+          <Link to="/signup">
             <button className="bg-[#049D8E] text-white py-2 px-4 rounded-lg transition duration-300">
               Sign up and Get Started
             </button>
@@ -150,10 +148,10 @@ const Home = () => {
               Shoppinessmart is a platform that turns your everyday online
               shopping into a force for good. By simply shopping through our
               website or app, you can support your favorite charities without
-              spending a penny extra. We've partnered with hundreds of popular
-              online stores, and for every purchase made through our platform, a
-              percentage of the sale is donated to your chosen charity. It’s
-              that easy to make a difference.
+              spending a penny extra. We&apos;ve partnered with hundreds of
+              popular online stores, and for every purchase made through our
+              platform, a percentage of the sale is donated to your chosen
+              charity. It’s that easy to make a difference.
             </p>
           </div>
         </div>
@@ -196,7 +194,7 @@ const Home = () => {
       </div>
 
       {/*why we use this platform */}
-      <RoundedCards data={roundedCardsData} />
+      {loading ? <Loader /> : <RoundedCards data={roundedCardsData} />}
 
       {/* how online or offline shop work  */}
       <div className="bg-[#EAEFF2] gap-20 flex justify-center items-center flex-wrap px-10 pb-16 mb-16">
@@ -286,70 +284,85 @@ const Home = () => {
       </div>
 
       {/* Blogs */}
-      <div className="mt-10 mx-auto px-6 md:px-40 pt-8 pb-6">
-        <div>
-          <p className="font-bold text-3xl md:text-4xl text-center font-slab">
-            Recently Posted Blog
-          </p>
-          <p className="text-gray-600 text-sm md:text-lg text-center mx-auto mt-2">
-            Share stories of how Shoppinessmart donations have made a difference
-            in people&apos;s lives.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-12 gap-4 mt-10">
-          <div className="lg:col-span-5 col-span-12">
-            <div>
-              <img src={blogsData[1].img} alt="" className="w-full" />
-              <p className="font-medium text-lg mt-4">{blogsData[1].title}</p>
-              <p className="text-gray-500 text-sm md:text-base">
-                {blogsData[1].desc}{" "}
-                <span className="text-[#049D8E] font-medium">Read More...</span>
-              </p>
-              <p className="text-gray-400 mt-4">
-                By {blogsData[0].auther}, 10 Mar 2024
-              </p>
-            </div>
+      {loading ? (
+        <Loader />
+      ) : (
+        <div className="mt-10 mx-auto px-6 md:px-40 pt-8 pb-6">
+          <div>
+            <p className="font-bold text-3xl md:text-4xl text-center font-slab">
+              Recently Posted Blog
+            </p>
+            <p className="text-gray-600 text-sm md:text-lg text-center mx-auto mt-2">
+              Share stories of how Shoppinessmart donations have made a
+              difference in people&apos;s lives.
+            </p>
           </div>
 
-          <div className="lg:col-span-7 col-span-12 mx-5">
-            <div className="lg:flex mb-4">
-              <img src={blogsData[0].img} alt=" " className="lg:w-1/3 w-full" />
-              <div className="lg:ml-4 mt-4 lg:mt-0">
-                <p className="font-medium text-lg">{blogsData[0].title}</p>
+          <div className="grid grid-cols-12 gap-4 mt-10">
+            <div className="lg:col-span-5 col-span-12">
+              <div>
+                <img src={blogsData[1].img} alt="" className="w-full" />
+                <p className="font-medium text-lg mt-4">{blogsData[1].title}</p>
                 <p className="text-gray-500 text-sm md:text-base">
-                  {blogsData[0].desc}
-                  <span className="text-[#049D8E] text-sm md:text-base font-medium">
-                    {" "}
+                  {blogsData[1].desc}{" "}
+                  <span className="text-[#049D8E] font-medium">
                     Read More...
                   </span>
                 </p>
                 <p className="text-gray-400 mt-4">
-                  By {blogsData[1].auther}, 15 July 2024
+                  By {blogsData[0].auther}, 10 Mar 2024
                 </p>
               </div>
             </div>
-            <div className="lg:flex">
-              <img src={blogsData[2].img} alt="" className="lg:w-1/3 w-full" />
-              <div className="lg:ml-4 mt-4 lg:mt-0">
-                <p className="font-medium text-lg">{blogsData[2].title}</p>
-                <p className="text-gray-500 text-sm md:text-base">
-                  {blogsData[2].desc}{" "}
-                  <span className="text-[#049D8E] text-sm md:text-base font-medium">
-                    {" "}
-                    Read More...
-                  </span>
-                </p>
-                <p className="text-gray-400 mt-4">
-                  By {blogsData[2].auther}, 09 April 2024
-                </p>
+
+            <div className="lg:col-span-7 col-span-12 mx-5">
+              <div className="lg:flex mb-4">
+                <img
+                  src={blogsData[0].img}
+                  alt=" "
+                  className="lg:w-1/3 w-full"
+                />
+                <div className="lg:ml-4 mt-4 lg:mt-0">
+                  <p className="font-medium text-lg">{blogsData[0].title}</p>
+                  <p className="text-gray-500 text-sm md:text-base">
+                    {blogsData[0].desc}
+                    <span className="text-[#049D8E] text-sm md:text-base font-medium">
+                      {" "}
+                      Read More...
+                    </span>
+                  </p>
+                  <p className="text-gray-400 mt-4">
+                    By {blogsData[1].auther}, 15 July 2024
+                  </p>
+                </div>
+              </div>
+              <div className="lg:flex">
+                <img
+                  src={blogsData[2].img}
+                  alt=""
+                  className="lg:w-1/3 w-full"
+                />
+                <div className="lg:ml-4 mt-4 lg:mt-0">
+                  <p className="font-medium text-lg">{blogsData[2].title}</p>
+                  <p className="text-gray-500 text-sm md:text-base">
+                    {blogsData[2].desc}{" "}
+                    <span className="text-[#049D8E] text-sm md:text-base font-medium">
+                      {" "}
+                      Read More...
+                    </span>
+                  </p>
+                  <p className="text-gray-400 mt-4">
+                    By {blogsData[2].auther}, 09 April 2024
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* NewsLetter */}
+
       <div className="relative mt-44 py-20 flex flex-col justify-center items-center">
         <div className="absolute inset-0">
           <img

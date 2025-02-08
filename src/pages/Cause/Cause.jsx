@@ -51,7 +51,7 @@ const Cause = () => {
               </div>
             </div>
             <div className="link">
-              <Link to="/">Register a Causes/NGO</Link>
+              <Link to="/cause-form">Register a Causes/NGO</Link>
             </div>
           </div>
         </div>

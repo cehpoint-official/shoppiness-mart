@@ -62,7 +62,7 @@ const UserDashboardNav = ({ profilePic, userId }) => {
         <div className="profile">
           <IoNotifications />
           <div className="profilePic">
-            <Link to={`/user-dashboard/${userId}`}>
+            <Link to={`/user-dashboard/${userId}/profile`}>
               <img
                 src={
                   profilePic ||

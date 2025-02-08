@@ -15,17 +15,9 @@ import bag from "../../assets/RegisterBusiness/bag.jpg";
 import { RiSearchFill } from "react-icons/ri";
 import RoundedCards from "../../Components/RoundedCards/RoundedCards";
 import FAQ from "../../Components/FAQ";
-import Loader from "../../Components/Loader/Loader";
-import { useState } from "react";
 
 const HowItWorks = () => {
-  const [loading, setLoading] = useState(true);
-  setInterval(() => {
-    setLoading(false);
-  }, [3000]);
-  return loading ? (
-    <Loader />
-  ) : (
+  return (
     <div className="howitworks">
       <div className="howitworksContainer">
         <div className="secOne">
@@ -39,7 +31,7 @@ const HowItWorks = () => {
               stores and shop for your favorite products at no extra cost. For
               every purchase you make through SHOPPINESSMART, a percentage of
               the sale is automatically donated to your chosen charity. This
-              way, you can enjoy your shopping while knowing you're contributing
+              way, you can enjoy your shopping while knowing you&apos;re contributing
               to meaningful causes and making a positive impact on the world. By
               seamlessly integrating charity into your everyday shopping
               experience, SHOPPINESSMART helps you support the causes you care
@@ -78,8 +70,8 @@ const HowItWorks = () => {
                   </div>
                   <p>
                     <span>Make a Difference: </span>Enjoy your shopping while
-                    knowing you're contributing to meaningful causes and making
-                    a positive impact on the world.
+                    knowing you&apos;re contributing to meaningful causes and
+                    making a positive impact on the world.
                   </p>
                 </div>
                 <div className="point">
@@ -104,7 +96,7 @@ const HowItWorks = () => {
                   </p>
                 </div>
 
-                <Link className="signup" to="/login">
+                <Link to="/signup" className="signup">
                   SIGN UP FOR FREE
                 </Link>
               </div>
@@ -128,7 +120,7 @@ const HowItWorks = () => {
               through your user dashboard, making every purchase a meaningful
               one. Save money and make a difference with Shoppinessmart!
             </p>
-            <Link to="/register" className="shoping">
+            <Link to="/signup" className="shoping">
               Start Shopping
             </Link>
           </div>

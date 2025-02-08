@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import Cashbackimg1 from "../assets/Cashback/Cashbackimg1.png";
 import Cashbackimg2 from "../assets/Cashback/Cashbackimg2.png";
 import Cashbackimg3 from "../assets/Cashback/Cashbackimg3.png";
@@ -25,12 +26,15 @@ const Cashback = () => {
               totam aperiam nesciunt doloremque magni neque placeat, laborum
               nisi eum quae voluptatum{" "}
             </p>
-            <button
-              type="button"
-              className="bg-[#049D8E] rounded-md py-2 px-4 text-white  mt-5"
-            >
-              Sign up for free
-            </button>
+            <Link to="/cause-form">
+              {" "}
+              <button
+                type="button"
+                className="bg-[#049D8E] rounded-md py-2 px-4 text-white  mt-5"
+              >
+                Sign up for free
+              </button>
+            </Link>
           </div>
           <div className="col-span-12 md:col-span-6">
             <div className="flex flex-wrap justify-center md:justify-start">
@@ -63,12 +67,14 @@ const Cashback = () => {
               totam aperiam nesciunt doloremque magni neque placeat, laborum
               nisi eum quae voluptatum{" "}
             </p>
-            <button
-              type="button"
-              className="bg-[#049D8E] rounded-md py-2 px-4 text-white  mt-5"
-            >
-              Start Shopping
-            </button>
+            <Link to="/signup">
+              <button
+                type="button"
+                className="bg-[#049D8E] rounded-md py-2 px-4 text-white  mt-5"
+              >
+                Start Shopping
+              </button>
+            </Link>
           </div>
         </div>
       </div>
@@ -91,12 +97,15 @@ const Cashback = () => {
               totam aperiam nesciunt doloremque magni neque placeat, laborum
               nisi eum quae voluptatum{" "}
             </p>
-            <button
-              type="button"
-              className="bg-[#049D8E] rounded-md py-2 px-4 text-white  mt-5"
-            >
-              Sign up for free
-            </button>
+            <Link to="/cause-form">
+
+              <button
+                type="button"
+                className="bg-[#049D8E] rounded-md py-2 px-4 text-white  mt-5"
+              >
+                Sign up for free
+              </button>
+            </Link>
           </div>
           <div className="col-span-12 md:col-span-6">
             <div className="flex flex-wrap justify-center md:justify-start">

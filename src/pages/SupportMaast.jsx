@@ -7,17 +7,12 @@ import page3 from "../assets/SupportMaast/page3.png";
 import playingworld from "../assets/SupportMaast/playingworld.png";
 import savenature from "../assets/SupportMaast/savenature.png";
 import blooddonate from "../assets/SupportMaast/blooddonate.png";
-import Loader from "../Components/Loader/Loader";
-import { useState } from "react";
+import { Link } from "react-router-dom";
+
 const SupportMasst = () => {
-  const [loading, setLoading] = useState(true);
   document.title = "Support Maast - Shopiness";
-  setInterval(() => {
-    setLoading(false);
-  }, [3000]);
-  return loading ? (
-    <Loader />
-  ) : (
+
+  return (
     <div className=" overflow-hidden">
       {/* { 1st page } */}
       <div>
@@ -35,14 +30,16 @@ const SupportMasst = () => {
             society by supporting various charitable causes. Through the MAAST
             program, users can contribute to meaningful projects that focus on
             areas such as hunger relief, nutrition, emergency aid, support for
-            the elderly, and children's welfare. By participating in MAAST,
+            the elderly, and children&apos;s welfare. By participating in MAAST,
             individuals can donate, volunteer, or raise awareness to help
             transform lives and communities.
           </p>
           <div>
-            <button className="bg-teal-500 text-white font-medium rounded-md py-2.5 px-8 mt-4">
-              Donate
-            </button>
+            <Link to="/signup">
+              <button className="bg-teal-500 text-white font-medium rounded-md py-2.5 px-8 mt-4">
+                Donate
+              </button>
+            </Link>
           </div>
         </div>
 
@@ -78,9 +75,11 @@ const SupportMasst = () => {
             way to contribute to a better world.
           </p>
           <div>
-            <button className="bg-teal-500 text-white font-medium rounded-md py-2.5 px-8 mt-4">
-              Donate
-            </button>
+            <Link to="/signup">
+              <button className="bg-teal-500 text-white font-medium rounded-md py-2.5 px-8 mt-4">
+                Donate
+              </button>
+            </Link>
           </div>
         </div>
       </div>

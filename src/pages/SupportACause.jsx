@@ -85,7 +85,7 @@ const SupportACause = () => {
               <p className="text-sm">
                 You can also{" "}
                 <Link
-                  to="/login/cause"
+                  to="/cause-form"
                   className="text-teal-500 underline decoration-1  	"
                 >
                   Register your own cause/NGO

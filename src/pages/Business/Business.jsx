@@ -61,7 +61,7 @@ const Business = () => {
               mollitia voluptatem recusandae impedit totam aperiam nesciunt
               doloremque magni neque placeat, laborum nisi eum quae voluptatum{" "}
             </p>
-            <Link to="/signup">Sign Up</Link>
+            <Link to="/business-form">Sign Up</Link>
           </div>
           <div className="right">
             <img src={vid} alt="person" />
@@ -87,8 +87,8 @@ const Business = () => {
               nisi eum quae voluptatum{" "}
             </p>
             <div className="links">
-              <Link className="online">Online Shopping</Link>
-              <Link className="offline">Offline Shopping</Link>
+              <Link to="/online-shop" className="online">Online Shopping</Link>
+              <Link to="/offline-shop" className="offline">Offline Shopping</Link>
             </div>
           </div>
         </div>
@@ -109,7 +109,7 @@ const Business = () => {
               recusandae impedit totam aperiam nesciunt doloremque magni neque
               placeat, laborum nisi eum quae voluptatum
             </p>
-            <Link to="/signUp">Sign Up for free</Link>
+            <Link to="/business-form">Sign Up for free</Link>
           </div>
           <div className="right">
             <img src={convoImg} alt="convoImg" />
