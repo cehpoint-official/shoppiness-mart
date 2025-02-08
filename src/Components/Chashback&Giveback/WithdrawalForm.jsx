@@ -1,10 +1,21 @@
-import { collection, doc, getDocs } from "firebase/firestore";
-import { useCallback, useEffect, useState } from "react";
+import {
+  addDoc,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  updateDoc,
+  increment,
+} from "firebase/firestore";
+import { useEffect, useState } from "react";
 import { db } from "../../../firebase";
 import { useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { userExist } from "../../redux/reducer/userReducer";
 
-const CashbackForm = () => {
-  const [selectedFile, setSelectedFile] = useState(null);
+const WithdrawalForm = () => {
   const [showPaymentSelection, setShowPaymentSelection] = useState(false);
   const [existingPayments, setExistingPayments] = useState({
     bankAccounts: [],
@@ -13,41 +24,10 @@ const CashbackForm = () => {
   });
   const [selectedPayment, setSelectedPayment] = useState(null);
   const { user } = useSelector((state) => state.userReducer);
-  const [shops, setShops] = useState([]);
-  const [selectedShop, setSelectedShop] = useState("");
-  const [paidAmount, setPaidAmount] = useState("");
+  const [amount, setAmount] = useState("");
   const [loadingPayment, setLoadingPayment] = useState(true);
-
-  const fetchData = useCallback(async () => {
-    try {
-      const querySnapshot = await getDocs(collection(db, "businessDetails"));
-      const data = [];
-      querySnapshot.forEach((doc) => {
-        const shopData = doc.data();
-        data.push({ id: doc.id, ...shopData });
-      });
-      setShops(data);
-    } catch (error) {
-      console.log("Error getting documents: ", error);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  const handleFileChange = (e) => {
-    setSelectedFile(e.target.files[0]);
-  };
-
-  const handleShopChange = (e) => {
-    setSelectedShop(e.target.value);
-  };
-
-  const handlePaidAmountChange = (e) => {
-    setPaidAmount(e.target.value);
-  };
-
+  const { userId } = useParams();
+  const dispatch = useDispatch();
   useEffect(() => {
     const fetchAllPaymentMethods = async () => {
       if (!user?.uid) return;
@@ -127,53 +107,73 @@ const CashbackForm = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!amount || isNaN(amount) || Number(amount) <= 0) {
+      return toast.error("Enter a valid withdrawal amount");
+    }
 
-    const formData = {
-      selectedShop,
-      paidAmount,
-      selectedFile,
-      selectedPayment,
-      status: "New",
-    };
+    const docRef = doc(db, "users", userId);
+    const docSnap = await getDoc(docRef);
 
-    console.log("Form Data:", formData);
+    if (!docSnap.exists()) {
+      return toast.error("Error fetching user data");
+    }
+
+    const userData = docSnap.data();
+    const availableCashback = userData.collectedCashback || 0;
+
+    if (Number(amount) > availableCashback) {
+      return toast.error("Insufficient cashback balance");
+    }
+
+    try {
+      // Store the withdrawal request with status "Pending"
+      await addDoc(collection(db, "WithdrawCashback"), {
+        userId,
+        userName: user.fname + " " + user.lname,
+        userEmail: user.email,
+        amount: Number(amount),
+        selectedPayment,
+        status: "Pending",
+        requestedAt: new Date().toISOString(),
+      });
+
+      const numAmount = Number(amount);
+
+      // Update Firestore
+      await updateDoc(docRef, {
+        collectedCashback: increment(-numAmount),
+        pendingCashback: increment(numAmount),
+      });
+
+      // Update Redux state immediately
+      const updatedUser = {
+        ...user,
+        collectedCashback: (user.collectedCashback || 0) - numAmount,
+        pendingCashback: (user.pendingCashback || 0) + numAmount,
+      };
+      dispatch(userExist(updatedUser));
+
+      toast.success("Withdrawal request submitted successfully!");
+      setAmount("");
+    } catch (error) {
+      console.error("Error processing withdrawal:", error);
+      toast.error("Something went wrong");
+    }
   };
 
   return (
     <div className="relative">
-      {/* write disclaimer  */}
-      <p className="text-sm text-yellow-800 bg-yellow-100 p-3 rounded-md border border-yellow-400 font-semibold mb-2">
-        ⚠️ Important: If you have received a bill or invoice but have not
-        received the cashback in your wallet, please upload the invoice along
-        with the shop name and the paid amount for verification.
-      </p>
-
       <form className="space-y-4 max-w-md" onSubmit={handleSubmit}>
         <div>
-          <label className="block text-sm mb-2">Select Shop</label>
-          <select
-            className="w-full bg-gray-200 rounded p-2 text-sm border-0"
-            value={selectedShop}
-            onChange={handleShopChange}
-          >
-            <option value="">Select a shop...</option>
-            {shops.map((shop, index) => (
-              <option key={index} value={shop.businessName}>
-                {shop.businessName}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-sm mb-2">Paid Amount</label>
+          <label className="block text-sm mb-2">Amount</label>
           <input
             type="text"
+            placeholder="Enter withdrawal amount"
             className="w-full bg-gray-200 rounded p-2 text-sm border-0"
-            value={paidAmount}
-            onChange={handlePaidAmountChange}
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
           />
         </div>
 
@@ -251,11 +251,11 @@ const CashbackForm = () => {
           type="submit"
           className="w-full bg-blue-700 text-white rounded py-2 text-md mt-6"
         >
-          Claim Cashback
+          Withdraw Amount
         </button>
       </form>
     </div>
   );
 };
 
-export default CashbackForm;
+export default WithdrawalForm;

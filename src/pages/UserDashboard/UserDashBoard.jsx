@@ -90,8 +90,9 @@ const UserDashBoard = () => {
       await setDoc(doc(db, "users", userData.uid), updatedData, {
         merge: true,
       });
+      
       dispatch(userExist(updatedData));
-      setUserData(updatedData);
+       setUserData(updatedData);
       setIsDialogOpen(false);
     } catch (error) {
       console.error("Error updating user data:", error);
