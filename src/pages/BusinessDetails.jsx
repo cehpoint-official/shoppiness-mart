@@ -92,7 +92,7 @@ const BusinessDetails = () => {
         platformEarnings: business.rate / 2,
         code: generatedCouponCode,
         businessName: business.businessName,
-        userProfilePic: user.profilePic,
+        userProfilePic: user.profilePic || "",
         status: "Pending",
       });
 

@@ -21,8 +21,7 @@ const ProductDetails = () => {
   const [savingCoupon, setSavingCoupon] = useState(false);
   const [generatedCouponCode, setGeneratedCouponCode] = useState("");
   const { user } = useSelector((state) => state.userReducer);
- 
-  
+
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -85,12 +84,12 @@ const ProductDetails = () => {
         productId,
         createdAt: new Date().toISOString(),
         businessRate: business.rate,
-        userCashback: business.rate / 2,  
+        userCashback: business.rate / 2,
         platformEarnings: business.rate / 2,
         code: generatedCouponCode,
         businessName: business.businessName,
         productName: productsDetails.name,
-        userProfilePic: user.profilePic,
+        userProfilePic: user.profilePic || "",
         productDiscount: productsDetails.discount,
         status: "Pending",
       });
