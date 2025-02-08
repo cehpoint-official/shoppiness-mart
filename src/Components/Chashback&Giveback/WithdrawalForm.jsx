@@ -167,7 +167,7 @@ const WithdrawalForm = () => {
     <div className="relative">
       <form className="space-y-4 max-w-md" onSubmit={handleSubmit}>
         <div>
-          <label className="block text-sm mb-2">Amount</label>
+          <label className="block text-sm mb-2">Enter Amount</label>
           <input
             type="text"
             placeholder="Enter withdrawal amount"
