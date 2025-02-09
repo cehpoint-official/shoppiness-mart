@@ -14,13 +14,14 @@ import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
 import { userExist } from "../../redux/reducer/userReducer";
-
+import { BiLoaderAlt } from "react-icons/bi";
 const GiveBackForm = () => {
   const [ngos, setNgos] = useState([]);
   const [amount, setAmount] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedNgo, setSelectedNgo] = useState(null); 
+  const [selectedNgo, setSelectedNgo] = useState(null);
+  const [isProcessingGiveback, setIsProcessingGiveback] = useState(false);
   const { userId } = useParams();
   const { user } = useSelector((state) => state.userReducer);
   const dispatch = useDispatch();
@@ -51,28 +52,36 @@ const GiveBackForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setIsProcessingGiveback(true);
     // Validate NGO selection
     if (!selectedNgo) {
-      return toast.error("Please select an NGO");
+      toast.error("Please select an NGO");
+      setIsProcessingGiveback(false);
+      return;
     }
 
     if (!amount || isNaN(amount) || Number(amount) <= 0) {
-      return toast.error("Enter a valid Giveback amount");
+      toast.error("Enter a valid Giveback amount");
+      setIsProcessingGiveback(false);
+      return;
     }
 
     const docRef = doc(db, "users", userId);
     const docSnap = await getDoc(docRef);
 
     if (!docSnap.exists()) {
-      return toast.error("Error fetching user data");
+      toast.error("Error fetching user data");
+      setIsProcessingGiveback(false);
+      return;
     }
 
     const userData = docSnap.data();
     const availableCashback = userData.collectedCashback || 0;
 
     if (Number(amount) > availableCashback) {
-      return toast.error("Insufficient cashback balance");
+      toast.error("Insufficient cashback balance");
+      setIsProcessingGiveback(false);
+      return;
     }
 
     try {
@@ -87,7 +96,7 @@ const GiveBackForm = () => {
         ngoId: selectedNgo.id,
         amount: numAmount,
         completedAt: new Date().toISOString(),
-        status: "Completed", 
+        status: "Completed",
       });
 
       // Update Firestore
@@ -114,6 +123,8 @@ const GiveBackForm = () => {
     } catch (error) {
       console.error("Error processing giveback:", error);
       toast.error("Something went wrong");
+    } finally {
+      setIsProcessingGiveback(false);
     }
   };
 
@@ -191,9 +202,17 @@ const GiveBackForm = () => {
 
         <button
           type="submit"
-          className="w-full bg-blue-700 text-white rounded-lg py-3 text-sm font-medium hover:bg-blue-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          className="w-full flex justify-center items-center gap-3 bg-blue-700 text-white rounded-lg py-3 text-sm font-medium hover:bg-blue-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
-          Give Back
+          {" "}
+          {isProcessingGiveback ? (
+            <>
+              <BiLoaderAlt className="w-5 h-5 animate-spin" />
+              Processing...
+            </>
+          ) : (
+            " Give Back"
+          )}
         </button>
       </form>
     </div>

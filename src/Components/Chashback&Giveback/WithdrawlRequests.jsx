@@ -37,7 +37,7 @@ const WithdrawlRequests = () => {
   }, [fetchData]);
 
   const formatDate = (dateString) => {
-    return dateString.split("T")[0];
+    return dateString ? dateString.split("T")[0] : "-";
   };
 
   const filteredData = withdraws.filter((item) => {
@@ -95,7 +95,10 @@ const WithdrawlRequests = () => {
           <tr>
             <th className="py-2 px-4 border-b text-left">#</th>
             <th className="py-2 px-4 border-b text-left">Amount</th>
-            <th className="py-2 px-4 border-b text-left">Date</th>
+            <th className="py-2 px-4 border-b text-left">Requested Date</th>
+            {(activeFilter === "COLLECTED" || activeFilter === "ALL") && (
+              <th className="py-2 px-4 border-b text-left">Received Date</th>
+            )}
             <th className="py-2 px-4 border-b text-left">Status</th>
             <th className="py-2 px-4 border-b text-left">Payment Type</th>
           </tr>
@@ -113,6 +116,11 @@ const WithdrawlRequests = () => {
                 <td className="py-2 px-4 border-b">
                   <div className="h-4 bg-gray-300 rounded w-24"></div>
                 </td>
+                {(activeFilter === "COLLECTED" || activeFilter === "ALL") && (
+                  <td className="py-2 px-4 border-b">
+                    <div className="h-4 bg-gray-300 rounded w-24"></div>
+                  </td>
+                )}
                 <td className="py-2 px-4 border-b">
                   <div className="h-4 bg-gray-300 rounded w-16"></div>
                 </td>
@@ -123,7 +131,12 @@ const WithdrawlRequests = () => {
             ))
           ) : filteredData.length === 0 ? (
             <tr>
-              <td colSpan="5" className="py-6 text-center text-gray-500">
+              <td
+                colSpan={
+                  activeFilter === "COLLECTED" || activeFilter === "ALL" ? 6 : 5
+                }
+                className="py-6 text-center text-gray-500"
+              >
                 {getNoDataMessage()}
               </td>
             </tr>
@@ -137,6 +150,13 @@ const WithdrawlRequests = () => {
                 <td className="py-2 px-4 border-b">
                   {formatDate(request.requestedAt)}
                 </td>
+                {(activeFilter === "COLLECTED" || activeFilter === "ALL") && (
+                  <td className="py-2 px-4 border-b">
+                    {request.status === "Collected"
+                      ? formatDate(request.paidAt)
+                      : "-"}
+                  </td>
+                )}
                 <td className="py-2 px-4 border-b">
                   <span
                     className={`${

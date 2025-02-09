@@ -145,9 +145,16 @@ const CashbackForm = () => {
     <div className="relative">
       {/* write disclaimer  */}
       <p className="text-sm text-yellow-800 bg-yellow-100 p-3 rounded-md border border-yellow-400 font-semibold mb-2">
-        ⚠️ Important: If you have received a bill or invoice but have not
-        received the cashback in your wallet, please upload the invoice along
-        with the shop name and the paid amount for verification.
+        ⚠️ <strong>Important:</strong>
+        <p>
+          1. If you have received a bill or invoice but have not received the
+          cashback in your wallet, please upload the invoice along with the shop
+          name and the paid amount for verification.
+        </p>
+        <p>
+          2. For online purchases, you must upload the invoice and the total
+          bill amount to claim your cashback.
+        </p>
       </p>
 
       <form className="space-y-4 max-w-md" onSubmit={handleSubmit}>

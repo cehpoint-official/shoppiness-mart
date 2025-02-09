@@ -71,64 +71,68 @@ const Coupons = () => {
   );
 
   return (
-    <div className="p-6">
+    <div className="p-6 flex flex-col">
       <h1 className="text-2xl font-normal mb-6">Available Coupons</h1>
 
-      <div className="space-y-4">
-        {loading ? (
-          // Show skeleton while loading
-          Array.from({ length: 3 }).map((_, index) => (
-            <SkeletonCoupon key={index} />
-          ))
-        ) : coupons.length > 0 ? (
-          // Show actual coupons once data is loaded
-          coupons.map((coupon) => (
-            <div
-              key={coupon.id}
-              className="border p-4 bg-[#e9f9f77a] shadow-sm relative"
-            >
-              <div className="absolute top-4 right-4">
-                <span className="text-gray-600">
-                  {formatDate(coupon.createdAt)}
-                </span>
-              </div>
+      <div className="space-y-4 overflow-y-auto flex-1">
+        <div className="max-w-6xl mx-auto space-y-4">
+          {loading ? (
+            // Show skeleton while loading
+            Array.from({ length: 3 }).map((_, index) => (
+              <SkeletonCoupon key={index} />
+            ))
+          ) : coupons.length > 0 ? (
+            // Show actual coupons once data is loaded
+            coupons.map((coupon) => (
+              <div
+                key={coupon.id}
+                className="border p-4 bg-[#e9f9f77a] shadow-sm relative"
+              >
+                <div className="absolute top-4 right-4">
+                  <span className="text-gray-600 text-sm sm:text-base">
+                    {formatDate(coupon.createdAt)}
+                  </span>
+                </div>
 
-              <div className="space-y-4">
-                <h2 className="text-blue-600 text-xl font-normal pr-32">
-                  {coupon.businessName}
-                </h2>
+                <div className="space-y-4">
+                  <h2 className="text-blue-600 text-lg sm:text-xl font-normal pr-20 sm:pr-32">
+                    {coupon.businessName}
+                  </h2>
 
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <p className="text-gray-600">{getOfferText(coupon)}</p>
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <p className="text-gray-600 text-sm sm:text-base">
+                      {getOfferText(coupon)}
+                    </p>
 
-                  <div className="flex items-center gap-2 whitespace-nowrap">
-                    <span className="text-blue-600 text-lg">
-                      Coupon code - {coupon.code}
-                    </span>
-                    <button
-                      onClick={() => handleCopy(coupon.code)}
-                      className="p-1 hover:bg-gray-100 rounded transition-colors"
-                      title="Copy code"
-                    >
-                      <IoCopyOutline
-                        className={
-                          copiedCode === coupon.code
-                            ? "text-green-500"
-                            : "text-gray-400"
-                        }
-                        size={20}
-                      />
-                    </button>
+                    <div className="flex items-center gap-2 whitespace-nowrap">
+                      <span className="text-blue-600 text-base sm:text-lg">
+                        Coupon code - {coupon.code}
+                      </span>
+                      <button
+                        onClick={() => handleCopy(coupon.code)}
+                        className="p-1 hover:bg-gray-100 rounded transition-colors"
+                        title="Copy code"
+                      >
+                        <IoCopyOutline
+                          className={
+                            copiedCode === coupon.code
+                              ? "text-green-500"
+                              : "text-gray-400"
+                          }
+                          size={20}
+                        />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))
-        ) : (
-          <p className="text-gray-500 text-center text-lg">
-            You haven&apos;t generated any coupons yet.
-          </p>
-        )}
+            ))
+          ) : (
+            <p className="text-gray-500 text-center text-lg">
+              You haven&apos;t generated any coupons yet.
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );

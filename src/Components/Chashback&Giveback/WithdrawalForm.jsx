@@ -14,7 +14,7 @@ import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { userExist } from "../../redux/reducer/userReducer";
-
+import { BiLoaderAlt } from "react-icons/bi";
 const WithdrawalForm = () => {
   const [showPaymentSelection, setShowPaymentSelection] = useState(false);
   const [existingPayments, setExistingPayments] = useState({
@@ -25,6 +25,7 @@ const WithdrawalForm = () => {
   const [selectedPayment, setSelectedPayment] = useState(null);
   const { user } = useSelector((state) => state.userReducer);
   const [amount, setAmount] = useState("");
+  const [isProcessingWithdrawal, setIsProcessingWithdrawal] = useState(false);
   const [loadingPayment, setLoadingPayment] = useState(true);
   const { userId } = useParams();
   const dispatch = useDispatch();
@@ -109,22 +110,30 @@ const WithdrawalForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsProcessingWithdrawal(true);
+
     if (!amount || isNaN(amount) || Number(amount) <= 0) {
-      return toast.error("Enter a valid withdrawal amount");
+      toast.error("Enter a valid withdrawal amount");
+      setIsProcessingWithdrawal(false);
+      return;
     }
 
     const docRef = doc(db, "users", userId);
     const docSnap = await getDoc(docRef);
 
     if (!docSnap.exists()) {
-      return toast.error("Error fetching user data");
+      toast.error("Error fetching user data");
+      setIsProcessingWithdrawal(false);
+      return;
     }
 
     const userData = docSnap.data();
     const availableCashback = userData.collectedCashback || 0;
 
     if (Number(amount) > availableCashback) {
-      return toast.error("Insufficient cashback balance");
+      toast.error("Insufficient cashback balance");
+      setIsProcessingWithdrawal(false);
+      return;
     }
 
     try {
@@ -160,6 +169,8 @@ const WithdrawalForm = () => {
     } catch (error) {
       console.error("Error processing withdrawal:", error);
       toast.error("Something went wrong");
+    } finally {
+      setIsProcessingWithdrawal(false);
     }
   };
 
@@ -249,9 +260,18 @@ const WithdrawalForm = () => {
 
         <button
           type="submit"
-          className="w-full bg-blue-700 text-white rounded py-2 text-md mt-6"
+          disabled={isProcessingWithdrawal}
+          className="w-full flex justify-center items-center gap-3 bg-blue-700 text-white rounded py-2 text-md mt-6"
         >
-          Withdraw Amount
+          {" "}
+          {isProcessingWithdrawal ? (
+            <>
+              <BiLoaderAlt className="w-5 h-5 animate-spin" />
+              Processing...
+            </>
+          ) : (
+            "Withdraw Amount"
+          )}
         </button>
       </form>
     </div>
