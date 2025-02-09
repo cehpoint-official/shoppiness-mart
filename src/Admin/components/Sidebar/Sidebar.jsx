@@ -221,6 +221,12 @@ const Sidebar = () => {
                 Coupons
               </Link>
               <Link
+                to="/admin/shoppiness/users/withdrawal-requests"
+                className="py-2 px-6 hover:bg-teal-600 transition-colors"
+              >
+                Withdrawal Requests
+              </Link>
+              <Link
                 to="/admin/shoppiness/users/cashback-requests"
                 className="py-2 px-6 hover:bg-teal-600 transition-colors"
               >

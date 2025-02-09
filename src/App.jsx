@@ -27,6 +27,7 @@ import OnlineShopRequests from "./Admin/pages/Product&Services/OnlineShopRequest
 import AllOfflineShops from "./Admin/pages/Product&Services/AllOfflineShops/AllOfflineShops";
 import AllOnlineShops from "./Admin/pages/Product&Services/AllOnlineShops/AllOnlineShops";
 import AddCategories from "./Admin/pages/Product&Services/AddCategories/AddCategories";
+import WithdrawalRequests from "./Admin/pages/Users/Withdrawal Requests/WithdrawalRequests";
 // Lazy-loaded components
 const Home = lazy(() => import("./pages/Home"));
 const Signup = lazy(() => import("./pages/Signup"));
@@ -287,6 +288,7 @@ const router = createBrowserRouter([
           { path: "services/all-onlineshops", element: <AllOnlineShops /> },
           { path: "services/add-categories", element: <AddCategories /> },
           { path: "users/coupons", element: <Coupons /> },
+          { path: "users/withdrawal-requests", element: <WithdrawalRequests /> },
           { path: "users/cashback-requests", element: <CashbackRequests /> },
           { path: "users/cashback-status", element: <CashbackStatus /> },
           { path: "users/givebacks", element: <Givebacks /> },
