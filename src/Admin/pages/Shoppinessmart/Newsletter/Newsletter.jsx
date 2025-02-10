@@ -1,7 +1,6 @@
-import Navbar from "../../components/Navbar/Navbar";
-import Sidebar from "../../components/Sidebar/Sidebar";
 
-const AddPrivacyPolicy = () => {
+
+const Newsletter = () => {
   const data = [
     {
       id: 1,
@@ -31,9 +30,7 @@ const AddPrivacyPolicy = () => {
   return (
     <div>
       <div className="flex">
-        <Sidebar />
         <div className="flex-1 flex flex-col">
-          <Navbar />
 
           {/*ADD NEWSLETTER CODE  */}
           <div className="p-6">
@@ -70,4 +67,4 @@ const AddPrivacyPolicy = () => {
   );
 };
 
-export default AddPrivacyPolicy;
+export default Newsletter;

@@ -1,284 +1,184 @@
-import { useState } from "react";
-import { MdMoreVert, MdSort } from "react-icons/md";
+import { collection, getDocs } from "firebase/firestore";
+import { useCallback, useEffect, useState } from "react";
+import { db } from "../../../../../firebase";
+const SkeletonRow = () => {
+  return (
+    <tr className="border-b animate-pulse">
+      <td className="p-4">
+        <div className="h-4 bg-gray-200 rounded"></div>
+      </td>
+      <td className="p-4">
+        <div className="h-4 bg-gray-200 rounded"></div>
+      </td>
+      <td className="p-4">
+        <div className="h-4 bg-gray-200 rounded"></div>
+      </td>
+      <td className="p-4">
+        <div className="h-4 bg-gray-200 rounded"></div>
+      </td>
+      <td className="p-4">
+        <div className="h-4 bg-gray-200 rounded"></div>
+      </td>
+    </tr>
+  );
+};
 
 const AllDonations = () => {
-  const [donations] = useState([
-    {
-      id: 1,
-      ngo: "MAAST",
-      date: "02 Jan, 2024",
-      name: "Tithi Mondal",
-      email: "email@gmail.com",
-      amount: "₹ 1300",
-      message: "Lorem ipsum dolor sit amet consectetur. Tur..",
-    },
-    {
-      id: 2,
-      ngo: "MAAST",
-      date: "03 Jan, 2024",
-      name: "Rahul Kumar",
-      email: "rahul@gmail.com",
-      amount: "₹ 1500",
-      message: "Lorem ipsum dolor sit amet consectetur. Tur..",
-    },
-    {
-      id: 3,
-      ngo: "MAAST",
-      date: "04 Jan, 2024",
-      name: "Priya Singh",
-      email: "priya@gmail.com",
-      amount: "₹ 600",
-      message: "Lorem ipsum dolor sit amet consectetur. Tur..",
-    },
-    {
-      id: 4,
-      ngo: "SUN",
-      date: "05 Jan, 2024",
-      name: "Amit Shah",
-      email: "amit@gmail.com",
-      amount: "₹ 1000",
-      message: "Lorem ipsum dolor sit amet consectetur. Tur..",
-    },
-    {
-      id: 5,
-      ngo: "SUN",
-      date: "06 Jan, 2024",
-      name: "Zara Khan",
-      email: "zara@gmail.com",
-      amount: "₹ 7000",
-      message: "Lorem ipsum dolor sit amet consectetur. Tur..",
-    },
-    {
-      id: 6,
-      ngo: "CARE",
-      date: "07 Jan, 2024",
-      name: "John Doe",
-      email: "john@gmail.com",
-      amount: "₹ 2500",
-      message: "Lorem ipsum dolor sit amet consectetur. Tur..",
-    },
-    {
-      id: 7,
-      ngo: "HOPE",
-      date: "08 Jan, 2024",
-      name: "Mary Jane",
-      email: "mary@gmail.com",
-      amount: "₹ 3000",
-      message: "Lorem ipsum dolor sit amet consectetur. Tur..",
-    },
-    {
-      id: 8,
-      ngo: "LIFE",
-      date: "09 Jan, 2024",
-      name: "David Wilson",
-      email: "david@gmail.com",
-      amount: "₹ 5000",
-      message: "Lorem ipsum dolor sit amet consectetur. Tur..",
-    },
-    {
-      id: 9,
-      ngo: "GIVE",
-      date: "10 Jan, 2024",
-      name: "Sarah Brown",
-      email: "sarah@gmail.com",
-      amount: "₹ 4000",
-      message: "Lorem ipsum dolor sit amet consectetur. Tur..",
-    },
-    {
-      id: 10,
-      ngo: "HELP",
-      date: "11 Jan, 2024",
-      name: "Michael Scott",
-      email: "michael@gmail.com",
-      amount: "₹ 6000",
-      message: "Lorem ipsum dolor sit amet consectetur. Tur..",
-    },
-  ]);
-
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortMenuOpen, setSortMenuOpen] = useState(false);
-  const [sortBy, setSortBy] = useState("Newest First");
-  const [activeDropdown, setActiveDropdown] = useState(null);
+  const [sortBy, setSortBy] = useState("newest");
+  const [history, setHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
   const itemsPerPage = 5;
 
-  const sortOptions = [
-    "Newest First",
-    "Oldest First",
-    "Alphabetical (A-Z)",
-    "Alphabetical (Z-A)",
-  ];
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true);
+      const querySnapshot = await getDocs(collection(db, "givebackCashbacks"));
+      const data = [];
+      querySnapshot.forEach((doc) => {
+        const GivebackHistoryData = doc.data();
+        data.push({ id: doc.id, ...GivebackHistoryData });
+      });
+      setHistory(data);
+    } catch (error) {
+      console.log("Error getting documents: ", error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-  const handleSort = (option) => {
-    setSortBy(option);
-    setSortMenuOpen(false);
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const formatDate = (dateString) => {
+    return dateString.split("T")[0];
   };
 
-  const handleEdit = () => {
-    // Handle edit logic
-    setActiveDropdown(null);
-  };
-
-  const handleDelete = () => {
-    // Handle delete logic
-    setActiveDropdown(null);
-  };
-
-  // Sort donations based on selected option
-  const getSortedDonations = () => {
-    let sorted = [...donations];
+  const sortDonations = (donations) => {
     switch (sortBy) {
-      case "Newest First":
-        return sorted.sort((a, b) => new Date(b.date) - new Date(a.date));
-      case "Oldest First":
-        return sorted.sort((a, b) => new Date(a.date) - new Date(b.date));
-      case "Alphabetical (A-Z)":
-        return sorted.sort((a, b) => a.ngo.localeCompare(b.ngo));
-      case "Alphabetical (Z-A)":
-        return sorted.sort((a, b) => b.ngo.localeCompare(a.ngo));
+      case "newest":
+        return [...donations].sort(
+          (a, b) =>
+            new Date(formatDate(b.completedAt)) -
+            new Date(formatDate(a.completedAt))
+        );
+      case "oldest":
+        return [...donations].sort(
+          (a, b) =>
+            new Date(formatDate(a.completedAt)) -
+            new Date(formatDate(b.completedAt))
+        );
+      case "az":
+        return [...donations].sort((a, b) =>
+          a.ngoName.localeCompare(b.ngoName)
+        );
+      case "za":
+        return [...donations].sort((a, b) =>
+          b.ngoName.localeCompare(a.ngoName)
+        );
       default:
-        return sorted;
+        return donations;
     }
   };
 
-  // Get current page items
-  const sortedDonations = getSortedDonations();
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = sortedDonations.slice(indexOfFirstItem, indexOfLastItem);
+  const sortedDonations = sortDonations(history);
   const totalPages = Math.ceil(sortedDonations.length / itemsPerPage);
-
-  // Generate page numbers
-  const pageNumbers = [];
-  for (let i = 1; i <= totalPages; i++) {
-    pageNumbers.push(i);
-  }
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const displayedDonations = sortedDonations.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
 
   return (
     <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-normal">All Donation</h1>
-        <div className="relative">
-          <button
-            onClick={() => setSortMenuOpen(!sortMenuOpen)}
-            className="flex items-center gap-2 px-4 py-2 border border-black rounded-md hover:bg-gray-50"
-          >
-            <MdSort className="w-5 h-5" />
-            Sort by
-          </button>
-
-          {sortMenuOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
-              {sortOptions.map((option) => (
-                <button
-                  key={option}
-                  className={`block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 ${
-                    sortBy === option ? "bg-gray-50" : ""
-                  }`}
-                  onClick={() => handleSort(option)}
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden overflow-x-auto">
-        <table className="w-full min-w-[800px]">
-          <thead>
-            <tr className="border-b">
-              <th className="text-left p-4">NGO/Cause name</th>
-              <th className="text-left p-4">Date</th>
-              <th className="text-left p-4">Name</th>
-              <th className="text-left p-4">Email</th>
-              <th className="text-left p-4">Amount</th>
-              <th className="text-left p-4">Message</th>
-              <th className="text-left p-4">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentItems.map((donation) => (
-              <tr key={donation.id} className="border-b">
-                <td className="p-4">{donation.ngo}</td>
-                <td className="p-4">{donation.date}</td>
-                <td className="p-4">{donation.name}</td>
-                <td className="p-4">{donation.email}</td>
-                <td className="p-4">{donation.amount}</td>
-                <td className="p-4">{donation.message}</td>
-                <td className="p-4">
-                  <div className="relative">
-                    <button
-                      className="text-gray-600 hover:text-gray-800"
-                      onClick={() =>
-                        setActiveDropdown(
-                          activeDropdown === donation.id ? null : donation.id
-                        )
-                      }
-                    >
-                      <MdMoreVert size={20} />
-                    </button>
-
-                    {activeDropdown === donation.id && (
-                      <div className="absolute right-0 mt-1 w-32 bg-white rounded-md shadow-lg z-10">
-                        <button
-                          className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
-                          onClick={() => handleEdit(donation.id)}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100"
-                          onClick={() => handleDelete(donation.id)}
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="flex flex-col sm:flex-row items-center justify-between mt-4 gap-4">
-        <div className="text-sm text-gray-600">
-          Showing {indexOfFirstItem + 1} to{" "}
-          {Math.min(indexOfLastItem, sortedDonations.length)} of{" "}
-          {sortedDonations.length}
-        </div>
+      <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-            className="px-3 py-1 border rounded hover:bg-gray-50 disabled:opacity-50"
+          <h1 className="text-xl">All Donations</h1>
+        </div>
+        <div className="relative">
+          <select
+            className="appearance-none border rounded-lg px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
           >
-            Previous
-          </button>
-          {pageNumbers.map((number) => (
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="az">Alphabetical (A-Z)</option>
+            <option value="za">Alphabetical (Z-A)</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-lg shadow-lg">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="text-left border-b">
+                <th className="p-4 font-medium text-gray-600">
+                  NGO/Cause name
+                </th>
+                <th className="p-4 font-medium text-gray-600">Date</th>
+                <th className="p-4 font-medium text-gray-600">Name</th>
+                <th className="p-4 font-medium text-gray-600">Email</th>
+                <th className="p-4 font-medium text-gray-600">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading
+                ? Array.from({ length: itemsPerPage }).map((_, index) => (
+                    <SkeletonRow key={index} />
+                  ))
+                : displayedDonations.map((donation) => (
+                    <tr key={donation.id} className="border-b">
+                      <td className="p-4">{donation.ngoName}</td>
+                      <td className="p-4">
+                        {formatDate(donation.completedAt)}
+                      </td>
+                      <td className="p-4">{donation.userName}</td>
+                      <td className="p-4">{donation.userEmail}</td>
+                      <td className="p-4">₹ {donation.amount}</td>
+                    </tr>
+                  ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="p-4 flex items-center justify-between">
+          <div className="text-sm text-gray-500">
+            Showing {startIndex + 1} to{" "}
+            {Math.min(startIndex + itemsPerPage, history.length)} of{" "}
+            {history.length}
+          </div>
+          <div className="flex items-center gap-2">
             <button
-              key={number}
-              onClick={() => setCurrentPage(number)}
-              className={`px-3 py-1 rounded ${
-                currentPage === number
-                  ? "bg-blue-500 text-white"
-                  : "hover:bg-gray-50"
-              }`}
+              className="px-4 py-2 text-sm disabled:opacity-50"
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(currentPage - 1)}
             >
-              {number}
+              Previous
             </button>
-          ))}
-          <button
-            onClick={() =>
-              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-            }
-            disabled={currentPage === totalPages}
-            className="px-3 py-1 border rounded hover:bg-gray-50 disabled:opacity-50"
-          >
-            Next
-          </button>
+            {[...Array(totalPages)].map((_, i) => (
+              <button
+                key={i + 1}
+                className={`w-8 h-8 rounded ${
+                  currentPage === i + 1
+                    ? "bg-blue-500 text-white"
+                    : "hover:bg-gray-100"
+                }`}
+                onClick={() => setCurrentPage(i + 1)}
+              >
+                {i + 1}
+              </button>
+            ))}
+            <button
+              className="px-4 py-2 text-sm disabled:opacity-50"
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage(currentPage + 1)}
+            >
+              Next
+            </button>
+          </div>
         </div>
       </div>
     </div>

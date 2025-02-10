@@ -53,7 +53,7 @@ const Sidebar = () => {
                 Edit Pages
               </Link>
               <Link
-                to="/admin/shoppiness/contact"
+                to="/admin/shoppiness/contact-info"
                 className="py-2 px-6 hover:bg-teal-600 transition-colors"
               >
                 Contact Info
@@ -71,7 +71,7 @@ const Sidebar = () => {
                 Blog
               </Link>
               <Link
-                to="/admin/shoppiness/add/privacy-policy"
+                to="/admin/shoppiness/privacy-policy"
                 className="py-2 px-6 hover:bg-teal-600 transition-colors"
               >
                 Privacy polices

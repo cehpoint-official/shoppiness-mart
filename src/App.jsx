@@ -28,6 +28,13 @@ import AllOfflineShops from "./Admin/pages/Product&Services/AllOfflineShops/AllO
 import AllOnlineShops from "./Admin/pages/Product&Services/AllOnlineShops/AllOnlineShops";
 import AddCategories from "./Admin/pages/Product&Services/AddCategories/AddCategories";
 import WithdrawalRequests from "./Admin/pages/Users/Withdrawal Requests/WithdrawalRequests";
+import WebsiteEditPages from "./Admin/pages/Shoppinessmart/WebsiteEditPages/WebsiteEditPages";
+import ContactInfo from "./Admin/pages/Shoppinessmart/Contact/ContactInfo";
+import AllFaqs from "./Admin/pages/Shoppinessmart/FAQ/AllFaqs";
+import PrivacyPolicy from "./Admin/pages/Shoppinessmart/PrivacyPolicy/PrivacyPolicy";
+import Newsletter from "./Admin/pages/Shoppinessmart/Newsletter/Newsletter";
+import MainBlog from "./Admin/pages/Shoppinessmart/MainBlogs/MainBlog";
+import MainSocialmedia from "./Admin/pages/Shoppinessmart/MainSocialmedia/MainSocialmedia";
 // Lazy-loaded components
 const Home = lazy(() => import("./pages/Home"));
 const Signup = lazy(() => import("./pages/Signup"));
@@ -50,16 +57,7 @@ const OnlineShop = lazy(() => import("./pages/OnlineShop"));
 const OfflineShop = lazy(() => import("./pages/OfflineShop"));
 const CatagoryBasedShops = lazy(() => import("./pages/CatagoryBasedShops"));
 const UserProfile = lazy(() => import("./pages/UserProfile/UserProfile"));
-// const FaqHome = lazy(() => import("./Admin/pages/FAQ/home"));
-// const AddFaq = lazy(() => import("./Admin/pages/FAQ/AddFaq"));
-// const AddPrivacyPolicy = lazy(() =>
-//   import("./Admin/pages/PrivacyPolicy/AddPrivacyPolicy")
-// );
-// const Newsletter = lazy(() => import("./Admin/pages/Newsletter/Newsletter"));
-// const ContactInfo = lazy(() => import("./Admin/pages/Contact/ContactInfo"));
-// const ContactMessage = lazy(() =>
-//   import("./Admin/pages/Contact/ContactMessage")
-// );
+
 const DashboardOutlet = lazy(() =>
   import("./Services-Dashboard/pages/DashboardOutlet/DashboardOutlet")
 );
@@ -201,17 +199,17 @@ const router = createBrowserRouter([
       {
         path: "/user-dashboard/:userId/dashboard",
         element: (
-         // <UserProtectedRoute>
-            <UserDashboard />
-       //   </UserProtectedRoute>
+          // <UserProtectedRoute>
+          <UserDashboard />
+          //   </UserProtectedRoute>
         ),
       },
       {
         path: "/user-dashboard/:userId",
         element: (
-      //    <UserProtectedRoute>
-            <NewLayout />
-     //     </UserProtectedRoute>
+          //    <UserProtectedRoute>
+          <NewLayout />
+          //     </UserProtectedRoute>
         ),
         children: [
           {
@@ -276,23 +274,38 @@ const router = createBrowserRouter([
         element: <AdminDashboardOutlet />,
         children: [
           { path: "dashboard", element: <AdminDashboard /> },
+          { path: "edit-pages", element: <WebsiteEditPages /> },
+          { path: "contact-info", element: <ContactInfo /> },
+          { path: "faq", element: <AllFaqs /> },
+          { path: "privacy-policy", element: <PrivacyPolicy /> },
+          { path: "newsletter", element: <Newsletter /> },
+          { path: "blog", element: <MainBlog /> },
+          { path: "social-media", element: <MainSocialmedia /> },
           { path: "maast/edit", element: <EditPage /> },
           { path: "maast/donations", element: <AllDonations /> },
           { path: "maast/events", element: <Events /> },
-          { path: "ngo/ngo-requests", element: <NgoRequest />},
+          { path: "ngo/ngo-requests", element: <NgoRequest /> },
           { path: "ngo/all-ngo", element: <AllNgos /> },
           { path: "ngo/giveback-request", element: <GiveBackRecord /> },
-          { path: "services/offlineshop-requests", element: <OfflineShopRequests /> },
-          { path: "services/onlineshop-requests", element: <OnlineShopRequests /> },
+          {
+            path: "services/offlineshop-requests",
+            element: <OfflineShopRequests />,
+          },
+          {
+            path: "services/onlineshop-requests",
+            element: <OnlineShopRequests />,
+          },
           { path: "services/all-offlineshops", element: <AllOfflineShops /> },
           { path: "services/all-onlineshops", element: <AllOnlineShops /> },
           { path: "services/add-categories", element: <AddCategories /> },
           { path: "users/coupons", element: <Coupons /> },
-          { path: "users/withdrawal-requests", element: <WithdrawalRequests /> },
+          {
+            path: "users/withdrawal-requests",
+            element: <WithdrawalRequests />,
+          },
           { path: "users/cashback-requests", element: <CashbackRequests /> },
           { path: "users/cashback-status", element: <CashbackStatus /> },
           { path: "users/givebacks", element: <Givebacks /> },
-         
 
           // { path: "/contact", element: <ContactInfo /> },
           // { path: "/contact/message", element: <ContactMessage />},
