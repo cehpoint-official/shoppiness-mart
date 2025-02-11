@@ -1,6 +1,6 @@
 import { Outlet, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState} from "react";
 import { doc, getDoc } from "firebase/firestore";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import DashboardHeader from "./../../components/DashboardHeader/DashboardHeader";
@@ -25,7 +25,7 @@ function App() {
 
       if (docSnap.exists()) {
         const data = docSnap.data();
-        dispatch(ngoUserExist(data));
+        dispatch(ngoUserExist({ ...data, uid: id }));
       } else {
         console.error("No such document!");
         dispatch(ngoUserNotExist());

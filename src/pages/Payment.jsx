@@ -1,7 +1,14 @@
 import { useEffect, useState } from "react";
-import { FaPlus } from "react-icons/fa6";
-import { doc, collection, getDocs, addDoc } from "firebase/firestore";
+import { FaPlus, FaSpinner, FaTrash } from "react-icons/fa6";
+import {
+  doc,
+  collection,
+  getDocs,
+  addDoc,
+  deleteDoc,
+} from "firebase/firestore";
 import { db } from "../../firebase";
+import toast from "react-hot-toast";
 
 const Payment = ({ userData }) => {
   const [showPaymentMethods, setShowPaymentMethods] = useState(false);
@@ -11,6 +18,11 @@ const Payment = ({ userData }) => {
     cardDetails: [],
     upiDetails: [],
   });
+
+  // Loading states
+  const [isFetching, setIsFetching] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // State for new payment methods
   const [upiId, setUpiId] = useState("");
@@ -32,6 +44,7 @@ const Payment = ({ userData }) => {
     const fetchAllPaymentMethods = async () => {
       if (!userData?.uid) return;
 
+      setIsFetching(true);
       try {
         const userBankDetailsRef = doc(db, "userBankDetails", userData.uid);
 
@@ -69,6 +82,9 @@ const Payment = ({ userData }) => {
         });
       } catch (error) {
         console.error("Error fetching payment methods:", error);
+        toast.error("Failed to fetch payment methods");
+      } finally {
+        setIsFetching(false);
       }
     };
 
@@ -79,46 +95,50 @@ const Payment = ({ userData }) => {
   const saveUpiDetails = async () => {
     if (!upiId.trim()) return;
 
+    setIsSaving(true);
     try {
       const userBankDetailsRef = doc(db, "userBankDetails", userData.uid);
       const upiCollectionRef = collection(userBankDetailsRef, "upiDetails");
 
-      await addDoc(upiCollectionRef, {
+      const docRef = await addDoc(upiCollectionRef, {
         upiId: upiId.trim(),
       });
 
       // Refresh the UPI list
-      const newUpiList = [
-        ...existingPayments.upiDetails,
-        { upiId: upiId.trim() },
-      ];
       setExistingPayments((prev) => ({
         ...prev,
-        upiDetails: newUpiList,
+        upiDetails: [
+          ...prev.upiDetails,
+          { id: docRef.id, upiId: upiId.trim() },
+        ],
       }));
 
       // Reset form
       setUpiId("");
       setShowPaymentMethods(false);
+      toast.success("UPI details saved successfully");
     } catch (error) {
       console.error("Error saving UPI details:", error);
+      toast.error("Failed to save UPI details");
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const saveBankDetails = async () => {
     if (!bankDetails.bankName || !bankDetails.accountNumber) return;
 
+    setIsSaving(true);
     try {
       const userBankDetailsRef = doc(db, "userBankDetails", userData.uid);
       const bankCollectionRef = collection(userBankDetailsRef, "bankAccounts");
 
-      await addDoc(bankCollectionRef, bankDetails);
+      const docRef = await addDoc(bankCollectionRef, bankDetails);
 
       // Refresh the bank accounts list
-      const newBanksList = [...existingPayments.bankAccounts, bankDetails];
       setExistingPayments((prev) => ({
         ...prev,
-        bankAccounts: newBanksList,
+        bankAccounts: [...prev.bankAccounts, { id: docRef.id, ...bankDetails }],
       }));
 
       // Reset form
@@ -129,25 +149,29 @@ const Payment = ({ userData }) => {
         accountNumber: "",
       });
       setShowPaymentMethods(false);
+      toast.success("Bank details saved successfully");
     } catch (error) {
       console.error("Error saving bank details:", error);
+      toast.error("Failed to save bank details");
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const saveCardDetails = async () => {
     if (!cardDetails.cardNumber || !cardDetails.cardHolder) return;
 
+    setIsSaving(true);
     try {
       const userBankDetailsRef = doc(db, "userBankDetails", userData.uid);
       const cardCollectionRef = collection(userBankDetailsRef, "cardDetails");
 
-      await addDoc(cardCollectionRef, cardDetails);
+      const docRef = await addDoc(cardCollectionRef, cardDetails);
 
       // Refresh the cards list
-      const newCardsList = [...existingPayments.cardDetails, cardDetails];
       setExistingPayments((prev) => ({
         ...prev,
-        cardDetails: newCardsList,
+        cardDetails: [...prev.cardDetails, { id: docRef.id, ...cardDetails }],
       }));
 
       // Reset form
@@ -158,8 +182,36 @@ const Payment = ({ userData }) => {
         cvv: "",
       });
       setShowPaymentMethods(false);
+      toast.success("Card details saved successfully");
     } catch (error) {
       console.error("Error saving card details:", error);
+      toast.error("Failed to save card details");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Delete payment method
+  const deletePaymentMethod = async (type, id) => {
+    if (!userData?.uid) return;
+
+    setIsDeleting(true);
+    try {
+      const userBankDetailsRef = doc(db, "userBankDetails", userData.uid);
+      await deleteDoc(doc(collection(userBankDetailsRef, type), id));
+
+      // Update state to remove deleted item
+      setExistingPayments((prev) => ({
+        ...prev,
+        [type]: prev[type].filter((item) => item.id !== id),
+      }));
+
+      toast.success("Payment method deleted successfully");
+    } catch (error) {
+      console.error("Error deleting payment method:", error);
+      toast.error("Failed to delete payment method");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -168,65 +220,109 @@ const Payment = ({ userData }) => {
     return `********${number.slice(-4)}`;
   };
 
+  // Skeleton Loading Component
+  const SkeletonLoader = () => (
+    <div className="animate-pulse space-y-4">
+      <div className="h-16 bg-gray-200 rounded"></div>
+      <div className="h-16 bg-gray-200 rounded"></div>
+      <div className="h-16 bg-gray-200 rounded"></div>
+    </div>
+  );
+
   const hasExistingPayments =
     existingPayments.bankAccounts.length > 0 ||
     existingPayments.cardDetails.length > 0 ||
     existingPayments.upiDetails.length > 0;
 
-  // Generate years for card expiry
-  const generateYears = () => {
-    const currentYear = new Date().getFullYear();
-    const years = [];
-    for (let i = 0; i < 10; i++) {
-      years.push(currentYear + i);
-    }
-    return years;
-  };
-
   return (
-    <div className=" p-2">
+    <div className="p-2">
       <div className="flex flex-col gap-10">
         <h1 className="text-2xl font-bold">Payment Methods</h1>
 
         {/* Display existing payment methods */}
-        {hasExistingPayments && (
+        {isFetching ? (
+          <SkeletonLoader />
+        ) : hasExistingPayments ? (
           <div className="space-y-4">
-            {existingPayments.bankAccounts.map((bank, index) => (
+            {existingPayments.bankAccounts.map((bank) => (
               <div
-                key={`bank-${index}`}
-                className="p-4 border rounded shadow-sm"
+                key={bank.id}
+                className="p-4 border rounded shadow-sm flex justify-between items-center"
               >
-                <p className="font-medium text-gray-800">Bank Account</p>
-                <p className="text-lg font-medium">{bank.bankName}</p>
-                <p className="text-sm text-gray-600">
-                  Account: {bank.accountNumber}
-                </p>
+                <div>
+                  <p className="font-medium text-gray-800">Bank Account</p>
+                  <p className="text-lg font-medium">{bank.bankName}</p>
+                  <p className="text-sm text-gray-600">
+                    Account: {bank.accountNumber}
+                  </p>
+                </div>
+                <button
+                  onClick={() => deletePaymentMethod("bankAccounts", bank.id)}
+                  className="text-red-500 hover:text-red-700"
+                  disabled={isDeleting}
+                >
+                  {isDeleting ? (
+                    <FaSpinner className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <FaTrash className="w-4 h-4" />
+                  )}
+                </button>
               </div>
             ))}
 
-            {existingPayments.cardDetails.map((card, index) => (
+            {existingPayments.cardDetails.map((card) => (
               <div
-                key={`card-${index}`}
-                className="p-4 border rounded shadow-sm"
+                key={card.id}
+                className="p-4 border rounded shadow-sm flex justify-between items-center"
               >
-                <p className="font-medium text-gray-800">Card</p>
-                <p className="text-lg font-medium">{card.cardHolder}</p>
-                <p className="text-sm text-gray-600">
-                  {maskCardNumber(card.cardNumber)}
-                </p>
+                <div>
+                  <p className="font-medium text-gray-800">Card</p>
+                  <p className="text-lg font-medium">{card.cardHolder}</p>
+                  <p className="text-sm text-gray-600">
+                    {maskCardNumber(card.cardNumber)}
+                  </p>
+                </div>
+                <button
+                  onClick={() => deletePaymentMethod("cardDetails", card.id)}
+                  className="text-red-500 hover:text-red-700"
+                  disabled={isDeleting}
+                >
+                  {isDeleting ? (
+                    <FaSpinner className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <FaTrash className="w-4 h-4" />
+                  )}
+                </button>
               </div>
             ))}
 
-            {existingPayments.upiDetails.map((upi, index) => (
+            {existingPayments.upiDetails.map((upi) => (
               <div
-                key={`upi-${index}`}
-                className="p-4 border rounded shadow-sm"
+                key={upi.id}
+                className="p-4 border rounded shadow-sm flex justify-between items-center"
               >
-                <p className="font-medium text-gray-800">UPI</p>
-                <p className="text-lg text-gray-600">{upi.upiId}</p>
+                <div>
+                  <p className="font-medium text-gray-800">UPI</p>
+                  <p className="text-lg text-gray-600">{upi.upiId}</p>
+                </div>
+                <button
+                  onClick={() => deletePaymentMethod("upiDetails", upi.id)}
+                  className="text-red-500 hover:text-red-700"
+                  disabled={isDeleting}
+                >
+                  {isDeleting ? (
+                    <FaSpinner className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <FaTrash className="w-4 h-4" />
+                  )}
+                </button>
               </div>
             ))}
           </div>
+        ) : (
+          <p className="text-sm text-gray-600">
+            No payment methods have been added yet.
+          </p>
         )}
 
         {/* Add Payment Method Button */}
@@ -301,8 +397,13 @@ const Payment = ({ userData }) => {
                   <button
                     onClick={saveUpiDetails}
                     className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors self-end"
+                    disabled={isSaving}
                   >
-                    Save UPI
+                    {isSaving ? (
+                      <FaSpinner className="w-4 h-4 animate-spin mx-auto" />
+                    ) : (
+                      "Save UPI"
+                    )}
                   </button>
                 </div>
               </div>
@@ -383,8 +484,13 @@ const Payment = ({ userData }) => {
                   <button
                     onClick={saveBankDetails}
                     className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                    disabled={isSaving}
                   >
-                    Save Bank Account
+                    {isSaving ? (
+                      <FaSpinner className="w-4 h-4 animate-spin mx-auto" />
+                    ) : (
+                      "Save Bank Account"
+                    )}
                   </button>
                 </div>
               </div>
@@ -472,7 +578,10 @@ const Payment = ({ userData }) => {
                         className="w-24 p-2 border rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       >
                         <option value="">YY</option>
-                        {generateYears().map((year) => (
+                        {Array.from(
+                          { length: 10 },
+                          (_, i) => new Date().getFullYear() + i
+                        ).map((year) => (
                           <option key={year} value={year.toString().slice(-2)}>
                             {year.toString().slice(-2)}
                           </option>
@@ -502,7 +611,11 @@ const Payment = ({ userData }) => {
                     onClick={saveCardDetails}
                     className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                   >
-                    Save Card
+                    {isSaving ? (
+                      <FaSpinner className="w-4 h-4 animate-spin mx-auto" />
+                    ) : (
+                      "Save Card"
+                    )}
                   </button>
                 </div>
               </div>

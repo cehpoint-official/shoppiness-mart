@@ -95,21 +95,21 @@ const GiveBackForm = () => {
         ngoName: selectedNgo.causeName,
         ngoId: selectedNgo.id,
         amount: numAmount,
-        completedAt: new Date().toISOString(),
-        status: "Completed",
+        requestedAt: new Date().toISOString(),
+        status: "Pending",
       });
 
       // Update Firestore
       await updateDoc(docRef, {
         collectedCashback: increment(-numAmount),
-        givebackAmount: increment(numAmount),
+        pendingGivebackAmount: increment(numAmount),
       });
 
       // Update Redux state immediately
       const updatedUser = {
         ...user,
         collectedCashback: (user.collectedCashback || 0) - numAmount,
-        givebackAmount: (user.givebackAmount || 0) + numAmount,
+        pendingGivebackAmount: (user.pendingGivebackAmount || 0) + numAmount,
       };
       dispatch(userExist(updatedUser));
 

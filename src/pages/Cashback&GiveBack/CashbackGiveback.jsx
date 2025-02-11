@@ -18,7 +18,7 @@ const CashbackGiveback = () => {
   const handleTabClick = (tabValue) => {
     setActiveTab(tabValue);
   };
-
+  
   if (showCashbackRequests) {
     return (
       <div className=" p-4 space-y-6">
@@ -110,6 +110,7 @@ const CashbackGiveback = () => {
         <CashbackCard
           title="Give Back"
           amount={user?.givebackAmount || 0}
+          pendingGivebackAmount={user?.pendingGivebackAmount || 0}
           link="View Details"
         />
       </div>
@@ -160,17 +161,25 @@ const CashbackGiveback = () => {
 
 export default CashbackGiveback;
 
-const CashbackCard = ({ title, amount, pendingAmount, link }) => {
+const CashbackCard = ({
+  title,
+  amount,
+  pendingAmount,
+  pendingGivebackAmount,
+  link,
+}) => {
   const isLoading = amount === undefined || amount === null;
   const isPendingLoading =
     pendingAmount === undefined || pendingAmount === null;
+  const isPendingGivebackLoading =
+    pendingGivebackAmount === undefined || pendingGivebackAmount === null;
 
   return (
     <div className="bg-white p-4 rounded shadow-md border border-gray-100">
       <div className="text-sm text-text-gray mb-2">{title}</div>
 
       {/* Main Amount */}
-      <div className="font-medium">
+      <div className="font-medium text-lg mb-3">
         {isLoading ? (
           <div className="animate-pulse h-6 w-20 bg-gray-200 rounded"></div>
         ) : (
@@ -178,22 +187,39 @@ const CashbackCard = ({ title, amount, pendingAmount, link }) => {
         )}
       </div>
 
-      {/* Pending Cashback */}
-      {pendingAmount > 0 && (
-        <div className="text-sm text-red-500">
-          Pending:{" "}
-          {isPendingLoading ? (
-            <div className="animate-pulse h-4 w-16 bg-red-200 rounded"></div>
-          ) : (
-            <>₹{pendingAmount}</>
-          )}
-        </div>
-      )}
+      {/* Pending Amounts Section */}
+      <div className="space-y-2">
+        {/* Pending Withdrawal */}
+        {pendingAmount > 0 && (
+          <div className="flex items-center text-sm text-amber-600 bg-amber-50 px-2 py-1 rounded">
+            <span className="mr-2">🕒</span>
+            {isPendingLoading ? (
+              <div className="animate-pulse h-4 w-16 bg-amber-200 rounded"></div>
+            ) : (
+              <>Pending Withdrawal: ₹{pendingAmount}</>
+            )}
+          </div>
+        )}
+
+        {/* Pending Giveback */}
+        {pendingGivebackAmount > 0 && (
+          <div className="flex items-center text-sm text-purple-600 bg-purple-50 px-2 py-1 rounded">
+            <span className="mr-2">💝</span>
+            {isPendingGivebackLoading ? (
+              <div className="animate-pulse h-4 w-16 bg-purple-200 rounded"></div>
+            ) : (
+              <>Pending Giveback: ₹{pendingGivebackAmount}</>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* Link */}
-      <a href="#" className="text-blue-600 text-sm">
-        {link}
-      </a>
+      <div className="mt-3">
+        <a href="#" className="text-blue-600 text-sm hover:underline">
+          {link}
+        </a>
+      </div>
     </div>
   );
 };

@@ -254,9 +254,9 @@ const router = createBrowserRouter([
       {
         path: "/ngo-dashboard/:id",
         element: (
-          <NgoProtectedRoute>
+         // <NgoProtectedRoute>
             <NgoDashboardOutlet />
-          </NgoProtectedRoute>
+        //  </NgoProtectedRoute>
         ),
         children: [
           { path: "dashboard", element: <NgoDashboard /> },
