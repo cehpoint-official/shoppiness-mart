@@ -1,4 +1,10 @@
-import { collection, getDocs, doc, getDoc } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  doc,
+  getDoc,
+  updateDoc,
+} from "firebase/firestore";
 import { useCallback, useEffect, useState } from "react";
 import { db } from "../../../../../firebase";
 import {
@@ -9,26 +15,63 @@ import {
   BsCalendar,
 } from "react-icons/bs";
 import { IoArrowBack } from "react-icons/io5";
-
+import toast from "react-hot-toast";
+import { BiLoaderAlt } from "react-icons/bi";
 const SkeletonRow = () => {
   return (
     <tr className="border-b animate-pulse">
-      <td className="p-4">
-        <div className="h-4 bg-gray-200 rounded"></div>
+      <td className="py-4">
+        <div className="h-4 w-8 bg-gray-200 rounded"></div>
       </td>
-      <td className="p-4">
-        <div className="h-4 bg-gray-200 rounded"></div>
+      <td className="py-4">
+        <div className="h-4 w-40 bg-gray-200 rounded"></div>
       </td>
-      <td className="p-4">
-        <div className="h-4 bg-gray-200 rounded"></div>
+      <td className="py-4">
+        <div className="h-4 w-48 bg-gray-200 rounded"></div>
       </td>
-      <td className="p-4">
-        <div className="h-4 bg-gray-200 rounded"></div>
+      <td className="py-4">
+        <div className="h-4 w-32 bg-gray-200 rounded"></div>
       </td>
-      <td className="p-4">
-        <div className="h-4 bg-gray-200 rounded"></div>
+      <td className="py-4">
+        <div className="h-4 w-24 bg-gray-200 rounded"></div>
+      </td>
+      <td className="py-4">
+        <div className="h-4 w-20 bg-gray-200 rounded"></div>
+      </td>
+      <td className="py-4">
+        <div className="h-4 w-24 bg-gray-200 rounded"></div>
+      </td>
+      <td className="py-4">
+        <div className="h-8 w-24 bg-gray-200 rounded"></div>
       </td>
     </tr>
+  );
+};
+
+const SkeletonDetails = () => {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-pulse">
+      {[...Array(6)].map((_, index) => (
+        <div key={index} className="flex items-start gap-4">
+          <div className="p-3 bg-gray-200 rounded-lg w-12 h-12"></div>
+          <div className="flex-1">
+            <div className="h-4 w-24 bg-gray-200 rounded mb-2"></div>
+            <div className="h-6 w-48 bg-gray-200 rounded"></div>
+          </div>
+        </div>
+      ))}
+      <div className="flex items-start gap-4 p-4 border rounded-lg bg-gray-50">
+        <div className="p-3 bg-gray-200 rounded-lg w-12 h-12"></div>
+        <div className="flex-1">
+          <div className="h-4 w-32 bg-gray-200 rounded mb-2"></div>
+          <div className="space-y-2">
+            <div className="h-4 w-48 bg-gray-200 rounded"></div>
+            <div className="h-4 w-40 bg-gray-200 rounded"></div>
+            <div className="h-4 w-44 bg-gray-200 rounded"></div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
@@ -39,6 +82,8 @@ const Givebacks = () => {
   const [history, setHistory] = useState([]);
   const [ngoDetails, setNgoDetails] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [ngoLoading, setNgoLoading] = useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [selectedGivebackRequest, setSelectedGivebackRequest] = useState(null);
   const itemsPerPage = 5;
 
@@ -107,31 +152,186 @@ const Givebacks = () => {
     startIndex,
     startIndex + itemsPerPage
   );
+  const handleMarkAsPaid = async (givebackRequest) => {
+    setIsProcessingPayment(true);
+    try {
+      // 1. Update the withdrawal request status
+      const withdrawalRef = doc(
+        db,
+        "givebackCashbacks",
+        givebackRequest.historyId
+      );
+      await updateDoc(withdrawalRef, {
+        status: "Completed",
+        paidAt: new Date().toISOString(),
+      });
 
-  const handleApprove = (request) => {
-    console.log("Approved:", request);
-    // Add your approval logic here
-  };
+      // 2. Update user's cashback balances
+      const userRef = doc(db, "users", givebackRequest.userId);
+      const userDoc = await getDoc(userRef);
 
-  const handleReject = (request) => {
-    console.log("Rejected:", request);
-    // Add your rejection logic here
+      if (!userDoc.exists()) {
+        throw new Error("User document not found");
+      }
+
+      const userData = userDoc.data();
+
+      await updateDoc(userRef, {
+        pendingGivebackAmount: Math.max(
+          0,
+          (userData.pendingGivebackAmount || 0) - givebackRequest.amount
+        ),
+        givebackAmount: (userData.givebackAmount || 0) + givebackRequest.amount,
+      });
+
+      // 4. Refresh the withdrawals list
+      await fetchData();
+
+      // 5. Reset selected withdrawal request and show success message
+      setSelectedGivebackRequest(null);
+      toast.success("Payment marked as completed successfully!");
+    } catch (error) {
+      console.error("Error processing payment:", error);
+      toast.error("Failed to process payment. Please try again.");
+    } finally {
+      setIsProcessingPayment(false);
+    }
   };
+  const renderActionButtons = (request) => {
+    if (request.status === "Pending") {
+      return (
+        <div className="flex justify-end mt-12 border-t pt-8">
+          <button
+            onClick={() => handleMarkAsPaid(request)}
+            disabled={isProcessingPayment}
+            className="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg font-medium
+                      hover:from-amber-600 hover:to-orange-600 transition-all duration-200 
+                      focus:ring-4 focus:ring-amber-200 focus:outline-none
+                      active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed
+                      flex items-center gap-2"
+          >
+            {isProcessingPayment ? (
+              <>
+                <BiLoaderAlt className="w-5 h-5 animate-spin" />
+                Processing...
+              </>
+            ) : (
+              "Mark as Paid"
+            )}
+          </button>
+        </div>
+      );
+    }
+    return null;
+  };
+  const renderTableHeaders = () => {
+    const commonHeaders = [
+      { key: "number", label: "#" },
+      { key: "ngo", label: "NGO/Cause name" },
+      { key: "email", label: "Email" },
+      { key: "name", label: "Donor Name" },
+      { key: "requestDate", label: "Request Date" },
+      { key: "amount", label: "Donated Amount" },
+      { key: "status", label: "Status" },
+      { key: "action", label: "Action" },
+    ];
+
+    if (activeTab === "Completed") {
+      // Insert paid date header before status for collected withdrawals
+      commonHeaders.splice(6, 0, { key: "paidDate", label: "Paid Date" });
+    }
+
+    return (
+      <tr className="text-left font-medium">
+        {commonHeaders.map((header) => (
+          <th key={header.key} className="pb-4 text-gray-500">
+            {header.label}
+          </th>
+        ))}
+      </tr>
+    );
+  };
+  const renderEmptyMessage = () => {
+    if (loading) return null;
+
+    return (
+      <tr>
+        <td colSpan={activeTab === "Collected" ? 9 : 8} className="py-8">
+          <div className="text-center text-gray-500">
+            {activeTab === "Pending" ? (
+              <p className="text-lg">
+                No pending giveback requests at the moment.
+              </p>
+            ) : (
+              <p className="text-lg">No completed givebacks to display yet.</p>
+            )}
+          </div>
+        </td>
+      </tr>
+    );
+  };
+  // Update the table rows rendering
+  const renderTableRows = () => {
+    if (loading) {
+      return [Array.from({ length: itemsPerPage })].map((_, index) => (
+        <SkeletonRow key={index} />
+      ));
+    }
+    return displayedDonations.length > 0
+      ? displayedDonations.map((donation, index) => (
+          <tr key={donation.paymentId} className="border-t">
+            <td className="py-4">{startIndex + index + 1}.</td>
+            <td className="py-4">{donation.ngoName}</td>
+            <td className="py-4">{donation.userEmail}</td>
+            <td className="py-4">{donation.userName}</td>
+            <td className="py-4">{formatDate(donation.requestedAt)}</td>
+            <td className="py-4">₹{donation.amount}</td>
+            {activeTab === "Completed" && (
+              <td className="py-4">{formatDate(donation.paidAt)}</td>
+            )}
+            <td
+              className={`py-4 font-medium ${getStatusColor(donation.status)}`}
+            >
+              {donation.status}
+            </td>
+            <td className="py-4">
+              <button
+                onClick={() => setSelectedGivebackRequest(donation)}
+                className="border px-2 py-1 border-[#F59E0B] hover:bg-[#F59E0B] hover:text-white transition-colors duration-200"
+              >
+                View Details
+              </button>
+            </td>
+          </tr>
+        ))
+      : renderEmptyMessage();
+  };
+  useEffect(() => {
+    if (selectedGivebackRequest) {
+      const fetchNgoDetails = async () => {
+        setNgoLoading(true);
+        try {
+          const docRef = doc(db, "causeDetails", selectedGivebackRequest.ngoId);
+          const docSnap = await getDoc(docRef);
+
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            setNgoDetails(data);
+          }
+        } catch (error) {
+          console.error("Error fetching NGO details:", error);
+          toast.error("Failed to load NGO details");
+        } finally {
+          setNgoLoading(false);
+        }
+      };
+
+      fetchNgoDetails();
+    }
+  }, [selectedGivebackRequest]);
 
   if (selectedGivebackRequest) {
-    const fetchNgoDetails = async () => {
-      const docRef = doc(db, "causeDetails", selectedGivebackRequest.ngoId);
-      const docSnap = await getDoc(docRef);
-
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        setNgoDetails(data);
-      }
-    };
-
-    useEffect(() => {
-      fetchNgoDetails();
-    }, [selectedGivebackRequest]);
+    const { paymentDetails } = ngoDetails || {};
 
     return (
       <div className="min-h-screen bg-gray-50 p-8">
@@ -143,7 +343,9 @@ const Givebacks = () => {
             aria-label="Go back"
           >
             <IoArrowBack className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-            <span className="text-xl font-medium">Withdrawal Request Details</span>
+            <span className="text-xl font-medium">
+              Giveback Request Details
+            </span>
           </button>
 
           {/* Main Card */}
@@ -157,133 +359,146 @@ const Givebacks = () => {
 
             {/* Card Content */}
             <div className="p-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Name */}
-                <div className="flex items-start gap-4">
-                  <div className="p-3 bg-violet-50 rounded-lg">
-                    <BsPerson className="w-5 h-5 text-violet-500" />
-                  </div>
-                  <div>
-                    <div className="text-sm text-gray-500 mb-1">Name</div>
-                    <div className="font-medium text-gray-900">
-                      {selectedGivebackRequest.userName}
-                    </div>
-                  </div>
-                </div>
-
-                {/* NGO Name */}
-                <div className="flex items-start gap-4">
-                  <div className="p-3 bg-violet-50 rounded-lg">
-                    <BsPerson className="w-5 h-5 text-violet-500" />
-                  </div>
-                  <div>
-                    <div className="text-sm text-gray-500 mb-1">NGO Name</div>
-                    <div className="font-medium text-gray-900">
-                      {ngoDetails?.name || "N/A"}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Email */}
-                <div className="flex items-start gap-4">
-                  <div className="p-3 bg-purple-50 rounded-lg">
-                    <BsEnvelope className="w-5 h-5 text-purple-500" />
-                  </div>
-                  <div>
-                    <div className="text-sm text-gray-500 mb-1">Email</div>
-                    <div className="font-medium text-gray-900">
-                      {selectedGivebackRequest.userEmail}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Amount */}
-                <div className="flex items-start gap-4">
-                  <div className="p-3 bg-emerald-50 rounded-lg">
-                    <BsCurrencyDollar className="w-5 h-5 text-emerald-500" />
-                  </div>
-                  <div>
-                    <div className="text-sm text-gray-500 mb-1">Requested Amount</div>
-                    <div className="font-medium text-gray-900">
-                      {selectedGivebackRequest.amount}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Payment Method */}
-                <div className="flex items-start gap-4">
-                  <div className="p-3 bg-blue-50 rounded-lg">
-                    <BsBank2 className="w-5 h-5 text-blue-500" />
-                  </div>
-                  <div>
-                    <div className="text-sm text-gray-500 mb-1">Payment Method</div>
-                    <div className="font-medium text-gray-900 mb-2">
-                      <div className="space-y-1">
-                        <div className="text-sm text-gray-600">
-                          {selectedGivebackRequest.selectedPayment?.accountNumber}
-                        </div>
-                        <div className="text-sm text-gray-600">
-                          {selectedGivebackRequest.selectedPayment?.ifscCode}
-                        </div>
-                        <div className="text-sm text-gray-600">
-                          {selectedGivebackRequest.selectedPayment?.upiId}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Requested Date */}
-                <div className="flex items-start gap-4">
-                  <div className="p-3 bg-amber-50 rounded-lg">
-                    <BsCalendar className="w-5 h-5 text-amber-500" />
-                  </div>
-                  <div>
-                    <div className="text-sm text-gray-500 mb-1">Requested Date</div>
-                    <div className="font-medium text-gray-900">
-                      {formatDate(selectedGivebackRequest.requestedAt)}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Paid Date (if applicable) */}
-                {activeTab === "Completed" && (
+              {ngoLoading ? (
+                <SkeletonDetails />
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {/* Name */}
                   <div className="flex items-start gap-4">
-                    <div className="p-3 bg-green-50 rounded-lg">
-                      <BsCalendar className="w-5 h-5 text-green-500" />
+                    <div className="p-3 bg-violet-50 rounded-lg">
+                      <BsPerson className="w-5 h-5 text-violet-500" />
                     </div>
                     <div>
-                      <div className="text-sm text-gray-500 mb-1">Paid Date</div>
+                      <div className="text-sm text-gray-500 mb-1">
+                        Doner Name
+                      </div>
                       <div className="font-medium text-gray-900">
-                        {formatDate(selectedGivebackRequest.paidAt)}
+                        {selectedGivebackRequest.userName}
                       </div>
                     </div>
                   </div>
-                )}
-              </div>
+
+                  {/* NGO Name */}
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-violet-50 rounded-lg">
+                      <BsPerson className="w-5 h-5 text-violet-500" />
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-500 mb-1">NGO Name</div>
+                      <div className="font-medium text-gray-900">
+                        {ngoDetails?.causeName || "N/A"}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Email */}
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-purple-50 rounded-lg">
+                      <BsEnvelope className="w-5 h-5 text-purple-500" />
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-500 mb-1">Email</div>
+                      <div className="font-medium text-gray-900">
+                        {selectedGivebackRequest.userEmail}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Amount */}
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-emerald-50 rounded-lg">
+                      <BsCurrencyDollar className="w-5 h-5 text-emerald-500" />
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-500 mb-1">
+                        Requested Amount
+                      </div>
+                      <div className="font-medium text-gray-900">
+                        {selectedGivebackRequest.amount}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Payment Method */}
+                  <div className="flex items-start gap-4 p-4 border rounded-lg bg-gray-50">
+                    <div className="p-3 bg-blue-50 rounded-lg">
+                      <BsBank2 className="w-5 h-5 text-blue-500" />
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-500 mb-1">
+                        Payment Method
+                      </div>
+                      {paymentDetails?.bankAccounts?.length > 0 ? (
+                        <div className="font-medium text-gray-900 space-y-1">
+                          <div className="text-sm text-gray-600">
+                            Account Name:{" "}
+                            {paymentDetails.bankAccounts[0].accountName}
+                          </div>
+                          <div className="text-sm text-gray-600">
+                            IFSC Code: {paymentDetails.bankAccounts[0].ifscCode}
+                          </div>
+                          <div className="text-sm text-gray-600">
+                            Account Number:{" "}
+                            {paymentDetails.bankAccounts[0].accountNumber}
+                          </div>
+                        </div>
+                      ) : paymentDetails?.upiDetails?.length > 0 ? (
+                        <div className="font-medium text-sm text-gray-600">
+                          UPI ID: {paymentDetails.upiDetails[0].upiId}
+                        </div>
+                      ) : (
+                        <div className="text-sm text-gray-600">
+                          No payment details available
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Requested Date */}
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-amber-50 rounded-lg">
+                      <BsCalendar className="w-5 h-5 text-amber-500" />
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-500 mb-1">
+                        Requested Date
+                      </div>
+                      <div className="font-medium text-gray-900">
+                        {formatDate(selectedGivebackRequest.requestedAt)}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Paid Date (if applicable) */}
+                  {activeTab === "Completed" && (
+                    <div className="flex items-start gap-4">
+                      <div className="p-3 bg-green-50 rounded-lg">
+                        <BsCalendar className="w-5 h-5 text-green-500" />
+                      </div>
+                      <div>
+                        <div className="text-sm text-gray-500 mb-1">
+                          Paid Date
+                        </div>
+                        <div className="font-medium text-gray-900">
+                          {formatDate(selectedGivebackRequest.paidAt)}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Action Buttons */}
-              <div className="mt-8 flex gap-4">
-                <button
-                  className="px-4 py-2 bg-green-500 text-white rounded-lg"
-                  onClick={() => handleApprove(selectedGivebackRequest)}
-                >
-                  Approve
-                </button>
-                <button
-                  className="px-4 py-2 bg-red-500 text-white rounded-lg"
-                  onClick={() => handleReject(selectedGivebackRequest)}
-                >
-                  Reject
-                </button>
-              </div>
+              {renderActionButtons(selectedGivebackRequest)}
             </div>
           </div>
         </div>
       </div>
     );
   }
-
+  const getStatusColor = (status) => {
+    return status === "Completed" ? "text-emerald-500" : "text-[#F59E0B]";
+  };
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-8">
@@ -304,8 +519,8 @@ const Givebacks = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-lg">
-        <div className="flex py-6 px-2 gap-4 mb-4">
+      <div className="bg-white p-6 rounded-lg shadow-lg">
+        <div className="flex gap-4 mb-8">
           <button
             className={`px-4 py-2 rounded-full ${
               activeTab === "requested"
@@ -335,42 +550,19 @@ const Givebacks = () => {
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead>
-              <tr className="text-left border-b">
-                <th className="p-4 font-medium text-gray-600">NGO/Cause name</th>
-                <th className="p-4 font-medium text-gray-600">Requested Date</th>
-                <th className="p-4 font-medium text-gray-600">Name</th>
-                <th className="p-4 font-medium text-gray-600">Email</th>
-                <th className="p-4 font-medium text-gray-600">Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading
-                ? Array.from({ length: itemsPerPage }).map((_, index) => (
-                    <SkeletonRow key={index} />
-                  ))
-                : displayedDonations.map((donation) => (
-                    <tr
-                      key={donation.id}
-                      className="border-b hover:bg-gray-50 cursor-pointer"
-                      onClick={() => setSelectedGivebackRequest(donation)}
-                    >
-                      <td className="p-4">{donation.ngoName}</td>
-                      <td className="p-4">{formatDate(donation.requestedAt)}</td>
-                      <td className="p-4">{donation.userName}</td>
-                      <td className="p-4">{donation.userEmail}</td>
-                      <td className="p-4">₹ {donation.amount}</td>
-                    </tr>
-                  ))}
-            </tbody>
+            <thead>{renderTableHeaders()}</thead>
+            <tbody>{renderTableRows()}</tbody>
           </table>
         </div>
 
-        <div className="p-4 flex items-center justify-between">
+        <div className="py-4 flex items-center justify-between">
           <div className="text-sm text-gray-500">
             Showing {startIndex + 1} to{" "}
-            {Math.min(startIndex + itemsPerPage, filteredGiveBackRequest.length)} of{" "}
-            {filteredGiveBackRequest.length}
+            {Math.min(
+              startIndex + itemsPerPage,
+              filteredGiveBackRequest.length
+            )}{" "}
+            of {filteredGiveBackRequest.length}
           </div>
           <div className="flex items-center gap-2">
             <button
