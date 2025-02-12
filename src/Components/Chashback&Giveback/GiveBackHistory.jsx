@@ -17,7 +17,10 @@ const GiveBackHistory = () => {
       const data = [];
       querySnapshot.forEach((doc) => {
         const GivebackHistoryData = doc.data();
-        if (GivebackHistoryData.userId === userId) {
+        if (
+          GivebackHistoryData.userId === userId &&
+          GivebackHistoryData.status === "Completed"
+        ) {
           data.push({ id: doc.id, ...GivebackHistoryData });
         }
       });
@@ -45,8 +48,8 @@ const GiveBackHistory = () => {
 
   const sortHistory = (order) => {
     const sortedHistory = [...history].sort((a, b) => {
-      const dateA = new Date(a.completedAt);
-      const dateB = new Date(b.completedAt);
+      const dateA = new Date(a.paidAt);
+      const dateB = new Date(b.paidAt);
       return order === "asc" ? dateA - dateB : dateB - dateA;
     });
     setHistory(sortedHistory);
@@ -60,7 +63,8 @@ const GiveBackHistory = () => {
           onClick={toggleSortOrder}
         >
           <LuArrowUpDown className="h-4 w-4 text-[#047E72]" />
-          <span className="hidden sm:inline">Sort by Date</span> {sortOrder === "asc" ? "↑" : "↓"}
+          <span className="hidden sm:inline">Sort by Date</span>{" "}
+          {sortOrder === "asc" ? "↑" : "↓"}
         </button>
       </div>
 
@@ -98,12 +102,12 @@ const GiveBackHistory = () => {
                     {item.ngoName}
                   </h3>
                   <h4 className="text-blue-700 text-sm">
-                    {formatDate(item.completedAt)}
+                   Money Send On : {formatDate(item.paidAt)}
                   </h4>
                 </div>
                 <p className="text-sm text-gray-500 break-words">
-                  Your Generous Giveback of Rs. {item.amount} to {item.ngoName} Has Been{" "}
-                  {item.status}
+                  Your Generous Giveback of Rs. {item.amount} to {item.ngoName}{" "}
+                  Has Been {item.status}
                 </p>
               </div>
             ))}

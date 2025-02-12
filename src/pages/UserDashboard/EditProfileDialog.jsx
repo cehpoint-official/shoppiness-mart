@@ -5,6 +5,7 @@ import { FaSpinner } from "react-icons/fa"; // Import spinner icon
 
 const EditProfileDialog = ({ userData, onClose, onSave }) => {
   const [formData, setFormData] = useState({
+    ...userData,
     id: userData.uid,
     fname: userData.fname,
     lname: userData.lname,

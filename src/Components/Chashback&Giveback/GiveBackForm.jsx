@@ -92,6 +92,9 @@ const GiveBackForm = () => {
         userId,
         userName: user.fname + " " + user.lname,
         userEmail: user.email,
+        userPic:
+          user.profilePic ||
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8oghbsuzggpkknQSSU-Ch_xep_9v3m6EeBQ&s",
         ngoName: selectedNgo.causeName,
         ngoId: selectedNgo.id,
         amount: numAmount,

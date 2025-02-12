@@ -90,6 +90,7 @@ const UserDashBoard = () => {
       await setDoc(doc(db, "users", userData.uid), updatedData, {
         merge: true,
       });
+      console.log(updatedData);
       
       dispatch(userExist(updatedData));
        setUserData(updatedData);

@@ -39,45 +39,23 @@ const TransactionRow = ({ merchant, id, date, amount, status }) => (
   </div>
 );
 
-const TransactionHistory = ({ onBack }) => {
-  const transactions = [
-    {
-      merchant: "SPHOPINESSSMART",
-      id: "8879090009",
-      date: "12 Jun 2024 at 8 PM",
-      amount: "2000",
-      status: "Recived",
-    },
-    // Repeated data for demonstration
-    {
-      merchant: "SPHOPINESSSMART",
-      id: "8879090009",
-      date: "12 Jun 2024 at 8 PM",
-      amount: "2000",
-      status: "Recived",
-    },
-    {
-      merchant: "SPHOPINESSSMART",
-      id: "8879090009",
-      date: "12 Jun 2024 at 8 PM",
-      amount: "2000",
-      status: "Recived",
-    },
-    {
-      merchant: "SPHOPINESSSMART",
-      id: "8879090009",
-      date: "12 Jun 2024 at 8 PM",
-      amount: "2000",
-      status: "Recived",
-    },
-    {
-      merchant: "SPHOPINESSSMART",
-      id: "8879090009",
-      date: "12 Jun 2024 at 8 PM",
-      amount: "2000",
-      status: "Recived",
-    },
-  ];
+const TransactionHistory = ({ onBack, givebacks }) => {
+  // Transform givebacks into transactions
+  const transactions = givebacks
+    .filter((item) => item.status === "Completed") // Only include completed transactions
+    .map((item) => ({
+      merchant: "SPHOPINESSMART", // Static merchant name
+      id: item.id, // Use the transaction ID from givebacks
+      date: new Date(item.paidAt || item.requestedAt).toLocaleString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      }), // Format date
+      amount: item.amount, // Use the amount from givebacks
+      status: "Received", // Static status for completed transactions
+    }));
 
   return (
     <div className="p-10">
@@ -97,9 +75,13 @@ const TransactionHistory = ({ onBack }) => {
       </div>
 
       <div className="space-y-4">
-        {transactions.map((transaction, index) => (
-          <TransactionRow key={index} {...transaction} />
-        ))}
+        {transactions.length > 0 ? (
+          transactions.map((transaction, index) => (
+            <TransactionRow key={index} {...transaction} />
+          ))
+        ) : (
+          <p className="text-gray-600">No transactions found.</p>
+        )}
       </div>
     </div>
   );
