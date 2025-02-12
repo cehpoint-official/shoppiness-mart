@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { FaFacebook, FaInstagram, FaLinkedin, FaXTwitter } from "react-icons/fa6";
+import { useState } from 'react';
+import { FaFacebook, FaInstagram, FaLinkedin} from "react-icons/fa6";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { RxCross1 } from "react-icons/rx"; 
 const socialPlatforms = [
