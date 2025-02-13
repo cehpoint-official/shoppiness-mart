@@ -3,7 +3,7 @@ import "./BusinessForm.scss";
 import { FaCircleCheck } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import logo from "../../assets/RegisterBusiness/logo.png";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { db, storage } from "../../../firebase.js";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import SuccessPage from "../../Components/SuccessPage/SuccessPage";
@@ -97,11 +97,30 @@ const BusinessForm = () => {
     setCurrentPage((prev) => prev - 1);
   };
 
+  const checkEmailExists = async (email) => {
+    const businessRef = collection(db, "businessDetails");
+    const q = query(businessRef, where("email", "==", email));
+    const querySnapshot = await getDocs(q);
+    return !querySnapshot.empty;
+  };
+
   const handleCreateAccount = async (e) => {
     e.preventDefault();
     if (validateCurrentPage()) {
       setIsLoading(true);
       try {
+        // Check if email already exists
+        const emailExists = await checkEmailExists(formData.email);
+
+        if (emailExists) {
+          toast.error(
+            "This email is already registered. Please use a different email address."
+          );
+          // Keep the user on the same page
+          setIsLoading(false);
+          return;
+        }
+
         await addData(); // Add data to Firebase
         // Send confirmation email
         try {
@@ -238,7 +257,7 @@ const BusinessForm = () => {
         bannerUrl,
         status: "Pending",
         rate: "0",
-        createdDate: formatDate(new Date()), 
+        createdDate: formatDate(new Date()),
       });
     } catch (e) {
       throw new Error(e.message);
@@ -246,7 +265,7 @@ const BusinessForm = () => {
   };
   function formatDate(date) {
     const options = { day: "numeric", month: "short", year: "numeric" };
-    return date.toLocaleDateString("en-GB", options); 
+    return date.toLocaleDateString("en-GB", options);
   }
   const pages = [
     {

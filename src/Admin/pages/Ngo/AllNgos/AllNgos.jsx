@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { FaArrowLeft, FaSpinner } from "react-icons/fa";
 import { collection, getDocs, doc, updateDoc } from "firebase/firestore";
-import { db } from "../../../../../firebase"; // Adjust the path to your Firebase config
+import { db } from "../../../../../firebase";
 import toast from "react-hot-toast";
 import axios from "axios";
 
@@ -12,10 +12,10 @@ const AllNgos = () => {
   const [viewMode, setViewMode] = useState("list");
   const [selectedNGO, setSelectedNGO] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [markingActive, setMarkingActive] = useState(false); // State for "Mark as Active" button
-  const [markingInactive, setMarkingInactive] = useState(false); // State for "Mark as Inactive" button
-  const [loading, setLoading] = useState(false); // State for loading data
-  const [ngoRequests, setNgoRequests] = useState([]); // State to store fetched data
+  const [markingActive, setMarkingActive] = useState(false);
+  const [markingInactive, setMarkingInactive] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [ngoRequests, setNgoRequests] = useState([]);
 
   // Fetch data from Firestore
   const fetchData = useCallback(async () => {
@@ -375,6 +375,18 @@ const AllNgos = () => {
                     <p className="text-gray-900">{ngo.createdDate}</p>
                     <p className="text-gray-500 text-sm">Requested date</p>
                   </td>
+                  {activeTab === "Active" && (
+                    <td className="p-3">
+                      <p className="text-gray-900">{ngo.approvedDate}</p>
+                      <p className="text-gray-500 text-sm">Activation Date</p>
+                    </td>
+                  )}
+                  {activeTab === "Inactive" && (
+                    <td className="p-3">
+                      <p className="text-gray-900">{ngo.inactiveDate}</p>
+                      <p className="text-gray-500 text-sm">Inactivation Date</p>
+                    </td>
+                  )}
                   <td className="p-3">
                     <button
                       onClick={() => handleViewDetails(ngo)}

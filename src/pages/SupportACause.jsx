@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebase";
 import Loader from "../Components/Loader/Loader";
@@ -24,7 +24,9 @@ const SupportACause = () => {
       const data = [];
       querySnapshot.forEach((doc) => {
         const shopData = doc.data();
-        data.push({ id: doc.id, ...shopData });
+        if (shopData.status === "Active") {
+          data.push({ id: doc.id, ...shopData });
+        }
       });
       setNgos(data);
       setLoading(false);

@@ -94,11 +94,30 @@ const CauseForm = () => {
     setCurrentPage((prev) => prev - 1);
   };
 
+  const checkEmailExists = async (email) => {
+    const causeRef = collection(db, "causeDetails");
+    const q = query(causeRef, where("email", "==", email));
+    const querySnapshot = await getDocs(q);
+    return !querySnapshot.empty;
+  };
+
   const handleCreateAccount = async (e) => {
     e.preventDefault();
     if (validateCurrentPage()) {
       setIsLoading(true);
       try {
+        // Check if email already exists
+        const emailExists = await checkEmailExists(causeDetails.email);
+
+        if (emailExists) {
+          toast.error(
+            "This email is already registered. Please use a different email address."
+          );
+          // Keep the user on the same page
+          setIsLoading(false);
+          return;
+        }
+
         await addData(); // Add data to Firebase
         // Send confirmation email
         try {
