@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Googleicon from "../../assets/googleicon.png";
 import Facebookicon from "../../assets/facebookicon.png";
 import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
@@ -140,9 +140,9 @@ const UserLoginForm = () => {
       <div className="mt-7 text-center">
         <p className="font-medium text-lg">
           Don’t have an account?{" "}
-          <a href="/signup" className="text-[#049D8E] font-medium underline">
+          <Link to="/signup" className="text-[#049D8E] font-medium underline">
             Signup
-          </a>
+          </Link>
         </p>
       </div>
     </form>

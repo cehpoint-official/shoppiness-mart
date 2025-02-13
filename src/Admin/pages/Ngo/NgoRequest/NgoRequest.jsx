@@ -1,45 +1,163 @@
-import { useState } from "react";
-import { FaArrowLeft } from "react-icons/fa";
+import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
+import { useCallback, useEffect, useState } from "react";
+import { FaArrowLeft, FaSpinner } from "react-icons/fa";
+import { db } from "../../../../../firebase";
+import toast from "react-hot-toast";
+import axios from "axios";
 
-const ngoRequests = [
-  {
-    id: 1,
-    name: "Care Foundation",
-    location: "Pravat Sarani, opposite to Bolpur..",
-    phone: "9564076906",
-    email: "care@gmail.com",
-    date: "02Jan,2024",
-    logo: "/placeholder.svg",
-    status: "Pending",
-  },
-  {
-    id: 2,
-    name: "Hope Trust",
-    location: "Tourist lodge, Pravat Sarani, opposite to Bolpur..",
-    phone: "9564076907",
-    email: "hope@gmail.com",
-    date: "03Jan,2024",
-    logo: "/placeholder.svg",
-    status: "Pending",
-  },
-  {
-    id: 7,
-    name: "Invalid Foundation",
-    location: "Unknown Location, Bolpur",
-    phone: "9564076912",
-    email: "invalid@gmail.com",
-    date: "01Jan,2024",
-    logo: "/placeholder.svg",
-    status: "Rejected",
-  },
-];
+const ITEMS_PER_PAGE = 10;
 
 const NgoRequest = () => {
   const [activeTab, setActiveTab] = useState("Pending");
   const [viewMode, setViewMode] = useState("list");
   const [selectedNGO, setSelectedNGO] = useState(null);
+  const [ngoRequests, setNgoRequests] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [accepting, setAccepting] = useState(false);
+  const [rejecting, setRejecting] = useState(false);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const querySnapshot = await getDocs(collection(db, "causeDetails"));
+      const data = [];
+      querySnapshot.forEach((doc) => {
+        const ngoData = doc.data();
+        if (ngoData && ngoData.causeName) {
+          data.push({ id: doc.id, ...ngoData });
+        }
+      });
+      setNgoRequests(data);
+    } catch (error) {
+      console.log("Error getting documents: ", error);
+      toast.error("Failed to fetch data");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const handleUpdateStatus = async (id, status) => {
+    if (status === "Active") {
+      setAccepting(true);
+    } else if (status === "Rejected") {
+      setRejecting(true);
+    }
+
+    try {
+      const ngoRef = doc(db, "causeDetails", id);
+      await updateDoc(ngoRef, {
+        status,
+        approvedDate:
+          status === "Active"
+            ? new Date().toLocaleDateString("en-GB", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              })
+            : null,
+      });
+
+      // Send email based on status
+      try {
+        const emailTemplate =
+          status === "Active"
+            ? `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+              <div style="text-align: center; margin-bottom: 20px;">
+                <h2 style="color: #2c5282;">Congratulations! Your NGO Registration is Approved</h2>
+              </div>
+              
+              <p>Dear ${selectedNGO.firstName} ${selectedNGO.lastName},</p>
+              
+              <p>We are pleased to inform you that your NGO "${selectedNGO.causeName}" has been approved on Shoppiness Mart. You can now start using our platform to showcase your cause and connect with potential donors.</p>
+              
+              <div style="background-color: #f7fafc; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                <h3 style="color: #2d3748; margin-bottom: 10px;">Your Login Credentials:</h3>
+                <p style="margin: 5px 0;"><strong>Email:</strong> ${selectedNGO.email}</p>
+                <p style="margin: 5px 0;"><strong>Password:</strong> ${selectedNGO.password}</p>
+              </div>
+              
+              <p>Please login to your dashboard to:</p>
+              <ul style="list-style-type: none; padding-left: 0;">
+                <li style="margin: 10px 0;">✅ Complete your NGO profile</li>
+                <li style="margin: 10px 0;">✅ Add your campaigns and initiatives</li>
+                <li style="margin: 10px 0;">✅ Connect with donors</li>
+              </ul>
+              
+              <p>For any assistance, please don't hesitate to contact our support team.</p>
+              
+              <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+                <p style="margin: 0;">Best regards,</p>
+                <p style="margin: 5px 0; color: #4a5568;"><strong>The Shoppiness Mart Team</strong></p>
+              </div>
+            </div>
+          `
+            : `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+              <div style="text-align: center; margin-bottom: 20px;">
+                <h2 style="color: #c53030;">NGO Registration Status Update</h2>
+              </div>
+              
+              <p>Dear ${selectedNGO.firstName} ${selectedNGO.lastName},</p>
+              
+              <p>Thank you for your interest in registering "${selectedNGO.causeName}" on Shoppiness Mart. After careful review of your application, we regret to inform you that we are unable to approve your NGO registration at this time.</p>
+              
+              <p>This decision could be due to one or more of the following reasons:</p>
+              <ul style="list-style-type: none; padding-left: 0;">
+                <li style="margin: 10px 0;">• Incomplete or incorrect documentation</li>
+                <li style="margin: 10px 0;">• Unable to verify NGO credentials</li>
+                <li style="margin: 10px 0;">• Does not meet our current platform requirements</li>
+              </ul>
+              
+              <p>You are welcome to submit a new application after addressing these potential issues. If you need clarification or have any questions, please don't hesitate to contact our support team.</p>
+              
+              <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+                <p style="margin: 0;">Best regards,</p>
+                <p style="margin: 5px 0; color: #4a5568;"><strong>The Shoppiness Mart Team</strong></p>
+              </div>
+            </div>
+          `;
+
+        await axios.post(`${import.meta.env.VITE_AWS_SERVER}/send-email`, {
+          email: selectedNGO.email,
+          title:
+            status === "Active"
+              ? "Shoppiness Mart - NGO Registration Approved!"
+              : "Shoppiness Mart - NGO Registration Update",
+          body: emailTemplate,
+        });
+      } catch (emailError) {
+        console.error("Failed to send notification email:", emailError);
+        // Don't block the status update if email fails
+      }
+
+      toast.success(`Request ${status.toLowerCase()} successfully`);
+      fetchData();
+      setViewMode("list");
+    } catch (error) {
+      console.log("Error updating document: ", error);
+      toast.error("Failed to update status");
+    } finally {
+      if (status === "Active") {
+        setAccepting(false);
+      } else if (status === "Rejected") {
+        setRejecting(false);
+      }
+    }
+  };
 
   const displayData = ngoRequests.filter((ngo) => ngo.status === activeTab);
+  const totalPages = Math.ceil(displayData.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedData = displayData.slice(
+    startIndex,
+    startIndex + ITEMS_PER_PAGE
+  );
 
   const handleViewDetails = (ngo) => {
     setSelectedNGO(ngo);
@@ -64,27 +182,25 @@ const NgoRequest = () => {
 
         <div className="bg-white rounded-lg p-8 shadow-sm">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Left column - Image */}
-            <div className="relative h-[400px] rounded-lg overflow-hidden">
+            <div className="relative rounded-lg overflow-hidden">
               <img
-                src={selectedNGO.featuredImage || "/placeholder.svg"}
+                src={selectedNGO.bannerUrl || "/placeholder.svg"}
                 alt="NGO Featured Image"
-                className="object-cover"
+                className="object-cover h-full w-full"
               />
             </div>
 
-            {/* Right column - Details */}
             <div className="space-y-6">
               <div className="flex justify-between items-start">
                 <div>
                   <h1 className="text-2xl font-semibold mb-1">
-                    {selectedNGO.name}
+                    {selectedNGO.causeName}
                   </h1>
-                  <p className="text-gray-600">{selectedNGO.groupType}</p>
+                  <p className="text-gray-600">{selectedNGO.type}</p>
                 </div>
                 <div className="w-20 h-20 relative">
                   <img
-                    src={selectedNGO.logo || "/placeholder.svg"}
+                    src={selectedNGO.logoUrl || "/placeholder.svg"}
                     alt="NGO Logo"
                     className="object-contain"
                   />
@@ -98,7 +214,7 @@ const NgoRequest = () => {
 
               <div>
                 <h2 className="font-medium mb-2">Cause / NGO Description</h2>
-                <p className="text-gray-600">{selectedNGO.description}</p>
+                <p className="text-gray-600">{selectedNGO.shortDesc}</p>
               </div>
 
               <div>
@@ -108,17 +224,19 @@ const NgoRequest = () => {
 
               <div>
                 <h2 className="font-medium mb-2">PIN</h2>
-                <p className="text-gray-600">{selectedNGO.pin}</p>
+                <p className="text-gray-600">{selectedNGO.pincode}</p>
               </div>
 
               <div className="grid grid-cols-3 gap-4">
                 <div>
                   <h2 className="font-medium mb-2">Account Created by</h2>
-                  <p className="text-gray-600">{selectedNGO.createdBy}</p>
+                  <p className="text-gray-600">
+                    {selectedNGO.firstName + " " + selectedNGO.lastName}
+                  </p>
                 </div>
                 <div>
                   <h2 className="font-medium mb-2">Phone Number</h2>
-                  <p className="text-gray-600">{selectedNGO.phone}</p>
+                  <p className="text-gray-600">{selectedNGO.mobileNumber}</p>
                 </div>
                 <div>
                   <h2 className="font-medium mb-2">Email ID</h2>
@@ -127,10 +245,24 @@ const NgoRequest = () => {
               </div>
 
               <div className="flex justify-end gap-4 pt-4">
-                <button className="px-6 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors">
-                  Reject Request
-                </button>
-                <button className="px-6 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors">
+                {activeTab === "Pending" && (
+                  <button
+                    onClick={() =>
+                      handleUpdateStatus(selectedNGO.id, "Rejected")
+                    }
+                    disabled={rejecting || accepting}
+                    className="px-6 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors flex items-center gap-2"
+                  >
+                    {rejecting && <FaSpinner className="animate-spin" />}
+                    Reject Request
+                  </button>
+                )}
+                <button
+                  onClick={() => handleUpdateStatus(selectedNGO.id, "Active")}
+                  disabled={accepting || rejecting}
+                  className="px-6 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors flex items-center gap-2"
+                >
+                  {accepting && <FaSpinner className="animate-spin" />}
                   Accept Request
                 </button>
               </div>
@@ -168,42 +300,126 @@ const NgoRequest = () => {
       </div>
 
       <div className="bg-white rounded-lg p-3 shadow-sm">
-        <div className="space-y-8">
-          {displayData.map((ngo) => (
-            <div key={ngo.id} className="flex border p-3 rounded-xl items-center gap-6">
-              <div className="w-20 h-20 flex-shrink-0">
-                <img
-                  src={ngo.logo || "/placeholder.svg"}
-                  alt={`${ngo.name} logo`}
-                  className="object-contain w-full h-full"
-                />
-              </div>
-
-              <div className="flex-1 min-w-0">
-                <h3 className="font-medium text-lg">{ngo.name}</h3>
-                <p className="text-gray-500 text-sm">{ngo.location}</p>
-              </div>
-
-              <div className="flex-1 min-w-0">
-                <p className="text-gray-900">{ngo.phone}</p>
-                <p className="text-gray-500 text-sm">Phone</p>
-              </div>
-
-              <div className="flex-1 min-w-0">
-                <p className="text-gray-900">{ngo.email}</p>
-                <p className="text-gray-500 text-sm">Email</p>
-              </div>
-
-              <button
-                onClick={() => handleViewDetails(ngo)}
-                className="text-blue-500 border border-blue-600 px-2 py-1 hover:text-blue-600 transition-colors"
+        {loading ? (
+          <div className="space-y-8">
+            {Array.from({ length: ITEMS_PER_PAGE }).map((_, index) => (
+              <div
+                key={index}
+                className="flex border p-3 rounded-xl items-center gap-6 animate-pulse"
               >
-                View Details
-              </button>
-            </div>
-          ))}
-        </div>
+                <div className="w-20 h-20 flex-shrink-0 bg-gray-200 rounded"></div>
+                <div className="flex-1 min-w-0 space-y-2">
+                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                </div>
+                <div className="flex-1 min-w-0 space-y-2">
+                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                </div>
+                <div className="flex-1 min-w-0 space-y-2">
+                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                </div>
+                <div className="flex-1 min-w-0 space-y-2">
+                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                </div>
+                <div className="h-10 bg-gray-200 rounded w-24"></div>
+              </div>
+            ))}
+          </div>
+        ) : paginatedData.length > 0 ? (
+          <table className="w-full">
+            <tbody>
+              {paginatedData.map((ngo) => (
+                <tr key={ngo.id} className="border-b border-t">
+                  <td className="p-3">
+                    <img
+                      src={ngo.logoUrl || "/placeholder.svg"}
+                      alt={`${ngo.causeName} logo`}
+                      className="w-20 h-20 object-contain"
+                    />
+                  </td>
+                  <td className="p-3">
+                    <h3 className="font-medium text-lg">{ngo.causeName}</h3>
+                    <p className="text-gray-500 text-sm">
+                      Location: {ngo.location}
+                    </p>
+                  </td>
+                  <td className="p-3">
+                    <p className="text-gray-900">{ngo.mobileNumber}</p>
+                    <p className="text-gray-500 text-sm">Phone</p>
+                  </td>
+                  <td className="p-3">
+                    <p className="text-gray-900">{ngo.email}</p>
+                    <p className="text-gray-500 text-sm">Email</p>
+                  </td>
+                  <td className="p-3">
+                    <p className="text-gray-900">{ngo.createdDate}</p>
+                    <p className="text-gray-500 text-sm">Requested date</p>
+                  </td>
+                  <td className="p-3">
+                    <button
+                      onClick={() => handleViewDetails(ngo)}
+                      className="text-blue-500 border border-blue-600 px-2 py-1 hover:text-blue-600 transition-colors"
+                    >
+                      View Details
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <div className="p-6 text-center text-gray-600">
+            {activeTab === "Pending"
+              ? "No Cause / NGO have been registered yet."
+              : "No rejected Cause / NGO are there."}
+          </div>
+        )}
       </div>
+
+      {paginatedData.length > 0 && (
+        <div className="flex items-center justify-between mt-3">
+          <p className="text-gray-600">
+            Showing {startIndex + 1} to{" "}
+            {Math.min(startIndex + ITEMS_PER_PAGE, displayData.length)} of{" "}
+            {displayData.length}
+          </p>
+
+          <div className="flex items-center gap-2">
+            <button
+              className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded disabled:opacity-50"
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(currentPage - 1)}
+            >
+              Previous
+            </button>
+
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                className={`w-8 h-8 rounded ${
+                  currentPage === page
+                    ? "bg-blue-500 text-white"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+                onClick={() => setCurrentPage(page)}
+              >
+                {page}
+              </button>
+            ))}
+
+            <button
+              className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded disabled:opacity-50"
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage(currentPage + 1)}
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

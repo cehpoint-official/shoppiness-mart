@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import Googleicon from "../../assets/googleicon.png";
 import Facebookicon from "../../assets/facebookicon.png";
@@ -29,7 +29,7 @@ const CauseLoginForm = () => {
   const submitHandler = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError(""); // Show loading toast
+    setError("");
 
     try {
       const q = query(
@@ -45,17 +45,22 @@ const CauseLoginForm = () => {
       const userDoc = Userquery.docs[0];
       const user = userDoc.data();
 
+      // Check password
       if (user.password !== userData.password) {
         throw new Error("Incorrect password.");
       }
+
+      // Check status
+      if (user.status !== "Active") {
+        throw new Error("Your account is pending approval from ShoppineSmart. Please wait for approval.");
+      }
+
       dispatch(ngoUserExist(user));
-
       toast.success("Login successful!");
-
       navigate(`/ngo-dashboard/${userDoc.id}/dashboard`);
     } catch (error) {
       setError(error.message);
-      toast.error(error.message); // Show error toast
+      toast.error(error.message);
     } finally {
       setLoading(false);
     }
@@ -69,22 +74,41 @@ const CauseLoginForm = () => {
 
     try {
       const res = await signInWithPopup(auth, provider);
-      const user = res.user;
-      await setDoc(doc(db, "causeDetails", res.user.uid), {
-        fname: res.user.displayName,
-        email: res.user.email,
-        profilePic: res.user.photoURL,
-      });
-      dispatch(ngoUserExist(user));
-      toast.success("Google sign-in successful!");
-      setTimeout(() => {
-        navigate(`/ngo-dashboard/${res.user.uid}`);
-      }, 1000);
+      
+      // Check if user already exists
+      const q = query(
+        collection(db, "causeDetails"),
+        where("email", "==", res.user.email)
+      );
+      const userQuery = await getDocs(q);
+      
+      if (!userQuery.empty) {
+        const existingUser = userQuery.docs[0].data();
+        
+        // Check status for existing users
+        if (existingUser.status !== "Active") {
+          throw new Error("Your account is pending approval from ShoppineSmart. Please wait for approval.");
+        }
+        
+        dispatch(ngoUserExist(existingUser));
+        toast.success("Google sign-in successful!");
+        navigate(`/ngo-dashboard/${userQuery.docs[0].id}/dashboard`);
+      } else {
+        // For new users, set initial status as "Pending"
+        await setDoc(doc(db, "causeDetails", res.user.uid), {
+          fname: res.user.displayName,
+          email: res.user.email,
+          profilePic: res.user.photoURL,
+          status: "Pending"
+        });
+        toast.error("Your account is pending approval from ShoppineSmart. Please wait for approval.");
+      }
     } catch (error) {
       setError(error.message);
       toast.error(error.message);
     } finally {
       setLoading(false);
+      toast.dismiss();
     }
   };
 
@@ -159,10 +183,10 @@ const CauseLoginForm = () => {
       </div>
       <div className="mt-7 text-center">
         <p className="font-medium text-lg">
-          Don’t have an account?{" "}
-          <a href="/signup" className="text-[#049D8E] font-medium underline">
+          Don&apos;t have an account?{" "}
+          <Link to="/cause-form" className="text-[#049D8E] font-medium underline">
             Signup
-          </a>
+          </Link>
         </p>
       </div>
     </form>

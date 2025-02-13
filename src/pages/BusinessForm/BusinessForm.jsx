@@ -7,16 +7,13 @@ import { addDoc, collection } from "firebase/firestore";
 import { db, storage } from "../../../firebase.js";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import SuccessPage from "../../Components/SuccessPage/SuccessPage";
-import toast from "react-hot-toast"; // Import toast
-import { useDispatch } from "react-redux";
-import { businessUserExist } from "../../redux/reducer/businessUserReducer.js";
-
+import toast from "react-hot-toast";
+import { FaSpinner } from "react-icons/fa";
+import axios from "axios";
 const BusinessForm = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [success, setSuccess] = useState(false);
-  const [id, setId] = useState("");
   const [completedSteps, setCompletedSteps] = useState([false, false, false]);
-  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     // Business Details (Page 1)
     businessName: "",
@@ -43,7 +40,7 @@ const BusinessForm = () => {
   const [logoFile, setLogoFile] = useState(null);
   const [bannerFile, setBannerFile] = useState(null);
   const [uploadProgress, setUploadProgress] = useState("");
-
+  const [isLoading, setIsLoading] = useState(false);
   const handleInputChange = (e, field) => {
     const { value } = e.target;
     setFormData((prev) => ({
@@ -103,12 +100,46 @@ const BusinessForm = () => {
   const handleCreateAccount = async (e) => {
     e.preventDefault();
     if (validateCurrentPage()) {
+      setIsLoading(true);
       try {
         await addData(); // Add data to Firebase
+        // Send confirmation email
+        try {
+          await axios.post(`${import.meta.env.VITE_AWS_SERVER}/send-email`, {
+            email: formData.email,
+            title:
+              "ShoppinessMart - Business/Services Registration Confirmation",
+            body: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+              <h2 style="color: #333;">Thank you for registering with ShoppinessMart!</h2>
+              
+              <p>Dear ${formData.firstName} ${formData.lastName},</p>
+              
+              <p>We have received your Business/Services registration request for "${formData.businessName}". Our team will review your application and get back to you soon.</p>
+              
+              <p>Please note:</p>
+              <ul>
+                <li>The review process typically takes 2-3 business days</li>
+                <li>You will receive another email once your registration is approved</li>
+                <li>If we need any additional information, we will contact you at this email address</li>
+              </ul>
+              
+              <p>If you have any questions, please don't hesitate to contact our support team.</p>
+              
+              <p>Best regards,<br>
+              The ShoppinessMart Team</p>
+            </div>
+          `,
+          });
+        } catch (emailError) {
+          console.error("Failed to send confirmation email:", emailError);
+        }
         setSuccess(true);
         toast.success("Business registered successfully!");
       } catch (error) {
         toast.error("Registration failed. Please try again.");
+      } finally {
+        setIsLoading(false);
       }
     }
   };
@@ -201,18 +232,22 @@ const BusinessForm = () => {
       const logoUrl = logoFile ? await uploadFile(logoFile) : "";
       const bannerUrl = bannerFile ? await uploadFile(bannerFile) : "";
 
-      const res = await addDoc(collection(db, "businessDetails"), {
+      await addDoc(collection(db, "businessDetails"), {
         ...formData,
         logoUrl,
         bannerUrl,
+        status: "Pending",
+        rate: "0",
+        createdDate: formatDate(new Date()), 
       });
-      dispatch(businessUserExist(res));
-      setId(res.id);
     } catch (e) {
       throw new Error(e.message);
     }
   };
-
+  function formatDate(date) {
+    const options = { day: "numeric", month: "short", year: "numeric" };
+    return date.toLocaleDateString("en-GB", options); 
+  }
   const pages = [
     {
       title: "Business Details",
@@ -454,8 +489,19 @@ const BusinessForm = () => {
               <button type="button" className="back" onClick={handleBackPage}>
                 Back
               </button>
-              <button type="submit" className="next">
-                Create Your Account
+              <button
+                className="next flex justify-center items-center gap-3"
+                type="submit"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <FaSpinner className="w-5 h-5 animate-spin" />
+                    <span>Creating...</span>
+                  </>
+                ) : (
+                  "Create Your Account"
+                )}
               </button>
             </div>
           </div>
@@ -494,7 +540,7 @@ const BusinessForm = () => {
       </div>
       <div className="formContainer">
         {success ? (
-          <SuccessPage id={id} link={`/services-dashboard/${id}/dashboard`} />
+          <SuccessPage link="/" title="Business/Services" />
         ) : (
           pages[currentPage - 1].content
         )}

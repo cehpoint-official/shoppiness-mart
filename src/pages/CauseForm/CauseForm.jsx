@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "./CauseForm.scss";
 import { FaCircleCheck } from "react-icons/fa6";
+import { FaSpinner } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import logo from "../../assets/RegisterBusiness/logo.png";
 import SuccessPage from "../../Components/SuccessPage/SuccessPage";
@@ -8,13 +9,10 @@ import { db, storage } from "../../../firebase.js";
 import { addDoc, collection } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import toast from "react-hot-toast";
-import { useDispatch } from "react-redux";
-import { ngoUserExist } from "../../redux/reducer/ngoUserReducer.js";
-
+import axios from "axios";
 const CauseForm = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [success, setSuccess] = useState(false);
-  const [id, setId] = useState("");
   const [completedSteps, setCompletedSteps] = useState([false, false, false]);
   const [causeDetails, setCauseDetails] = useState({
     // Page 1 fields
@@ -39,7 +37,7 @@ const CauseForm = () => {
   const [logoFile, setLogoFile] = useState(null);
   const [bannerFile, setBannerFile] = useState(null);
   const [uploadProgress, setUploadProgress] = useState("");
-  const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(false);
   const handleInputChange = (e, field) => {
     const { value } = e.target;
 
@@ -99,16 +97,48 @@ const CauseForm = () => {
   const handleCreateAccount = async (e) => {
     e.preventDefault();
     if (validateCurrentPage()) {
+      setIsLoading(true);
       try {
         await addData(); // Add data to Firebase
+        // Send confirmation email
+        try {
+          await axios.post(`${import.meta.env.VITE_AWS_SERVER}/send-email`, {
+            email: causeDetails.email,
+            title: "ShoppinessMart - Cause/NGO Registration Confirmation",
+            body: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+              <h2 style="color: #333;">Thank you for registering with ShoppinessMart!</h2>
+              
+              <p>Dear ${causeDetails.firstName} ${causeDetails.lastName},</p>
+              
+              <p>We have received your Cause/NGO registration request for "${causeDetails.causeName}". Our team will review your application and get back to you soon.</p>
+              
+              <p>Please note:</p>
+              <ul>
+                <li>The review process typically takes 2-3 business days</li>
+                <li>You will receive another email once your registration is approved</li>
+                <li>If we need any additional information, we will contact you at this email address</li>
+              </ul>
+              
+              <p>If you have any questions, please don't hesitate to contact our support team.</p>
+              
+              <p>Best regards,<br>
+              The ShoppinessMart Team</p>
+            </div>
+          `,
+          });
+        } catch (emailError) {
+          console.error("Failed to send confirmation email:", emailError);
+        }
         setSuccess(true);
-        toast.success("NGO registered successful!");
+        toast.success("NGO registered successfully!");
       } catch (error) {
         toast.error("Registration failed. Please try again.");
+      } finally {
+        setIsLoading(false);
       }
     }
   };
-
   // Validate file format
   const validateFileFormat = (file) => {
     const allowedFormats = ["image/png", "image/jpeg", "image/jpg"];
@@ -200,18 +230,21 @@ const CauseForm = () => {
       const logoUrl = logoFile ? await uploadFile(logoFile) : "";
       const bannerUrl = bannerFile ? await uploadFile(bannerFile) : "";
 
-      const res = await addDoc(collection(db, "causeDetails"), {
+      await addDoc(collection(db, "causeDetails"), {
         ...causeDetails,
         logoUrl,
         bannerUrl,
+        status: "Pending",
+        createdDate: formatDate(new Date()),
       });
-      dispatch(ngoUserExist(res));
-      setId(res.id);
     } catch (e) {
       throw new Error(e.message); // Throw error to handle in handleCreateAccount
     }
   };
-
+  function formatDate(date) {
+    const options = { day: "numeric", month: "short", year: "numeric" };
+    return date.toLocaleDateString("en-GB", options);
+  }
   const pages = [
     {
       title: "Cause / NGO Details",
@@ -430,8 +463,19 @@ const CauseForm = () => {
               <button className="back" onClick={handleBackPage}>
                 Back
               </button>
-              <button className="next" type="submit">
-                Create Your Account
+              <button
+                className="next flex justify-center items-center gap-3"
+                type="submit"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <FaSpinner className="w-5 h-5 animate-spin" />
+                    <span>Creating...</span>
+                  </>
+                ) : (
+                  "Create Your Account"
+                )}
               </button>
             </div>
           </div>
@@ -470,7 +514,7 @@ const CauseForm = () => {
       </div>
       <div className="formContainer">
         {success ? (
-          <SuccessPage id={id} link={`/ngo-dashboard/${id}/dashboard`} />
+          <SuccessPage link="/" title="Cause/NGO" />
         ) : (
           pages[currentPage - 1].content
         )}
