@@ -383,7 +383,7 @@ const AllNgos = () => {
                   {activeTab === "Inactive" && (
                     <td className="p-3">
                       <p className="text-gray-900">{ngo.inactiveDate}</p>
-                      <p className="text-gray-500 text-sm">Inactivation Date</p>
+                      <p className="text-red-500 text-sm">Inactivation Date</p>
                     </td>
                   )}
                   <td className="p-3">

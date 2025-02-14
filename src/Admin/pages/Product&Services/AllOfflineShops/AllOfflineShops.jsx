@@ -11,7 +11,7 @@ const AllOfflineShops = () => {
   const [showListedProducts, setShowListedProducts] = useState(false);
   const [offlineShops, setOfflineShops] = useState([]);
   const [loading, setLoading] = useState(false);
-  // Fetch data from Firestore
+
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
@@ -20,10 +20,10 @@ const AllOfflineShops = () => {
       querySnapshot.forEach((doc) => {
         const offlineShopData = doc.data();
         if (
-          (offlineShopData &&
-            offlineShopData.mode === "Offline" &&
-            offlineShopData.status === "Active") ||
-          offlineShopData.status === "Inactive"
+          offlineShopData &&
+          offlineShopData.mode === "Offline" &&
+          (offlineShopData.status === "Active" ||
+            offlineShopData.status === "Inactive")
         ) {
           data.push({ id: doc.id, ...offlineShopData });
         }
@@ -40,6 +40,7 @@ const AllOfflineShops = () => {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
   const handleBack = () => {
     if (showListedProducts) {
       setShowListedProducts(false);
@@ -52,19 +53,20 @@ const AllOfflineShops = () => {
     <div className="min-h-screen bg-gray-50 p-4">
       {selectedShop ? (
         showListedProducts ? (
-          <ListedProducts onBack={handleBack}  />
+          <ListedProducts onBack={handleBack} />
         ) : (
           <ShopDetails
             shop={selectedShop}
             onBack={handleBack}
             onListedProducts={() => setShowListedProducts(true)}
+            onStatusUpdate={fetchData}
           />
         )
       ) : (
         <ShopRequests
           onViewDetails={setSelectedShop}
-            offlineShops={offlineShops}
-            fetchData={fetchData}
+          offlineShops={offlineShops}
+          loading={loading}
         />
       )}
     </div>

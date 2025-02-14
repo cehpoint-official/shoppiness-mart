@@ -5,11 +5,15 @@ import { MdVerified } from "react-icons/md";
 import { db } from "../../../../firebase";
 import toast from "react-hot-toast";
 import axios from "axios";
-function ShopDetails({ shop, onBack, onListedProducts }) {
+import { FaSpinner } from "react-icons/fa";
+
+function ShopDetails({ shop, onBack, onListedProducts, onStatusUpdate }) {
   const [showOptions, setShowOptions] = useState(false);
   const [markingActive, setMarkingActive] = useState(false);
   const [markingInactive, setMarkingInactive] = useState(false);
+
   const handleUpdateStatus = async (id, status) => {
+    // Set loading states based on the status being updated
     if (status === "Active") {
       setMarkingActive(true);
     } else if (status === "Inactive") {
@@ -17,8 +21,9 @@ function ShopDetails({ shop, onBack, onListedProducts }) {
     }
 
     try {
-      const ngoRef = doc(db, "businessDetails", id);
-      await updateDoc(ngoRef, {
+      // Update Firestore document
+      const shopRef = doc(db, "businessDetails", id);
+      await updateDoc(shopRef, {
         status,
         approvedDate:
           status === "Active"
@@ -38,99 +43,84 @@ function ShopDetails({ shop, onBack, onListedProducts }) {
             : null,
       });
 
-      // Send email based on status change
-      try {
-        const emailTemplate =
+      // Prepare email template based on the status
+      const emailTemplate =
+        status === "Active"
+          ? `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <h2 style="color: #2c5282;">Your Business Account Has Been Reactivated!</h2>
+          </div>
+          <p>Dear ${shop.owner},</p>
+          <p>Great news! Your Business "${shop.businessName}" has been reactivated on Shoppiness Mart. You can now resume all activities on our platform.</p>
+          <div style="background-color: #f7fafc; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <h3 style="color: #2d3748; margin-bottom: 10px;">Your Login Credentials:</h3>
+            <p style="margin: 5px 0;"><strong>Email:</strong> ${shop.email}</p>
+            <p style="margin: 5px 0;"><strong>Password:</strong> ${shop.password}</p>
+          </div>
+          <p>You can now:</p>
+          <ul style="list-style-type: none; padding-left: 0;">
+            <li style="margin: 10px 0;">✅ Access your Business dashboard</li>
+            <li style="margin: 10px 0;">✅ Update your products/services</li>
+            <li style="margin: 10px 0;">✅ Connect with customers</li>
+          </ul>
+          <p>If you have any questions or need assistance, our support team is here to help.</p>
+          <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+            <p style="margin: 0;">Best regards,</p>
+            <p style="margin: 5px 0; color: #4a5568;"><strong>The Shoppiness Mart Team</strong></p>
+          </div>
+        </div>
+      `
+          : `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <h2 style="color: #c53030;">Important Notice: Business Account Deactivated</h2>
+          </div>
+          <p>Dear ${shop.owner},</p>
+          <p>We regret to inform you that your Business "${shop.businessName}" has been temporarily deactivated on Shoppiness Mart.</p>
+          <div style="background-color: #fff5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <p style="color: #c53030; margin: 5px 0;">During this period:</p>
+            <ul style="list-style-type: none; padding-left: 0;">
+              <li style="margin: 5px 0;">• Your Business profile will not be visible to donors</li>
+              <li style="margin: 5px 0;">• Active products/services will be paused</li>
+              <li style="margin: 5px 0;">• You won't be able to connect with customers</li>
+            </ul>
+          </div>
+          <p>If you believe this is an error or would like to reactivate your account, please contact our support team for assistance.</p>
+          <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+            <p style="margin: 0;">Best regards,</p>
+            <p style="margin: 5px 0; color: #4a5568;"><strong>The Shoppiness Mart Team</strong></p>
+          </div>
+        </div>
+      `;
+
+      // Send email notification
+      await axios.post(`${import.meta.env.VITE_AWS_SERVER}/send-email`, {
+        email: shop.email,
+        title:
           status === "Active"
-            ? `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
-              <div style="text-align: center; margin-bottom: 20px;">
-                <h2 style="color: #2c5282;">Your Business Account Has Been Reactivated!</h2>
-              </div>
-              
-              <p>Dear ${shop.owner},</p>
-              
-              <p>Great news! Your Business "${shop.businessName}" has been reactivated on Shoppiness Mart. You can now resume all activities on our platform.</p>
-              
-              <div style="background-color: #f7fafc; padding: 15px; border-radius: 5px; margin: 20px 0;">
-                <h3 style="color: #2d3748; margin-bottom: 10px;">Your Login Credentials:</h3>
-                <p style="margin: 5px 0;"><strong>Email:</strong> ${shop.email}</p>
-                <p style="margin: 5px 0;"><strong>Password:</strong> ${shop.password}</p>
-              </div>
-              
-              <p>You can now:</p>
-              <ul style="list-style-type: none; padding-left: 0;">
-                <li style="margin: 10px 0;">✅ Access your Business dashboard</li>
-                <li style="margin: 10px 0;">✅ Update your products/services</li>
-                <li style="margin: 10px 0;">✅  Connect with customers</li>
-              </ul>
-              
-              <p>If you have any questions or need assistance, our support team is here to help.</p>
-              
-              <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
-                <p style="margin: 0;">Best regards,</p>
-                <p style="margin: 5px 0; color: #4a5568;"><strong>The Shoppiness Mart Team</strong></p>
-              </div>
-            </div>
-          `
-            : `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
-              <div style="text-align: center; margin-bottom: 20px;">
-                <h2 style="color: #c53030;">Important Notice: Business Account Deactivated</h2>
-              </div>
-              
-              <p>Dear ${shop.owner},</p>
-              
-              <p>We regret to inform you that your Business "${shop.businessName}" has been temporarily deactivated on Shoppiness Mart.</p>
-              
-              <div style="background-color: #fff5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
-                <p style="color: #c53030; margin: 5px 0;">During this period:</p>
-                <ul style="list-style-type: none; padding-left: 0;">
-                  <li style="margin: 5px 0;">• Your Business profile will not be visible to donors</li>
-                  <li style="margin: 5px 0;">• Active products/services will be paused</li>
-                  <li style="margin: 5px 0;">• You won't be able to connect with customers</li>
-                </ul>
-              </div>
-              
-              <p>If you believe this is an error or would like to reactivate your account, please contact our support team for assistance.</p>
-              
-              <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
-                <p style="margin: 0;">Best regards,</p>
-                <p style="margin: 5px 0; color: #4a5568;"><strong>The Shoppiness Mart Team</strong></p>
-              </div>
-            </div>
-          `;
+            ? "Shoppiness Mart - Business Account Reactivated!"
+            : "Shoppiness Mart - Business Account Deactivated",
+        body: emailTemplate,
+      });
 
-        await axios.post(`${import.meta.env.VITE_AWS_SERVER}/send-email`, {
-          email: shop.email,
-          title:
-            status === "Active"
-              ? "Shoppiness Mart - Business Account Reactivated!"
-              : "Shoppiness Mart - Business Account Deactivated",
-          body: emailTemplate,
-        });
-      } catch (emailError) {
-        console.error("Failed to send notification email:", emailError);
-        // Don't block the status update if email fails
-      }
-
+      // Show success toast and refresh data
       toast.success(`Status updated to ${status}`);
-      fetchData();
+      onStatusUpdate();
     } catch (error) {
-      console.log("Error updating document: ", error);
+      console.error("Error updating document or sending email:", error);
       toast.error("Failed to update status");
     } finally {
-      if (status === "Active") {
-        setMarkingActive(false);
-      } else if (status === "Inactive") {
-        setMarkingInactive(false);
-      }
+      // Reset loading states
+      setMarkingActive(false);
+      setMarkingInactive(false);
     }
   };
+
   return (
     <div className="min-h-screen p-6">
       {/* Header */}
-      <div className="py-4 flex items-center justify-between ">
+      <div className="py-4 flex items-center justify-between">
         <button
           onClick={onBack}
           className="flex items-center text-gray-700 hover:text-gray-900"
@@ -158,11 +148,21 @@ function ShopDetails({ shop, onBack, onListedProducts }) {
                 Listed Products
               </button>
               {shop.status === "Active" ? (
-                <button className="w-full px-4 py-2 text-left hover:bg-gray-50">
+                <button
+                  onClick={() => handleUpdateStatus(shop.id, "Inactive")}
+                  disabled={markingInactive || markingActive}
+                  className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-2"
+                >
+                  {markingInactive && <FaSpinner className="animate-spin" />}
                   Mark as Inactive
                 </button>
               ) : (
-                <button className="w-full px-4 py-2 text-left hover:bg-gray-50">
+                <button
+                  onClick={() => handleUpdateStatus(shop.id, "Active")}
+                  disabled={markingActive || markingInactive}
+                  className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-2"
+                >
+                  {markingActive && <FaSpinner className="animate-spin" />}
                   Mark as Active
                 </button>
               )}

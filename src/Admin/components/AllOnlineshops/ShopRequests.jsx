@@ -1,105 +1,54 @@
-import { useState } from "react";
-const shopData = [
-  {
-    id: 1,
-    name: "Sonali Beauty Parlour",
-    category: "Beauty shop",
-    image: "https://placehold.co/400x400",
-    logo: "https://placehold.co/100x100",
-    location: "Bang Lamung District, Chon Buri 20150, Thailand",
-    phone: "+66 966778788",
-    email: "email@gmail.com",
-    date: "02Jan,2024",
-    status: "active",
-    verified: true,
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero et velit interdum, ac aliquet odio mattis. Class aptent taciti sociosqu.",
-    ownerName: "Sujan Banerjee",
-    type: "Offline",
-    commission: "5",
-    businessEmail: "offlineshop@gmail.com",
-  },
-  {
-    id: 2,
-    name: "Royal Spa & Salon",
-    category: "Spa & Wellness",
-    image: "https://placehold.co/400x400",
-    logo: "https://placehold.co/100x100",
-    location: "Sukhumvit Road, Bangkok 10110, Thailand",
-    phone: "+66 945678901",
-    email: "royal@gmail.com",
-    date: "03Jan,2024",
-    status: "active",
-    verified: true,
-    description: "Premium spa and salon services in the heart of Bangkok.",
-    ownerName: "Sarah Johnson",
-    type: "Offline",
-    commission: "7",
-    businessEmail: "royal.spa@gmail.com",
-  },
-  {
-    id: 3,
-    name: "Thai Massage Center",
-    category: "Massage",
-    image: "https://placehold.co/400x400",
-    logo: "https://placehold.co/100x100",
-    location: "Pattaya Beach Road, Chonburi 20150, Thailand",
-    phone: "+66 934567890",
-    email: "thaimassage@gmail.com",
-    date: "04Jan,2024",
-    status: "inactive",
-    verified: false,
-    description: "Traditional Thai massage and wellness treatments.",
-    ownerName: "Somchai Thai",
-    type: "Offline",
-    commission: "6",
-    businessEmail: "info.thaimassage@gmail.com",
-  },
-  {
-    id: 4,
-    name: "Glamour Studio",
-    category: "Beauty shop",
-    image: "https://placehold.co/400x400",
-    logo: "https://placehold.co/100x100",
-    location: "Siam Square, Bangkok 10330, Thailand",
-    phone: "+66 923456789",
-    email: "glamour@gmail.com",
-    date: "05Jan,2024",
-    status: "active",
-    verified: true,
-    description: "High-end beauty treatments and makeup services.",
-    ownerName: "Lisa Park",
-    type: "Offline",
-    commission: "8",
-    businessEmail: "glamour.studio@gmail.com",
-  },
-  {
-    id: 5,
-    name: "Zen Wellness",
-    category: "Wellness Center",
-    image: "https://placehold.co/400x400",
-    logo: "https://placehold.co/100x100",
-    location: "Silom Road, Bangkok 10500, Thailand",
-    phone: "+66 912345678",
-    email: "zen@gmail.com",
-    date: "06Jan,2024",
-    status: "inactive",
-    verified: true,
-    description: "Holistic wellness treatments and meditation services.",
-    ownerName: "David Chen",
-    type: "Online",
-    commission: "5",
-    businessEmail: "zen.wellness@gmail.com",
-  },
-];
-function ShopRequests({ onViewDetails }) {
-  const [activeTab, setActiveTab] = useState("active");
+import { useEffect, useState } from "react";
+// Skeleton loader component
+const TableRowSkeleton = () => (
+  <tr className="border-b border-t animate-pulse">
+    <td className="py-4 px-6">
+      <div className="flex items-center gap-4">
+        <div className="w-20 h-20 bg-gray-200 rounded"></div>
+        <div>
+          <div className="h-4 w-32 bg-gray-200 rounded mb-2"></div>
+          <div className="h-3 w-24 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+    </td>
+    <td className="py-4 px-6">
+      <div className="grid grid-cols-4 gap-8">
+        {[...Array(4)].map((_, i) => (
+          <div key={i}>
+            <div className="h-4 w-24 bg-gray-200 rounded mb-1"></div>
+            <div className="h-3 w-16 bg-gray-200 rounded"></div>
+          </div>
+        ))}
+      </div>
+    </td>
+    <td className="py-4 px-6">
+      <div className="ml-auto w-24 h-8 bg-gray-200 rounded"></div>
+    </td>
+  </tr>
+);
 
-  const filteredData = shopData.filter((item) =>
-    activeTab === "active"
-      ? item.status === "active"
-      : item.status === "inactive"
+function ShopRequests({ onViewDetails, onlineShops, loading }) {
+const [activeTab, setActiveTab] = useState("Active");
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 5;
+
+  const filteredData = onlineShops.filter((item) =>
+    activeTab === "Active"
+      ? item.status === "Active"
+      : item.status === "Inactive"
   );
+
+  const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedData = filteredData.slice(
+    startIndex,
+    startIndex + ITEMS_PER_PAGE
+  );
+
+  // Reset to first page when switching tabs
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab]);
 
   return (
     <div className="p-6">
@@ -107,80 +56,155 @@ function ShopRequests({ onViewDetails }) {
         All Online shops
       </h1>
       <div className="bg-white p-6 rounded-xl border shadow-md">
-        {" "}
         <div className="flex gap-4 mb-6">
           <button
             className={`px-6 py-2 rounded-full border transition-all ${
-              activeTab === "active"
+              activeTab === "Active"
                 ? "bg-orange-400 text-white border-orange-400"
                 : "border-gray-300 text-gray-700"
             }`}
-            onClick={() => setActiveTab("active")}
+            onClick={() => setActiveTab("Active")}
           >
             Active Product/Service
           </button>
           <button
             className={`px-6 py-2 rounded-full border transition-all ${
-              activeTab === "inactive"
+              activeTab === "Inactive"
                 ? "bg-orange-400 text-white border-orange-400"
                 : "border-gray-300 text-gray-700"
             }`}
-            onClick={() => setActiveTab("inactive")}
+            onClick={() => setActiveTab("Inactive")}
           >
             Inactive Product/Service
           </button>
         </div>
         <div className="overflow-x-auto">
-          {" "}
           <table className="w-full">
             <tbody className="space-y-4">
-              {filteredData.map((shop) => (
-                <tr key={shop.id} className="border-b">
-                  <td className="py-4 px-6">
-                    <div className="flex items-center gap-4">
-                      <img
-                    src={shop.image}
-                    alt={shop.name}
-                        className="w-20 h-20 rounded object-cover"
-                      />
-                      <div>
-                        <h3 className="font-medium">{shop.name}</h3>
-                        <p className="text-sm text-gray-500">
-                        {shop.location}
-                        </p>
+              {loading ? (
+                [...Array(ITEMS_PER_PAGE)].map((_, index) => (
+                  <TableRowSkeleton key={index} />
+                ))
+              ) : paginatedData.length > 0 ? (
+                paginatedData.map((shop) => (
+                  <tr key={shop.id} className="border-b border-t">
+                    <td className="py-4 px-6">
+                      <div className="flex items-center gap-4">
+                        <img
+                          src={shop.logoUrl}
+                          alt={shop.businessName}
+                          className="w-20 h-20 rounded object-cover"
+                        />
+                        <div>
+                          <h3 className="font-medium">{shop.businessName}</h3>
+                          <p className="text-sm text-gray-500">
+                            {shop.location}
+                          </p>
+                        </div>
                       </div>
+                    </td>
+                    <td className="py-4 px-6">
+                      <div className="grid grid-cols-4 gap-8">
+                        <div>
+                          <p className="text-sm">{shop.mobileNumber}</p>
+                          <p className="text-xs text-gray-500">Phone</p>
+                        </div>
+                        <div>
+                          <p className="text-sm">{shop.email}</p>
+                          <p className="text-xs text-gray-500">Email</p>
+                        </div>
+                        <div>
+                          <p className="text-sm">{shop.createdDate}</p>
+                          <p className="text-xs text-gray-500">
+                            Requested date
+                          </p>
+                        </div>
+                        <div>
+                          {activeTab === "Active" ? (
+                            <div>
+                              <p className="text-sm">{shop.approvedDate}</p>
+                              <p className="text-xs text-gray-500">
+                                Activation Date
+                              </p>
+                            </div>
+                          ) : (
+                            <div>
+                              <p className="text-sm">{shop.inactiveDate}</p>
+                              <p className="text-xs text-red-500">
+                                Inactivation Date
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="py-4 px-6">
+                      <button
+                        onClick={() => onViewDetails(shop)}
+                        className="ml-auto px-6 py-2 border border-blue-500 text-blue-500 rounded-md
+                          hover:bg-blue-500 hover:text-white transition-colors"
+                      >
+                        View Details
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="3">
+                    <div className="p-6 text-center text-gray-600">
+                      {activeTab === "Active"
+                        ? "No Active shops found."
+                        : "No Inactive shops found."}
                     </div>
-                  </td>
-                  <td className="py-4 px-6">
-                    <div className="grid grid-cols-3 gap-8">
-                      <div>
-                        <p className="text-sm">{shop.phone}</p>
-                        <p className="text-xs text-gray-500">Phone</p>
-                      </div>
-                      <div>
-                        <p className="text-sm">{shop.email}</p>
-                        <p className="text-xs text-gray-500">Email</p>
-                      </div>
-                      <div>
-                        <p className="text-sm"> {shop.date}</p>
-                        <p className="text-xs text-gray-500">Date</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="py-4 px-6">
-                    <button
-                      onClick={() => onViewDetails(shop)}
-                       className="ml-auto px-6 py-2 border border-blue-500 text-blue-500 rounded-md
-                        hover:bg-blue-500 hover:text-white transition-colors"
-                    >
-                      View Details
-                    </button>
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
+
+        {/* Pagination */}
+        {!loading && paginatedData.length > 0 && (
+          <div className="flex items-center justify-between mt-6">
+            <p className="text-gray-600">
+              Showing {startIndex + 1} to{" "}
+              {Math.min(startIndex + ITEMS_PER_PAGE, filteredData.length)} of{" "}
+              {filteredData.length}
+            </p>
+            <div className="flex gap-2">
+              <button
+                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded disabled:opacity-50"
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(currentPage - 1)}
+              >
+                Previous
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <button
+                    key={page}
+                    className={`w-8 h-8 rounded ${
+                      currentPage === page
+                        ? "bg-blue-500 text-white"
+                        : "text-gray-600 hover:bg-gray-100"
+                    }`}
+                    onClick={() => setCurrentPage(page)}
+                  >
+                    {page}
+                  </button>
+                )
+              )}
+              <button
+                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded disabled:opacity-50"
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage(currentPage + 1)}
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
