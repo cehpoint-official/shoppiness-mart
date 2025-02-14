@@ -17,6 +17,11 @@ const NgoRequest = () => {
   const [accepting, setAccepting] = useState(false);
   const [rejecting, setRejecting] = useState(false);
 
+  // Reset page when tab changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab]);
+
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
@@ -41,117 +46,129 @@ const NgoRequest = () => {
     fetchData();
   }, [fetchData]);
 
-  const handleUpdateStatus = async (id, status) => {
-    if (status === "Active") {
-      setAccepting(true);
-    } else if (status === "Rejected") {
-      setRejecting(true);
-    }
-
+  const handleAcceptRequest = async (ngo) => {
+    setAccepting(true);
     try {
-      const ngoRef = doc(db, "causeDetails", id);
-      await updateDoc(ngoRef, {
-        status,
-        approvedDate:
-          status === "Active"
-            ? new Date().toLocaleDateString("en-GB", {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              })
-            : null,
+      const emailTemplate = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <h2 style="color: #2c5282;">Congratulations! Your NGO Registration is Approved</h2>
+          </div>
+          
+          <p>Dear ${ngo.firstName} ${ngo.lastName},</p>
+          
+          <p>We are pleased to inform you that your NGO "${ngo.causeName}" has been approved on Shoppiness Mart. You can now start using our platform to showcase your cause and connect with potential donors.</p>
+          
+          <div style="background-color: #f7fafc; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <h3 style="color: #2d3748; margin-bottom: 10px;">Your Login Credentials:</h3>
+            <p style="margin: 5px 0;"><strong>Email:</strong> ${ngo.email}</p>
+            <p style="margin: 5px 0;"><strong>Password:</strong> ${ngo.password}</p>
+          </div>
+          
+          <p>Please login to your dashboard to:</p>
+          <ul style="list-style-type: none; padding-left: 0;">
+            <li style="margin: 10px 0;">✅ Complete your NGO profile</li>
+            <li style="margin: 10px 0;">✅ Add your campaigns and initiatives</li>
+            <li style="margin: 10px 0;">✅ Connect with donors</li>
+          </ul>
+          
+          <p>For any assistance, please don't hesitate to contact our support team.</p>
+          
+          <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+            <p style="margin: 0;">Best regards,</p>
+            <p style="margin: 5px 0; color: #4a5568;"><strong>The Shoppiness Mart Team</strong></p>
+          </div>
+        </div>
+      `;
+
+      await axios.post(`${import.meta.env.VITE_AWS_SERVER}/send-email`, {
+        email: ngo.email,
+        title: "Shoppiness Mart - NGO Registration Approved!",
+        body: emailTemplate,
       });
 
-      // Send email based on status
-      try {
-        const emailTemplate =
-          status === "Active"
-            ? `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
-              <div style="text-align: center; margin-bottom: 20px;">
-                <h2 style="color: #2c5282;">Congratulations! Your NGO Registration is Approved</h2>
-              </div>
-              
-              <p>Dear ${selectedNGO.firstName} ${selectedNGO.lastName},</p>
-              
-              <p>We are pleased to inform you that your NGO "${selectedNGO.causeName}" has been approved on Shoppiness Mart. You can now start using our platform to showcase your cause and connect with potential donors.</p>
-              
-              <div style="background-color: #f7fafc; padding: 15px; border-radius: 5px; margin: 20px 0;">
-                <h3 style="color: #2d3748; margin-bottom: 10px;">Your Login Credentials:</h3>
-                <p style="margin: 5px 0;"><strong>Email:</strong> ${selectedNGO.email}</p>
-                <p style="margin: 5px 0;"><strong>Password:</strong> ${selectedNGO.password}</p>
-              </div>
-              
-              <p>Please login to your dashboard to:</p>
-              <ul style="list-style-type: none; padding-left: 0;">
-                <li style="margin: 10px 0;">✅ Complete your NGO profile</li>
-                <li style="margin: 10px 0;">✅ Add your campaigns and initiatives</li>
-                <li style="margin: 10px 0;">✅ Connect with donors</li>
-              </ul>
-              
-              <p>For any assistance, please don't hesitate to contact our support team.</p>
-              
-              <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
-                <p style="margin: 0;">Best regards,</p>
-                <p style="margin: 5px 0; color: #4a5568;"><strong>The Shoppiness Mart Team</strong></p>
-              </div>
-            </div>
-          `
-            : `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
-              <div style="text-align: center; margin-bottom: 20px;">
-                <h2 style="color: #c53030;">NGO Registration Status Update</h2>
-              </div>
-              
-              <p>Dear ${selectedNGO.firstName} ${selectedNGO.lastName},</p>
-              
-              <p>Thank you for your interest in registering "${selectedNGO.causeName}" on Shoppiness Mart. After careful review of your application, we regret to inform you that we are unable to approve your NGO registration at this time.</p>
-              
-              <p>This decision could be due to one or more of the following reasons:</p>
-              <ul style="list-style-type: none; padding-left: 0;">
-                <li style="margin: 10px 0;">• Incomplete or incorrect documentation</li>
-                <li style="margin: 10px 0;">• Unable to verify NGO credentials</li>
-                <li style="margin: 10px 0;">• Does not meet our current platform requirements</li>
-              </ul>
-              
-              <p>You are welcome to submit a new application after addressing these potential issues. If you need clarification or have any questions, please don't hesitate to contact our support team.</p>
-              
-              <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
-                <p style="margin: 0;">Best regards,</p>
-                <p style="margin: 5px 0; color: #4a5568;"><strong>The Shoppiness Mart Team</strong></p>
-              </div>
-            </div>
-          `;
+      const ngoRef = doc(db, "causeDetails", ngo.id);
+      await updateDoc(ngoRef, {
+        status: "Active",
+        approvedDate: new Date().toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        }),
+      });
 
-        await axios.post(`${import.meta.env.VITE_AWS_SERVER}/send-email`, {
-          email: selectedNGO.email,
-          title:
-            status === "Active"
-              ? "Shoppiness Mart - NGO Registration Approved!"
-              : "Shoppiness Mart - NGO Registration Update",
-          body: emailTemplate,
-        });
-      } catch (emailError) {
-        console.error("Failed to send notification email:", emailError);
-        // Don't block the status update if email fails
-      }
-
-      toast.success(`Request ${status.toLowerCase()} successfully`);
+      toast.success("Request accepted successfully");
       fetchData();
       setViewMode("list");
     } catch (error) {
-      console.log("Error updating document: ", error);
-      toast.error("Failed to update status");
+      console.error("Error in handleAcceptRequest:", error);
+      toast.error("Failed to accept request. No changes were made.");
     } finally {
-      if (status === "Active") {
-        setAccepting(false);
-      } else if (status === "Rejected") {
-        setRejecting(false);
-      }
+      setAccepting(false);
     }
   };
 
-  const displayData = ngoRequests.filter((ngo) => ngo.status === activeTab);
+  const handleRejectRequest = async (ngo) => {
+    setRejecting(true);
+    try {
+      const emailTemplate = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <h2 style="color: #c53030;">NGO Registration Status Update</h2>
+          </div>
+          
+          <p>Dear ${ngo.firstName} ${ngo.lastName},</p>
+          
+          <p>Thank you for your interest in registering "${ngo.causeName}" on Shoppiness Mart. After careful review of your application, we regret to inform you that we are unable to approve your NGO registration at this time.</p>
+          
+          <p>This decision could be due to one or more of the following reasons:</p>
+          <ul style="list-style-type: none; padding-left: 0;">
+            <li style="margin: 10px 0;">• Incomplete or incorrect documentation</li>
+            <li style="margin: 10px 0;">• Unable to verify NGO credentials</li>
+            <li style="margin: 10px 0;">• Does not meet our current platform requirements</li>
+          </ul>
+          
+          <p>You are welcome to submit a new application after addressing these potential issues. If you need clarification or have any questions, please don't hesitate to contact our support team.</p>
+          
+          <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+            <p style="margin: 0;">Best regards,</p>
+            <p style="margin: 5px 0; color: #4a5568;"><strong>The Shoppiness Mart Team</strong></p>
+          </div>
+        </div>
+      `;
+
+      await axios.post(`${import.meta.env.VITE_AWS_SERVER}/send-email`, {
+        email: ngo.email,
+        title: "Shoppiness Mart - NGO Registration Update",
+        body: emailTemplate,
+      });
+
+      const ngoRef = doc(db, "causeDetails", ngo.id);
+      await updateDoc(ngoRef, {
+        status: "Rejected",
+        rejectedDate: new Date().toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        }),
+      });
+
+      toast.success("Request rejected successfully");
+      fetchData();
+      setViewMode("list");
+    } catch (error) {
+      console.error("Error in handleRejectRequest:", error);
+      toast.error("Failed to reject request. No changes were made.");
+    } finally {
+      setRejecting(false);
+    }
+  };
+
+  const displayData = ngoRequests.filter((ngo) =>
+    activeTab === "Pending"
+      ? ngo.status === "Pending"
+      : ngo.status === "Rejected"
+  );
   const totalPages = Math.ceil(displayData.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const paginatedData = displayData.slice(
@@ -247,9 +264,7 @@ const NgoRequest = () => {
               <div className="flex justify-end gap-4 pt-4">
                 {activeTab === "Pending" && (
                   <button
-                    onClick={() =>
-                      handleUpdateStatus(selectedNGO.id, "Rejected")
-                    }
+                    onClick={() => handleRejectRequest(selectedNGO)}
                     disabled={rejecting || accepting}
                     className="px-6 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors flex items-center gap-2"
                   >
@@ -258,7 +273,7 @@ const NgoRequest = () => {
                   </button>
                 )}
                 <button
-                  onClick={() => handleUpdateStatus(selectedNGO.id, "Active")}
+                  onClick={() => handleAcceptRequest(selectedNGO)}
                   disabled={accepting || rejecting}
                   className="px-6 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors flex items-center gap-2"
                 >
@@ -354,10 +369,30 @@ const NgoRequest = () => {
                     <p className="text-gray-900">{ngo.email}</p>
                     <p className="text-gray-500 text-sm">Email</p>
                   </td>
-                  <td className="p-3">
-                    <p className="text-gray-900">{ngo.createdDate}</p>
-                    <p className="text-gray-500 text-sm">Requested date</p>
-                  </td>
+                  <div className="mt-10">
+                    {activeTab === "Pending" ? (
+                      <>
+                        <p className="text-sm">{ngo.createdDate}</p>
+                        <p className="text-xs text-gray-500">Requested Date</p>
+                      </>
+                    ) : (
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm">{ngo.createdDate}</p>
+                          <p className="text-xs text-gray-500">
+                            Requested Date
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-red-500">
+                            {ngo.rejectedDate || "N/A"}
+                          </p>
+                          <p className="text-xs text-gray-500">Rejected Date</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
                   <td className="p-3">
                     <button
                       onClick={() => handleViewDetails(ngo)}

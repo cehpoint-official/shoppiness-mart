@@ -1,145 +1,212 @@
 import { BsArrowLeft } from "react-icons/bs";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
+import { db } from "../../../../../firebase";
+import toast from "react-hot-toast";
+import { FiEdit } from "react-icons/fi";
+import { FaSpinner } from "react-icons/fa";
+import axios from "axios";
+
+const ITEMS_PER_PAGE = 10; // Number of items per page
+
 const OfflineShopRequests = () => {
   const [activeTab, setActiveTab] = useState("Pending");
   const [selectedShop, setSelectedShop] = useState(null);
+  const [offlineShopRequests, setOfflineShopRequests] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [editingRate, setEditingRate] = useState(null);
+  const [tempRate, setTempRate] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [accepting, setAccepting] = useState(false);
+  const [rejecting, setRejecting] = useState(false);
 
-  // Sample data with both pending and rejected requests
-  const shopRequests = [
-    {
-      id: 1,
-      status: "Pending",
-      shopName: "Sonali Beauty Parlour",
-      location: "Bang Lamung District, Chon Buri 20150, Thailand",
-      phone: "+66 9667788788",
-      email: "email@gmail.com",
-      date: "02 Jan, 2024",
-      image:
-        "https://example.com/fashion-hub-image.jpg",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero et velit interdum, ac aliquet odio mattis.",
-      category: "Beauty Shop",
-      ownerName: "Sujan Banerjee",
-      businessType: "Offline",
-      commission: "5%",
-      logo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-ZILqxyDtKtjzPhSIhEhhZSWas5zz9g.png",
-    },
-    {
-      id: 2,
-      status: "Pending",
-      shopName: "Elegant Fashion Hub",
-      location: "Mumbai, Maharashtra, India",
-      phone: "+91 9876543210",
-      email: "fashionhub@gmail.com",
-      date: "05 Jan, 2024",
-      image: "https://example.com/fashion-hub-image.jpg",
-      description:
-        "Trendy and stylish clothing for all occasions. Explore our latest collections with great discounts.",
-      category: "Clothing Store",
-      ownerName: "Anjali Sharma",
-      businessType: "Online",
-      commission: "7%",
-      logo: "https://example.com/fashion-hub-logo.jpg",
-    },
-    {
-      id: 3,
-      status: "Rejected",
-      shopName: "TechGear Electronics",
-      location: "Singapore",
-      phone: "+65 81234567",
-      email: "techgear@gmail.com",
-      date: "10 Jan, 2024",
-      image: "https://example.com/techgear-image.jpg",
-      description:
-        "Leading provider of cutting-edge electronics, including laptops, smartphones, and accessories.",
-      category: "Electronics",
-      ownerName: "Rajesh Kumar",
-      businessType: "Offline",
-      commission: "4%",
-      logo: "https://example.com/techgear-logo.jpg",
-    },
-    {
-      id: 4,
-      status: "Pending",
-      shopName: "GreenFresh Organic Store",
-      location: "Los Angeles, California, USA",
-      phone: "+1 323-555-7890",
-      email: "greenfresh@gmail.com",
-      date: "12 Jan, 2024",
-      image: "https://example.com/greenfresh-image.jpg",
-      description:
-        "Fresh and organic groceries delivered straight to your doorstep. Eat healthy, live better!",
-      category: "Grocery Store",
-      ownerName: "Emily Johnson",
-      businessType: "Online",
-      commission: "6%",
-      logo: "https://example.com/greenfresh-logo.jpg",
-    },
-    {
-      id: 5,
-      status: "Rejected",
-      shopName: "Speedy Auto Services",
-      location: "Sydney, Australia",
-      phone: "+61 412 345 678",
-      email: "speedyauto@gmail.com",
-      date: "15 Jan, 2024",
-      image: "https://example.com/speedyauto-image.jpg",
-      description:
-        "Professional auto repair and maintenance services. Your car’s best friend!",
-      category: "Automobile Services",
-      ownerName: "Michael Brown",
-      businessType: "Offline",
-      commission: "8%",
-      logo: "https://example.com/speedyauto-logo.jpg",
-    },
-    {
-      id: 6,
-      status: "Pending",
-      shopName: "Healthy Bites Café",
-      location: "Toronto, Canada",
-      phone: "+1 416-555-6789",
-      email: "healthybites@gmail.com",
-      date: "18 Jan, 2024",
-      image: "https://example.com/healthybites-image.jpg",
-      description:
-        "Delicious and nutritious meals prepared with fresh ingredients. Come taste the difference!",
-      category: "Restaurant",
-      ownerName: "Sophia Martinez",
-      businessType: "Offline",
-      commission: "10%",
-      logo: "https://example.com/healthybites-logo.jpg",
-    },
-    {
-      id: 7,
-      status: "Rejected",
-      shopName: "Book Haven",
-      location: "London, UK",
-      phone: "+44 20 7946 0958",
-      email: "bookhaven@gmail.com",
-      date: "20 Jan, 2024",
-      image: "https://example.com/bookhaven-image.jpg",
-      description:
-        "A paradise for book lovers. Find the latest bestsellers and timeless classics in one place.",
-      category: "Bookstore",
-      ownerName: "Oliver Wilson",
-      businessType: "Online",
-      commission: "5%",
-      logo: "https://example.com/bookhaven-logo.jpg",
-    },
-  ];
+  // Fetch data from Firestore
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const querySnapshot = await getDocs(collection(db, "businessDetails"));
+      const data = [];
+      querySnapshot.forEach((doc) => {
+        const offlineShopData = doc.data();
+        if (offlineShopData && offlineShopData.mode === "Offline") {
+          data.push({ id: doc.id, ...offlineShopData });
+        }
+      });
+      setOfflineShopRequests(data);
+    } catch (error) {
+      console.log("Error getting documents: ", error);
+      toast.error("Failed to fetch data");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-  const filteredRequests = shopRequests.filter((request) =>
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  // Filter requests based on active tab
+  const filteredRequests = offlineShopRequests.filter((request) =>
     activeTab === "Pending"
       ? request.status === "Pending"
       : request.status === "Rejected"
   );
 
+  // Pagination logic
+  const totalPages = Math.ceil(filteredRequests.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedData = filteredRequests.slice(
+    startIndex,
+    startIndex + ITEMS_PER_PAGE
+  );
+  // Reset current page when tab changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab]);
+  // Handle editing commission rate
+  const handleEditRate = (shop) => {
+    setEditingRate(shop.id);
+    setTempRate(shop.rate || "");
+  };
+
+  // Handle accepting a request
+  const handleAcceptRequest = async (shop) => {
+    setAccepting(true);
+    try {
+      // Prepare email content
+      const emailTemplate = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <h2 style="color: #2c5282;">Congratulations! Your Business Registration is Approved</h2>
+          </div>
+          
+          <p>Dear ${shop.owner},</p>
+          
+          <p>We are pleased to inform you that your business "${shop.businessName}" has been approved on Shoppiness Mart. You can now start using our platform to showcase your products/services and connect with potential customers.</p>
+          
+          <div style="background-color: #f7fafc; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <h3 style="color: #2d3748; margin-bottom: 10px;">The Commission Rate:</h3>
+            <p style="margin: 5px 0;"><strong>${tempRate}%</strong></p>
+          </div>
+            <div style="background-color: #f7fafc; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                <h3 style="color: #2d3748; margin-bottom: 10px;">Your Login Credentials:</h3>
+                <p style="margin: 5px 0;"><strong>Email:</strong> ${shop.email}</p>
+                <p style="margin: 5px 0;"><strong>Password:</strong> ${shop.password}</p>
+              </div>
+              
+          <p>Please login to your dashboard to:</p>
+          <ul style="list-style-type: none; padding-left: 0;">
+            <li style="margin: 10px 0;">✅ Complete your business profile</li>
+            <li style="margin: 10px 0;">✅ Add your products/services</li>
+            <li style="margin: 10px 0;">✅ Connect with customers</li>
+          </ul>
+          
+          <p>For any assistance, please don't hesitate to contact our support team.</p>
+          
+          <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+            <p style="margin: 0;">Best regards,</p>
+            <p style="margin: 5px 0; color: #4a5568;"><strong>The Shoppiness Mart Team</strong></p>
+          </div>
+        </div>
+      `;
+
+      // Send email
+      await axios.post(`${import.meta.env.VITE_AWS_SERVER}/send-email`, {
+        email: shop.email,
+        title: "Shoppiness Mart - Business Registration Approved!",
+        body: emailTemplate,
+      });
+
+      // Update Firestore document
+      const shopRef = doc(db, "businessDetails", shop.id);
+      await updateDoc(shopRef, {
+        status: "Active",
+        rate: tempRate,
+        approvedDate: new Date().toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        }),
+      });
+
+      // Show success message and refresh data
+      toast.success("Request accepted successfully");
+      fetchData();
+      setSelectedShop(null);
+    } catch (error) {
+      console.error("Error in handleAcceptRequest:", error);
+      toast.error("Failed to accept request. No changes were made.");
+    } finally {
+      setAccepting(false);
+    }
+  };
+
+  // Handle rejecting a request
+  const handleRejectRequest = async (shop) => {
+    setRejecting(true);
+    try {
+      // Prepare email content
+      const emailTemplate = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <h2 style="color: #c53030;">Business Registration Status Update</h2>
+          </div>
+          
+          <p>Dear ${shop.owner},</p>
+          
+          <p>Thank you for your interest in registering "${shop.businessName}" on Shoppiness Mart. After careful review of your application, we regret to inform you that we are unable to approve your business registration at this time.</p>
+          
+          <p>This decision could be due to one or more of the following reasons:</p>
+          <ul style="list-style-type: none; padding-left: 0;">
+            <li style="margin: 10px 0;">• Incomplete or incorrect documentation</li>
+            <li style="margin: 10px 0;">• Unable to verify business credentials</li>
+            <li style="margin: 10px 0;">• Does not meet our current platform requirements</li>
+          </ul>
+          
+          <p>You are welcome to submit a new application after addressing these potential issues. If you need clarification or have any questions, please don't hesitate to contact our support team.</p>
+          
+          <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+            <p style="margin: 0;">Best regards,</p>
+            <p style="margin: 5px 0; color: #4a5568;"><strong>The Shoppiness Mart Team</strong></p>
+          </div>
+        </div>
+      `;
+
+      // Send email
+      await axios.post(`${import.meta.env.VITE_AWS_SERVER}/send-email`, {
+        email: shop.email,
+        title: "Shoppiness Mart - Business Registration Update",
+        body: emailTemplate,
+      });
+
+      // Update Firestore document
+      const shopRef = doc(db, "businessDetails", shop.id);
+      await updateDoc(shopRef, {
+        status: "Rejected",
+        rejectedDate: new Date().toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        }),
+      });
+
+      // Show success message and refresh data
+      toast.success("Request rejected successfully");
+      fetchData();
+      setSelectedShop(null);
+    } catch (error) {
+      console.error("Error in handleRejectRequest:", error);
+      toast.error("Failed to reject request. No changes were made.");
+    } finally {
+      setRejecting(false);
+    }
+  };
   if (selectedShop) {
     return (
       <div className="p-6">
         <button
           onClick={() => setSelectedShop(null)}
-          className="flex items-center gap-2  mb-8 hover:text-gray-900"
+          className="flex items-center gap-2 mb-8 hover:text-gray-900"
         >
           <BsArrowLeft className="w-4 h-4" />
           View request
@@ -148,27 +215,26 @@ const OfflineShopRequests = () => {
         <div className="grid md:grid-cols-2 gap-8 bg-white p-6">
           <div>
             <img
-              src={selectedShop.image || "/placeholder.svg"}
-              alt={selectedShop.shopName}
+              src={selectedShop.bannerUrl || "/placeholder.svg"}
+              alt={selectedShop.businessName}
               className="w-full rounded-lg object-cover aspect-square"
             />
           </div>
 
           <div>
             <div className="flex items-start gap-4 mb-6">
-              <div className="w-12 h-12 rounded-full bg-gray-200"></div>
               <div>
                 <h1 className="text-2xl font-semibold">
-                  {selectedShop.shopName}
+                  {selectedShop.businessName}
                 </h1>
-                <p className="text-gray-500">{selectedShop.category}</p>
+                <p className="text-gray-500">{selectedShop.cat}</p>
               </div>
             </div>
 
             <div className="space-y-6">
               <div>
                 <h2 className="font-medium mb-2">Description</h2>
-                <p className="text-gray-600">{selectedShop.description}</p>
+                <p className="text-gray-600">{selectedShop.shortDesc}</p>
               </div>
 
               <div>
@@ -179,7 +245,7 @@ const OfflineShopRequests = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <h2 className="font-medium mb-2">Phone Number</h2>
-                  <p className="text-gray-600">{selectedShop.phone}</p>
+                  <p className="text-gray-600">{selectedShop.mobileNumber}</p>
                 </div>
                 <div>
                   <h2 className="font-medium mb-2">Email ID</h2>
@@ -196,15 +262,13 @@ const OfflineShopRequests = () => {
                     <td className="py-3 text-sm text-gray-500">
                       Business/Services Owner Name
                     </td>
-                    <td className="py-3 text-sm">{selectedShop.ownerName}</td>
+                    <td className="py-3 text-sm">{selectedShop.owner}</td>
                   </tr>
                   <tr>
                     <td className="py-3 text-sm text-gray-500">
-                      Business/Services type
+                      Business/Services Mode
                     </td>
-                    <td className="py-3 text-sm">
-                      {selectedShop.businessType}
-                    </td>
+                    <td className="py-3 text-sm">{selectedShop.mode}</td>
                   </tr>
                   <tr>
                     <td className="py-3 text-sm text-gray-500">Email</td>
@@ -214,19 +278,36 @@ const OfflineShopRequests = () => {
                     <td className="py-3 text-sm text-gray-500">
                       Shop Category
                     </td>
-                    <td className="py-3 text-sm">{selectedShop.category}</td>
+                    <td className="py-3 text-sm">{selectedShop.cat}</td>
                   </tr>
                   <tr>
                     <td className="py-3 text-sm text-gray-500">
-                      commission rate
+                      Commission rate
                     </td>
-                    <td className="py-3 text-sm">{selectedShop.commission}</td>
+                    <td className="py-3 text-sm flex gap-4 items-center">
+                      {editingRate === selectedShop.id ? (
+                        <input
+                          type="text"
+                          value={tempRate}
+                          onChange={(e) => setTempRate(e.target.value)}
+                          className="border rounded px-2 py-1 w-24"
+                        />
+                      ) : (
+                        selectedShop.rate
+                      )}
+                      <button
+                        onClick={() => handleEditRate(selectedShop)}
+                        className="hover:text-blue-700"
+                      >
+                        <FiEdit className="text-blue-600" />
+                      </button>
+                    </td>
                   </tr>
                   <tr>
                     <td className="py-3 text-sm text-gray-500">LOGO</td>
                     <td className="py-3">
                       <img
-                        src={selectedShop.logo || "/placeholder.svg"}
+                        src={selectedShop.logoUrl || "/placeholder.svg"}
                         alt="Shop logo"
                         className="w-24 h-24 object-contain"
                       />
@@ -237,10 +318,20 @@ const OfflineShopRequests = () => {
             </div>
 
             <div className="flex gap-4 mt-8">
-              <button className="px-6 py-2 rounded bg-gray-200 text-gray-700 hover:bg-gray-300">
-                Reject Request
-              </button>
-              <button className="px-6 py-2 rounded bg-blue-500 text-white hover:bg-blue-600">
+              {activeTab === "Pending" && (
+                <button
+                  onClick={() => handleRejectRequest(selectedShop)}
+                  className="px-6 py-2 rounded bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors flex items-center gap-2"
+                >
+                  {rejecting && <FaSpinner className="animate-spin" />}
+                  Reject Request
+                </button>
+              )}
+              <button
+                onClick={() => handleAcceptRequest(selectedShop)}
+                className="px-6 py-2 rounded bg-blue-500 text-white hover:bg-blue-600 transition-colors flex items-center gap-2"
+              >
+                {accepting && <FaSpinner className="animate-spin" />}
                 Accept Request
               </button>
             </div>
@@ -254,7 +345,6 @@ const OfflineShopRequests = () => {
     <div className="p-6">
       <h1 className="text-2xl font-semibold mb-6">Offline Shop Requests</h1>
       <div className="bg-white p-6 rounded-xl border shadow-md">
-       
         <div className="flex gap-4 mb-6">
           <button
             className={`px-4 py-2 rounded-full text-sm ${
@@ -280,52 +370,164 @@ const OfflineShopRequests = () => {
         <div className="overflow-x-auto">
           <table className="w-full">
             <tbody>
-              {filteredRequests.map((request) => (
-                <tr key={request.id} className="border-b">
-                  <td className="py-4 px-6">
-                    <div className="flex items-center gap-4">
-                      <img
-                        src={request.image || "/placeholder.svg"}
-                        alt={request.shopName}
-                        className="w-20 h-20 rounded object-cover"
-                      />
-                      <div>
-                        <h3 className="font-medium">{request.shopName}</h3>
-                        <p className="text-sm text-gray-500">
-                          {request.location}
-                        </p>
+              {loading ? (
+                // Skeleton loading effect
+                Array.from({ length: ITEMS_PER_PAGE }).map((_, index) => (
+                  <tr key={index} className="border-b">
+                    <td className="py-4 px-6">
+                      <div className="flex items-center gap-4">
+                        <div className="w-20 h-20 rounded bg-gray-200 animate-pulse"></div>
+                        <div className="flex-1">
+                          <div className="h-4 w-3/4 bg-gray-200 animate-pulse mb-2"></div>
+                          <div className="h-3 w-1/2 bg-gray-200 animate-pulse"></div>
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="py-4 px-6">
-                    <div className="grid grid-cols-3 gap-8">
-                      <div>
-                        <p className="text-sm">{request.phone}</p>
-                        <p className="text-xs text-gray-500">Phone</p>
+                    </td>
+                    <td className="py-4 px-6">
+                      <div className="grid grid-cols-3 gap-8">
+                        <div>
+                          <div className="h-4 w-3/4 bg-gray-200 animate-pulse mb-2"></div>
+                          <div className="h-3 w-1/2 bg-gray-200 animate-pulse"></div>
+                        </div>
+                        <div>
+                          <div className="h-4 w-3/4 bg-gray-200 animate-pulse mb-2"></div>
+                          <div className="h-3 w-1/2 bg-gray-200 animate-pulse"></div>
+                        </div>
+                        <div>
+                          <div className="h-4 w-3/4 bg-gray-200 animate-pulse mb-2"></div>
+                          <div className="h-3 w-1/2 bg-gray-200 animate-pulse"></div>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-sm">{request.email}</p>
-                        <p className="text-xs text-gray-500">Email</p>
-                      </div>
-                      <div>
-                        <p className="text-sm">{request.date}</p>
-                        <p className="text-xs text-gray-500">Date</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="py-4 px-6">
-                    <button
-                      onClick={() => setSelectedShop(request)}
-                      className="text-blue-500 border border-blue-600 px-2 py-1 hover:text-blue-600 transition-colors"
-                    >
-                      View Details
-                    </button>
+                    </td>
+                    <td className="py-4 px-6">
+                      <div className="h-8 w-24 bg-gray-200 animate-pulse"></div>
+                    </td>
+                  </tr>
+                ))
+              ) : paginatedData.length === 0 ? (
+                <tr>
+                  <td colSpan="3" className="py-6 text-center text-gray-500">
+                    {activeTab === "Pending"
+                      ? "There are no pending business requests."
+                      : "There are no rejected businesses"}
                   </td>
                 </tr>
-              ))}
+              ) : (
+                paginatedData.map((request) => (
+                  <tr key={request.id} className="border-b border-t">
+                    <td className="py-4 px-6">
+                      <div className="flex items-center gap-4">
+                        <img
+                          src={request.logoUrl || "/placeholder.svg"}
+                          alt={request.businessName}
+                          className="w-20 h-20 rounded object-cover"
+                        />
+                        <div>
+                          <h3 className="font-medium">
+                            {request.businessName}
+                          </h3>
+                          <p className="text-sm text-gray-500">
+                            {request.location}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="py-4 px-6">
+                      <div className="grid grid-cols-3 gap-8">
+                        <div>
+                          <p className="text-sm">{request.mobileNumber}</p>
+                          <p className="text-xs text-gray-500">Phone</p>
+                        </div>
+                        <div>
+                          <p className="text-sm">{request.email}</p>
+                          <p className="text-xs text-gray-500">Email</p>
+                        </div>
+                        <div>
+                          {activeTab === "Pending" ? (
+                            <>
+                              <p className="text-sm">{request.createdDate}</p>
+                              <p className="text-xs text-gray-500">
+                                Requested Date
+                              </p>
+                            </>
+                          ) : (
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="text-sm">{request.createdDate}</p>
+                                <p className="text-xs text-gray-500">
+                                  Requested Date
+                                </p>
+                              </div>
+                              <div>
+                                <p className="text-sm text-red-500">
+                                  {request.rejectedDate || "N/A"}
+                                </p>
+                                <p className="text-xs text-gray-500">
+                                  Rejected Date
+                                </p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="py-4 px-6">
+                      <button
+                        onClick={() => setSelectedShop(request)}
+                        className="text-blue-500 border border-blue-600 px-2 py-1 hover:text-blue-600 transition-colors"
+                      >
+                        View Details
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
+
+        {/* Pagination */}
+        {/* Pagination - Only show if there's data and more than one page */}
+        {!loading && filteredRequests.length > 0 && (
+          <div className="flex items-center justify-between mt-6">
+            <p className="text-gray-600">
+              Showing {startIndex + 1} to{" "}
+              {Math.min(startIndex + ITEMS_PER_PAGE, filteredRequests.length)}{" "}
+              of {filteredRequests.length}
+            </p>
+            <div className="flex gap-2">
+              <button
+                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded disabled:opacity-50"
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(currentPage - 1)}
+              >
+                Previous
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <button
+                    key={page}
+                    className={`w-8 h-8 rounded ${
+                      currentPage === page
+                        ? "bg-blue-500 text-white"
+                        : "text-gray-600 hover:bg-gray-100"
+                    }`}
+                    onClick={() => setCurrentPage(page)}
+                  >
+                    {page}
+                  </button>
+                )
+              )}
+              <button
+                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded disabled:opacity-50"
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage(currentPage + 1)}
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

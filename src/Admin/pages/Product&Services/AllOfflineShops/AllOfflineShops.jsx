@@ -1,38 +1,74 @@
-import { useState } from 'react'
-import ListedProducts from '../../../components/AllOfflineshops/ListedProducts'
-import ShopDetails from '../../../components/AllOfflineshops/ShopDetails'
-import ShopRequests from '../../../components/AllOfflineshops/ShopRequests'
+import { useCallback, useEffect, useState } from "react";
+import ListedProducts from "../../../components/AllOfflineshops/ListedProducts";
+import ShopDetails from "../../../components/AllOfflineshops/ShopDetails";
+import ShopRequests from "../../../components/AllOfflineshops/ShopRequests";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../../../../firebase";
+import toast from "react-hot-toast";
 
 const AllOfflineShops = () => {
-  const [selectedShop, setSelectedShop] = useState(null)
-  const [showListedProducts, setShowListedProducts] = useState(false)
+  const [selectedShop, setSelectedShop] = useState(null);
+  const [showListedProducts, setShowListedProducts] = useState(false);
+  const [offlineShops, setOfflineShops] = useState([]);
+  const [loading, setLoading] = useState(false);
+  // Fetch data from Firestore
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const querySnapshot = await getDocs(collection(db, "businessDetails"));
+      const data = [];
+      querySnapshot.forEach((doc) => {
+        const offlineShopData = doc.data();
+        if (
+          (offlineShopData &&
+            offlineShopData.mode === "Offline" &&
+            offlineShopData.status === "Active") ||
+          offlineShopData.status === "Inactive"
+        ) {
+          data.push({ id: doc.id, ...offlineShopData });
+        }
+      });
+      setOfflineShops(data);
+    } catch (error) {
+      console.log("Error getting documents: ", error);
+      toast.error("Failed to fetch data");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
   const handleBack = () => {
     if (showListedProducts) {
-      setShowListedProducts(false)
+      setShowListedProducts(false);
     } else {
-      setSelectedShop(null)
+      setSelectedShop(null);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
       {selectedShop ? (
         showListedProducts ? (
-          <ListedProducts onBack={handleBack} />
+          <ListedProducts onBack={handleBack}  />
         ) : (
-          <ShopDetails 
-            shop={selectedShop} 
+          <ShopDetails
+            shop={selectedShop}
             onBack={handleBack}
             onListedProducts={() => setShowListedProducts(true)}
           />
         )
       ) : (
-        <ShopRequests onViewDetails={setSelectedShop} />
+        <ShopRequests
+          onViewDetails={setSelectedShop}
+            offlineShops={offlineShops}
+            fetchData={fetchData}
+        />
       )}
     </div>
-  )
-}
+  );
+};
 
-
-export default AllOfflineShops
+export default AllOfflineShops;
