@@ -362,7 +362,6 @@ const AllNgos = () => {
                     <h3 className="font-medium text-lg">{ngo.causeName}</h3>
                     <p className="text-gray-500 text-sm">{ngo.location}</p>
                   </td>
-                  <td className="p-3">{ngo.location}</td>
                   <td className="p-3">
                     <p className="text-gray-900">{ngo.mobileNumber}</p>
                     <p className="text-gray-500 text-sm">Phone</p>

@@ -3,8 +3,8 @@ import {
   getDocs,
   doc,
   getDoc,
-  updateDoc,
 } from "firebase/firestore";
+import { writeBatch } from "firebase/firestore"; 
 import { useCallback, useEffect, useState } from "react";
 import { db } from "../../../../../firebase";
 import {
@@ -152,42 +152,56 @@ const Givebacks = () => {
     startIndex,
     startIndex + itemsPerPage
   );
+ 
+
   const handleMarkAsPaid = async (givebackRequest) => {
     setIsProcessingPayment(true);
     try {
-      // 1. Update the withdrawal request status
-      const withdrawalRef = doc(
-        db,
-        "givebackCashbacks",
-        givebackRequest.historyId
-      );
-      await updateDoc(withdrawalRef, {
-        status: "Completed",
-        paidAt: new Date().toISOString(),
+      // Create a Firestore batch
+      const batch = writeBatch(db);
+  
+      // 1. Update NGO's total donation amount and total givebacks
+      const ngoRef = doc(db, "causeDetails", givebackRequest.ngoId);
+      const ngoDoc = await getDoc(ngoRef);
+      if (!ngoDoc.exists()) {
+        throw new Error("NGO document not found");
+      }
+      const ngoData = ngoDoc.data();
+  
+      batch.update(ngoRef, {
+        totalDonationAmount: (ngoData.totalDonationAmount || 0) + givebackRequest.amount,
+        totalGiveBacks: (ngoData.totalGiveBacks || 0) + 1,
       });
-
-      // 2. Update user's cashback balances
+  
+      // 2. Update user's pending giveback amount and giveback amount
       const userRef = doc(db, "users", givebackRequest.userId);
       const userDoc = await getDoc(userRef);
-
+  
       if (!userDoc.exists()) {
         throw new Error("User document not found");
       }
-
+  
       const userData = userDoc.data();
-
-      await updateDoc(userRef, {
-        pendingGivebackAmount: Math.max(
-          0,
-          (userData.pendingGivebackAmount || 0) - givebackRequest.amount
-        ),
+  
+      batch.update(userRef, {
+        pendingGivebackAmount: Math.max(0, (userData.pendingGivebackAmount || 0) - givebackRequest.amount),
         givebackAmount: (userData.givebackAmount || 0) + givebackRequest.amount,
       });
-
-      // 4. Refresh the withdrawals list
+  
+      // 3. Update the giveback request status to "Completed"
+      const withdrawalRef = doc(db, "givebackCashbacks", givebackRequest.historyId);
+      batch.update(withdrawalRef, {
+        status: "Completed",
+        paidAt: new Date().toISOString(),
+      });
+  
+      // Commit the batch (all updates happen atomically)
+      await batch.commit();
+  
+      // 4. Refresh the giveback requests list
       await fetchData();
-
-      // 5. Reset selected withdrawal request and show success message
+  
+      // 5. Reset selected giveback request and show success message
       setSelectedGivebackRequest(null);
       toast.success("Payment marked as completed successfully!");
     } catch (error) {
@@ -279,7 +293,7 @@ const Givebacks = () => {
     }
     return displayedDonations.length > 0
       ? displayedDonations.map((donation, index) => (
-          <tr key={donation.paymentId} className="border-t">
+          <tr key={index} className="border-t">
             <td className="py-4">{startIndex + index + 1}.</td>
             <td className="py-4">{donation.ngoName}</td>
             <td className="py-4">{donation.userEmail}</td>

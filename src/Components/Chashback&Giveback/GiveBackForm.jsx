@@ -31,9 +31,9 @@ const GiveBackForm = () => {
       const querySnapshot = await getDocs(collection(db, "causeDetails"));
       const data = [];
       querySnapshot.forEach((doc) => {
-        const shopData = doc.data();
-        if (shopData && shopData.causeName) {
-          data.push({ id: doc.id, ...shopData });
+        const ngoData = doc.data();
+        if (ngoData && ngoData.causeName && ngoData.status === "Active") {
+          data.push({ id: doc.id, ...ngoData });
         }
       });
       setNgos(data);
@@ -41,6 +41,7 @@ const GiveBackForm = () => {
       console.log("Error getting documents: ", error);
     }
   }, []);
+  console.log(ngos);
 
   useEffect(() => {
     fetchData();

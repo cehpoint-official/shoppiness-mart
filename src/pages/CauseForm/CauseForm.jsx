@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import logo from "../../assets/RegisterBusiness/logo.png";
 import SuccessPage from "../../Components/SuccessPage/SuccessPage";
 import { db, storage } from "../../../firebase.js";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import toast from "react-hot-toast";
 import axios from "axios";
@@ -255,6 +255,8 @@ const CauseForm = () => {
         bannerUrl,
         status: "Pending",
         createdDate: formatDate(new Date()),
+        totalDonationAmount: 0,
+        totalGiveBacks: 0,
       });
     } catch (e) {
       throw new Error(e.message); // Throw error to handle in handleCreateAccount
