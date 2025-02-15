@@ -43,11 +43,11 @@ const GiveBackRecord = () => {
     switch (sortOption) {
       case "newest":
         return [...ngos].sort(
-          (a, b) => b.approvedDate.getTime() - a.approvedDate.getTime()
+          (a, b) => b.approvedDate - a.approvedDate
         );
       case "oldest":
         return [...ngos].sort(
-          (a, b) => a.approvedDate.getTime() - b.approvedDate.getTime()
+          (a, b) => a.approvedDate - b.approvedDate
         );
       case "az":
         return [...ngos].sort((a, b) => a.causeName.localeCompare(b.causeName));

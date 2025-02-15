@@ -24,7 +24,9 @@ const CashbackForm = () => {
       const data = [];
       querySnapshot.forEach((doc) => {
         const shopData = doc.data();
-        data.push({ id: doc.id, ...shopData });
+        if (shopData.status === "Active") {
+          data.push({ id: doc.id, ...shopData });
+        }
       });
       setShops(data);
     } catch (error) {

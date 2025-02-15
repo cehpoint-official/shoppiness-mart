@@ -1,124 +1,72 @@
-import { useState } from 'react'
-import { IoArrowBack, IoEllipsisVertical } from 'react-icons/io5'
+import { collection, getDocs } from "firebase/firestore";
+import { useCallback, useEffect, useState } from "react";
+import { IoArrowBack, IoEllipsisVertical } from "react-icons/io5";
+import { db } from "../../../../firebase";
 
-const productsData = [
-  {
-    id: 1,
-    name: "Hair cutting service",
-    image: "https://placehold.co/100x100",
-    price: 500,
-    offer: "20% Off",
-    createDate: "20/05/2024",
-    category: "Hair Cut",
-    status: "Active"
-  },
-  {
-    id: 2,
-    name: "Facial service",
-    image: "https://placehold.co/100x100",
-    price: 500,
-    offer: "20% Off",
-    createDate: "20/05/2024",
-    category: "Facial",
-    status: "Active"
-  },
-  {
-    id: 3,
-    name: "Spa service",
-    image: "https://placehold.co/100x100",
-    price: 500,
-    offer: "Cashback Rs.50",
-    createDate: "20/05/2024",
-    category: "SPA",
-    status: "Active"
-  },
-  // Add more items to make 10 total
-  {
-    id: 4,
-    name: "Massage service",
-    image: "https://placehold.co/100x100",
-    price: 500,
-    offer: "Cashback Rs.50",
-    createDate: "20/05/2024",
-    category: "SPA",
-    status: "Active"
-  },
-  {
-    id: 5,
-    name: "Hair coloring",
-    image: "https://placehold.co/100x100",
-    price: 500,
-    offer: "15% Off",
-    createDate: "20/05/2024",
-    category: "Hair Cut",
-    status: "Active"
-  },
-  {
-    id: 6,
-    name: "Manicure",
-    image: "https://placehold.co/100x100",
-    price: 500,
-    offer: "10% Off",
-    createDate: "20/05/2024",
-    category: "Nail Care",
-    status: "Active"
-  },
-  {
-    id: 7,
-    name: "Pedicure",
-    image: "https://placehold.co/100x100",
-    price: 500,
-    offer: "10% Off",
-    createDate: "20/05/2024",
-    category: "Nail Care",
-    status: "Active"
-  },
-  {
-    id: 8,
-    name: "Hair styling",
-    image: "https://placehold.co/100x100",
-    price: 500,
-    offer: "25% Off",
-    createDate: "20/05/2024",
-    category: "Hair Cut",
-    status: "Active"
-  },
-  {
-    id: 9,
-    name: "Deep tissue massage",
-    image: "https://placehold.co/100x100",
-    price: 500,
-    offer: "Cashback Rs.100",
-    createDate: "20/05/2024",
-    category: "SPA",
-    status: "Active"
-  },
-  {
-    id: 10,
-    name: "Body scrub",
-    image: "https://placehold.co/100x100",
-    price: 500,
-    offer: "15% Off",
-    createDate: "20/05/2024",
-    category: "SPA",
-    status: "Active"
-  }
-]
+function ListedProducts({ onBack, shopId }) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-function ListedProducts({ onBack }) {
-  const [currentPage, setCurrentPage] = useState(1)
-  const [showOptionsId, setShowOptionsId] = useState(null)
-  const itemsPerPage = 5
-  
-  const indexOfLastItem = currentPage * itemsPerPage
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage
-  const currentItems = productsData.slice(indexOfFirstItem, indexOfLastItem)
-  const totalPages = Math.ceil(productsData.length / itemsPerPage)
+  const fetchData = useCallback(async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "productDetails"));
+      const data = [];
+      querySnapshot.forEach((doc) => {
+        const productData = doc.data();
+        if (productData.businessId === shopId) {
+          data.push({ id: doc.id, ...productData });
+        }
+      });
+      setProducts(data);
+    } catch (error) {
+      console.log("Error getting documents: ", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [shopId]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = products.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(products.length / itemsPerPage);
+
+  // Skeleton loading row component
+  const SkeletonRow = () => (
+    <tr>
+      <td className="py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 bg-gray-200 rounded-lg animate-pulse"></div>
+            <div className="space-y-2">
+              <div className="h-4 w-32 bg-gray-200 rounded animate-pulse"></div>
+              <div className="h-4 w-24 bg-gray-200 rounded animate-pulse"></div>
+            </div>
+          </div>
+          <div className="hidden md:flex items-center gap-8">
+            <div className="space-y-2">
+              <div className="h-4 w-20 bg-gray-200 rounded animate-pulse"></div>
+              <div className="h-4 w-24 bg-gray-200 rounded animate-pulse"></div>
+            </div>
+            <div className="space-y-2">
+              <div className="h-4 w-20 bg-gray-200 rounded animate-pulse"></div>
+              <div className="h-4 w-24 bg-gray-200 rounded animate-pulse"></div>
+            </div>
+          </div>
+        </div>
+      </td>
+    </tr>
+  );
 
   return (
     <div className="p-6">
       <div className="py-4 flex items-center">
-        <button 
+        <button
           onClick={onBack}
           className="flex items-center text-gray-700 hover:text-gray-900"
         >
@@ -127,108 +75,114 @@ function ListedProducts({ onBack }) {
         </button>
       </div>
 
-      <div className="p-4 bg-white rounded-xl shadow-md">
-        <table className="w-full">
+      <div className="p-4 bg-white rounded-xl shadow-md overflow-x-auto">
+        <table className="w-full min-w-[640px]">
           <tbody>
-            {currentItems.map(product => (
-              <tr key={product.id} className="border-b last:border-b-0">
-                <td className="py-4">
-                  <div className="flex items-center justify-between">
+            {loading ? (
+              Array(itemsPerPage)
+                .fill(0)
+                .map((_, index) => <SkeletonRow key={index} />)
+            ) : products.length === 0 ? (
+              <tr>
+                <td colSpan="4" className="text-center py-8 text-gray-500">
+                  There are no products listed in this shop currently
+                </td>
+              </tr>
+            ) : (
+              currentItems.map((product) => (
+                <tr key={product.id} className="border-b border-t ">
+                  <td className="py-4 px-4">
                     <div className="flex items-center gap-4">
-                      <img 
-                        src={product.image} 
+                      <img
+                        src={product.imageUrl}
                         alt={product.name}
                         className="w-16 h-16 object-cover rounded-lg"
                       />
                       <div>
                         <h3 className="font-medium">{product.name}</h3>
                         <div className="flex items-center gap-2 mt-1">
-                          <span className="text-gray-900">₹ {product.price}</span>
-                          <span className="text-green-500">{product.offer}</span>
+                          <span className="text-gray-900">
+                            ₹ {product.price}
+                          </span>
+                          {product.discountType === "percentage" ? (
+                            <span className="text-green-600">
+                              {product.discount}% off
+                            </span>
+                          ) : (
+                            <span className="text-green-600">
+                              ₹{product.discount} discount
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>
-
-                    <div className="flex items-center gap-8">
-                      <div>
-                        <div className="text-sm text-gray-600">Create on</div>
-                        <div>{product.createDate}</div>
-                      </div>
-                      
-                      <div>
-                        <div className="text-sm text-gray-600">Category</div>
-                        <div>{product.category}</div>
-                      </div>
-                      
-                      <div>
-                        <div className="text-sm text-gray-600">Status</div>
-                        <div className="text-green-500">{product.status}</div>
-                      </div>
-                      
-                      <div className="relative">
-                        <button 
-                          onClick={() => setShowOptionsId(showOptionsId === product.id ? null : product.id)}
-                          className="p-1 hover:bg-gray-100 rounded-full"
-                        >
-                          <IoEllipsisVertical className="w-6 h-6 text-gray-600" />
-                        </button>
-                        
-                        {showOptionsId === product.id && (
-                          <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border py-1 z-10">
-                            <button className="w-full px-4 py-2 text-left hover:bg-gray-50 text-red-500">
-                              Mark as inactive
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            ))}
+                  </td>
+                  <td className="py-4 px-4 hidden md:table-cell">
+                    <div className="text-sm text-gray-600">Created on</div>
+                    <div>{product.createdDate}</div>
+                  </td>
+                  <td className="py-4 px-4 hidden md:table-cell">
+                    <div className="text-sm text-gray-600">Category</div>
+                    <div>{product.category}</div>
+                  </td>
+                  <td className="py-4 px-4">
+                    <button className="p-1 hover:bg-gray-100 rounded-full">
+                      <IoEllipsisVertical className="w-6 h-6 text-gray-600" />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
 
-        <div className="flex items-center justify-between mt-6">
-          <div className="text-sm text-gray-600">
-            Showing {indexOfFirstItem + 1} of {Math.min(indexOfLastItem, productsData.length)} of {productsData.length}
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className="px-3 py-1 border rounded hover:bg-gray-50 disabled:opacity-50"
-            >
-              Previous
-            </button>
-            
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+        {!loading && products.length > 0 && (
+          <div className="flex flex-col md:flex-row items-center justify-between mt-6 gap-4">
+            <div className="text-sm text-gray-600 order-2 md:order-1">
+              Showing {indexOfFirstItem + 1} to{" "}
+              {Math.min(indexOfLastItem, products.length)} of {products.length}
+            </div>
+
+            <div className="flex items-center gap-2 order-1 md:order-2">
               <button
-                key={page}
-                onClick={() => setCurrentPage(page)}
-                className={`px-3 py-1 rounded ${
-                  currentPage === page
-                    ? 'bg-blue-500 text-white'
-                    : 'hover:bg-gray-50'
-                }`}
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-1 border rounded hover:bg-gray-50 disabled:opacity-50"
               >
-                {page}
+                Previous
               </button>
-            ))}
-            
-            <button
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
-              className="px-3 py-1 border rounded hover:bg-gray-50 disabled:opacity-50"
-            >
-              Next
-            </button>
+
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`px-3 py-1 rounded ${
+                      currentPage === page
+                        ? "bg-blue-500 text-white"
+                        : "hover:bg-gray-50"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                )
+              )}
+
+              <button
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 border rounded hover:bg-gray-50 disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
-  )
+  );
 }
 
-export default ListedProducts
+export default ListedProducts;

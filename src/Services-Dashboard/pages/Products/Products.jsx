@@ -12,7 +12,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../../../../firebase";
 import { useParams } from "react-router-dom";
-import EditProductDialog from "../../components/Product/EditProductDialog"; // Import the EditProductDialog
+import EditProductDialog from "../../components/Product/EditProductDialog";
 import toast from "react-hot-toast";
 
 // Skeleton Component
@@ -48,7 +48,7 @@ const Products = () => {
   const [productToEdit, setProductToEdit] = useState(null);
   const { id } = useParams();
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const querySnapshot = await getDocs(collection(db, "productDetails"));
       const data = [];
@@ -64,11 +64,12 @@ const Products = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+  console.log(products);
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   const toggleActionMenu = (product) => {
     setSelectedProduct(selectedProduct === product ? null : product);
@@ -105,7 +106,12 @@ const Products = () => {
   };
 
   if (currentView === "addProduct") {
-    return <AddProduct onBack={() => setCurrentView("products")} onProductAdded={fetchData}/>;
+    return (
+      <AddProduct
+        onBack={() => setCurrentView("products")}
+        onProductAdded={fetchData}
+      />
+    );
   }
 
   if (currentView === "addCategory") {
@@ -153,7 +159,13 @@ const Products = () => {
                   <p>{product.name}</p>
                   <div className="flex gap-5">
                     <p className="font-medium">₹{product.price}</p>
-                    <p className="text-green-600">{product.discount}% off</p>
+                    {product.discountType === "percentage" ? (
+                      <p className="text-green-600">{product.discount}% off</p>
+                    ) : (
+                      <p className="text-green-600">
+                        ₹{product.discount} discount
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -161,7 +173,10 @@ const Products = () => {
                   <p>Category</p>
                   <p>{product.category}</p>
                 </div>
-
+                <div className="flex flex-col gap-2.5">
+                  <p>Creation Date</p>
+                  <p>{product.createdDate}</p>
+                </div>
                 <div className="flex flex-col gap-2.5 items-center">
                   <p>Action</p>
                   <button

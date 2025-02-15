@@ -11,7 +11,8 @@ const AllOfflineShops = () => {
   const [showListedProducts, setShowListedProducts] = useState(false);
   const [offlineShops, setOfflineShops] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  const [selectedShopId, setSelectedShopId] = useState(null); 
+  
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
@@ -48,17 +49,21 @@ const AllOfflineShops = () => {
       setSelectedShop(null);
     }
   };
+  const handleListedProducts = (shopId) => {
+    setSelectedShopId(shopId); 
+    setShowListedProducts(true);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
       {selectedShop ? (
         showListedProducts ? (
-          <ListedProducts onBack={handleBack} />
+          <ListedProducts onBack={handleBack} shopId={selectedShopId} /> 
         ) : (
           <ShopDetails
             shop={selectedShop}
             onBack={handleBack}
-            onListedProducts={() => setShowListedProducts(true)}
+            onListedProducts={handleListedProducts} 
             onStatusUpdate={fetchData}
           />
         )

@@ -1,14 +1,18 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
-// import { useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { storage } from "../../../../firebase";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { FaSpinner, FaImage } from "react-icons/fa";
+import { doc, updateDoc } from "firebase/firestore"; // Import Firestore functions
+import { db } from "../../../../firebase"; // Import your Firestore instance
+import { useDispatch, useSelector } from "react-redux";
+import { businessUserExist } from "../../../redux/reducer/businessUserReducer";
 
 const ShopInfoUpdate = ({ onBack, shopData }) => {
-//   const { id } = useParams();
-//   console.log("Shop Data: ", shopData);
-
+  const { id } = useParams();
+  const { user } = useSelector((state) => state.businessUserReducer);
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     businessName: shopData.businessName || "",
     mobileNumber: shopData.mobileNumber || "",
@@ -101,9 +105,13 @@ const ShopInfoUpdate = ({ onBack, shopData }) => {
     setIsSubmitting(true);
 
     try {
-      // Add your submit logic here
-      // For example: await updateShopInfo(id, formData);
-      toast.success("Update Request Send successfully!");
+      const shopRef = doc(db, "businessDetails", id);
+      await updateDoc(shopRef, formData);
+
+      // Dispatch the updated user data to Redux
+      dispatch(businessUserExist({ ...user, ...formData }));
+
+      toast.success("Shop information updated successfully!");
       onBack();
     } catch (error) {
       toast.error("Error updating shop information: " + error.message);
@@ -196,12 +204,14 @@ const ShopInfoUpdate = ({ onBack, shopData }) => {
                 <label className="text-gray-600">Commission Rate (%)</label>
                 <input
                   type="text"
-                  className="border rounded-md p-2 "
-                  value={formData.rate }
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, rate: e.target.value }))
-                  }
+                  className="border rounded-md p-2 bg-gray-100"
+                  value={formData.rate}
+                  disabled
                 />
+                <p className="text-sm text-gray-500">
+                  Important: To change the commission rate, please contact
+                  Shoppinessmart.
+                </p>
               </div>
             </div>
 
@@ -358,7 +368,11 @@ const ShopInfoUpdate = ({ onBack, shopData }) => {
               className="bg-green-600 text-white py-3 px-6 rounded-md hover:bg-green-700 transition-colors disabled:bg-gray-400"
               disabled={isSubmitting || isUploadingLogo || isUploadingBanner}
             >
-              Update Shop Information
+              {isSubmitting ? (
+                <FaSpinner className="animate-spin" />
+              ) : (
+                "Update Shop Information"
+              )}
             </button>
           </div>
         </form>

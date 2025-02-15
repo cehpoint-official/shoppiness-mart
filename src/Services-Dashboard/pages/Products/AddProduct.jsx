@@ -132,11 +132,16 @@ const AddProduct = ({ onBack, onProductAdded }) => {
         ...formData,
         imageUrl,
         businessId: id,
+        createdDate: new Date().toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        }),
       });
 
       toast.success("Product added successfully!");
       onProductAdded();
-      onBack(); // Navigate back after successful submission
+      onBack(); 
     } catch (error) {
       toast.error("Failed to add product: " + error.message);
     } finally {

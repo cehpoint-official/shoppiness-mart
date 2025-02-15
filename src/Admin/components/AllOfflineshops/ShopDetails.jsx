@@ -6,14 +6,18 @@ import { db } from "../../../../firebase";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { FaSpinner } from "react-icons/fa";
+import { FiEdit } from "react-icons/fi";
 
 function ShopDetails({ shop, onBack, onListedProducts, onStatusUpdate }) {
   const [showOptions, setShowOptions] = useState(false);
   const [markingActive, setMarkingActive] = useState(false);
   const [markingInactive, setMarkingInactive] = useState(false);
+  const [editingRate, setEditingRate] = useState(null);
+  const [tempRate, setTempRate] = useState("");
+  const [isSavingRate, setIsSavingRate] = useState(false); // Loading state for saving rate
 
+  // Handle updating the status (Active/Inactive)
   const handleUpdateStatus = async (id, status) => {
-    // Set loading states based on the status being updated
     if (status === "Active") {
       setMarkingActive(true);
     } else if (status === "Inactive") {
@@ -21,7 +25,6 @@ function ShopDetails({ shop, onBack, onListedProducts, onStatusUpdate }) {
     }
 
     try {
-      // Update Firestore document
       const shopRef = doc(db, "businessDetails", id);
       await updateDoc(shopRef, {
         status,
@@ -43,7 +46,6 @@ function ShopDetails({ shop, onBack, onListedProducts, onStatusUpdate }) {
             : null,
       });
 
-      // Prepare email template based on the status
       const emailTemplate =
         status === "Active"
           ? `
@@ -80,7 +82,6 @@ function ShopDetails({ shop, onBack, onListedProducts, onStatusUpdate }) {
           <p>We regret to inform you that your Business "${shop.businessName}" has been temporarily deactivated on Shoppiness Mart.</p>
           <div style="background-color: #fff5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
             <p style="color: #c53030; margin: 5px 0;">During this period:</p>
-            <ul style="list-style-type: none; padding-left: 0;">
               <li style="margin: 5px 0;">• Your Business profile will not be visible to donors</li>
               <li style="margin: 5px 0;">• Active products/services will be paused</li>
               <li style="margin: 5px 0;">• You won't be able to connect with customers</li>
@@ -94,7 +95,6 @@ function ShopDetails({ shop, onBack, onListedProducts, onStatusUpdate }) {
         </div>
       `;
 
-      // Send email notification
       await axios.post(`${import.meta.env.VITE_AWS_SERVER}/send-email`, {
         email: shop.email,
         title:
@@ -104,16 +104,45 @@ function ShopDetails({ shop, onBack, onListedProducts, onStatusUpdate }) {
         body: emailTemplate,
       });
 
-      // Show success toast and refresh data
       toast.success(`Status updated to ${status}`);
       onStatusUpdate();
     } catch (error) {
       console.error("Error updating document or sending email:", error);
       toast.error("Failed to update status");
     } finally {
-      // Reset loading states
       setMarkingActive(false);
       setMarkingInactive(false);
+    }
+  };
+
+  // Handle editing commission rate
+  const handleEditRate = (shop) => {
+    setEditingRate(shop.id);
+    setTempRate(shop.rate || "");
+  };
+
+  // Handle saving the updated commission rate
+  const handleSaveRate = async () => {
+    if (!tempRate || isNaN(tempRate)) {
+      toast.error("Please enter a valid commission rate.");
+      return;
+    }
+
+    setIsSavingRate(true); // Start loading
+
+    try {
+      const shopRef = doc(db, "businessDetails", shop.id);
+      await updateDoc(shopRef, { rate: tempRate });
+
+      // Update the local state to reflect the change immediately
+      shop.rate = tempRate;
+      setEditingRate(null); // Exit editing mode
+      toast.success("Commission rate updated successfully!");
+    } catch (error) {
+      console.error("Error updating commission rate:", error);
+      toast.error("Failed to update commission rate");
+    } finally {
+      setIsSavingRate(false); // Stop loading
     }
   };
 
@@ -140,7 +169,7 @@ function ShopDetails({ shop, onBack, onListedProducts, onStatusUpdate }) {
             <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border py-1">
               <button
                 onClick={() => {
-                  onListedProducts();
+                  onListedProducts(shop.id);
                   setShowOptions(false);
                 }}
                 className="w-full px-4 py-2 text-left hover:bg-gray-50"
@@ -242,7 +271,39 @@ function ShopDetails({ shop, onBack, onListedProducts, onStatusUpdate }) {
             </div>
             <div>
               <h3 className="text-sm text-gray-600 mb-1">Commission rate</h3>
-              <p className="font-medium">{shop.rate}%</p>
+              <p className="font-medium flex gap-4 items-center">
+                {editingRate === shop.id && shop.status === "Active" ? (
+                  <>
+                    <input
+                      type="text"
+                      value={tempRate}
+                      onChange={(e) => setTempRate(e.target.value)}
+                      className="border rounded px-2 py-1 w-24"
+                    />
+                    <button
+                      onClick={handleSaveRate}
+                      disabled={isSavingRate}
+                      className="bg-blue-400 py-1 px-2 rounded text-white flex items-center gap-2"
+                    >
+                      {isSavingRate ? (
+                        <FaSpinner className="animate-spin" />
+                      ) : (
+                        "Save"
+                      )}
+                    </button>
+                  </>
+                ) : (
+                  `${shop.rate}%`
+                )}
+                {editingRate !== shop.id && shop.status === "Active" &&  (
+                  <button
+                    onClick={() => handleEditRate(shop)}
+                    className="hover:text-blue-700"
+                  >
+                    <FiEdit className="text-blue-600" />
+                  </button>
+                )}
+              </p>
             </div>
             <div>
               <h3 className="text-sm text-gray-600 mb-1">Email</h3>
