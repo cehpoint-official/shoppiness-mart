@@ -244,6 +244,12 @@ const Sidebar = () => {
               >
                 Give backs
               </Link>
+              <Link
+                to="/admin/shoppiness/users/dispute-requests"
+                className="py-2 px-6 hover:bg-teal-600 transition-colors"
+              >
+                Dispute Requests
+              </Link>
             </div>
           )}
         </div>

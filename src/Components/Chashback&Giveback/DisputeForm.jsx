@@ -1,9 +1,9 @@
 import { collection, doc, getDocs } from "firebase/firestore";
 import { useCallback, useEffect, useState } from "react";
-import { db } from "../../../firebase";
 import { useSelector } from "react-redux";
+import { db } from "../../../firebase";
 
-const CashbackForm = () => {
+const DisputeForm = () => {
   const [showPaymentSelection, setShowPaymentSelection] = useState(false);
   const [existingPayments, setExistingPayments] = useState({
     bankAccounts: [],
@@ -16,8 +16,8 @@ const CashbackForm = () => {
   const [selectedShop, setSelectedShop] = useState("");
   const [paidAmount, setPaidAmount] = useState("");
   const [loadingPayment, setLoadingPayment] = useState(true);
-  const [couponCode, setCouponCode] = useState(""); // New state for coupon code
-  const [uploadedPdf, setUploadedPdf] = useState(null); // New state for uploaded PDF
+  const [couponCode, setCouponCode] = useState("");
+  const [uploadedPdf, setUploadedPdf] = useState(null); 
 
   const fetchData = useCallback(async () => {
     try {
@@ -38,7 +38,6 @@ const CashbackForm = () => {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
-
 
   const handleShopChange = (e) => {
     setSelectedShop(e.target.value);
@@ -147,8 +146,8 @@ const CashbackForm = () => {
       selectedShop,
       paidAmount,
       selectedPayment,
-      couponCode, 
-      uploadedPdf, 
+      couponCode,
+      uploadedPdf,
       status: "New",
     };
 
@@ -160,17 +159,15 @@ const CashbackForm = () => {
       {/* Disclaimer */}
       <p className="text-sm text-yellow-800 bg-yellow-100 p-3 rounded-md border border-yellow-400 font-semibold mb-2">
         ⚠️ <strong>Important:</strong>
-        {/* <p>
-          1. If you have received a bill or invoice but have not received the
-          cashback in your wallet, please upload the invoice along with the shop
-          name and the paid amount for verification.
-        </p> */}
         <p>
-          For online purchases, follow these steps before clicking the
-          &quot;Claim Cashback&quot; button to ensure a successful cashback
-          request:
+          If you have received a bill or invoice but have not received the
+          cashback in your wallet, follow these steps before clicking the &quot;
+          Dispute Request&quot; button to ensure a successful Dispute request:
         </p>
-        <p>1. Select the shop from which you redeemed the coupon.</p>
+        <p>
+          1. Select the shop from which you redeemed the coupon and purchased
+          items.
+        </p>
         <p>2. Enter the total bill amount.</p>
         <p>
           3. Go to the &quot;My Coupons&quot; section, copy the coupon code, and
@@ -308,11 +305,11 @@ const CashbackForm = () => {
           type="submit"
           className="w-full bg-blue-700 text-white rounded py-2 text-md mt-6"
         >
-          Claim Cashback
+          Dispute Request
         </button>
       </form>
     </div>
   );
 };
 
-export default CashbackForm;
+export default DisputeForm;

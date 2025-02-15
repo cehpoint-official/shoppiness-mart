@@ -8,17 +8,19 @@ import GiveBackHistory from "../../Components/Chashback&Giveback/GiveBackHistory
 import WithdrawalForm from "../../Components/Chashback&Giveback/WithdrawalForm";
 import WithdrawlRequests from "../../Components/Chashback&Giveback/WithdrawlRequests";
 import { useSelector } from "react-redux";
+import DisputeForm from "../../Components/Chashback&Giveback/DisputeForm";
 
 const CashbackGiveback = () => {
   const [activeTab, setActiveTab] = useState("claim");
   const [showCashbackRequests, setShowCashbackRequests] = useState(false);
   const [showGiveBackHistory, setShowGiveBackHistory] = useState(false);
   const [showWithdrawalRequests, setShowWithdrawalRequests] = useState(false);
+  const [showDisputeRequests, setShowDisputeRequests] = useState(false);
   const { user } = useSelector((state) => state.userReducer);
   const handleTabClick = (tabValue) => {
     setActiveTab(tabValue);
   };
-  
+
   if (showCashbackRequests) {
     return (
       <div className=" p-4 space-y-6">
@@ -65,6 +67,19 @@ const CashbackGiveback = () => {
       </div>
     );
   }
+  if (showDisputeRequests) {
+    return (
+      <div className="p-4 space-y-6">
+        <div className="flex items-center gap-2">
+          <button onClick={() => setShowDisputeRequests(false)} className="p-1">
+            <HiOutlineArrowNarrowLeft className="h-5 w-5" />
+          </button>
+          <h2 className="text-lg font-normal">Dispute Requests</h2>
+        </div>
+        <GiveBackHistory />
+      </div>
+    );
+  }
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -91,6 +106,14 @@ const CashbackGiveback = () => {
             className="text-[#047E72] text-sm border border-[#047E72] rounded px-4 py-1"
           >
             Giveback History
+          </button>
+        )}
+        {activeTab === "dispute" && (
+          <button
+            onClick={() => setShowDisputeRequests(true)}
+            className="text-[#047E72] text-sm border border-[#047E72] rounded px-4 py-1"
+          >
+            Dispute Request
           </button>
         )}
       </div>
@@ -147,12 +170,23 @@ const CashbackGiveback = () => {
           >
             Give Back your Cashback
           </button>
+          <button
+            onClick={() => handleTabClick("dispute")}
+            className={`text-sm font-medium pb-2 px-1 transition-all ${
+              activeTab === "dispute"
+                ? "border-b-2 border-[#047E72] text-[#047E72]"
+                : "text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            Dispute Of your Cashback
+          </button>
         </div>
 
         <div className="tab-content">
           {activeTab === "claim" && <CashbackForm />}
           {activeTab === "withdrawal" && <WithdrawalForm />}
           {activeTab === "giveback" && <GiveBackForm />}
+          {activeTab === "dispute" && <DisputeForm />}
         </div>
       </div>
     </div>

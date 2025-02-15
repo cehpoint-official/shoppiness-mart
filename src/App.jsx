@@ -1,40 +1,86 @@
 import { lazy, Suspense } from "react";
 import { Outlet, createBrowserRouter, RouterProvider } from "react-router-dom";
-import { useSelector } from "react-redux";
+// import { useSelector } from "react-redux";
 import { Toaster } from "react-hot-toast";
 import Footer from "./Components/Footer";
 import Navbar from "./Components/Navbar/Navbar";
 import Loader from "./Components/Loader/Loader";
 import NewLayout from "./NewLayout";
-import BusinessDetails from "./pages/BusinessDetails";
-import ProductDetails from "./pages/ProductDetails";
-import ProtectedRoute from "./Components/ProtectedRoute"; // Adjust the path as needed
-import AdminDashboard from "./Admin/pages/AdminDashboard/AdminDashboard";
-import AdminDashboardOutlet from "./Admin/pages/AdminDashboardOutlet/AdminDashboardOutlet";
-import Coupons from "./Admin/pages/Users/Coupons/Coupons";
-import Givebacks from "./Admin/pages/Users/Give Backs/Givebacks";
+// import ProtectedRoute from "./Components/ProtectedRoute";
 
-import CashbackStatus from "./Admin/pages/Users/Cashback Status/CashbackStatus";
-import CashbackRequests from "./Admin/pages/Users/Cashback Requests/CashbackRequests";
-import GiveBackRecord from "./Admin/pages/Ngo/GiveBackRecord/GiveBackRecord";
-import AllNgos from "./Admin/pages/Ngo/AllNgos/AllNgos";
-import NgoRequest from "./Admin/pages/Ngo/NgoRequest/NgoRequest";
-import EditPage from "./Admin/pages/Maast/EditPage/EditPage";
-import AllDonations from "./Admin/pages/Maast/ViewDonations/AllDonations";
-import Events from "./Admin/pages/Maast/NewEvents/Events";
-import OfflineShopRequests from "./Admin/pages/Product&Services/OfflineShopRequests/OfflineShopRequests";
-import OnlineShopRequests from "./Admin/pages/Product&Services/OnlineShopRequests/OnlineShopRequests";
-import AllOfflineShops from "./Admin/pages/Product&Services/AllOfflineShops/AllOfflineShops";
-import AllOnlineShops from "./Admin/pages/Product&Services/AllOnlineShops/AllOnlineShops";
-import AddCategories from "./Admin/pages/Product&Services/AddCategories/AddCategories";
-import WithdrawalRequests from "./Admin/pages/Users/Withdrawal Requests/WithdrawalRequests";
-import WebsiteEditPages from "./Admin/pages/Shoppinessmart/WebsiteEditPages/WebsiteEditPages";
-import ContactInfo from "./Admin/pages/Shoppinessmart/Contact/ContactInfo";
-import AllFaqs from "./Admin/pages/Shoppinessmart/FAQ/AllFaqs";
-import PrivacyPolicy from "./Admin/pages/Shoppinessmart/PrivacyPolicy/PrivacyPolicy";
-import Newsletter from "./Admin/pages/Shoppinessmart/Newsletter/Newsletter";
-import MainBlog from "./Admin/pages/Shoppinessmart/MainBlogs/MainBlog";
-import MainSocialmedia from "./Admin/pages/Shoppinessmart/MainSocialmedia/MainSocialmedia";
+const BusinessDetails = lazy(() => import("./pages/BusinessDetails"));
+const ProductDetails = lazy(() => import("./pages/ProductDetails"));
+const AdminDashboard = lazy(() =>
+  import("./Admin/pages/AdminDashboard/AdminDashboard")
+);
+const AdminDashboardOutlet = lazy(() =>
+  import("./Admin/pages/AdminDashboardOutlet/AdminDashboardOutlet")
+);
+const Coupons = lazy(() => import("./Admin/pages/Users/Coupons/Coupons"));
+const Givebacks = lazy(() =>
+  import("./Admin/pages/Users/Give Backs/Givebacks")
+);
+const CashbackStatus = lazy(() =>
+  import("./Admin/pages/Users/Cashback Status/CashbackStatus")
+);
+const CashbackRequests = lazy(() =>
+  import("./Admin/pages/Users/Cashback Requests/CashbackRequests")
+);
+const GiveBackRecord = lazy(() =>
+  import("./Admin/pages/Ngo/GiveBackRecord/GiveBackRecord")
+);
+const AllNgos = lazy(() => import("./Admin/pages/Ngo/AllNgos/AllNgos"));
+const NgoRequest = lazy(() =>
+  import("./Admin/pages/Ngo/NgoRequest/NgoRequest")
+);
+const EditPage = lazy(() => import("./Admin/pages/Maast/EditPage/EditPage"));
+const AllDonations = lazy(() =>
+  import("./Admin/pages/Maast/ViewDonations/AllDonations")
+);
+const Events = lazy(() => import("./Admin/pages/Maast/NewEvents/Events"));
+const OfflineShopRequests = lazy(() =>
+  import(
+    "./Admin/pages/Product&Services/OfflineShopRequests/OfflineShopRequests"
+  )
+);
+const OnlineShopRequests = lazy(() =>
+  import("./Admin/pages/Product&Services/OnlineShopRequests/OnlineShopRequests")
+);
+const AllOfflineShops = lazy(() =>
+  import("./Admin/pages/Product&Services/AllOfflineShops/AllOfflineShops")
+);
+const AllOnlineShops = lazy(() =>
+  import("./Admin/pages/Product&Services/AllOnlineShops/AllOnlineShops")
+);
+const AddCategories = lazy(() =>
+  import("./Admin/pages/Product&Services/AddCategories/AddCategories")
+);
+const WithdrawalRequests = lazy(() =>
+  import("./Admin/pages/Users/Withdrawal Requests/WithdrawalRequests")
+);
+const WebsiteEditPages = lazy(() =>
+  import("./Admin/pages/Shoppinessmart/WebsiteEditPages/WebsiteEditPages")
+);
+const ContactInfo = lazy(() =>
+  import("./Admin/pages/Shoppinessmart/Contact/ContactInfo")
+);
+const AllFaqs = lazy(() => import("./Admin/pages/Shoppinessmart/FAQ/AllFaqs"));
+const PrivacyPolicy = lazy(() =>
+  import("./Admin/pages/Shoppinessmart/PrivacyPolicy/PrivacyPolicy")
+);
+const Newsletter = lazy(() =>
+  import("./Admin/pages/Shoppinessmart/Newsletter/Newsletter")
+);
+const MainBlog = lazy(() =>
+  import("./Admin/pages/Shoppinessmart/MainBlogs/MainBlog")
+);
+const MainSocialmedia = lazy(() =>
+  import("./Admin/pages/Shoppinessmart/MainSocialmedia/MainSocialmedia")
+);
+const DisputeRequest = lazy(() =>
+  import("./Admin/pages/Users/Dispute Request/DisputeRequest")
+);
+
 // Lazy-loaded components
 const Home = lazy(() => import("./pages/Home"));
 const Signup = lazy(() => import("./pages/Signup"));
@@ -139,14 +185,14 @@ const Layout = () => (
 //   );
 // };
 
-const NgoProtectedRoute = ({ children }) => {
-  const { user } = useSelector((state) => state.ngoUserReducer);
-  return (
-    <ProtectedRoute isAuthenticated={!!user} redirect="/login/cause">
-      {children}
-    </ProtectedRoute>
-  );
-};
+// const NgoProtectedRoute = ({ children }) => {
+//   const { user } = useSelector((state) => state.ngoUserReducer);
+//   return (
+//     <ProtectedRoute isAuthenticated={!!user} redirect="/login/cause">
+//       {children}
+//     </ProtectedRoute>
+//   );
+// };
 
 // const BusinessProtectedRoute = ({ children }) => {
 //   const { user } = useSelector((state) => state.businessUserReducer);
@@ -323,8 +369,7 @@ const router = createBrowserRouter([
           { path: "users/cashback-status", element: <CashbackStatus /> },
           { path: "users/givebacks", element: <Givebacks /> },
 
-          // { path: "/contact", element: <ContactInfo /> },
-          // { path: "/contact/message", element: <ContactMessage />},
+          { path: "users/dispute-requests", element: <DisputeRequest /> },
         ],
       },
       // Protected Services Dashboard Routes
