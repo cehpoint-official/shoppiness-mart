@@ -190,6 +190,14 @@ const router = createBrowserRouter([
             element: <ProductDetails />,
           },
           { path: "/online-shop", element: <OnlineShop /> },
+          {
+            path: "/online-shop/:businessId",
+            element: <BusinessDetails />,
+          },
+          {
+            path: "/online-shop/:businessId/:productId",
+            element: <ProductDetails />,
+          },
           { path: "/shop", element: <Shop /> },
           { path: "/business-form", element: <BusinessForm /> },
           { path: "/cause-form", element: <CauseForm /> },
@@ -215,6 +223,14 @@ const router = createBrowserRouter([
           {
             path: "/user-dashboard/:userId/online-shop",
             element: <OnlineShop />,
+          },
+          {
+            path: "/user-dashboard/:userId/online-shop/:businessId",
+            element: <BusinessDetails />,
+          },
+          {
+            path: "/user-dashboard/:userId/online-shop/:businessId/:productId",
+            element: <ProductDetails />,
           },
           {
             path: "/user-dashboard/:userId/offline-shop",
@@ -254,9 +270,9 @@ const router = createBrowserRouter([
       {
         path: "/ngo-dashboard/:id",
         element: (
-         // <NgoProtectedRoute>
-            <NgoDashboardOutlet />
-        //  </NgoProtectedRoute>
+          // <NgoProtectedRoute>
+          <NgoDashboardOutlet />
+          //  </NgoProtectedRoute>
         ),
         children: [
           { path: "dashboard", element: <NgoDashboard /> },

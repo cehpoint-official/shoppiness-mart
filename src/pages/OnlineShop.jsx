@@ -3,7 +3,7 @@ import shopcard from "../assets/Shop/shopcard.png";
 import onlineShopHeader from "../assets/onlineShopHeader.png";
 import Loader from "../Components/Loader/Loader";
 import { FiSearch } from "react-icons/fi";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebase";
 
@@ -14,7 +14,7 @@ const OnlineShop = () => {
   const [shops, setShops] = useState([]);
   const [storeSearchTerm, setStoreSearchTerm] = useState("");
   const [serviceSearchTerm, setServiceSearchTerm] = useState("");
-
+const { userId } = useParams();
   useEffect(() => {
     const fetchStores = async () => {
       try {
@@ -181,7 +181,14 @@ const OnlineShop = () => {
                 <div className="text-center">No services found</div>
               ) : (
                 filteredShops.map((item) => (
-                  <div key={item.id}>
+                  <Link
+                    to={
+                      location.pathname.includes("/user-dashboard")
+                        ? `/user-dashboard/${userId}/online-shop/${item.id}`
+                        : `/online-shop/${item.id}`
+                    }
+                    key={item.id}
+                  >
                     <div>
                       <img
                         src={item.bannerUrl}
@@ -198,7 +205,7 @@ const OnlineShop = () => {
                         {item.rate}% Cashback
                       </button>
                     </div>
-                  </div>
+                  </Link>
                 ))
               )}
             </div>

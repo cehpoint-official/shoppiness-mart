@@ -50,7 +50,7 @@ const OfflineShop = () => {
       const data = [];
       querySnapshot.forEach((doc) => {
         const shopData = doc.data();
-        if (shopData.mode === "Offline") {
+        if (shopData.mode === "Offline" && shopData.status === "Active") {
           data.push({ id: doc.id, ...shopData });
         }
       });

@@ -1,6 +1,6 @@
 import { doc, getDoc, collection, getDocs, addDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import { db } from "../../firebase";
 import toast from "react-hot-toast";
 import Loader from "../Components/Loader/Loader";
@@ -88,7 +88,7 @@ const BusinessDetails = () => {
         userId,
         createdAt: new Date().toISOString(),
         businessRate: business.rate,
-        userCashback: business.rate / 2,  
+        userCashback: business.rate / 2,
         platformEarnings: business.rate / 2,
         code: generatedCouponCode,
         businessName: business.businessName,
@@ -178,6 +178,7 @@ const BusinessDetails = () => {
   if (!business) {
     return <Loader />;
   }
+  console.log(filteredProducts);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -244,14 +245,12 @@ const BusinessDetails = () => {
         {/* Products Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProducts.map((product) => (
-            <Link
-              to={
-                location.pathname.includes("/user-dashboard")
-                  ? `/user-dashboard/${userId}/offline-shop/${category}/${businessId}/${product.id}`
-                  : `/offline-shop/${category}/${businessId}/${product.id}`
-              }
+            <ShopLink
               key={product.id}
-              className="overflow-hidden"
+              userId={userId}
+              category={category}
+              businessId={businessId}
+              productId={product.id}
             >
               <div className="aspect-[4/3] relative">
                 <img
@@ -264,12 +263,18 @@ const BusinessDetails = () => {
                 <h3 className="font-medium mb-2">{product.name}</h3>
                 <div className="flex items-center gap-2">
                   <span className="text-gray-500 ">₹{product.price}</span>
-                  <span className="text-green-600 text-sm">
-                    {product.discount}%
-                  </span>
+                  {product.discountType === "percentage" ? (
+                    <span className="text-green-600 text-sm">
+                      {product.discount}%
+                    </span>
+                  ) : (
+                    <span className="text-green-600 text-sm">
+                      ₹{product.discount} discount
+                    </span>
+                  )}
                 </div>
               </div>
-            </Link>
+            </ShopLink>
           ))}
         </div>
       </div>
@@ -414,3 +419,37 @@ const BusinessDetails = () => {
 };
 
 export default BusinessDetails;
+const ShopLink = ({ userId, category, businessId, productId, children }) => {
+  const location = useLocation();
+
+  // Function to detect if the route is for online or offline shop
+  const isOfflineShop = () => {
+    return (
+      location.pathname.includes("/offline-shop") ||
+      (location.pathname.includes("/user-dashboard") &&
+        location.pathname.includes("/offline-shop"))
+    );
+  };
+
+  // Function to generate the correct path
+  const getPath = () => {
+    const isInDashboard = location.pathname.includes("/user-dashboard");
+    const isOffline = isOfflineShop();
+
+    if (isOffline) {
+      return isInDashboard
+        ? `/user-dashboard/${userId}/offline-shop/${category}/${businessId}/${productId}`
+        : `/offline-shop/${category}/${businessId}/${productId}`;
+    } else {
+      return isInDashboard
+        ? `/user-dashboard/${userId}/online-shop/${businessId}/${productId}`
+        : `/online-shop/${businessId}/${productId}`;
+    }
+  };
+
+  return (
+    <Link to={getPath()} className="overflow-hidden">
+      {children}
+    </Link>
+  );
+};
