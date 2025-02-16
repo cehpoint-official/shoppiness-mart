@@ -28,6 +28,12 @@ const CategoryModal = ({ isOpen, onClose, editingCategory = null, onSave }) => {
     }
   }, [editingCategory]);
 
+  useEffect(() => {
+    if (!isOpen) {
+      setCategoryName(""); // Reset categoryName when modal is closed
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const handleSubmit = async (e) => {
@@ -56,10 +62,13 @@ const CategoryModal = ({ isOpen, onClose, editingCategory = null, onSave }) => {
         onSave({ id: docRef.id, name: categoryName, businessId: id });
       }
 
+      setCategoryName(""); // Reset categoryName after successful save
       onClose();
     } catch (error) {
       toast.error(
-        `Failed to ${editingCategory ? "update" : "add"} category: ${error.message}`
+        `Failed to ${editingCategory ? "update" : "add"} category: ${
+          error.message
+        }`
       );
     } finally {
       setIsSubmitting(false);
@@ -202,7 +211,10 @@ const AddCategory = ({ onBack }) => {
   };
 
   // Calculate number of skeletons to show based on entries count
-  const skeletonCount = Math.min(parseInt(entriesCount), categories.length || parseInt(entriesCount));
+  const skeletonCount = Math.min(
+    parseInt(entriesCount),
+    categories.length || parseInt(entriesCount)
+  );
 
   return (
     <div className="p-10 mt-[30px] flex flex-col gap-[30px]">
@@ -242,7 +254,9 @@ const AddCategory = ({ onBack }) => {
             <thead>
               <tr className="border-b">
                 <th className="text-left py-4 px-4 font-medium"># ↕</th>
-                <th className="text-left py-4 px-4 font-medium">Category name</th>
+                <th className="text-left py-4 px-4 font-medium">
+                  Category name
+                </th>
                 <th className="text-left py-4 px-4 font-medium">Action</th>
               </tr>
             </thead>
@@ -251,6 +265,12 @@ const AddCategory = ({ onBack }) => {
                 Array.from({ length: skeletonCount }).map((_, index) => (
                   <SkeletonRow key={index} />
                 ))
+              ) : categories.length === 0 ? (
+                <tr>
+                  <td colSpan="3" className="text-center py-6 text-gray-500">
+                    No categories have been added yet.
+                  </td>
+                </tr>
               ) : (
                 categories
                   .slice(0, parseInt(entriesCount))

@@ -1,7 +1,6 @@
 import { collection, getDocs } from "firebase/firestore";
 import { useCallback, useEffect, useState } from "react";
-import { FaUsers, FaBox, FaTicketAlt, FaUserPlus } from "react-icons/fa";
-import { IoMdArrowDropdown } from "react-icons/io";
+import { FaUsers, FaBox, FaTicketAlt } from "react-icons/fa";
 import { useParams } from "react-router-dom";
 import { db } from "../../../../firebase";
 
@@ -65,7 +64,10 @@ export default function Dashboard() {
       const data = [];
       querySnapshot.forEach((doc) => {
         const customersData = doc.data();
-        if (customersData.businessId === id) {
+        if (
+          customersData.businessId === id &&
+          customersData.claimedCouponCode
+        ) {
           data.push({ id: doc.id, ...customersData });
         }
       });

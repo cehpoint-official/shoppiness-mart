@@ -1,7 +1,7 @@
 import { collection, getDocs } from "firebase/firestore";
 import { useCallback, useEffect, useState } from "react";
 import { db } from "../../../../firebase";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 const Customers = () => {
   const [customers, setCustomers] = useState([]);
@@ -12,11 +12,16 @@ const Customers = () => {
 
   const fetchData = useCallback(async () => {
     try {
-      const querySnapshot = await getDocs(collection(db, "claimedCouponsDetails"));
+      const querySnapshot = await getDocs(
+        collection(db, "claimedCouponsDetails")
+      );
       const data = [];
       querySnapshot.forEach((doc) => {
         const customersData = doc.data();
-        if (customersData.businessId === id) {
+        if (
+          customersData.businessId === id &&
+          customersData.claimedCouponCode
+        ) {
           data.push({ id: doc.id, ...customersData });
         }
       });
@@ -34,7 +39,10 @@ const Customers = () => {
 
   const indexOfLastCustomer = currentPage * customersPerPage;
   const indexOfFirstCustomer = indexOfLastCustomer - customersPerPage;
-  const currentCustomers = customers.slice(indexOfFirstCustomer, indexOfLastCustomer);
+  const currentCustomers = customers.slice(
+    indexOfFirstCustomer,
+    indexOfLastCustomer
+  );
 
   const totalPages = Math.ceil(customers.length / customersPerPage);
 
@@ -56,12 +64,24 @@ const Customers = () => {
           <tbody>
             {Array.from({ length: customersPerPage }).map((_, index) => (
               <tr key={index} className="border-b animate-pulse">
-                <td className="py-3 px-4"><div className="h-4 bg-gray-300 rounded w-24"></div></td>
-                <td className="py-3 px-4"><div className="h-4 bg-gray-300 rounded w-32"></div></td>
-                <td className="py-3 px-4"><div className="h-4 bg-gray-300 rounded w-40"></div></td>
-                <td className="py-3 px-4"><div className="h-4 bg-gray-300 rounded w-20"></div></td>
-                <td className="py-3 px-4"><div className="h-4 bg-gray-300 rounded w-28"></div></td>
-                <td className="py-3 px-4"><div className="h-8 bg-gray-300 rounded w-16"></div></td>
+                <td className="py-3 px-4">
+                  <div className="h-4 bg-gray-300 rounded w-24"></div>
+                </td>
+                <td className="py-3 px-4">
+                  <div className="h-4 bg-gray-300 rounded w-32"></div>
+                </td>
+                <td className="py-3 px-4">
+                  <div className="h-4 bg-gray-300 rounded w-40"></div>
+                </td>
+                <td className="py-3 px-4">
+                  <div className="h-4 bg-gray-300 rounded w-20"></div>
+                </td>
+                <td className="py-3 px-4">
+                  <div className="h-4 bg-gray-300 rounded w-28"></div>
+                </td>
+                <td className="py-3 px-4">
+                  <div className="h-8 bg-gray-300 rounded w-16"></div>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -74,7 +94,7 @@ const Customers = () => {
             <thead>
               <tr>
                 <th className="py-3 px-4 text-left">Coupon ID</th>
-                <th className="py-3 px-4 text-left">Name</th>
+                <th className="py-3 px-4 text-left">Customer Name</th>
                 <th className="py-3 px-4 text-left">Contact</th>
                 <th className="py-3 px-4 text-left">Offer</th>
                 <th className="py-3 px-4 text-left">Claimed on</th>
@@ -85,19 +105,23 @@ const Customers = () => {
               {currentCustomers.map((customer, index) => (
                 <tr key={index} className="border-b">
                   <td className="py-3 px-4">{customer.claimedCouponCode}</td>
-                  <td className="py-3 px-4">{customer.claimedCouponCodeUserName}</td>
-                  <td className="py-3 px-4">{customer.claimedCouponCodeUserEmail}</td>
+                  <td className="py-3 px-4">
+                    {customer.claimedCouponCodeUserName}
+                  </td>
+                  <td className="py-3 px-4">
+                    {customer.claimedCouponCodeUserEmail}
+                  </td>
                   <td className="py-3 px-4">{customer.discount}%</td>
                   <td className="py-3 px-4">{customer.claimedDate}</td>
                   <td className="py-3 px-4">
                     {customer.pdfUrl ? (
-                      <a
-                        href={customer.pdfUrl}
+                      <Link
+                        to={customer.pdfUrl}
                         download
                         className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
                       >
                         View
-                      </a>
+                      </Link>
                     ) : (
                       <span className="text-gray-400">No PDF</span>
                     )}
@@ -116,10 +140,14 @@ const Customers = () => {
               >
                 Previous
               </button>
-              <span className="px-4 py-2">Page {currentPage} of {totalPages}</span>
+              <span className="px-4 py-2">
+                Page {currentPage} of {totalPages}
+              </span>
               <button
                 className="px-4 py-2 mx-1 bg-blue-500 text-white rounded disabled:opacity-50"
-                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
                 disabled={currentPage === totalPages}
               >
                 Next

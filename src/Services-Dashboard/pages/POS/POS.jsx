@@ -15,6 +15,10 @@ const POS = ({ onGenerateInvoice }) => {
   const [coupons, setCoupons] = useState([]);
   const [couponCode, setCouponCode] = useState("");
   const [matchedCoupon, setMatchedCoupon] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [listedProducts, setListedProducts] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const { id } = useParams();
 
   // Tax and Cash Collected State
@@ -43,7 +47,24 @@ const POS = ({ onGenerateInvoice }) => {
       [name]: value,
     }));
   };
-
+  const fetchProductData = useCallback(async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "productDetails"));
+      const data = [];
+      querySnapshot.forEach((doc) => {
+        const productData = doc.data();
+        if (productData.businessId === id) {
+          data.push({ id: doc.id, ...productData });
+        }
+      });
+      setListedProducts(data);
+    } catch (error) {
+      console.log("Error getting documents: ", error);
+    }
+  }, [id]);
+  const filteredProducts = listedProducts.filter((product) =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
   const handleDeleteProduct = (productId) => {
     setProducts(products.filter((product) => product.id !== productId));
   };
@@ -66,8 +87,19 @@ const POS = ({ onGenerateInvoice }) => {
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
-
+    fetchProductData();
+  }, [fetchData, fetchProductData]);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (event.target.closest(".relative") === null) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
   const handleVerify = async () => {
     setIsVerifying(true);
     const found = coupons.find((coupon) => coupon.code === couponCode);
@@ -101,14 +133,22 @@ const POS = ({ onGenerateInvoice }) => {
     };
     onGenerateInvoice(invoiceData);
   };
-
+  const handleProductSelect = (product) => {
+    setProductName(product.name);
+    setSearchTerm(product.name);
+    setProductPrice(product.price.toString());
+    setDiscountType(product.discountType || "percentage");
+    setDiscountValue(product.discount?.toString() || "0");
+    setSelectedProduct(product);
+    setIsDropdownOpen(false);
+  };
   const handleAddProduct = () => {
     const price = parseFloat(productPrice);
     const quantity = productQuantity;
     const discount = parseFloat(discountValue) || 0;
 
     let subtotal = price * quantity;
-    if (discountType === "percent") {
+    if (discountType === "percentage") {
       subtotal -= (subtotal * discount) / 100;
     } else {
       subtotal -= discount;
@@ -120,19 +160,21 @@ const POS = ({ onGenerateInvoice }) => {
       price: price,
       quantity: quantity,
       discount: discount,
+      discountType: discountType,
       subtotal: subtotal,
     };
 
     setProducts([...products, newProduct]);
 
-    // Reset form fields
+    // Reset form fields and selected product
     setProductName("");
+    setSearchTerm("");
     setProductPrice("");
     setProductQuantity(1);
     setDiscountType("percent");
     setDiscountValue("");
+    setSelectedProduct(null);
   };
-
   // Calculate totals
   const totalItems = products.length;
   const totalPrice = products.reduce(
@@ -196,6 +238,7 @@ const POS = ({ onGenerateInvoice }) => {
               <span className="">Customer Name:</span>
               <input
                 type="text"
+                required
                 name="customerName"
                 value={customerInfo.customerName}
                 onChange={handleCustomerInfoChange}
@@ -206,6 +249,7 @@ const POS = ({ onGenerateInvoice }) => {
               <span className="font-medium">Phone No.:</span>
               <input
                 type="text"
+                required
                 name="phoneNumber"
                 value={customerInfo.phoneNumber}
                 onChange={handleCustomerInfoChange}
@@ -217,6 +261,7 @@ const POS = ({ onGenerateInvoice }) => {
               <input
                 type="text"
                 name="email"
+                required
                 value={customerInfo.email}
                 onChange={handleCustomerInfoChange}
                 className="bg-gray-50 rounded px-2 py-2"
@@ -229,6 +274,7 @@ const POS = ({ onGenerateInvoice }) => {
                 <span className="font-medium">Biller Name:</span>
                 <input
                   type="text"
+                  required
                   name="billerName"
                   value={customerInfo.billerName}
                   onChange={handleCustomerInfoChange}
@@ -250,6 +296,7 @@ const POS = ({ onGenerateInvoice }) => {
                 <input
                   type="date"
                   name="dueDate"
+                  required
                   value={customerInfo.dueDate}
                   onChange={handleCustomerInfoChange}
                   className="bg-gray-50 rounded px-2 py-2"
@@ -263,7 +310,7 @@ const POS = ({ onGenerateInvoice }) => {
         <div className="bg-gray-50 w-[500px] p-6 rounded-lg shadow-md ">
           <h2 className="text-2xl font-bold mb-4">Add Product</h2>
           <form>
-            <div className="mb-4">
+            <div className="relative mb-4">
               <label
                 htmlFor="productName"
                 className="block text-gray-700 font-medium mb-2"
@@ -273,11 +320,29 @@ const POS = ({ onGenerateInvoice }) => {
               <input
                 type="text"
                 id="productName"
-                value={productName}
-                onChange={(e) => setProductName(e.target.value)}
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setIsDropdownOpen(true);
+                  setSelectedProduct(null); // Clear selected product when user types
+                }}
+                onFocus={() => setIsDropdownOpen(true)}
                 className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter product name"
+                placeholder="Search product name"
               />
+              {isDropdownOpen && (
+                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                  {filteredProducts.map((product) => (
+                    <div
+                      key={product.id}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                      onClick={() => handleProductSelect(product)}
+                    >
+                      {product.name}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="mb-4">
               <label

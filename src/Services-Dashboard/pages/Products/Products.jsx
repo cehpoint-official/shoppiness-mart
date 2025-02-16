@@ -138,80 +138,86 @@ const Products = () => {
         </div>
       </div>
       <div className="max-h-[500px] overflow-auto p-5 bg-white rounded-[20px] flex flex-col gap-10 scrollbar-hide">
-        {loading
-          ? Array.from({ length: 5 }).map((_, index) => (
-              <ProductSkeleton key={index} />
-            ))
-          : products.map((product, index) => (
-              <div
-                key={index}
-                className="relative flex justify-between border text-[18px] p-3 rounded-[15px] hover:bg-gray-100 transition-colors"
-              >
-                <div className="w-[100px] h-[100px]">
-                  <img
-                    src={product.imageUrl}
-                    alt={product.name}
-                    className="w-full h-full object-cover rounded-[10px]"
-                  />
-                </div>
+        {loading ? (
+          Array.from({ length: 5 }).map((_, index) => (
+            <ProductSkeleton key={index} />
+          ))
+        ) : products.length === 0 ? (
+          <div className="text-center text-gray-500 text-[18px]">
+            There are no products listed yet.
+          </div>
+        ) : (
+          products.map((product, index) => (
+            <div
+              key={index}
+              className="relative flex justify-between border text-[18px] p-3 rounded-[15px] hover:bg-gray-100 transition-colors"
+            >
+              <div className="w-[100px] h-[100px]">
+                <img
+                  src={product.imageUrl}
+                  alt={product.name}
+                  className="w-full h-full object-cover rounded-[10px]"
+                />
+              </div>
 
-                <div className="flex flex-col gap-2.5">
-                  <p>{product.name}</p>
-                  <div className="flex gap-5">
-                    <p className="font-medium">₹{product.price}</p>
-                    {product.discountType === "percentage" ? (
-                      <p className="text-green-600">{product.discount}% off</p>
-                    ) : (
-                      <p className="text-green-600">
-                        ₹{product.discount} discount
-                      </p>
-                    )}
+              <div className="flex flex-col gap-2.5">
+                <p>{product.name}</p>
+                <div className="flex gap-5">
+                  <p className="font-medium">₹{product.price}</p>
+                  {product.discountType === "percentage" ? (
+                    <p className="text-green-600">{product.discount}% off</p>
+                  ) : (
+                    <p className="text-green-600">
+                      ₹{product.discount} discount
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2.5">
+                <p>Category</p>
+                <p>{product.category}</p>
+              </div>
+              <div className="flex flex-col gap-2.5">
+                <p>Creation Date</p>
+                <p>{product.createdDate}</p>
+              </div>
+              <div className="flex flex-col gap-2.5 items-center">
+                <p>Action</p>
+                <button
+                  className="flex items-center justify-center w-[35px] h-[35px] rounded-full bg-black/5 cursor-pointer hover:bg-black/10"
+                  onClick={() => toggleActionMenu(product)}
+                >
+                  <IoMdMore className="text-[27px]" />
+                </button>
+              </div>
+              {selectedProduct === product && (
+                <div className="absolute w-[200px] top-1 right-0 mt-2 bg-white shadow-md rounded-md p-3 z-10">
+                  <div className="flex justify-end mb-2">
+                    <button
+                      onClick={() => setSelectedProduct(null)}
+                      className="text-gray-500 hover:text-gray-700"
+                    >
+                      <IoMdClose className="text-[24px]" />
+                    </button>
                   </div>
-                </div>
-
-                <div className="flex flex-col gap-2.5">
-                  <p>Category</p>
-                  <p>{product.category}</p>
-                </div>
-                <div className="flex flex-col gap-2.5">
-                  <p>Creation Date</p>
-                  <p>{product.createdDate}</p>
-                </div>
-                <div className="flex flex-col gap-2.5 items-center">
-                  <p>Action</p>
                   <button
-                    className="flex items-center justify-center w-[35px] h-[35px] rounded-full bg-black/5 cursor-pointer hover:bg-black/10"
-                    onClick={() => toggleActionMenu(product)}
+                    className="block w-full text-left text-blue-500 px-3 py-2 rounded-md hover:bg-blue-50"
+                    onClick={() => handleEditClick(product)}
                   >
-                    <IoMdMore className="text-[27px]" />
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDeleteClick(product.id)}
+                    className="block w-full text-left text-red-500 px-3 py-2 rounded-md hover:bg-red-50"
+                  >
+                    Remove
                   </button>
                 </div>
-                {selectedProduct === product && (
-                  <div className="absolute w-[200px] top-1 right-0 mt-2 bg-white shadow-md rounded-md p-3 z-10">
-                    <div className="flex justify-end mb-2">
-                      <button
-                        onClick={() => setSelectedProduct(null)}
-                        className="text-gray-500 hover:text-gray-700"
-                      >
-                        <IoMdClose className="text-[24px]" />
-                      </button>
-                    </div>
-                    <button
-                      className="block w-full text-left text-blue-500 px-3 py-2 rounded-md hover:bg-blue-50"
-                      onClick={() => handleEditClick(product)}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteClick(product.id)}
-                      className="block w-full text-left text-red-500 px-3 py-2 rounded-md hover:bg-red-50"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                )}
-              </div>
-            ))}
+              )}
+            </div>
+          ))
+        )}
       </div>
 
       {isEditDialogOpen && (

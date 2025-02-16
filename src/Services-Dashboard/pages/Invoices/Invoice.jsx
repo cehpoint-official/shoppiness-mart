@@ -22,7 +22,7 @@ const Invoice = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortOrder, setSortOrder] = useState("asc"); // 'asc' or 'desc'
+  const [sortOrder, setSortOrder] = useState("asc");
   const customersPerPage = 5;
   const { id } = useParams();
 
@@ -51,23 +51,20 @@ const Invoice = () => {
     fetchData();
   }, [fetchData]);
 
-  // Filter customers based on search term
   const filteredCustomers = customers.filter((customer) => {
     const searchLower = searchTerm.toLowerCase();
     return (
       customer.invoiceNum?.toString().toLowerCase().includes(searchLower) ||
-      customer.claimedCouponCodeUserName?.toLowerCase().includes(searchLower)
+      customer.customerName?.toLowerCase().includes(searchLower)
     );
   });
 
-  // Sort customers by date
   const sortedCustomers = filteredCustomers.sort((a, b) => {
-    const dateA = new Date(a.claimedDate);
-    const dateB = new Date(b.claimedDate);
+    const dateA = new Date(a.billingDate);
+    const dateB = new Date(b.billingDate);
     return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
   });
 
-  // Pagination calculations
   const indexOfLastCustomer = currentPage * customersPerPage;
   const indexOfFirstCustomer = indexOfLastCustomer - customersPerPage;
   const currentCustomers = sortedCustomers.slice(
@@ -76,7 +73,6 @@ const Invoice = () => {
   );
   const totalPages = Math.ceil(sortedCustomers.length / customersPerPage);
 
-  // Reset to first page when search term changes
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm]);
@@ -99,7 +95,7 @@ const Invoice = () => {
 
   const handleBackToInvoices = () => {
     setSelectedInvoice(null);
-    fetchData(); // Refresh data when returning to list
+    fetchData();
   };
 
   const toggleSortOrder = () => {
@@ -108,8 +104,8 @@ const Invoice = () => {
 
   if (selectedInvoice) {
     return (
-      <SingleInvoice 
-        invoice={selectedInvoice} 
+      <SingleInvoice
+        invoice={selectedInvoice}
         onBack={handleBackToInvoices}
         onUpdate={fetchData}
       />
@@ -123,18 +119,17 @@ const Invoice = () => {
           Customer Invoices
         </h1>
         <div className="flex gap-4">
-          {/* Search Input */}
           <div className="relative">
             <input
               type="text"
-              placeholder="Search by invoice no. or name..."
+              placeholder="Search by invoice no. or customer name..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 pr-4 py-2 border rounded-md w-64"
             />
             <BiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
           </div>
-          <button 
+          <button
             onClick={toggleSortOrder}
             className="px-4 py-2 text-blue-500 border border-blue-500 font-bold rounded-md flex items-center gap-2"
           >
@@ -150,13 +145,14 @@ const Invoice = () => {
               <tr className="border-b border-gray-100">
                 {[
                   "Invoice No.",
-                  "Name",
+                  "Customer Name",
                   "Amount",
                   "Paid",
                   "Due",
                   "Cashback Given",
                   "Remaining Cashback",
-                  "Date",
+                  "Billing Date",
+                  "Due Date",
                   "Invoice",
                 ].map((header) => (
                   <th
@@ -187,7 +183,7 @@ const Invoice = () => {
                     Invoice No.
                   </th>
                   <th className="text-left p-4 text-gray-500 font-normal">
-                    Name
+                    Customer Name
                   </th>
                   <th className="text-left p-4 text-gray-500 font-normal">
                     Amount
@@ -205,7 +201,10 @@ const Invoice = () => {
                     Remaining Cashback
                   </th>
                   <th className="text-left p-4 text-gray-500 font-normal">
-                    Date
+                    Billing Date
+                  </th>
+                  <th className="text-left p-4 text-gray-500 font-normal">
+                    Due Date
                   </th>
                   <th className="text-left p-4 text-gray-500 font-normal">
                     Invoice
@@ -220,18 +219,23 @@ const Invoice = () => {
                   >
                     <td className="p-4 text-gray-900">#{invoice.invoiceNum}</td>
                     <td className="p-4 text-gray-900">
-                      {invoice.claimedCouponCodeUserName}
+                      {invoice.customerName || "-"}
                     </td>
                     <td className="p-4 text-gray-900">{invoice.totalAmount}</td>
                     <td className="p-4 text-gray-900">{invoice.paidAmount}</td>
                     <td className="p-4 text-gray-900">{invoice.dueAmount}</td>
                     <td className="p-4 text-gray-900">
-                      {invoice.userCashback}
+                      {invoice.userCashback || 0}
                     </td>
                     <td className="p-4 text-gray-900">
-                      {invoice.remainingCashback}
+                      {invoice.remainingCashback || 0}
                     </td>
-                    <td className="p-4 text-gray-900">{invoice.claimedDate}</td>
+                    <td className="p-4 text-gray-900">
+                      {invoice.billingDate || "-"}
+                    </td>
+                    <td className="p-4 text-gray-900">
+                      {invoice.dueAmount > 0 ? invoice.dueDate || "-" : "-"}
+                    </td>
                     <td className="p-4">
                       <button
                         onClick={() => handleViewInvoice(invoice)}
@@ -246,7 +250,6 @@ const Invoice = () => {
               </tbody>
             </table>
 
-            {/* Pagination Controls */}
             <div className="flex justify-between items-center p-4">
               <button
                 onClick={prevPage}

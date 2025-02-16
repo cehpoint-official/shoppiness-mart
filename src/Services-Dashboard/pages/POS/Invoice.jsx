@@ -4,9 +4,14 @@ import headerLogo from "../../assets/header-logo.png";
 import { Link } from "react-router-dom";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import { addDoc, collection, doc, getDoc, setDoc } from "firebase/firestore";
+import { addDoc, collection, doc, runTransaction } from "firebase/firestore";
 import { db, storage } from "../../../../firebase";
-import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import {
+  getDownloadURL,
+  ref,
+  uploadBytesResumable,
+  deleteObject,
+} from "firebase/storage";
 import toast from "react-hot-toast";
 import { FaSpinner } from "react-icons/fa";
 
@@ -14,20 +19,26 @@ const Invoice = ({ data, onBack }) => {
   const { user } = useSelector((state) => state.businessUserReducer);
   const [isLoading, setIsLoading] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
-  console.log(data);
 
   const generatePdf = async (elementId) => {
-    const invoiceContent = document.getElementById(elementId);
-    const canvas = await html2canvas(invoiceContent, {
-      scale: 3,
-      useCORS: true,
-    });
-    const imgData = canvas.toDataURL("image/png", 1.0);
-    const pdf = new jsPDF("p", "mm", "a4");
-    const imgWidth = 210;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-    pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
-    return pdf;
+    try {
+      const invoiceContent = document.getElementById(elementId);
+      if (!invoiceContent) throw new Error("Invoice content not found");
+
+      const canvas = await html2canvas(invoiceContent, {
+        scale: 3,
+        useCORS: true,
+      });
+      const imgData = canvas.toDataURL("image/png", 1.0);
+      const pdf = new jsPDF("p", "mm", "a4");
+      const imgWidth = 210;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+      return pdf;
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      throw new Error("Failed to generate PDF");
+    }
   };
 
   const generatePdfBlob = async () => {
@@ -39,7 +50,7 @@ const Invoice = ({ data, onBack }) => {
     const metadata = {
       contentType: "application/pdf",
     };
-    const storageRef = ref(storage, "invoices/" + data.invoiceId + ".pdf");
+    const storageRef = ref(storage, `invoices/${data.invoiceId}.pdf`);
     const uploadTask = uploadBytesResumable(storageRef, file, metadata);
 
     return new Promise((resolve, reject) => {
@@ -54,148 +65,220 @@ const Invoice = ({ data, onBack }) => {
           console.error("Upload failed:", error);
           reject(error);
         },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref)
-            .then((downloadURL) => {
-              resolve(downloadURL);
-            })
-            .catch((error) => {
-              console.error("Failed to get download URL:", error);
-              reject(error);
-            });
+        async () => {
+          try {
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+            resolve(downloadURL);
+          } catch (error) {
+            console.error("Failed to get download URL:", error);
+            // Delete the uploaded file if we can't get its URL
+            try {
+              await deleteObject(storageRef);
+            } catch (deleteError) {
+              console.error("Failed to delete incomplete upload:", deleteError);
+            }
+            reject(error);
+          }
         }
       );
     });
   };
+
   const calculateCashbackAndEarnings = (
     grandTotal,
     cashCollected,
     userCashbackPercentage,
     platformEarningsPercentage
   ) => {
-    // Calculate due percentage
-
-    const duePercentage = ((grandTotal - cashCollected) / grandTotal) * 100;
-
-    // Calculate full cashback amount before due adjustment
-    const fullUserCashback = Number(
-      ((userCashbackPercentage / 100) * grandTotal).toFixed(1)
-    );
-
-    // Calculate platform earnings
-    const platformCashback = Number(
-      ((platformEarningsPercentage / 100) * grandTotal).toFixed(1)
-    );
-
-    // Determine user cashback and remaining cashback based on due percentage
-    let userCashback, remainingCashback;
-
-    if (duePercentage === 100) {
-      // If completely due, no cashback
-      userCashback = 0;
-      remainingCashback = 0;
-    } else if (duePercentage === 0) {
-      // If fully paid, user gets full cashback
-      userCashback = fullUserCashback;
-      remainingCashback = 0;
-    } else {
-      // If partially due, calculate adjusted cashback
-      userCashback = Number(
-        (fullUserCashback * ((100 - duePercentage) / 100)).toFixed(1)
-      );
-      remainingCashback = Number((fullUserCashback - userCashback).toFixed(1));
+    // Return zero values if no coupon data
+    if (!userCashbackPercentage || !platformEarningsPercentage) {
+      return {
+        platformCashback: 0,
+        userCashback: 0,
+        remainingCashback: 0,
+      };
     }
 
-    return {
-      platformCashback,
-      userCashback,
-      remainingCashback,
-    };
-  };
-  const handleSave = async () => {
-    setIsLoading(true);
     try {
-      const pdfBlob = await generatePdfBlob();
-      const pdfUrl = await uploadPdf(pdfBlob);
-
-      // Calculate cashback and earnings
-      const { platformCashback, userCashback, remainingCashback } =
-        calculateCashbackAndEarnings(
-          data.grandTotal,
-          data.dueAmount,
-          data.userCashback,
-          data.platformEarnings
-        );
-
-      // First, attempt to add the claimed coupon details
-      const claimedCouponRef = await addDoc(
-        collection(db, "claimedCouponsDetails"),
-        {
-          claimedCouponCode: data.code,
-          claimedCouponCodeUserName: data.fullName,
-          claimedCouponCodeUserEmail: data.email,
-          claimedDate: data.billingDate,
-          userPhoneNumber: data.phoneNumber,
-          billerName: data.billerName,
-          dueDate: data.dueDate,
-          subTotal: data.totalPrice,
-          discount: data.userCashback,
-          taxRate: ((data.taxAmount / data.totalPrice) * 100).toFixed(1),
-          userCashbackPercentage: data.userCashback,
-          userCashback,
-          platformCashback,
-          remainingCashback,
-          products: data.products,
-          userId: data.userId,
-          pdfUrl,
-          totalAmount: data.grandTotal,
-          paidAmount: data.cashCollected,
-          dueAmount: data.dueAmount,
-          invoiceNum: data.invoiceId,
-          businessId: data.businessId,
-        }
+      const duePercentage = ((grandTotal - cashCollected) / grandTotal) * 100;
+      const fullUserCashback = Number(
+        ((userCashbackPercentage / 100) * grandTotal).toFixed(1)
+      );
+      const platformCashback = Number(
+        ((platformEarningsPercentage / 100) * grandTotal).toFixed(1)
       );
 
-      // Only if document addition is successful, update the coupon status and user's collectedCashback
-      if (claimedCouponRef.id) {
-        // Fetch the current collectedCashback value from Firestore
-        const userDocRef = doc(db, "users", data.userId);
-        const userDoc = await getDoc(userDocRef);
+      let userCashback, remainingCashback;
 
-        if (userDoc.exists()) {
-          const currentCollectedCashback =
-            userDoc.data().collectedCashback || 0;
-
-          // Update the collectedCashback by adding the new userCashback
-          await setDoc(
-            userDocRef,
-            {
-              collectedCashback: currentCollectedCashback + userCashback,
-            },
-            { merge: true }
-          );
-        } else {
-          throw new Error("User document not found");
-        }
-
-        // Update the coupon status to "Claimed"
-        await setDoc(
-          doc(db, "coupons", data.id),
-          {
-            status: "Claimed",
-            claimedAt: new Date().toISOString(),
-          },
-          { merge: true }
-        );
-
-        toast.success("Invoice saved and coupon claimed successfully!");
-        onBack();
+      if (duePercentage === 100) {
+        userCashback = 0;
+        remainingCashback = 0;
+      } else if (duePercentage === 0) {
+        userCashback = fullUserCashback;
+        remainingCashback = 0;
       } else {
-        throw new Error("Failed to add claimed coupon document");
+        userCashback = Number(
+          (fullUserCashback * ((100 - duePercentage) / 100)).toFixed(1)
+        );
+        remainingCashback = Number(
+          (fullUserCashback - userCashback).toFixed(1)
+        );
       }
+
+      return {
+        platformCashback,
+        userCashback,
+        remainingCashback,
+      };
+    } catch (error) {
+      console.error("Error calculating cashback:", error);
+      return {
+        platformCashback: 0,
+        userCashback: 0,
+        remainingCashback: 0,
+      };
+    }
+  };
+
+  const handleSave = async () => {
+    setIsLoading(true);
+    let pdfUrl = null;
+    let storageRef = null;
+
+    try {
+      // Validate required data
+      if (!data.invoiceId || !data.grandTotal) {
+        throw new Error("Missing required invoice data");
+      }
+
+      // Generate and upload PDF first
+      const pdfBlob = await generatePdfBlob();
+      storageRef = ref(storage, `invoices/${data.invoiceId}.pdf`);
+      pdfUrl = await uploadPdf(pdfBlob);
+
+      // Prepare base invoice data
+      const baseInvoiceData = {
+        billerName: data.billerName || "",
+        dueDate: data.dueDate || "",
+        subTotal: data.totalPrice || 0,
+        taxRate: data.totalPrice
+          ? ((data.taxAmount / data.totalPrice) * 100).toFixed(1)
+          : "0",
+        products: data.products || [],
+        customerName: data.customerName || "",
+        pdfUrl,
+        totalAmount: data.grandTotal || 0,
+        paidAmount: data.cashCollected || 0,
+        dueAmount: data.dueAmount || 0,
+        invoiceNum: data.invoiceId,
+        businessId: data.businessId,
+        billingDate:
+          data.billingDate ||
+          new Date().toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          }),
+      };
+
+      // Use a transaction to ensure all or nothing is saved
+      await runTransaction(db, async (transaction) => {
+        // Check if this is a coupon-based invoice
+        const hasCoupon = Boolean(data.code && data.userId && data.id);
+
+        if (hasCoupon) {
+          // Verify coupon still exists and is valid
+          const couponRef = doc(db, "coupons", data.id);
+          const couponDoc = await transaction.get(couponRef);
+
+          if (!couponDoc.exists()) {
+            throw new Error("Coupon no longer exists");
+          }
+
+          if (couponDoc.data().status !== "Pending") {
+            throw new Error("Coupon is no longer valid");
+          }
+
+          // Calculate cashback
+          const { platformCashback, userCashback, remainingCashback } =
+            calculateCashbackAndEarnings(
+              data.grandTotal,
+              data.cashCollected,
+              data.userCashback,
+              data.platformEarnings
+            );
+
+          // Add coupon-specific data
+          const couponData = {
+            claimedCouponCode: data.code,
+            claimedCouponCodeUserName: data.customerName,
+            claimedCouponCodeUserEmail: data.email,
+            userPhoneNumber: data.phoneNumber,
+            discount: data.userCashback,
+            userCashbackPercentage: data.userCashback,
+            userCashback,
+            platformCashback,
+            remainingCashback,
+            userId: data.userId,
+          };
+
+          // Update user's cashback
+          const userRef = doc(db, "users", data.userId);
+          const userDoc = await transaction.get(userRef);
+
+          if (userDoc.exists()) {
+            const currentCashback = userDoc.data().collectedCashback || 0;
+            transaction.update(userRef, {
+              collectedCashback: currentCashback + userCashback,
+            });
+          }
+
+          // Update coupon status
+          transaction.update(couponRef, {
+            status: "Claimed",
+            claimedAt: new Date().toLocaleDateString("en-GB", {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            }),
+          });
+
+          // Save invoice with coupon data
+          const invoiceData = {
+            ...baseInvoiceData,
+            ...couponData,
+            claimedDate: new Date().toLocaleDateString("en-GB", {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            }),
+          };
+          await addDoc(collection(db, "claimedCouponsDetails"), invoiceData);
+        } else {
+          // Save invoice without coupon data
+          await addDoc(
+            collection(db, "claimedCouponsDetails"),
+            baseInvoiceData
+          );
+        }
+      });
+
+      toast.success("Invoice saved successfully!");
+      onBack();
     } catch (error) {
       console.error("Error saving invoice:", error);
-      toast.error("Failed to save invoice.");
+
+      // Clean up PDF from storage if it was uploaded
+      if (storageRef && pdfUrl) {
+        try {
+          await deleteObject(storageRef);
+        } catch (deleteError) {
+          console.error("Error cleaning up PDF:", deleteError);
+        }
+      }
+
+      // Show appropriate error message to user
+      toast.error(error.message || "Failed to save invoice.");
     } finally {
       setIsLoading(false);
     }
@@ -205,9 +288,9 @@ const Invoice = ({ data, onBack }) => {
     setIsDownloading(true);
     try {
       const pdf = await generatePdf("invoice-content");
-      pdf.save("invoice.pdf");
+      pdf.save(`invoice-${data.invoiceId || "download"}.pdf`);
     } catch (error) {
-      console.error("Error generating PDF:", error);
+      console.error("Error downloading PDF:", error);
       toast.error("Failed to download PDF.");
     } finally {
       setIsDownloading(false);
