@@ -47,6 +47,7 @@ const POS = ({ onGenerateInvoice }) => {
       [name]: value,
     }));
   };
+
   const fetchProductData = useCallback(async () => {
     try {
       const querySnapshot = await getDocs(collection(db, "productDetails"));
@@ -62,9 +63,11 @@ const POS = ({ onGenerateInvoice }) => {
       console.log("Error getting documents: ", error);
     }
   }, [id]);
+
   const filteredProducts = listedProducts.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
   const handleDeleteProduct = (productId) => {
     setProducts(products.filter((product) => product.id !== productId));
   };
@@ -89,6 +92,7 @@ const POS = ({ onGenerateInvoice }) => {
     fetchData();
     fetchProductData();
   }, [fetchData, fetchProductData]);
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (event.target.closest(".relative") === null) {
@@ -100,6 +104,7 @@ const POS = ({ onGenerateInvoice }) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
   const handleVerify = async () => {
     setIsVerifying(true);
     const found = coupons.find((coupon) => coupon.code === couponCode);
@@ -121,11 +126,11 @@ const POS = ({ onGenerateInvoice }) => {
       ...customerInfo,
       products: products,
       totalItems,
-      totalPrice,
-      grandTotal,
-      taxAmount,
-      cashCollected,
-      dueAmount: dueAmount,
+      totalPrice: totalPrice.toFixed(1),
+      grandTotal: grandTotal.toFixed(1),
+      taxAmount: taxAmount.toFixed(1),
+      cashCollected: cashCollected.toFixed(1),
+      dueAmount: dueAmount.toFixed(1),
       time: new Date().toLocaleTimeString(),
       invoiceId: `IN-${Math.floor(Math.random() * 100000)}`,
       ...matchedCoupon,
@@ -133,6 +138,7 @@ const POS = ({ onGenerateInvoice }) => {
     };
     onGenerateInvoice(invoiceData);
   };
+
   const handleProductSelect = (product) => {
     setProductName(product.name);
     setSearchTerm(product.name);
@@ -142,6 +148,7 @@ const POS = ({ onGenerateInvoice }) => {
     setSelectedProduct(product);
     setIsDropdownOpen(false);
   };
+
   const handleAddProduct = () => {
     const price = parseFloat(productPrice);
     const quantity = productQuantity;
@@ -157,11 +164,11 @@ const POS = ({ onGenerateInvoice }) => {
     const newProduct = {
       id: products.length + 1,
       name: productName,
-      price: price,
+      price: price.toFixed(1),
       quantity: quantity,
-      discount: discount,
+      discount: discount.toFixed(1),
       discountType: discountType,
-      subtotal: subtotal,
+      subtotal: subtotal.toFixed(1),
     };
 
     setProducts([...products, newProduct]);
@@ -175,17 +182,18 @@ const POS = ({ onGenerateInvoice }) => {
     setDiscountValue("");
     setSelectedProduct(null);
   };
+
   // Calculate totals
   const totalItems = products.length;
   const totalPrice = products.reduce(
-    (sum, product) => sum + product.subtotal,
+    (sum, product) => sum + parseFloat(product.subtotal),
     0
   );
 
   // Update tax amount when tax percentage changes
   useEffect(() => {
     const calculatedTax = (totalPrice * taxPercentage) / 100;
-    setTaxAmount(calculatedTax);
+    setTaxAmount(parseFloat(calculatedTax.toFixed(1)));
   }, [taxPercentage, totalPrice]);
 
   // Calculate grand total
@@ -451,14 +459,10 @@ const POS = ({ onGenerateInvoice }) => {
                 {products.map((product) => (
                   <tr key={product.id} className="border-b">
                     <td className="py-4">{product.name}</td>
-                    <td className="py-4">
-                      Rs. {product.price.toLocaleString()}
-                    </td>
+                    <td className="py-4">Rs. {product.price}</td>
                     <td className="py-4">{product.quantity}X</td>
                     <td className="py-4">{product.discount}%</td>
-                    <td className="py-4">
-                      Rs. {product.subtotal.toLocaleString()}
-                    </td>
+                    <td className="py-4">Rs. {product.subtotal}</td>
                     <td className="py-4">
                       <button
                         onClick={() => handleDeleteProduct(product.id)}
@@ -483,7 +487,7 @@ const POS = ({ onGenerateInvoice }) => {
               <div>
                 <p className="text-gray-600 mb-1">Total Price:</p>
                 <p className="text-2xl font-semibold">
-                  {totalPrice.toLocaleString()}
+                  Rs. {totalPrice.toFixed(1)}
                 </p>
               </div>
               <div>
@@ -515,13 +519,13 @@ const POS = ({ onGenerateInvoice }) => {
               <div className="flex flex-col items-center gap-2">
                 <p className="text-lg font-semibold">Grand Total</p>
                 <p className="text-2xl font-bold text-blue-600">
-                  Rs. {grandTotal.toLocaleString()}
+                  Rs. {grandTotal.toFixed(1)}
                 </p>
               </div>
               <div className="flex flex-col items-center gap-2">
                 <p className="text-lg font-semibold">Due Amount</p>
                 <p className="text-2xl font-bold text-red-600">
-                  Rs. {dueAmount.toLocaleString()}
+                  Rs. {dueAmount.toFixed(1)}
                 </p>
               </div>
             </div>

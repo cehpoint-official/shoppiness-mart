@@ -75,48 +75,71 @@ const SingleInvoice = ({ invoice, onBack, onUpdate }) => {
   const handleSave = async () => {
     setIsLoading(true);
     try {
-      if (invoice.dueAmount == 0) {
+      // Validate that there is a due amount to process
+      if (invoice.dueAmount === 0) {
         throw new Error("No amount is Due");
       }
+
+      // Generate and upload new PDF
       const pdfBlob = await generatePdfBlob();
       const pdfUrl = await uploadPdf(pdfBlob);
 
-      // Update invoice document
-      await setDoc(
-        doc(db, "claimedCouponsDetails", invoice.id),
-        {
-          userCashback:
-            (invoice.userCashback || 0) + (invoice.remainingCashback || 0),
-          remainingCashback: 0,
-          dueAmount: 0,
-          paidAmount: invoice.totalAmount,
-          pdfUrl: pdfUrl,
-        },
-        { merge: true }
-      );
+      // Base update data for invoice
+      const baseUpdateData = {
+        dueAmount: 0,
+        paidAmount: invoice.totalAmount,
+        pdfUrl: pdfUrl,
+      };
+
+      // Check if this is a coupon-based invoice
+      if (invoice.claimedCouponCode) {
+        // Handle coupon case
+        await setDoc(
+          doc(db, "claimedCouponsDetails", invoice.id),
+          {
+            ...baseUpdateData,
+            userCashback:
+              (invoice.userCashback || 0) + (invoice.remainingCashback || 0),
+            remainingCashback: 0,
+          },
+          { merge: true }
+        );
+
+        // Update user's collected cashback
+        const userDocRef = doc(db, "users", invoice.userId);
+        const userDoc = await getDoc(userDocRef);
+
+        if (userDoc.exists()) {
+          const currentCollectedCashback =
+            userDoc.data().collectedCashback || 0;
+          await setDoc(
+            userDocRef,
+            {
+              collectedCashback:
+                currentCollectedCashback + (invoice.remainingCashback || 0),
+            },
+            { merge: true }
+          );
+        }
+
+        toast.success(
+          "Invoice Updated and Remaining Cashback Sent successfully!"
+        );
+      } else {
+        // Handle non-coupon case
+        await setDoc(
+          doc(db, "claimedCouponsDetails", invoice.id),
+          baseUpdateData,
+          { merge: true }
+        );
+
+        toast.success("Invoice Updated successfully!");
+      }
 
       // Update local due amount state
       setLocalDueAmount(0);
 
-      // Update user's collected cashback
-      const userDocRef = doc(db, "users", invoice.userId);
-      const userDoc = await getDoc(userDocRef);
-
-      if (userDoc.exists()) {
-        const currentCollectedCashback = userDoc.data().collectedCashback || 0;
-        await setDoc(
-          userDocRef,
-          {
-            collectedCashback:
-              currentCollectedCashback + (invoice.remainingCashback || 0),
-          },
-          { merge: true }
-        );
-      }
-
-      toast.success(
-        "Invoice Updated and Remaining Cashback Sent successfully!"
-      );
+      // Call the update and back callbacks
       onUpdate();
       onBack();
     } catch (error) {
