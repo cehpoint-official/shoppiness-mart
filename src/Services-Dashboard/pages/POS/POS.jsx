@@ -19,6 +19,7 @@ const POS = ({ onGenerateInvoice }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [listedProducts, setListedProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isFormValid, setIsFormValid] = useState(false);
   const { id } = useParams();
 
   // Tax and Cash Collected State
@@ -189,7 +190,29 @@ const POS = ({ onGenerateInvoice }) => {
     (sum, product) => sum + parseFloat(product.subtotal),
     0
   );
+  const validateForm = useCallback(() => {
+    const isCustomerInfoValid =
+      customerInfo.customerName.trim() !== "" &&
+      customerInfo.phoneNumber.trim() !== "" &&
+      customerInfo.email.trim() !== "" &&
+      customerInfo.billerName.trim() !== "" &&
+      customerInfo.billingDate !== "" &&
+      customerInfo.dueDate !== "";
 
+    const isProductsValid = products.length > 0;
+
+    const isCashValid = !isNaN(cashCollected) && cashCollected >= 0;
+
+    const isTaxValid = !isNaN(taxPercentage) && taxPercentage >= 0;
+
+    setIsFormValid(
+      isCustomerInfoValid && isProductsValid && isCashValid && isTaxValid
+    );
+  }, [customerInfo, products, cashCollected, taxPercentage]);
+  // Run validation whenever relevant fields change
+  useEffect(() => {
+    validateForm();
+  }, [validateForm]);
   // Update tax amount when tax percentage changes
   useEffect(() => {
     const calculatedTax = (totalPrice * taxPercentage) / 100;
@@ -534,7 +557,12 @@ const POS = ({ onGenerateInvoice }) => {
           {/* Generate Invoice Button */}
           <button
             onClick={handleGenerateInvoice}
-            className="w-full mt-6 bg-blue-500 text-white py-4 rounded-lg hover:bg-blue-600 transition-colors"
+            disabled={!isFormValid}
+            className={`w-full mt-6 py-4 rounded-lg transition-colors ${
+              isFormValid
+                ? "bg-blue-500 hover:bg-blue-600 text-white"
+                : "bg-gray-300 cursor-not-allowed text-gray-500"
+            }`}
           >
             Generate Invoice
           </button>

@@ -15,27 +15,95 @@ const SingleInvoice = ({ invoice, onBack, onUpdate }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [localDueAmount, setLocalDueAmount] = useState(invoice.dueAmount);
   const [isDownloading, setIsDownloading] = useState(false);
-  console.log(invoice);
 
   const generatePdf = async (elementId) => {
-    const invoiceContent = document.getElementById(elementId);
-    const canvas = await html2canvas(invoiceContent, {
-      scale: 3,
-      useCORS: true,
-    });
-    const imgData = canvas.toDataURL("image/png", 1.0);
-    const pdf = new jsPDF("p", "mm", "a4");
-    const imgWidth = 210;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-    pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
-    return pdf;
+    try {
+      const invoiceContent = document.getElementById(elementId);
+      if (!invoiceContent) throw new Error("Invoice content not found");
+
+      // Optimize canvas settings for smaller file size
+      const canvas = await html2canvas(invoiceContent, {
+        scale: 2, // Reduced from 3 to 2
+        useCORS: true,
+        logging: false, // Disable logging
+        imageTimeout: 0, // Disable timeout
+        backgroundColor: null, // Transparent background
+      });
+
+      // Compress the image data
+      const imgData = canvas.toDataURL("image/jpeg", 1.0); 
+
+      // Create PDF with compression
+      const pdf = new jsPDF({
+        compress: true,
+        unit: "mm",
+        format: "a4",
+      });
+
+      // Calculate dimensions to maintain aspect ratio
+      const imgWidth = 210; // A4 width
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      // Add image with optimized settings
+      pdf.addImage(
+        imgData,
+        "JPEG",
+        0,
+        0,
+        imgWidth,
+        imgHeight,
+        undefined,
+        "FAST"
+      );
+
+      return pdf;
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      throw new Error("Failed to generate PDF");
+    }
   };
 
   const generatePdfBlob = async () => {
     const pdf = await generatePdf("invoice-content");
-    return pdf.output("blob");
-  };
+    const blob = pdf.output("blob");
 
+    // Check file size
+    if (blob.size > 500000) {
+      // 500KB in bytes
+      // If still too large, try with more aggressive compression
+      const invoiceContent = document.getElementById("invoice-content");
+      const canvas = await html2canvas(invoiceContent, {
+        scale: 1.5, // Further reduce scale
+        useCORS: true,
+        logging: false,
+        backgroundColor: null,
+      });
+
+      const imgData = canvas.toDataURL("image/jpeg", 1.0); 
+      const pdf = new jsPDF({
+        compress: true,
+        unit: "mm",
+        format: "a4",
+      });
+
+      const imgWidth = 210;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      pdf.addImage(
+        imgData,
+        "JPEG",
+        0,
+        0,
+        imgWidth,
+        imgHeight,
+        undefined,
+        "FAST"
+      );
+
+      return pdf.output("blob");
+    }
+
+    return blob;
+  };
   const uploadPdf = async (file) => {
     const metadata = {
       contentType: "application/pdf",

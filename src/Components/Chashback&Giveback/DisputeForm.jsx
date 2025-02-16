@@ -1,23 +1,25 @@
-import { collection, doc, getDocs } from "firebase/firestore";
+import { collection, doc, addDoc, getDocs } from "firebase/firestore";
+import {
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+  deleteObject,
+} from "firebase/storage";
 import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { db } from "../../../firebase";
+import { db, storage } from "../../../firebase";
+import axios from "axios";
+import { FaSpinner } from "react-icons/fa"; // Import FaSpinner from react-icons
+import toast from "react-hot-toast";
 
 const DisputeForm = () => {
-  const [showPaymentSelection, setShowPaymentSelection] = useState(false);
-  const [existingPayments, setExistingPayments] = useState({
-    bankAccounts: [],
-    cardDetails: [],
-    upiDetails: [],
-  });
-  const [selectedPayment, setSelectedPayment] = useState(null);
   const { user } = useSelector((state) => state.userReducer);
   const [shops, setShops] = useState([]);
   const [selectedShop, setSelectedShop] = useState("");
   const [paidAmount, setPaidAmount] = useState("");
-  const [loadingPayment, setLoadingPayment] = useState(true);
   const [couponCode, setCouponCode] = useState("");
-  const [uploadedPdf, setUploadedPdf] = useState(null); 
+  const [uploadedPdf, setUploadedPdf] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
@@ -26,7 +28,7 @@ const DisputeForm = () => {
       querySnapshot.forEach((doc) => {
         const shopData = doc.data();
         if (shopData.status === "Active") {
-          data.push({ id: doc.id, ...shopData });
+          data.push({ shopId: doc.id, ...shopData });
         }
       });
       setShops(data);
@@ -60,129 +62,161 @@ const DisputeForm = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchAllPaymentMethods = async () => {
-      if (!user?.uid) return;
-
-      try {
-        const userBankDetailsRef = doc(db, "userBankDetails", user.uid);
-
-        const bankAccountsSnapshot = await getDocs(
-          collection(userBankDetailsRef, "bankAccounts")
-        );
-        const banks = bankAccountsSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          type: "bank",
-          ...doc.data(),
-        }));
-
-        const cardDetailsSnapshot = await getDocs(
-          collection(userBankDetailsRef, "cardDetails")
-        );
-        const cards = cardDetailsSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          type: "card",
-          ...doc.data(),
-        }));
-
-        const upiDetailsSnapshot = await getDocs(
-          collection(userBankDetailsRef, "upiDetails")
-        );
-        const upis = upiDetailsSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          type: "upi",
-          ...doc.data(),
-        }));
-
-        setExistingPayments({
-          bankAccounts: banks,
-          cardDetails: cards,
-          upiDetails: upis,
-        });
-
-        if (banks.length > 0) {
-          setSelectedPayment(banks[0]);
-        } else if (cards.length > 0) {
-          setSelectedPayment(cards[0]);
-        } else if (upis.length > 0) {
-          setSelectedPayment(upis[0]);
-        }
-
-        setLoadingPayment(false);
-      } catch (error) {
-        console.error("Error fetching payment methods:", error);
-      }
+  const uploadPdf = async (file) => {
+    const metadata = {
+      contentType: "application/pdf",
     };
+    const storageRef = ref(storage, `dispute-invoices/${file.name}`);
+    const uploadTask = uploadBytesResumable(storageRef, file, metadata);
 
-    fetchAllPaymentMethods();
-  }, [user?.uid]);
-
-  const handlePaymentSelection = (payment) => {
-    setSelectedPayment(payment);
-    setShowPaymentSelection(false);
+    return new Promise((resolve, reject) => {
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log("Upload is " + progress + "% done");
+        },
+        (error) => {
+          console.error("Upload failed:", error);
+          reject(error);
+        },
+        async () => {
+          try {
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+            resolve(downloadURL);
+          } catch (error) {
+            console.error("Failed to get download URL:", error);
+            // Delete the uploaded file if we can't get its URL
+            try {
+              await deleteObject(storageRef);
+            } catch (deleteError) {
+              console.error("Failed to delete incomplete upload:", deleteError);
+            }
+            reject(error);
+          }
+        }
+      );
+    });
   };
 
-  const getPaymentDisplayText = (payment) => {
-    if (!payment) return "";
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
 
-    switch (payment.type) {
-      case "bank":
-        return `${payment.bankName} XXXXX${payment.accountNumber.slice(-3)}`;
-      case "card":
-        return `${payment.cardHolder} Card XXXXX${payment.cardNumber.slice(
-          -4
-        )}`;
-      case "upi":
-        return payment.upiId;
-      default:
-        return "";
+    try {
+      // Upload PDF to Firebase Storage
+      const pdfUrl = await uploadPdf(uploadedPdf);
+
+      // Find the selected shop details
+      const selectedShopDetails = shops.find(
+        (shop) => shop.businessName === selectedShop
+      );
+
+      // Save form data to Firestore
+      const formData = {
+        shopId: selectedShopDetails.shopId,
+        shopName: selectedShopDetails.businessName,
+        shopEmail: selectedShopDetails.email,
+        shopPhone: selectedShopDetails.mobileNumber,
+        shopOwnerName: selectedShopDetails.owner,
+        paidAmount,
+        couponCode,
+        invoiceName: uploadedPdf?.name,
+        invoiceUrl: pdfUrl,
+        userName: user.fname + " " + user.lname,
+        userEmail: user.email,
+        status: "Pending",
+        requestedAt: new Date().toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        }),
+      };
+      console.log(formData);
+
+      await addDoc(collection(db, "cashbackDisputeRequests"), formData);
+
+      // Send confirmation email
+      await axios.post(`${import.meta.env.VITE_AWS_SERVER}/send-email`, {
+        email: user.email,
+        title: "ShoppinessMart - Dispute Request Confirmation",
+        body: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h2 style="color: #333;">Thank you for submitting your dispute request!</h2>
+            
+            <p>Dear ${user.fname} ${user.lname},</p>
+            
+            <p>We have received your dispute request regarding the cashback for the following details:</p>
+            
+            <ul>
+              <li><strong>Shop Name:</strong> ${selectedShopDetails.businessName}</li>
+              <li><strong>Paid Amount:</strong> ${paidAmount}</li>
+              <li><strong>Coupon Code:</strong> ${couponCode}</li>
+            </ul>
+            
+            <p>Our team will review your request and get back to you within 2-3 business days.</p>
+            
+            <p>If you have any questions, please don't hesitate to contact our support team.</p>
+            
+            <p>Best regards,<br>
+            The ShoppinessMart Team</p>
+          </div>
+        `,
+      });
+
+      toast.success("Dispute request submitted successfully!");
+      // Reset form fields
+      setSelectedShop("");
+      setPaidAmount("");
+      setCouponCode("");
+      setUploadedPdf(null);
+    } catch (error) {
+      console.error("Error submitting dispute request:", error);
+      toast.error("Failed to submit dispute request. Please try again.");
+    } finally {
+      setIsLoading(false);
+      setUploadProgress(0); // Reset upload progress
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    const formData = {
-      selectedShop,
-      paidAmount,
-      selectedPayment,
-      couponCode,
-      uploadedPdf,
-      status: "New",
-    };
-
-    console.log("Form Data:", formData);
-  };
-
   return (
-    <div className="relative">
+    <div className="">
       {/* Disclaimer */}
-      <p className="text-sm text-yellow-800 bg-yellow-100 p-3 rounded-md border border-yellow-400 font-semibold mb-2">
-        ⚠️ <strong>Important:</strong>
-        <p>
-          If you have received a bill or invoice but have not received the
-          cashback in your wallet, follow these steps before clicking the &quot;
-          Dispute Request&quot; button to ensure a successful Dispute request:
+      <div className="bg-yellow-100 p-4 rounded-md border border-yellow-400 mb-6">
+        <p className="text-sm text-yellow-800 font-semibold">
+          ⚠️ <strong>Important:</strong>
         </p>
-        <p>
-          1. Select the shop from which you redeemed the coupon and purchased
-          items.
+        <p className="text-sm text-yellow-800 mt-2">
+          If you have received a bill or invoice and paid the full amount but
+          have not received the cashback in your wallet, follow these steps
+          before clicking the &quot; Dispute Request&quot; button to ensure a
+          successful dispute request:
         </p>
-        <p>2. Enter the total bill amount.</p>
-        <p>
-          3. Go to the &quot;My Coupons&quot; section, copy the coupon code, and
-          enter it in the required field.
-        </p>
-        <p>4. Upload the invoice as proof of purchase.</p>
-      </p>
+        <ol className="list-decimal list-inside text-sm text-yellow-800 mt-2">
+          <li>
+            Select the shop from which you redeemed the coupon and purchased
+            items.
+          </li>
+          <li>Enter the total bill amount.</li>
+          <li>
+            Go to the &quot;My Coupons&quot; section, copy the coupon code, and
+            enter it in the required field.
+          </li>
+          <li>Upload the invoice as proof of purchase.</li>
+        </ol>
+      </div>
 
       <form className="space-y-4 max-w-md" onSubmit={handleSubmit}>
         <div>
-          <label className="block text-sm mb-2">Select Shop</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Select Shop
+          </label>
           <select
-            className="w-full bg-gray-200 rounded p-2 text-sm border-0"
+            className="w-full bg-gray-100 rounded p-2 text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={selectedShop}
             onChange={handleShopChange}
+            required
           >
             <option value="">Select a shop...</option>
             {shops.map((shop, index) => (
@@ -194,20 +228,25 @@ const DisputeForm = () => {
         </div>
 
         <div>
-          <label className="block text-sm mb-2">Paid Amount</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Paid Amount
+          </label>
           <input
             type="text"
-            className="w-full bg-gray-200 rounded p-2 text-sm border-0"
+            className="w-full bg-gray-100 rounded p-2 text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={paidAmount}
             onChange={handlePaidAmountChange}
+            required
           />
         </div>
 
         <div>
-          <label className="block text-sm mb-2">Coupon Code</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Coupon Code
+          </label>
           <input
             type="text"
-            className="w-full bg-gray-200 rounded p-2 text-sm border-0"
+            className="w-full bg-gray-100 rounded p-2 text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={couponCode}
             onChange={handleCouponCodeChange}
             required
@@ -216,13 +255,15 @@ const DisputeForm = () => {
         </div>
 
         <div>
-          <label className="block text-sm mb-2">Upload PDF</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Upload PDF
+          </label>
           <input
-            required
             type="file"
             accept="application/pdf"
-            className="w-full bg-gray-200 rounded p-2 text-sm border-0"
+            className="w-full bg-gray-100 rounded p-2 text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
             onChange={handlePdfUpload}
+            required
           />
           {uploadedPdf && (
             <p className="text-sm text-gray-600 mt-1">
@@ -231,81 +272,16 @@ const DisputeForm = () => {
           )}
         </div>
 
-        <div className="flex justify-between items-center text-sm">
-          <div>
-            {loadingPayment ? (
-              <div className="w-40 h-4 bg-gray-300 rounded animate-pulse"></div>
-            ) : selectedPayment ? (
-              getPaymentDisplayText(selectedPayment)
-            ) : (
-              "No payment method selected"
-            )}
-          </div>
-          <button
-            type="button"
-            className="text-[#07B0A0] font-medium"
-            onClick={() => setShowPaymentSelection(!showPaymentSelection)}
-          >
-            CHANGE
-          </button>
-        </div>
-
-        {showPaymentSelection && (
-          <div className="absolute left-0 right-0 mt-2 bg-white shadow-lg rounded-md border p-4 z-10">
-            {existingPayments.bankAccounts.length > 0 && (
-              <div className="mb-4">
-                <h3 className="text-sm font-semibold mb-2">Bank Accounts</h3>
-                {existingPayments.bankAccounts.map((bank) => (
-                  <div
-                    key={bank.id}
-                    className="flex justify-between items-center p-2 hover:bg-gray-100 rounded cursor-pointer"
-                    onClick={() => handlePaymentSelection(bank)}
-                  >
-                    <span className="text-sm">{`${bank.bankName} - ${bank.accountNumber}`}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {existingPayments.cardDetails.length > 0 && (
-              <div className="mb-4">
-                <h3 className="text-sm font-semibold mb-2">Cards</h3>
-                {existingPayments.cardDetails.map((card) => (
-                  <div
-                    key={card.id}
-                    className="flex justify-between items-center p-2 hover:bg-gray-100 rounded cursor-pointer"
-                    onClick={() => handlePaymentSelection(card)}
-                  >
-                    <span className="text-sm">{`${
-                      card.cardHolder
-                    } - XXXX${card.cardNumber.slice(-4)}`}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {existingPayments.upiDetails.length > 0 && (
-              <div>
-                <h3 className="text-sm font-semibold mb-2">UPI</h3>
-                {existingPayments.upiDetails.map((upi) => (
-                  <div
-                    key={upi.id}
-                    className="flex justify-between items-center p-2 hover:bg-gray-100 rounded cursor-pointer"
-                    onClick={() => handlePaymentSelection(upi)}
-                  >
-                    <span className="text-sm">{upi.upiId}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
         <button
           type="submit"
-          className="w-full bg-blue-700 text-white rounded py-2 text-md mt-6"
+          className="w-full bg-blue-600 text-white rounded py-2 text-md mt-6 hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center"
+          disabled={isLoading}
         >
-          Dispute Request
+          {isLoading ? (
+            <FaSpinner className="animate-spin" /> // Add spinning animation
+          ) : (
+            "Dispute Request"
+          )}
         </button>
       </form>
     </div>
