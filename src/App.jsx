@@ -6,6 +6,7 @@ import Footer from "./Components/Footer";
 import Navbar from "./Components/Navbar/Navbar";
 import Loader from "./Components/Loader/Loader";
 import NewLayout from "./NewLayout";
+import GeneratedCoupons from "./Services-Dashboard/pages/Coupons/GeneratedCoupons";
 // import ProtectedRoute from "./Components/ProtectedRoute";
 
 const BusinessDetails = lazy(() => import("./pages/BusinessDetails"));
@@ -384,6 +385,7 @@ const router = createBrowserRouter([
           { path: "dashboard", element: <Dashboard /> },
           { path: "products", element: <Products /> },
           { path: "customers", element: <Customers /> },
+          { path: "coupons", element: <GeneratedCoupons /> },
           { path: "shopinfo", element: <ShopInfo /> },
           { path: "pos", element: <MainPos /> },
           { path: "invoices", element: <Invoice /> },

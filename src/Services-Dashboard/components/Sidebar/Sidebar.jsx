@@ -11,6 +11,7 @@ import iconPOS from "../../assets/icon-pos.png";
 import iconInvoices from "../../assets/icon-invoice.png";
 import iconLogout from "../../assets/icon-logout.png";
 import { businessUserExist } from "../../../redux/reducer/businessUserReducer";
+import { RiCoupon2Line } from "react-icons/ri";
 
 const Sidebar = () => {
   const { id } = useParams();
@@ -82,6 +83,13 @@ const Sidebar = () => {
             <li>
               <img src={iconCustomers} alt="loading" />
               Customers
+            </li>
+          </Link>
+
+          <Link to={`/services-dashboard/${id}/coupons`}>
+            <li>
+            <RiCoupon2Line className="w-5 h-5"/>
+             Generated Coupons
             </li>
           </Link>
 

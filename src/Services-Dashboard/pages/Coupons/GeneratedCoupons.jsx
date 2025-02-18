@@ -1,14 +1,16 @@
 import { collection, getDocs } from "firebase/firestore";
 import { useCallback, useEffect, useState } from "react";
 import { FiMoreVertical, FiSearch } from "react-icons/fi";
-import { db } from "../../../../../firebase";
+import { db } from "../../../../firebase";
+import { useParams } from "react-router-dom";
 
-const Coupons = () => {
+const GeneratedCoupons = () => {
   const [activeTab, setActiveTab] = useState("generated");
   const [currentPage, setCurrentPage] = useState(1);
   const [coupons, setCoupons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const { id } = useParams();
   const itemsPerPage = 5;
 
   const fetchData = useCallback(async () => {
@@ -18,7 +20,9 @@ const Coupons = () => {
       const data = [];
       querySnapshot.forEach((doc) => {
         const couponsData = doc.data();
-        data.push({ id: doc.id, ...couponsData });
+        if (couponsData.businessId === id) {
+          data.push({ id: doc.id, ...couponsData });
+        }
       });
       setCoupons(data);
     } catch (error) {
@@ -31,6 +35,7 @@ const Coupons = () => {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
 
   // Filter coupons based on active tab and search term
   const filteredCoupons = coupons
@@ -263,4 +268,4 @@ const Coupons = () => {
   );
 };
 
-export default Coupons;
+export default GeneratedCoupons;

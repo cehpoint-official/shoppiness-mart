@@ -82,7 +82,11 @@ const ProductDetails = () => {
         businessId,
         userId,
         productId,
-        createdAt: new Date().toISOString(),
+        createdAt: new Date().toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        }),
         businessRate: business.rate,
         userCashback: business.rate / 2,
         platformEarnings: business.rate / 2,

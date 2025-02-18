@@ -11,6 +11,7 @@ import { db, storage } from "../../../firebase";
 import axios from "axios";
 import { FaSpinner } from "react-icons/fa"; // Import FaSpinner from react-icons
 import toast from "react-hot-toast";
+import { useParams } from "react-router-dom";
 
 const DisputeForm = () => {
   const { user } = useSelector((state) => state.userReducer);
@@ -20,7 +21,7 @@ const DisputeForm = () => {
   const [couponCode, setCouponCode] = useState("");
   const [uploadedPdf, setUploadedPdf] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-
+  const { userId } = useParams();
   const fetchData = useCallback(async () => {
     try {
       const querySnapshot = await getDocs(collection(db, "businessDetails"));
@@ -126,6 +127,7 @@ const DisputeForm = () => {
         invoiceUrl: pdfUrl,
         userName: user.fname + " " + user.lname,
         userEmail: user.email,
+        userId,
         status: "Pending",
         requestedAt: new Date().toLocaleDateString("en-GB", {
           day: "numeric",
@@ -176,7 +178,6 @@ const DisputeForm = () => {
       toast.error("Failed to submit dispute request. Please try again.");
     } finally {
       setIsLoading(false);
-      setUploadProgress(0); // Reset upload progress
     }
   };
 

@@ -9,6 +9,7 @@ import WithdrawalForm from "../../Components/Chashback&Giveback/WithdrawalForm";
 import WithdrawlRequests from "../../Components/Chashback&Giveback/WithdrawlRequests";
 import { useSelector } from "react-redux";
 import DisputeForm from "../../Components/Chashback&Giveback/DisputeForm";
+import DisputeRequest from "../../Components/Chashback&Giveback/DisputeRequest";
 
 const CashbackGiveback = () => {
   const [activeTab, setActiveTab] = useState("claim");
@@ -76,7 +77,7 @@ const CashbackGiveback = () => {
           </button>
           <h2 className="text-lg font-normal">Dispute Requests</h2>
         </div>
-        <GiveBackHistory />
+        <DisputeRequest />
       </div>
     );
   }
