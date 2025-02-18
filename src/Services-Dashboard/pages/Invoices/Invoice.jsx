@@ -5,10 +5,11 @@ import SingleInvoice from "./SingleInvoice";
 import { useParams } from "react-router-dom";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../../../firebase";
+import UpdatePos from "../../components/Invoices/UpdatePos";
 
 const InvoiceSkeleton = () => (
   <tr className="animate-pulse">
-    {[...Array(9)].map((_, index) => (
+    {[...Array(11)].map((_, index) => (
       <td key={index} className="p-4">
         <div className="h-4 bg-gray-200 rounded"></div>
       </td>
@@ -21,6 +22,7 @@ const Invoice = () => {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [selectedInvoiceUpdate, setSelectedInvoiceUpdate] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
   const customersPerPage = 5;
@@ -95,6 +97,7 @@ const Invoice = () => {
 
   const handleBackToInvoices = () => {
     setSelectedInvoice(null);
+    setSelectedInvoiceUpdate(null);
     fetchData();
   };
 
@@ -111,6 +114,16 @@ const Invoice = () => {
       />
     );
   }
+  if (selectedInvoiceUpdate) {
+    return (
+      <UpdatePos
+        invoiceDetails={selectedInvoiceUpdate}
+        onBack={handleBackToInvoices}
+        onUpdate={fetchData}
+      />
+    );
+  }
+  console.log(currentCustomers);
 
   return (
     <div className="p-10">
@@ -154,6 +167,7 @@ const Invoice = () => {
                   "Billing Date",
                   "Due Date",
                   "Invoice",
+                  "Update Invoice",
                 ].map((header) => (
                   <th
                     key={header}
@@ -209,6 +223,9 @@ const Invoice = () => {
                   <th className="text-left p-4 text-gray-500 font-normal">
                     Invoice
                   </th>
+                  <th className="text-left p-4 text-gray-500 font-normal">
+                    Update Invoice
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -245,6 +262,17 @@ const Invoice = () => {
                         View
                       </button>
                     </td>
+                    {!invoice.claimedCouponCode && (
+                      <td className="p-4">
+                        <button
+                          onClick={() => setSelectedInvoiceUpdate(invoice)}
+                          className="px-4 py-2 text-white border bg-blue-500 rounded-md flex items-center gap-2"
+                        >
+                          <AiOutlineEye className="w-4 h-4" />
+                          Update
+                        </button>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>

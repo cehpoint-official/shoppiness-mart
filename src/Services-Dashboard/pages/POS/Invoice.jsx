@@ -224,6 +224,8 @@ const Invoice = ({ data, onBack }) => {
         billerName: data.billerName || "",
         dueDate: data.dueDate || "",
         subTotal: data.totalPrice || 0,
+        customerEmail: data.email || "",
+        customerPhoneNumber: data.phoneNumber || "",
         taxRate: data.totalPrice
           ? ((data.taxAmount / data.totalPrice) * 100).toFixed(1)
           : "0",
@@ -275,8 +277,6 @@ const Invoice = ({ data, onBack }) => {
           const couponData = {
             claimedCouponCode: data.code,
             claimedCouponCodeUserName: data.customerName,
-            claimedCouponCodeUserEmail: data.email,
-            userPhoneNumber: data.phoneNumber,
             discount: data.userCashback,
             userCashbackPercentage: data.userCashback,
             userCashback,
