@@ -86,6 +86,13 @@ const Sidebar = () => {
             </li>
           </Link>
 
+          <Link to={`/services-dashboard/${id}/money-send`}>
+            <li>
+              <img src={iconCustomers} alt="loading" />
+              Send Money To Platform
+            </li>
+          </Link>
+
           <Link to={`/services-dashboard/${id}/coupons`}>
             <li>
             <RiCoupon2Line className="w-5 h-5"/>

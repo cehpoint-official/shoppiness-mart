@@ -7,6 +7,7 @@ import Navbar from "./Components/Navbar/Navbar";
 import Loader from "./Components/Loader/Loader";
 import NewLayout from "./NewLayout";
 import GeneratedCoupons from "./Services-Dashboard/pages/Coupons/GeneratedCoupons";
+import AllMoneySendToPlatform from "./Services-Dashboard/pages/MoneySendToPlatform/AllMoneySendToPlatform";
 // import ProtectedRoute from "./Components/ProtectedRoute";
 
 const BusinessDetails = lazy(() => import("./pages/BusinessDetails"));
@@ -385,6 +386,7 @@ const router = createBrowserRouter([
           { path: "dashboard", element: <Dashboard /> },
           { path: "products", element: <Products /> },
           { path: "customers", element: <Customers /> },
+          { path: "money-send", element: <AllMoneySendToPlatform /> },
           { path: "coupons", element: <GeneratedCoupons /> },
           { path: "shopinfo", element: <ShopInfo /> },
           { path: "pos", element: <MainPos /> },
