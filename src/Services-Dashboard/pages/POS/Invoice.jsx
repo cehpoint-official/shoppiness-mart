@@ -14,6 +14,7 @@ import {
 } from "firebase/storage";
 import toast from "react-hot-toast";
 import { FaSpinner } from "react-icons/fa";
+import axios from "axios";
 
 const Invoice = ({ data, onBack }) => {
   const { user } = useSelector((state) => state.businessUserReducer);
@@ -35,7 +36,7 @@ const Invoice = ({ data, onBack }) => {
       });
 
       // Compress the image data
-      const imgData = canvas.toDataURL("image/jpeg", 1.0); 
+      const imgData = canvas.toDataURL("image/jpeg", 1.0);
 
       // Create PDF with compression
       const pdf = new jsPDF({
@@ -83,7 +84,7 @@ const Invoice = ({ data, onBack }) => {
         backgroundColor: null,
       });
 
-      const imgData = canvas.toDataURL("image/jpeg", 1.0); 
+      const imgData = canvas.toDataURL("image/jpeg", 1.0);
       const pdf = new jsPDF({
         compress: true,
         unit: "mm",
@@ -203,6 +204,178 @@ const Invoice = ({ data, onBack }) => {
     }
   };
 
+  // UPDATED EMAIL FUNCTIONS
+  const sendEmailToUser = async (invoiceData, pdfUrl) => {
+    // Extract values with guaranteed defaults
+    const customerName = invoiceData.customerName || "Customer";
+    const invoiceNum = invoiceData.invoiceNum || invoiceData.invoiceId || "N/A";
+    const billingDate =
+      invoiceData.billingDate || new Date().toLocaleDateString("en-GB");
+    const dueAmount = parseFloat(invoiceData.dueAmount || 0);
+    const customerEmail = invoiceData.customerEmail || invoiceData.email || "";
+
+    // Ensure we have a valid userCashback amount
+    let userCashback = 0;
+    if (typeof invoiceData.userCashback === "number") {
+      userCashback = invoiceData.userCashback;
+    } else if (typeof invoiceData.userCashbackAmount === "number") {
+      userCashback = invoiceData.userCashbackAmount;
+    } else if (invoiceData.userCashback) {
+      // Handle string conversion if needed
+      userCashback = parseFloat(invoiceData.userCashback);
+    }
+
+    // Ensure userCashback is a valid number
+    userCashback = isNaN(userCashback) ? 0 : userCashback;
+    // console.log("Email data check - User email:", {
+    //   customerName,
+    //   invoiceNum,
+    //   billingDate,
+    //   userCashback,
+    //   dueAmount,
+    //   customerEmail
+    // });
+
+    const emailTemplate = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background-color: #f8f8f8; padding: 20px; border-radius: 8px;">
+          <h2 style="color: #333; margin-bottom: 20px;">Invoice Generated and Cashback Details</h2>
+          <p style="color: #666;">Dear ${customerName},</p>
+          <p style="color: #666;">Your invoice number <strong>${invoiceNum}</strong> has been generated successfully.</p>
+          ${
+            userCashback > 0
+              ? `
+            <p style="color: #666;">You are eligible for a cashback of <strong>Rs. ${userCashback.toFixed(
+              2
+            )}</strong>.</p>
+            ${
+              dueAmount > 0
+                ? `
+              <p style="color: #666;">However, due to an outstanding due amount of <strong>Rs. ${dueAmount.toFixed(
+                2
+              )}</strong>, your cashback will be credited once the due is cleared.</p>
+            `
+                : `
+              <p style="color: #666;">The cashback has been credited to your account.</p>
+            `
+            }
+          `
+              : `
+            <p style="color: #666;">No cashback is applicable for this invoice.</p>
+          `
+          }
+          <div style="background-color: #fff; padding: 15px; border-radius: 5px; margin: 15px 0;">
+            <p style="margin: 5px 0;"><strong>Invoice Number:</strong> ${invoiceNum}</p>
+            ${
+              userCashback > 0
+                ? `
+              <p style="margin: 5px 0;"><strong>Cashback Amount:</strong> Rs. ${userCashback.toFixed(
+                2
+              )}</p>
+            `
+                : ""
+            }
+            <p style="margin: 5px 0;"><strong>Date:</strong> ${billingDate}</p>
+          </div>
+          <p style="color: #666;">You can download the invoice by clicking the button below:</p>
+          <div style="text-align: center; margin-top: 20px;">
+            <a href="${pdfUrl}" style="background-color: #179A56; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+              Download Invoice
+            </a>
+          </div>
+          <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+            <p style="color: #666; margin: 0;">Best regards,</p>
+            <p style="color: #666; margin: 5px 0;">The ShoppinessMart Team</p>
+          </div>
+        </div>
+      </div>
+    `;
+
+    try {
+      await axios.post(`${import.meta.env.VITE_AWS_SERVER}/send-email`, {
+        email: customerEmail,
+        title: "ShoppinessMart - Invoice Generated",
+        body: emailTemplate,
+      });
+      //  console.log("Customer email sent successfully to:", customerEmail);
+    } catch (error) {
+      console.error("Failed to send customer email:", error);
+      throw error;
+    }
+  };
+
+  const sendEmailToBusinessOwner = async (invoiceData, pdfUrl) => {
+    // Extract values with guaranteed defaults
+    const invoiceNum = invoiceData.invoiceNum || invoiceData.invoiceId || "N/A";
+    const billingDate =
+      invoiceData.billingDate || new Date().toLocaleDateString("en-GB");
+
+    // Ensure we have a valid platformCashback amount
+    let platformCashback = 0;
+    if (typeof invoiceData.platformCashback === "number") {
+      platformCashback = invoiceData.platformCashback;
+    } else if (typeof invoiceData.amountEarned === "number") {
+      platformCashback = invoiceData.amountEarned;
+    } else if (typeof invoiceData.platformEarnings === "number") {
+      platformCashback = invoiceData.platformEarnings;
+    } else if (invoiceData.platformCashback) {
+      // Handle string conversion if needed
+      platformCashback = parseFloat(invoiceData.platformCashback);
+    }
+
+    // Ensure platformCashback is a valid number
+    platformCashback = isNaN(platformCashback) ? 0 : platformCashback;
+
+    // console.log("Email data check - Business owner email:", {
+    //   invoiceNum,
+    //   billingDate,
+    //   platformCashback,
+    //   businessEmail: user.email
+    // });
+
+    const emailTemplate = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background-color: #f8f8f8; padding: 20px; border-radius: 8px;">
+          <h2 style="color: #333; margin-bottom: 20px;">Platform Earnings Reminder</h2>
+          <p style="color: #666;">Dear Business Owner,</p>
+          <p style="color: #666;">For invoice number <strong>${invoiceNum}</strong>, the platform's share is <strong>Rs. ${platformCashback.toFixed(
+      2
+    )}</strong>.</p>
+          <p style="color: #666;">Please ensure the payment is made within the next 2-3 days.</p>
+          <div style="background-color: #fff; padding: 15px; border-radius: 5px; margin: 15px 0;">
+            <p style="margin: 5px 0;"><strong>Invoice Number:</strong> ${invoiceNum}</p>
+            <p style="margin: 5px 0;"><strong>Platform Earnings:</strong> Rs. ${platformCashback.toFixed(
+              2
+            )}</p>
+            <p style="margin: 5px 0;"><strong>Date:</strong> ${billingDate}</p>
+          </div>
+          <p style="color: #666;">You can download the invoice by clicking the button below:</p>
+          <div style="text-align: center; margin-top: 20px;">
+            <a href="${pdfUrl}" style="background-color: #179A56; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+              Download Invoice
+            </a>
+          </div>
+          <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+            <p style="color: #666; margin: 0;">Best regards,</p>
+            <p style="color: #666; margin: 5px 0;">The ShoppinessMart Team</p>
+          </div>
+        </div>
+      </div>
+    `;
+
+    try {
+      await axios.post(`${import.meta.env.VITE_AWS_SERVER}/send-email`, {
+        email: user.email,
+        title: "ShoppinessMart - Platform Earnings Reminder",
+        body: emailTemplate,
+      });
+      //console.log("Business owner email sent successfully to:", user.email);
+    } catch (error) {
+      console.error("Failed to send business owner email:", error);
+      throw error;
+    }
+  };
+
   const handleSave = async () => {
     setIsLoading(true);
     let pdfUrl = null;
@@ -214,12 +387,12 @@ const Invoice = ({ data, onBack }) => {
         throw new Error("Missing required invoice data");
       }
 
-      // Generate and upload PDF first
+      // Generate and upload PDF
       const pdfBlob = await generatePdfBlob();
       storageRef = ref(storage, `invoices/${data.invoiceId}.pdf`);
       pdfUrl = await uploadPdf(pdfBlob);
 
-      // Prepare base invoice data
+      // Base invoice data
       const baseInvoiceData = {
         billerName: data.billerName || "",
         dueDate: data.dueDate || "",
@@ -246,14 +419,18 @@ const Invoice = ({ data, onBack }) => {
           }),
       };
 
-      // Use a transaction to ensure all or nothing is saved
+      // Use a transaction to ensure all-or-nothing saving
       await runTransaction(db, async (transaction) => {
-        // Check if this is a coupon-based invoice
-        const hasCoupon = Boolean(data.code && data.userId && data.id);
+        const hasCoupon = Boolean(
+          data.couponCode && data.customerId && data.couponId
+        );
+
+        // Variable to store complete invoice data
+        let completeInvoiceData = { ...baseInvoiceData };
 
         if (hasCoupon) {
-          // Verify coupon still exists and is valid
-          const couponRef = doc(db, "coupons", data.id);
+          // Verify coupon exists and is valid
+          const couponRef = doc(db, "coupons", data.couponId);
           const couponDoc = await transaction.get(couponRef);
 
           if (!couponDoc.exists()) {
@@ -273,20 +450,8 @@ const Invoice = ({ data, onBack }) => {
               data.platformEarnings
             );
 
-          // Add coupon-specific data
-          const couponData = {
-            claimedCouponCode: data.code,
-            claimedCouponCodeUserName: data.customerName,
-            discount: data.userCashback,
-            userCashbackPercentage: data.userCashback,
-            userCashback,
-            platformCashback,
-            remainingCashback,
-            userId: data.userId,
-          };
-
           // Update user's cashback
-          const userRef = doc(db, "users", data.userId);
+          const userRef = doc(db, "users", data.customerId);
           const userDoc = await transaction.get(userRef);
 
           if (userDoc.exists()) {
@@ -306,23 +471,120 @@ const Invoice = ({ data, onBack }) => {
             }),
           });
 
-          // Save invoice with coupon data
-          const invoiceData = {
-            ...baseInvoiceData,
-            ...couponData,
+          // Save user transaction details
+          const userTransactionData = {
+            customerId: data.customerId || "",
+            invoiceId: data.invoiceId,
+            couponCode: data.couponCode || "",
+            products: data.products || [],
+            claimedDate: new Date().toLocaleDateString("en-GB", {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            }),
+            customerName: data.customerName || "",
+            customerEmail: data.email || "",
+            discount: data.userCashback || 0,
+            userCashbackAmount: userCashback || 0,
+            userRemainingCashbackAmount: remainingCashback || 0,
+            status: "Claimed",
+          };
+          await addDoc(collection(db, "userTransactions"), userTransactionData);
+
+          // Save platform earnings details
+          const platformEarningsData = {
+            customerId: data.customerId || "",
+            businessId: data.businessId,
+            invoiceId: data.invoiceId,
+            customerName: data.customerName || "",
+            customerEmail: data.email || "",
+            amountEarned: platformCashback || 0,
+            paymentStatus: "Pending",
+            dueDate: new Date(
+              Date.now() + 3 * 24 * 60 * 60 * 1000
+            ).toLocaleDateString("en-GB", {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            }),
+          };
+          await addDoc(
+            collection(db, "platformEarnings"),
+            platformEarningsData
+          );
+
+          // Add coupon-specific data to invoice
+          const couponData = {
+            claimedCouponCode: data.couponCode,
+            claimedCouponCodeUserName: data.customerName,
+            discount: data.userCashback,
+            userCashbackPercentage: data.userCashback,
+            userCashback,
+            platformCashback,
+            remainingCashback,
+            customerId: data.customerId || "",
             claimedDate: new Date().toLocaleDateString("en-GB", {
               day: "numeric",
               month: "short",
               year: "numeric",
             }),
           };
-          await addDoc(collection(db, "claimedCouponsDetails"), invoiceData);
+
+          // Update complete invoice data with coupon info
+          completeInvoiceData = { ...baseInvoiceData, ...couponData };
+          await addDoc(collection(db, "invoiceDetails"), completeInvoiceData);
+
+          console.log("Complete invoice data for emails:", completeInvoiceData);
+
+          // Send email to user with complete data
+          await sendEmailToUser(completeInvoiceData, pdfUrl);
+
+          // If platform earnings exist, send email to business owner
+          if ((platformCashback || 0) > 0) {
+            await sendEmailToBusinessOwner(completeInvoiceData, pdfUrl);
+          }
         } else {
           // Save invoice without coupon data
+          await addDoc(collection(db, "invoiceDetails"), completeInvoiceData);
+
+          // Save user transaction details with default values
+          const userTransactionData = {
+            customerId: data.customerId || "",
+            invoiceId: data.invoiceId,
+            couponCode: "",
+            products: data.products || [],
+            claimedDate: new Date().toLocaleDateString("en-GB", {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            }),
+            customerName: data.customerName || "",
+            customerEmail: data.email || "",
+            discount: 0,
+            userCashbackAmount: 0,
+            userRemainingCashbackAmount: 0,
+            status: "No Coupon",
+          };
+          await addDoc(collection(db, "userTransactions"), userTransactionData);
+
+          // Save platform earnings details with default values
+          const platformEarningsData = {
+            businessId: data.businessId,
+            customerId: data.customerId || "",
+            invoiceId: data.invoiceId,
+            customerName: data.customerName || "",
+            customerEmail: data.email || "",
+            amountEarned: 0,
+            paymentStatus: "Not Applicable",
+            dueDate: "",
+          };
           await addDoc(
-            collection(db, "claimedCouponsDetails"),
-            baseInvoiceData
+            collection(db, "platformEarnings"),
+            platformEarningsData
           );
+
+          // Send email to user (without cashback details)
+          await sendEmailToUser(completeInvoiceData, pdfUrl);
         }
       });
 
@@ -340,7 +602,6 @@ const Invoice = ({ data, onBack }) => {
         }
       }
 
-      // Show appropriate error message to user
       toast.error(error.message || "Failed to save invoice.");
     } finally {
       setIsLoading(false);

@@ -1,4 +1,12 @@
-import { doc, getDoc, collection, getDocs, addDoc } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  collection,
+  getDocs,
+  addDoc,
+  where,
+  query,
+} from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { db } from "../../firebase";
@@ -35,7 +43,7 @@ const BusinessDetails = () => {
       [name]: value,
     }));
   };
-  const generateUniqueCouponCode = (businessName) => {
+  const generateUniqueCouponCode = async (businessName) => {
     const specialChars = ["#", "@", "$", "&", "*"];
     const randomSpecialChar =
       specialChars[Math.floor(Math.random() * specialChars.length)];
@@ -44,19 +52,45 @@ const BusinessDetails = () => {
       .replace(/[^a-zA-Z0-9]/g, "")
       .toUpperCase()
       .substring(0, 5);
-    return `${randomSpecialChar}${cleanBusinessName}${randomDigits}`;
+    const couponCode = `${randomSpecialChar}${cleanBusinessName}${randomDigits}`;
+
+    // Check if the coupon code already exists in the database
+    const couponQuery = await getDocs(
+      query(collection(db, "coupons"), where("code", "==", couponCode))
+    );
+    if (!couponQuery.empty) {
+      // If the code exists, recursively generate a new one
+      return generateUniqueCouponCode(businessName);
+    }
+
+    return couponCode;
+  };
+
+  const validateForm = () => {
+    const { fullName, email, phoneNumber } = formData;
+    if (!fullName || !email || !phoneNumber) {
+      toast.error("All fields are required");
+      return false;
+    }
+    if (!/^\d{10}$/.test(phoneNumber)) {
+      toast.error("Phone number must be 10 digits");
+      return false;
+    }
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      toast.error("Invalid email address");
+      return false;
+    }
+    return true;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
+
     setGeneratingCoupon(true);
-
     try {
-      // Generate unique coupon code
-      const couponCode = generateUniqueCouponCode(business.businessName);
+      const couponCode = await generateUniqueCouponCode(business.businessName);
       setGeneratedCouponCode(couponCode);
-
-      // Close form dialog and open coupon dialog
       setShowDialog(false);
       setShowCouponDialog(true);
     } catch (error) {
@@ -82,6 +116,11 @@ const BusinessDetails = () => {
     setSavingCoupon(true);
 
     try {
+      if (!businessId || !userId || !generatedCouponCode) {
+        toast.error("Missing required data to save coupon");
+        return;
+      }
+
       await addDoc(collection(db, "coupons"), {
         ...formData,
         businessId,

@@ -1,13 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import headerLogo from "../../assets/header-logo.png";
 import {
   doc,
-  getDoc,
-  setDoc,
-  updateDoc,
   runTransaction,
   query,
   getDocs,
@@ -26,7 +23,7 @@ import { Link } from "react-router-dom";
 import { FaSpinner } from "react-icons/fa";
 import axios from "axios";
 
-const InvoiceUpdate = ({ updatedData, updateTable, back }) => {
+const InvoiceUpdate = ({ updatedData, back }) => {
   const { user } = useSelector((state) => state.businessUserReducer);
   const [isLoading, setIsLoading] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);

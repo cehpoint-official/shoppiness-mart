@@ -3,7 +3,8 @@ import { RxCross2 } from "react-icons/rx";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../../../firebase";
 import { useParams } from "react-router-dom";
-import { FaSpinner } from "react-icons/fa"; // Import the spinner icon
+import { FaSpinner } from "react-icons/fa";
+import toast from "react-hot-toast";
 
 const POS = ({ onGenerateInvoice }) => {
   const [products, setProducts] = useState([]);
@@ -49,30 +50,6 @@ const POS = ({ onGenerateInvoice }) => {
     }));
   };
 
-  const fetchProductData = useCallback(async () => {
-    try {
-      const querySnapshot = await getDocs(collection(db, "productDetails"));
-      const data = [];
-      querySnapshot.forEach((doc) => {
-        const productData = doc.data();
-        if (productData.businessId === id) {
-          data.push({ id: doc.id, ...productData });
-        }
-      });
-      setListedProducts(data);
-    } catch (error) {
-      console.log("Error getting documents: ", error);
-    }
-  }, [id]);
-
-  const filteredProducts = listedProducts.filter((product) =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const handleDeleteProduct = (productId) => {
-    setProducts(products.filter((product) => product.id !== productId));
-  };
-
   const fetchData = useCallback(async () => {
     try {
       const querySnapshot = await getDocs(collection(db, "coupons"));
@@ -85,9 +62,35 @@ const POS = ({ onGenerateInvoice }) => {
       });
       setCoupons(data);
     } catch (error) {
-      console.log("Error getting documents: ", error);
+      console.error("Error fetching coupons:", error);
+      toast.error("Failed to fetch coupons. Please try again.");
     }
   }, [id]);
+
+  const fetchProductData = useCallback(async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "productDetails"));
+      const data = [];
+      querySnapshot.forEach((doc) => {
+        const productData = doc.data();
+        if (productData.businessId === id) {
+          data.push({ id: doc.id, ...productData });
+        }
+      });
+      setListedProducts(data);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      toast.error("Failed to fetch products. Please try again.");
+    }
+  }, [id]);
+
+  const filteredProducts = listedProducts.filter((product) =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleDeleteProduct = (productId) => {
+    setProducts(products.filter((product) => product.id !== productId));
+  };
 
   useEffect(() => {
     fetchData();
@@ -108,11 +111,20 @@ const POS = ({ onGenerateInvoice }) => {
 
   const handleVerify = async () => {
     setIsVerifying(true);
-    const found = coupons.find((coupon) => coupon.code === couponCode);
-    setTimeout(() => {
-      setMatchedCoupon(found || null);
+    try {
+      const found = coupons.find((coupon) => coupon.code === couponCode);
+      if (!found) {
+        toast.error("Invalid coupon code");
+        setMatchedCoupon(null);
+        return;
+      }
+      setMatchedCoupon(found);
+    } catch (error) {
+      console.error("Error verifying coupon:", error);
+      toast.error("Failed to verify coupon. Please try again.");
+    } finally {
       setIsVerifying(false);
-    }, 1000); // Simulate a delay for verification
+    }
   };
 
   const getOfferText = (coupon) => {
@@ -123,6 +135,11 @@ const POS = ({ onGenerateInvoice }) => {
   };
 
   const handleGenerateInvoice = () => {
+    if (!isFormValid) {
+      toast.error("Please fill all required fields and ensure data is valid.");
+      return;
+    }
+
     const invoiceData = {
       ...customerInfo,
       products: products,
@@ -134,9 +151,14 @@ const POS = ({ onGenerateInvoice }) => {
       dueAmount: dueAmount.toFixed(1),
       time: new Date().toLocaleTimeString(),
       invoiceId: `IN-${Math.floor(Math.random() * 100000)}`,
-      ...matchedCoupon,
+      couponCode: matchedCoupon?.code || "",
+      userCashback: matchedCoupon?.userCashback || 0,
+      platformEarnings: matchedCoupon?.platformEarnings || 0,
+      customerId: matchedCoupon?.userId || "",
+      couponId: matchedCoupon?.id || "",
       businessId: id,
     };
+
     onGenerateInvoice(invoiceData);
   };
 
@@ -154,6 +176,19 @@ const POS = ({ onGenerateInvoice }) => {
     const price = parseFloat(productPrice);
     const quantity = productQuantity;
     const discount = parseFloat(discountValue) || 0;
+
+    if (isNaN(price) || price <= 0) {
+      toast.error("Please enter a valid product price.");
+      return;
+    }
+    if (isNaN(quantity)) {
+      toast.error("Please enter a valid quantity.");
+      return;
+    }
+    if (isNaN(discount)) {
+      toast.error("Please enter a valid discount.");
+      return;
+    }
 
     let subtotal = price * quantity;
     if (discountType === "percentage") {
@@ -190,11 +225,18 @@ const POS = ({ onGenerateInvoice }) => {
     (sum, product) => sum + parseFloat(product.subtotal),
     0
   );
+
+  // FIX: Calculate tax amount when either totalPrice or taxPercentage changes
+  useEffect(() => {
+    const calculatedTaxAmount = (totalPrice * taxPercentage) / 100;
+    setTaxAmount(calculatedTaxAmount);
+  }, [totalPrice, taxPercentage]);
+
   const validateForm = useCallback(() => {
     const isCustomerInfoValid =
       customerInfo.customerName.trim() !== "" &&
-      customerInfo.phoneNumber.trim() !== "" &&
-      customerInfo.email.trim() !== "" &&
+      /^\d{10}$/.test(customerInfo.phoneNumber) &&
+      /\S+@\S+\.\S+/.test(customerInfo.email) &&
       customerInfo.billerName.trim() !== "" &&
       customerInfo.billingDate !== "" &&
       customerInfo.dueDate !== "";
@@ -209,19 +251,36 @@ const POS = ({ onGenerateInvoice }) => {
       isCustomerInfoValid && isProductsValid && isCashValid && isTaxValid
     );
   }, [customerInfo, products, cashCollected, taxPercentage]);
+
   // Run validation whenever relevant fields change
   useEffect(() => {
     validateForm();
   }, [validateForm]);
-  // Update tax amount when tax percentage changes
-  useEffect(() => {
-    const calculatedTax = (totalPrice * taxPercentage) / 100;
-    setTaxAmount(parseFloat(calculatedTax.toFixed(1)));
-  }, [taxPercentage, totalPrice]);
 
   // Calculate grand total
   const grandTotal = totalPrice + taxAmount;
   const dueAmount = grandTotal - cashCollected;
+
+  // FIX: Handle tax percentage input field
+  const handleTaxPercentageChange = (e) => {
+    const value = e.target.value;
+    if (value === "") {
+      setTaxPercentage(0);
+    } else {
+      setTaxPercentage(parseFloat(value));
+    }
+  };
+
+  // FIX: Handle cash collected input field
+  const handleCashCollectedChange = (e) => {
+    const value = e.target.value;
+    if (value === "") {
+      setCashCollected(0);
+    } else {
+      setCashCollected(parseFloat(value));
+    }
+  };
+  console.log(matchedCoupon);
 
   return (
     <div className="flex flex-col gap-6 p-10">
@@ -516,12 +575,19 @@ const POS = ({ onGenerateInvoice }) => {
               <div>
                 <div className="flex flex-col items-center gap-2">
                   <p className="text-gray-600">TAX:%</p>
+                  {/* FIX: Updated input field handling */}
                   <input
                     type="number"
-                    value={taxPercentage}
-                    onChange={(e) =>
-                      setTaxPercentage(parseFloat(e.target.value))
+                    value={
+                      taxPercentage === 0 &&
+                      document.activeElement ===
+                        document.getElementById("tax-input")
+                        ? ""
+                        : taxPercentage
                     }
+                    id="tax-input"
+                    onChange={handleTaxPercentageChange}
+                    onFocus={(e) => e.target.value === "0" && e.target.select()}
                     className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -529,12 +595,19 @@ const POS = ({ onGenerateInvoice }) => {
               <div>
                 <div className="flex flex-col gap-2">
                   <p className="text-gray-600">Cash collected:</p>
+                  {/* FIX: Updated input field handling */}
                   <input
                     type="number"
-                    value={cashCollected}
-                    onChange={(e) =>
-                      setCashCollected(parseFloat(e.target.value))
+                    value={
+                      cashCollected === 0 &&
+                      document.activeElement ===
+                        document.getElementById("cash-input")
+                        ? ""
+                        : cashCollected
                     }
+                    id="cash-input"
+                    onChange={handleCashCollectedChange}
+                    onFocus={(e) => e.target.value === "0" && e.target.select()}
                     className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
