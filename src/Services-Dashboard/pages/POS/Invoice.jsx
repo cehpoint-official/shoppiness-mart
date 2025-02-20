@@ -4,7 +4,12 @@ import headerLogo from "../../assets/header-logo.png";
 import { Link } from "react-router-dom";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import { addDoc, collection, doc, runTransaction } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  runTransaction,
+} from "firebase/firestore";
 import { db, storage } from "../../../../firebase";
 import {
   getDownloadURL,
@@ -227,14 +232,6 @@ const Invoice = ({ data, onBack }) => {
 
     // Ensure userCashback is a valid number
     userCashback = isNaN(userCashback) ? 0 : userCashback;
-    // console.log("Email data check - User email:", {
-    //   customerName,
-    //   invoiceNum,
-    //   billingDate,
-    //   userCashback,
-    //   dueAmount,
-    //   customerEmail
-    // });
 
     const emailTemplate = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -297,7 +294,6 @@ const Invoice = ({ data, onBack }) => {
         title: "ShoppinessMart - Invoice Generated",
         body: emailTemplate,
       });
-      //  console.log("Customer email sent successfully to:", customerEmail);
     } catch (error) {
       console.error("Failed to send customer email:", error);
       throw error;
@@ -325,13 +321,6 @@ const Invoice = ({ data, onBack }) => {
 
     // Ensure platformCashback is a valid number
     platformCashback = isNaN(platformCashback) ? 0 : platformCashback;
-
-    // console.log("Email data check - Business owner email:", {
-    //   invoiceNum,
-    //   billingDate,
-    //   platformCashback,
-    //   businessEmail: user.email
-    // });
 
     const emailTemplate = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -369,9 +358,46 @@ const Invoice = ({ data, onBack }) => {
         title: "ShoppinessMart - Platform Earnings Reminder",
         body: emailTemplate,
       });
-      //console.log("Business owner email sent successfully to:", user.email);
     } catch (error) {
       console.error("Failed to send business owner email:", error);
+      throw error;
+    }
+  };
+
+  // New function to update business details collection
+  const updateBusinessDetails = async (
+    transaction,
+    businessId,
+    platformCashback
+  ) => {
+    try {
+      if (!businessId) {
+        console.warn("Business ID is missing, cannot update business details");
+        return;
+      }
+
+      const businessRef = doc(db, "businessDetails", businessId);
+      const businessDoc = await transaction.get(businessRef);
+
+      if (!businessDoc.exists()) {
+        console.warn(`Business document with ID ${businessId} not found`);
+        return;
+      }
+
+      const businessData = businessDoc.data();
+
+      // Get current values or set defaults
+      const currentTotalDue = businessData.totalPlatformEarningsDue || 0;
+
+      // Update only if there's a valid platform cashback amount
+      if (platformCashback > 0) {
+        // Update business details with new earnings information
+        transaction.update(businessRef, {
+          totalPlatformEarningsDue: currentTotalDue + platformCashback,
+        });
+      }
+    } catch (error) {
+      console.error("Error updating business details:", error);
       throw error;
     }
   };
@@ -427,6 +453,7 @@ const Invoice = ({ data, onBack }) => {
 
         // Variable to store complete invoice data
         let completeInvoiceData = { ...baseInvoiceData };
+        let platformCashback = 0;
 
         if (hasCoupon) {
           // Verify coupon exists and is valid
@@ -442,13 +469,18 @@ const Invoice = ({ data, onBack }) => {
           }
 
           // Calculate cashback
-          const { platformCashback, userCashback, remainingCashback } =
-            calculateCashbackAndEarnings(
-              data.grandTotal,
-              data.cashCollected,
-              data.userCashback,
-              data.platformEarnings
-            );
+          const {
+            platformCashback: calculatedPlatformCashback,
+            userCashback,
+            remainingCashback,
+          } = calculateCashbackAndEarnings(
+            data.grandTotal,
+            data.cashCollected,
+            data.userCashback,
+            data.platformEarnings
+          );
+
+          platformCashback = calculatedPlatformCashback;
 
           // Update user's cashback
           const userRef = doc(db, "users", data.customerId);
@@ -534,7 +566,12 @@ const Invoice = ({ data, onBack }) => {
           completeInvoiceData = { ...baseInvoiceData, ...couponData };
           await addDoc(collection(db, "invoiceDetails"), completeInvoiceData);
 
-          console.log("Complete invoice data for emails:", completeInvoiceData);
+          // Update businessDetails collection
+          await updateBusinessDetails(
+            transaction,
+            data.businessId,
+            platformCashback
+          );
 
           // Send email to user with complete data
           await sendEmailToUser(completeInvoiceData, pdfUrl);
@@ -582,6 +619,8 @@ const Invoice = ({ data, onBack }) => {
             collection(db, "platformEarnings"),
             platformEarningsData
           );
+
+          // No need to update business details when no coupon is claimed
 
           // Send email to user (without cashback details)
           await sendEmailToUser(completeInvoiceData, pdfUrl);
@@ -757,7 +796,6 @@ const Invoice = ({ data, onBack }) => {
               </tbody>
             </table>
           </div>
-
           {/* Totals */}
           <div className="flex justify-end">
             <div className="w-64 space-y-2">

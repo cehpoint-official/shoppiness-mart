@@ -161,6 +161,12 @@ const Sidebar = () => {
                 All Online Shops
               </Link>
               <Link
+                to="/admin/shoppiness/services/earnings"
+                className="py-2 px-6 hover:bg-teal-600 transition-colors"
+              >
+                Eanrings From Shops
+              </Link>
+              <Link
                 to="/admin/shoppiness/services/add-categories"
                 className="py-2 px-6 hover:bg-teal-600 transition-colors"
               >

@@ -257,6 +257,9 @@ const BusinessForm = () => {
         bannerUrl,
         status: "Pending",
         rate: "0",
+        totalPlatformEarnings: 0,
+        totalPlatformEarningsPaid: 0,
+        totalPlatformEarningsDue :0,
         createdDate: formatDate(new Date()),
       });
     } catch (e) {

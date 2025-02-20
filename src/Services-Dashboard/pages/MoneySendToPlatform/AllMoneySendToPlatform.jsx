@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   collection,
   query,
   where,
   getDocs,
-  orderBy,
-  limit,
   doc,
   updateDoc,
-  Timestamp,
+  addDoc,
+  getDoc,
 } from "firebase/firestore";
-
+import axios from "axios";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useSelector } from "react-redux";
 import {
   FaSpinner,
@@ -18,12 +18,16 @@ import {
   FaArrowLeft,
   FaSearch,
   FaFilter,
-  FaMoneyBillWave,
+  FaUpload,
+  FaFileAlt,
+  FaFileImage,
 } from "react-icons/fa";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { MdPending } from "react-icons/md";
+import { TbClockSearch } from "react-icons/tb";
 import { useParams } from "react-router-dom";
-import { db } from "../../../../firebase";
+import { db, storage } from "../../../../firebase";
+import toast from "react-hot-toast";
 
 const AllMoneySendToPlatform = () => {
   // State management
@@ -38,25 +42,71 @@ const AllMoneySendToPlatform = () => {
   const [viewDetails, setViewDetails] = useState(false);
   const [totalAmount, setTotalAmount] = useState(0);
   const [processing, setProcessing] = useState(false);
+  const [businessDetails, setBusinessDetails] = useState(null);
+  const [paymentReceipt, setPaymentReceipt] = useState(null);
+  const fileInputRef = useRef(null);
   const { id } = useParams();
+
   // Get user from Redux store
   const { user } = useSelector((state) => state.businessUserReducer);
   const itemsPerPage = 10;
 
+  // Fetch business details
+  useEffect(() => {
+    const fetchBusinessDetails = async () => {
+      try {
+        const businessRef = doc(db, "businessDetails", id);
+        const businessDoc = await getDoc(businessRef);
+
+        if (businessDoc.exists()) {
+          setBusinessDetails(businessDoc.data());
+        }
+      } catch (error) {
+        console.error("Error fetching business details:", error);
+      }
+    };
+
+    fetchBusinessDetails();
+  }, [id]);
   // Initial data fetch
   useEffect(() => {
     fetchTotalCount();
     fetchEarnings();
   }, [activeTab, currentPage]);
 
-  // Calculate total amount whenever data changes
+  // Calculate total amounts whenever data changes
   useEffect(() => {
-    const total = platformEarnings.reduce(
-      (sum, earning) => sum + (earning.amountEarned || 0),
-      0
+    const duePayments = platformEarnings.filter(
+      (earning) => earning.paymentStatus === "Pending"
     );
-    setTotalAmount(total);
-  }, [platformEarnings]);
+    const paidPayments = platformEarnings.filter(
+      (earning) => earning.paymentStatus === "Completed"
+    );
+    const checkingPayments = platformEarnings.filter(
+      (earning) => earning.paymentStatus === "Checking"
+    );
+
+    // Calculate totals based on current filter
+    if (activeTab === "pending") {
+      const total = duePayments.reduce(
+        (sum, earning) => sum + (earning.amountEarned || 0),
+        0
+      );
+      setTotalAmount(total);
+    } else if (activeTab === "completed") {
+      const total = paidPayments.reduce(
+        (sum, earning) => sum + (earning.amountEarned || 0),
+        0
+      );
+      setTotalAmount(total);
+    } else if (activeTab === "checking") {
+      const total = checkingPayments.reduce(
+        (sum, earning) => sum + (earning.amountEarned || 0),
+        0
+      );
+      setTotalAmount(total);
+    }
+  }, [platformEarnings, activeTab]);
 
   // Fetch total count for pagination
   const fetchTotalCount = async () => {
@@ -67,7 +117,11 @@ const AllMoneySendToPlatform = () => {
         where(
           "paymentStatus",
           "==",
-          activeTab === "pending" ? "Pending" : "Completed"
+          activeTab === "pending"
+            ? "Pending"
+            : activeTab === "completed"
+            ? "Completed"
+            : "Checking"
         )
       );
 
@@ -84,7 +138,7 @@ const AllMoneySendToPlatform = () => {
   const fetchEarnings = async () => {
     setLoading(true);
     try {
-      const startIndex = (currentPage - 1) * itemsPerPage;
+      // const startIndex = (currentPage - 1) * itemsPerPage;
 
       // Base query with business ID filter
       const baseQuery = query(
@@ -93,7 +147,11 @@ const AllMoneySendToPlatform = () => {
         where(
           "paymentStatus",
           "==",
-          activeTab === "pending" ? "Pending" : "Completed"
+          activeTab === "pending"
+            ? "Pending"
+            : activeTab === "completed"
+            ? "Completed"
+            : "Checking"
         )
       );
 
@@ -110,6 +168,155 @@ const AllMoneySendToPlatform = () => {
       console.error("Error fetching platform earnings:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Handle file selection
+  const handleFileChange = (e) => {
+    if (e.target.files[0]) {
+      setPaymentReceipt(e.target.files[0]);
+    }
+  };
+
+  // Upload receipt and submit payment
+  const uploadReceiptAndSubmitPayment = async (earning) => {
+    if (!paymentReceipt) {
+      toast.success("Please upload a payment receipt");
+      return;
+    }
+
+    if (
+      !toast.success(
+        `Confirm that you've sent payment for Invoice #${earning.invoiceId}?`
+      )
+    ) {
+      return;
+    }
+
+    setProcessing(true);
+    try {
+      // 1. Upload the receipt to Firebase Storage
+      const fileRef = ref(
+        storage,
+        `receipts/${id}/${earning.id}_${paymentReceipt.name}`
+      );
+      await uploadBytes(fileRef, paymentReceipt);
+      const receiptUrl = await getDownloadURL(fileRef);
+
+      // 2. Create a payment verification request in a new collection
+      const paymentRequest = {
+        businessId: id,
+        businessName: user.businessName || businessDetails?.businessName,
+        businessEmail: user.email || businessDetails?.email,
+        earningId: earning.id,
+        invoiceId: earning.invoiceId,
+        amount: earning.amountEarned,
+        receiptUrl: receiptUrl,
+        fileType: paymentReceipt.type.includes("image") ? "image" : "pdf",
+        requestDate: new Date().toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        }),
+        status: "Checking",
+      };
+
+      await addDoc(collection(db, "paymentByBusiness"), paymentRequest);
+
+      // 3. Update the earning status to "Checking"
+      const earningRef = doc(db, "platformEarnings", earning.id);
+      await updateDoc(earningRef, {
+        paymentStatus: "Checking",
+        receiptUrl: receiptUrl,
+        paidAt: new Date().toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        }),
+      });
+
+      // 4. Update business stats
+      if (businessDetails) {
+        const businessRef = doc(db, "businessDetails", id);
+        await updateDoc(businessRef, {
+          totalPlatformEarningsDue:
+            (businessDetails.totalPlatformEarningsDue || 0) -
+            earning.amountEarned,
+          // We don't update paid amount yet since it's still being verified
+        });
+      }
+
+      // 5. Send email notification to admin
+      const emailData = {
+        email: "admin@shoppinessmart.com", // Replace with the admin's email
+        title: "New Payment Verification Request Received",
+        body: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h2 style="color: #333;">New Payment Verification Request Received</h2>
+            
+            <p>Dear Admin,</p>
+            
+            <p>A new payment verification request has been submitted by a business owner. Below are the details:</p>
+            
+            <div style="background-color: #f9f9f9; padding: 15px; border-radius: 8px; margin-top: 20px;">
+              <h3 style="color: #555; margin-bottom: 10px;">Payment Details</h3>
+              <p><strong>Business Name:</strong> ${
+                businessDetails.businessName
+              }</p>
+              <p><strong>Invoice ID:</strong> ${earning.invoiceId}</p>
+              <p><strong>Amount:</strong> Rs. ${earning.amountEarned?.toLocaleString()}</p>
+              <p><strong>Payment Status:</strong> ${earning.paymentStatus}</p>
+              <p><strong>Receipt Uploaded:</strong> <a href="${receiptUrl}" target="_blank" style="color: #1a73e8; text-decoration: none;">View Receipt</a></p>
+              <p><strong>Submitted On:</strong> ${new Date().toLocaleDateString(
+                "en-GB",
+                { day: "numeric", month: "short", year: "numeric" }
+              )}</p>
+            </div>
+            
+            <p>Please review the payment details on the admin dashboard and verify the payment accordingly.</p>
+            
+            
+            <p>Best regards,<br>
+            The ShoppinessMart Team</p>
+          </div>
+        `,
+      };
+
+      await axios.post(
+        `${import.meta.env.VITE_AWS_SERVER}/send-email`,
+        emailData
+      );
+
+      // Refresh the data
+      fetchTotalCount();
+      fetchEarnings();
+
+      // Reset form
+      setPaymentReceipt(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+
+      // If in detail view, update selected earning
+      if (viewDetails && selectedEarning?.id === earning.id) {
+        setSelectedEarning({
+          ...earning,
+          paymentStatus: "Checking",
+          receiptUrl: receiptUrl,
+          paidAt: new Date().toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          }),
+        });
+      }
+
+      toast.success("Payment verification request submitted successfully!");
+    } catch (error) {
+      console.error("Error submitting payment:", error);
+      toast.error("Failed to submit payment. Please try again.");
+    } finally {
+      setProcessing(false);
     }
   };
 
@@ -137,7 +344,11 @@ const AllMoneySendToPlatform = () => {
           where(
             "paymentStatus",
             "==",
-            activeTab === "pending" ? "Pending" : "Completed"
+            activeTab === "pending"
+              ? "Pending"
+              : activeTab === "completed"
+              ? "Completed"
+              : "Checking"
           )
         );
 
@@ -154,7 +365,13 @@ const AllMoneySendToPlatform = () => {
             earning.customerName
               ?.toLowerCase()
               .includes(searchTerm.toLowerCase()) ||
-            earning.invoiceId?.toLowerCase().includes(searchTerm.toLowerCase())
+            earning.invoiceId
+              ?.toLowerCase()
+              .includes(searchTerm.toLowerCase()) ||
+            (earning.approvedDate &&
+              earning.approvedDate
+                .toLowerCase()
+                .includes(searchTerm.toLowerCase()))
         );
 
         setPlatformEarnings(filtered);
@@ -171,72 +388,6 @@ const AllMoneySendToPlatform = () => {
     performSearch();
   };
 
-  // Mark payment as completed
-  const markAsPaid = async (earning) => {
-    if (
-      !confirm(
-        `Confirm that you've sent payment for Invoice #${earning.invoiceId}?`
-      )
-    ) {
-      return;
-    }
-
-    setProcessing(true);
-    try {
-      const earningRef = doc(db, "platformEarnings", earning.id);
-
-      // Update the document
-      await updateDoc(earningRef, {
-        paymentStatus: "Completed",
-        paidAt: new Date().toLocaleDateString("en-GB", {
-          day: "numeric",
-          month: "short",
-          year: "numeric",
-        }),
-        paymentNotes: `Payment sent by ${
-          user.businessName
-        } on ${new Date().toLocaleDateString("en-GB", {
-          day: "numeric",
-          month: "short",
-          year: "numeric",
-        })}`,
-      });
-
-      // Send email notification to admin
-      // await sendAdminNotificationEmail({
-      //   subject: `Platform Payment Received - Invoice #${earning.invoiceId}`,
-      //   businessName: user.businessName,
-      //   businessId: user.id,
-      //   amount: earning.amountEarned,
-      //   invoiceId: earning.invoiceId,
-      //   paidAt: new Date().toLocaleString()
-      // });
-
-      // Refresh the data
-      fetchTotalCount();
-      fetchEarnings();
-
-      // If in detail view, update selected earning
-      if (viewDetails && selectedEarning?.id === earning.id) {
-        setSelectedEarning({
-          ...earning,
-          paymentStatus: "Completed",
-          paidAt: new Date().toISOString(),
-          paymentNotes: `Payment sent by ${
-            user.businessName
-          } on ${new Date().toLocaleString()}`,
-        });
-      }
-
-      alert("Payment marked as completed successfully!");
-    } catch (error) {
-      console.error("Error marking payment as completed:", error);
-      alert("Failed to mark payment as completed. Please try again.");
-    } finally {
-      setProcessing(false);
-    }
-  };
-
   // View earnings details
   const viewEarningDetails = (earning) => {
     setSelectedEarning(earning);
@@ -247,6 +398,10 @@ const AllMoneySendToPlatform = () => {
   const backToList = () => {
     setViewDetails(false);
     setSelectedEarning(null);
+    setPaymentReceipt(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   // EmptyState component
@@ -288,7 +443,7 @@ const AllMoneySendToPlatform = () => {
   // If in detail view, render the details component
   if (viewDetails && selectedEarning) {
     return (
-      <div className="bg-white rounded-lg shadow-md p-6 max-w-4xl mx-auto">
+      <div className="bg-white rounded-lg shadow-md p-6 m-10">
         <div className="flex items-center mb-6">
           <button
             onClick={backToList}
@@ -332,6 +487,13 @@ const AllMoneySendToPlatform = () => {
                         Pending
                       </span>
                     </>
+                  ) : selectedEarning.paymentStatus === "Checking" ? (
+                    <>
+                      <TbClockSearch className="text-blue-500 mr-2" />
+                      <span className="text-blue-500 font-medium">
+                        Verification Pending
+                      </span>
+                    </>
                   ) : (
                     <>
                       <IoMdCheckmarkCircleOutline className="text-green-500 mr-2" />
@@ -342,13 +504,21 @@ const AllMoneySendToPlatform = () => {
                   )}
                 </div>
               </div>
+              {selectedEarning.completedAt && (
+                <div>
+                  <span className="text-gray-600 font-medium">
+                    Varification Completed Date:
+                  </span>
+                  <p className="text-gray-800">{selectedEarning.completedAt}</p>
+                </div>
+              )}
               {selectedEarning.paidAt && (
                 <div>
-                  <span className="text-gray-600 font-medium">Paid At:</span>
+                  <span className="text-gray-600 font-medium">
+                    Paid Date:
+                  </span>
                   <p className="text-gray-800">
-                    {new Date(
-                      selectedEarning.paidAt.seconds * 1000
-                    ).toLocaleString()}
+                    {selectedEarning.paidAt}
                   </p>
                 </div>
               )}
@@ -356,6 +526,28 @@ const AllMoneySendToPlatform = () => {
                 <span className="text-gray-600 font-medium">Due Date:</span>
                 <p className="text-gray-800">{selectedEarning.dueDate}</p>
               </div>
+              {selectedEarning.receiptUrl && (
+                <div>
+                  <span className="text-gray-600 font-medium">
+                    Payment Receipt:
+                  </span>
+                  <p className="text-blue-600 mt-1">
+                    <a
+                      href={selectedEarning.receiptUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center"
+                    >
+                      {selectedEarning.fileType === "image" ? (
+                        <FaFileImage className="mr-2" />
+                      ) : (
+                        <FaFileAlt className="mr-2" />
+                      )}
+                      View Receipt
+                    </a>
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -418,38 +610,58 @@ const AllMoneySendToPlatform = () => {
                 <p className="font-medium">payments@shopinesmart</p>
               </div>
             </div>
-
-            <div className="mt-6 p-4 bg-blue-50 border border-blue-100 rounded-md">
-              <p className="text-sm text-blue-800">
-                <strong>Note:</strong> Please include your Invoice ID (
-                {selectedEarning.invoiceId}) in the payment reference to help us
-                match your payment correctly.
-              </p>
-            </div>
           </div>
         </div>
 
         {selectedEarning.paymentStatus === "Pending" && (
-          <div className="mt-8 text-center">
-            <button
-              onClick={() => markAsPaid(selectedEarning)}
-              disabled={processing}
-              className="bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-md font-medium flex items-center justify-center mx-auto"
-            >
-              {processing ? (
-                <>
-                  <FaSpinner className="animate-spin mr-2" /> Processing...
-                </>
-              ) : (
-                <>
-                  <FaMoneyBillWave className="mr-2" /> Mark as Paid
-                </>
-              )}
-            </button>
-            <p className="text-sm text-gray-600 mt-2">
-              Click this button after you have sent the payment to confirm
-              completion
-            </p>
+          <div className="mt-8 border-t pt-6">
+            <h3 className="text-lg font-semibold mb-4 text-gray-700">
+              Submit Payment Verification
+            </h3>
+            <div className="bg-gray-50 p-6 rounded-lg border">
+              <div className="mb-4">
+                <label className="block text-gray-700 text-sm font-medium mb-2">
+                  Upload Payment Receipt (Image or PDF)
+                </label>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  accept="image/*,.pdf"
+                  onChange={handleFileChange}
+                  className="block w-full text-sm text-gray-500
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded-md file:border-0
+                    file:text-sm file:font-medium
+                    file:bg-blue-50 file:text-blue-700
+                    hover:file:bg-blue-100"
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  Please upload a clear image or PDF of your payment
+                  confirmation/receipt
+                </p>
+              </div>
+
+              <button
+                onClick={() => uploadReceiptAndSubmitPayment(selectedEarning)}
+                disabled={processing || !paymentReceipt}
+                className={`w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-md font-medium flex items-center justify-center mx-auto ${
+                  !paymentReceipt || processing
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }`}
+              >
+                {processing ? (
+                  <>
+                    <FaSpinner className="animate-spin mr-2" /> Processing...
+                  </>
+                ) : (
+                  <>
+                    <FaUpload className="mr-2" /> Submit Payment for
+                    Verification
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -458,11 +670,64 @@ const AllMoneySendToPlatform = () => {
 
   // Main component render - Earnings Table
   return (
-    <div className="bg-white rounded-lg shadow-md p-4">
+    <div className="bg-white rounded-lg shadow-md p-4 m-10">
       <h2 className="text-xl font-bold mb-6">Platform Earnings Management</h2>
 
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-blue-800 text-sm font-medium">Total Due</h3>
+              <p className="text-blue-900 text-2xl font-bold">
+                Rs.{" "}
+                {businessDetails?.totalPlatformEarningsDue?.toLocaleString()}
+              </p>
+            </div>
+            <div className="bg-blue-100 p-3 rounded-full">
+              <MdPending className="text-blue-600 text-xl" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-orange-50 p-4 rounded-lg border border-orange-100">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-orange-800 text-sm font-medium">
+                Under Verification
+              </h3>
+              <p className="text-orange-900 text-2xl font-bold">
+                Rs.{" "}
+                {platformEarnings
+                  .filter((e) => e.paymentStatus === "Checking")
+                  .reduce((sum, e) => sum + (e.amountEarned || 0), 0)
+                  .toLocaleString()}
+              </p>
+            </div>
+            <div className="bg-orange-100 p-3 rounded-full">
+              <TbClockSearch className="text-orange-600 text-xl" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-green-50 p-4 rounded-lg border border-green-100">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-green-800 text-sm font-medium">Total Paid</h3>
+              <p className="text-green-900 text-2xl font-bold">
+                Rs.{" "}
+                {businessDetails?.totalPlatformEarningsPaid?.toLocaleString()}
+              </p>
+            </div>
+            <div className="bg-green-100 p-3 rounded-full">
+              <IoMdCheckmarkCircleOutline className="text-green-600 text-xl" />
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Tabs */}
-      <div className="flex border-b mb-6">
+      <div className="flex border-b mb-6 flex-wrap">
         <button
           className={`py-2 px-4 font-medium ${
             activeTab === "pending"
@@ -474,6 +739,19 @@ const AllMoneySendToPlatform = () => {
           <div className="flex items-center">
             <MdPending className="mr-2" />
             Pending Payments
+          </div>
+        </button>
+        <button
+          className={`py-2 px-4 font-medium ${
+            activeTab === "checking"
+              ? "text-orange-600 border-b-2 border-orange-600"
+              : "text-gray-500 hover:text-gray-700"
+          }`}
+          onClick={() => setActiveTab("checking")}
+        >
+          <div className="flex items-center">
+            <TbClockSearch className="mr-2" />
+            Under Verification
           </div>
         </button>
         <button
@@ -498,7 +776,7 @@ const AllMoneySendToPlatform = () => {
             <div className="relative flex-grow">
               <input
                 type="text"
-                placeholder="Search by invoice ID or customer name"
+                placeholder="Search by invoice ID, customer name or date"
                 className="w-full px-4 py-2 border rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -514,13 +792,14 @@ const AllMoneySendToPlatform = () => {
         </div>
 
         <div className="flex items-center bg-gray-100 px-4 py-2 rounded-md">
-          <span className="text-gray-700 font-medium mr-2">Total:</span>
+          <span className="text-gray-700 font-medium mr-2">
+            Current Tab Total:
+          </span>
           <span className="text-green-600 font-bold">
             Rs. {totalAmount.toLocaleString()}
           </span>
         </div>
       </div>
-
       {/* Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
@@ -538,6 +817,16 @@ const AllMoneySendToPlatform = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Due Date
               </th>
+              {activeTab === "checking" && (
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Paid Date
+                </th>
+              )}
+              {activeTab === "completed" && (
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Completed Date
+                </th>
+              )}
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Status
               </th>
@@ -579,6 +868,21 @@ const AllMoneySendToPlatform = () => {
                       {earning.dueDate}
                     </div>
                   </td>
+                  {activeTab === "checking" && (
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">
+                        {earning.paidAt}
+                      </div>
+                    </td>
+                  )}
+                  {activeTab === "completed" && (
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">
+                        {earning.completedAt}
+                      </div>
+                    </td>
+                  )}
+                  
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
                       className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
@@ -599,21 +903,6 @@ const AllMoneySendToPlatform = () => {
                       >
                         <FaEye className="mr-1" /> View
                       </button>
-
-                      {earning.paymentStatus === "Pending" && (
-                        <button
-                          onClick={() => markAsPaid(earning)}
-                          disabled={processing}
-                          className="text-green-600 hover:text-green-900 flex items-center"
-                        >
-                          {processing && earning.id === selectedEarning?.id ? (
-                            <FaSpinner className="animate-spin mr-1" />
-                          ) : (
-                            <FaMoneyBillWave className="mr-1" />
-                          )}
-                          Mark as Paid
-                        </button>
-                      )}
                     </div>
                   </td>
                 </tr>

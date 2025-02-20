@@ -8,6 +8,9 @@ import Loader from "./Components/Loader/Loader";
 import NewLayout from "./NewLayout";
 import GeneratedCoupons from "./Services-Dashboard/pages/Coupons/GeneratedCoupons";
 import AllMoneySendToPlatform from "./Services-Dashboard/pages/MoneySendToPlatform/AllMoneySendToPlatform";
+import PlatformEarningsFromBusiness from "./Admin/pages/Product&Services/PlatformEarningsFromBuisness/PlatformEarningsFromBuisness";
+import AllPaymentVarificationRequest from "./Admin/pages/Product&Services/PlatformEarningsFromBuisness/AllPaymentVarificationRequest";
+import ViewPaymentDetails from "./Admin/pages/Product&Services/PlatformEarningsFromBuisness/ViewPaymentDetails";
 // import ProtectedRoute from "./Components/ProtectedRoute";
 
 const BusinessDetails = lazy(() => import("./pages/BusinessDetails"));
@@ -362,6 +365,9 @@ const router = createBrowserRouter([
           { path: "services/all-offlineshops", element: <AllOfflineShops /> },
           { path: "services/all-onlineshops", element: <AllOnlineShops /> },
           { path: "services/add-categories", element: <AddCategories /> },
+          { path: "services/earnings", element: <PlatformEarningsFromBusiness /> },
+          { path: "services/earnings/:id", element: <AllPaymentVarificationRequest /> },
+          { path: "services/earnings/:id/:id", element: <ViewPaymentDetails /> },
           { path: "users/coupons", element: <Coupons /> },
           {
             path: "users/withdrawal-requests",
