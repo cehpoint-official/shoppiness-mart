@@ -75,7 +75,7 @@ const Customers = () => {
           <div style="background-color: #f8f8f8; padding: 20px; border-radius: 8px;">
             <h2 style="color: #333; margin-bottom: 20px;">Reminder: Due Amount Payment</h2>
             <p style="color: #666;">Dear ${
-              customer.claimedCouponCodeUserName
+              customer.claimedCouponCodeUserName  
             },</p>
             <p style="color: #666;">You have an outstanding due amount of <strong>Rs. ${
               customer.dueAmount?.toFixed(2) || 0

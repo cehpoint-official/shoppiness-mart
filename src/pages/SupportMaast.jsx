@@ -7,11 +7,17 @@ import page3 from "../assets/SupportMaast/page3.png";
 import playingworld from "../assets/SupportMaast/playingworld.png";
 import savenature from "../assets/SupportMaast/savenature.png";
 import blooddonate from "../assets/SupportMaast/blooddonate.png";
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import DonationDialog from "../Components/DonationDialog";
 
 const SupportMasst = () => {
   document.title = "Support Maast - Shopiness";
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+  // Update all your donate buttons to use this handler
+  const handleDonateClick = () => {
+    setIsDialogOpen(true);
+  };
   return (
     <div className=" overflow-hidden">
       {/* { 1st page } */}
@@ -35,11 +41,12 @@ const SupportMasst = () => {
             transform lives and communities.
           </p>
           <div>
-            <Link to="/signup">
-              <button className="bg-teal-500 text-white font-medium rounded-md py-2.5 px-8 mt-4">
-                Donate
-              </button>
-            </Link>
+            <button
+              onClick={handleDonateClick}
+              className="bg-teal-500 text-white font-medium rounded-md py-2.5 px-8 mt-4"
+            >
+              Donate
+            </button>
           </div>
         </div>
 
@@ -75,11 +82,12 @@ const SupportMasst = () => {
             way to contribute to a better world.
           </p>
           <div>
-            <Link to="/signup">
-              <button className="bg-teal-500 text-white font-medium rounded-md py-2.5 px-8 mt-4">
-                Donate
-              </button>
-            </Link>
+            <button
+              onClick={handleDonateClick}
+              className="bg-teal-500 text-white font-medium rounded-md py-2.5 px-8 mt-4"
+            >
+              Donate
+            </button>
           </div>
         </div>
       </div>
@@ -347,6 +355,10 @@ const SupportMasst = () => {
       <PopularCauses />
       {/* { 7th page } */}
       <FAQ />
+      <DonationDialog
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+      />
     </div>
   );
 };

@@ -138,7 +138,7 @@ const UpdateInvoice = ({invoice,onBack, onUpdate}) => {
       );
     });
   };
-console.log(invoice);
+
 
   const handleSave = async () => {
     setIsLoading(true);
