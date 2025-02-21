@@ -4,12 +4,7 @@ import headerLogo from "../../assets/header-logo.png";
 import { Link } from "react-router-dom";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import {
-  addDoc,
-  collection,
-  doc,
-  runTransaction,
-} from "firebase/firestore";
+import { addDoc, collection, doc, runTransaction } from "firebase/firestore";
 import { db, storage } from "../../../../firebase";
 import {
   getDownloadURL,
@@ -364,50 +359,17 @@ const Invoice = ({ data, onBack }) => {
     }
   };
 
-  // New function to update business details collection
-  const updateBusinessDetails = async (
-    transaction,
-    businessId,
-    platformCashback
-  ) => {
-    try {
-      if (!businessId) {
-        console.warn("Business ID is missing, cannot update business details");
-        return;
-      }
-
-      const businessRef = doc(db, "businessDetails", businessId);
-      const businessDoc = await transaction.get(businessRef);
-
-      if (!businessDoc.exists()) {
-        console.warn(`Business document with ID ${businessId} not found`);
-        return;
-      }
-
-      const businessData = businessDoc.data();
-
-      // Get current values or set defaults
-      const currentTotalDue = businessData.totalPlatformEarningsDue || 0;
-
-      // Update only if there's a valid platform cashback amount
-      if (platformCashback > 0) {
-        // Update business details with new earnings information
-        transaction.update(businessRef, {
-          totalPlatformEarningsDue: currentTotalDue + platformCashback,
-        });
-      }
-    } catch (error) {
-      console.error("Error updating business details:", error);
-      throw error;
-    }
-  };
-
   const handleSave = async () => {
     setIsLoading(true);
     let pdfUrl = null;
     let storageRef = null;
 
     try {
+      // Define hasCoupon before the transaction
+      const hasCoupon = Boolean(
+        data.couponCode && data.customerId && data.couponId
+      );
+
       // Validate required data
       if (!data.invoiceId || !data.grandTotal) {
         throw new Error("Missing required invoice data");
@@ -445,20 +407,26 @@ const Invoice = ({ data, onBack }) => {
           }),
       };
 
+      // Initialize variables outside transaction
+      let completeInvoiceData = { ...baseInvoiceData };
+      let platformCashback = 0;
+      let userCashback = 0;
+      let remainingCashback = 0;
+
       // Use a transaction to ensure all-or-nothing saving
       await runTransaction(db, async (transaction) => {
         const hasCoupon = Boolean(
           data.couponCode && data.customerId && data.couponId
         );
 
-        // Variable to store complete invoice data
-        let completeInvoiceData = { ...baseInvoiceData };
-        let platformCashback = 0;
+        // IMPORTANT: Perform ALL reads first
+        let couponDoc = null;
+        let userDoc = null;
 
         if (hasCoupon) {
-          // Verify coupon exists and is valid
+          // READ: Verify coupon exists and is valid
           const couponRef = doc(db, "coupons", data.couponId);
-          const couponDoc = await transaction.get(couponRef);
+          couponDoc = await transaction.get(couponRef);
 
           if (!couponDoc.exists()) {
             throw new Error("Coupon no longer exists");
@@ -468,82 +436,31 @@ const Invoice = ({ data, onBack }) => {
             throw new Error("Coupon is no longer valid");
           }
 
+          // READ: Get user data for cashback update
+          const userRef = doc(db, "users", data.customerId);
+          userDoc = await transaction.get(userRef);
+        }
+
+        // READ: Get business details if needed
+        let businessDoc = null;
+        if (data.businessId) {
+          const businessRef = doc(db, "businessDetails", data.businessId);
+          businessDoc = await transaction.get(businessRef);
+        }
+
+        // Now perform calculations
+        if (hasCoupon) {
           // Calculate cashback
-          const {
-            platformCashback: calculatedPlatformCashback,
-            userCashback,
-            remainingCashback,
-          } = calculateCashbackAndEarnings(
+          const cashbackResults = calculateCashbackAndEarnings(
             data.grandTotal,
             data.cashCollected,
             data.userCashback,
             data.platformEarnings
           );
 
-          platformCashback = calculatedPlatformCashback;
-
-          // Update user's cashback
-          const userRef = doc(db, "users", data.customerId);
-          const userDoc = await transaction.get(userRef);
-
-          if (userDoc.exists()) {
-            const currentCashback = userDoc.data().collectedCashback || 0;
-            transaction.update(userRef, {
-              collectedCashback: currentCashback + userCashback,
-            });
-          }
-
-          // Update coupon status
-          transaction.update(couponRef, {
-            status: "Claimed",
-            claimedAt: new Date().toLocaleDateString("en-GB", {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-            }),
-          });
-
-          // Save user transaction details
-          const userTransactionData = {
-            customerId: data.customerId || "",
-            invoiceId: data.invoiceId,
-            couponCode: data.couponCode || "",
-            products: data.products || [],
-            claimedDate: new Date().toLocaleDateString("en-GB", {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-            }),
-            customerName: data.customerName || "",
-            customerEmail: data.email || "",
-            discount: data.userCashback || 0,
-            userCashbackAmount: userCashback || 0,
-            userRemainingCashbackAmount: remainingCashback || 0,
-            status: "Claimed",
-          };
-          await addDoc(collection(db, "userTransactions"), userTransactionData);
-
-          // Save platform earnings details
-          const platformEarningsData = {
-            customerId: data.customerId || "",
-            businessId: data.businessId,
-            invoiceId: data.invoiceId,
-            customerName: data.customerName || "",
-            customerEmail: data.email || "",
-            amountEarned: platformCashback || 0,
-            paymentStatus: "Pending",
-            dueDate: new Date(
-              Date.now() + 3 * 24 * 60 * 60 * 1000
-            ).toLocaleDateString("en-GB", {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-            }),
-          };
-          await addDoc(
-            collection(db, "platformEarnings"),
-            platformEarningsData
-          );
+          platformCashback = cashbackResults.platformCashback;
+          userCashback = cashbackResults.userCashback;
+          remainingCashback = cashbackResults.remainingCashback;
 
           // Add coupon-specific data to invoice
           const couponData = {
@@ -564,68 +481,95 @@ const Invoice = ({ data, onBack }) => {
 
           // Update complete invoice data with coupon info
           completeInvoiceData = { ...baseInvoiceData, ...couponData };
-          await addDoc(collection(db, "invoiceDetails"), completeInvoiceData);
+        }
 
-          // Update businessDetails collection
-          await updateBusinessDetails(
-            transaction,
-            data.businessId,
-            platformCashback
-          );
+        // NOW perform all writes after all reads
 
-          // Send email to user with complete data
-          await sendEmailToUser(completeInvoiceData, pdfUrl);
+        // WRITE: Update user's cashback if needed
+        if (hasCoupon && userDoc && userDoc.exists() && userCashback > 0) {
+          const currentCashback = userDoc.data().collectedCashback || 0;
+          const userRef = doc(db, "users", data.customerId);
+          transaction.update(userRef, {
+            collectedCashback: currentCashback + userCashback,
+          });
+        }
 
-          // If platform earnings exist, send email to business owner
-          if ((platformCashback || 0) > 0) {
-            await sendEmailToBusinessOwner(completeInvoiceData, pdfUrl);
-          }
-        } else {
-          // Save invoice without coupon data
-          await addDoc(collection(db, "invoiceDetails"), completeInvoiceData);
-
-          // Save user transaction details with default values
-          const userTransactionData = {
-            customerId: data.customerId || "",
-            invoiceId: data.invoiceId,
-            couponCode: "",
-            products: data.products || [],
-            claimedDate: new Date().toLocaleDateString("en-GB", {
+        // WRITE: Update coupon status if needed
+        if (hasCoupon && couponDoc && couponDoc.exists()) {
+          const couponRef = doc(db, "coupons", data.couponId);
+          transaction.update(couponRef, {
+            status: "Claimed",
+            claimedAt: new Date().toLocaleDateString("en-GB", {
               day: "numeric",
               month: "short",
               year: "numeric",
             }),
-            customerName: data.customerName || "",
-            customerEmail: data.email || "",
-            discount: 0,
-            userCashbackAmount: 0,
-            userRemainingCashbackAmount: 0,
-            status: "No Coupon",
-          };
-          await addDoc(collection(db, "userTransactions"), userTransactionData);
+          });
+        }
 
-          // Save platform earnings details with default values
-          const platformEarningsData = {
-            businessId: data.businessId,
-            customerId: data.customerId || "",
-            invoiceId: data.invoiceId,
-            customerName: data.customerName || "",
-            customerEmail: data.email || "",
-            amountEarned: 0,
-            paymentStatus: "Not Applicable",
-            dueDate: "",
-          };
-          await addDoc(
-            collection(db, "platformEarnings"),
-            platformEarningsData
-          );
-
-          // No need to update business details when no coupon is claimed
-
-          // Send email to user (without cashback details)
-          await sendEmailToUser(completeInvoiceData, pdfUrl);
+        // WRITE: Update business details if needed
+        if (businessDoc && businessDoc.exists() && platformCashback > 0) {
+          const businessRef = doc(db, "businessDetails", data.businessId);
+          const currentTotalDue =
+            businessDoc.data().totalPlatformEarningsDue || 0;
+          transaction.update(businessRef, {
+            totalPlatformEarningsDue: currentTotalDue + platformCashback,
+          });
         }
       });
+
+      // After transaction completes successfully, perform non-transactional operations
+
+      // Save invoice data
+      await addDoc(collection(db, "invoiceDetails"), completeInvoiceData);
+
+      // Save user transaction details
+      const userTransactionData = {
+        customerId: data.customerId || "",
+        invoiceId: data.invoiceId,
+        couponCode: data.couponCode || "",
+        products: data.products || [],
+        claimedDate: new Date().toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        }),
+        customerName: data.customerName || "",
+        customerEmail: data.email || "",
+        discount: data.userCashback || 0,
+        userCashbackAmount: userCashback || 0,
+        userRemainingCashbackAmount: remainingCashback || 0,
+        status: hasCoupon ? "Claimed" : "No Coupon",
+      };
+      await addDoc(collection(db, "userTransactions"), userTransactionData);
+
+      // Save platform earnings details
+      const platformEarningsData = {
+        customerId: data.customerId || "",
+        businessId: data.businessId,
+        invoiceId: data.invoiceId,
+        customerName: data.customerName || "",
+        customerEmail: data.email || "",
+        amountEarned: platformCashback || 0,
+        paymentStatus: hasCoupon ? "Pending" : "Not Applicable",
+        dueDate: hasCoupon
+          ? new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString(
+              "en-GB",
+              {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              }
+            )
+          : "",
+      };
+      await addDoc(collection(db, "platformEarnings"), platformEarningsData);
+
+      // Send emails
+      await sendEmailToUser(completeInvoiceData, pdfUrl);
+      if ((platformCashback || 0) > 0) {
+        await sendEmailToBusinessOwner(completeInvoiceData, pdfUrl);
+      }
 
       toast.success("Invoice saved successfully!");
       onBack();
@@ -646,7 +590,6 @@ const Invoice = ({ data, onBack }) => {
       setIsLoading(false);
     }
   };
-
   const handleDownloadPDF = async () => {
     setIsDownloading(true);
     try {

@@ -10,12 +10,11 @@ import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import toast from "react-hot-toast";
 import { FaSpinner } from "react-icons/fa";
 
-const SingleInvoice = ({ invoice, onBack, onUpdate }) => {
+const UpdateInvoice = ({invoice,onBack, onUpdate}) => {
   const { user } = useSelector((state) => state.businessUserReducer);
   const [isLoading, setIsLoading] = useState(false);
   const [localDueAmount, setLocalDueAmount] = useState(invoice.dueAmount);
   const [isDownloading, setIsDownloading] = useState(false);
-
   const generatePdf = async (elementId) => {
     try {
       const invoiceContent = document.getElementById(elementId);
@@ -139,6 +138,7 @@ const SingleInvoice = ({ invoice, onBack, onUpdate }) => {
       );
     });
   };
+console.log(invoice);
 
   const handleSave = async () => {
     setIsLoading(true);
@@ -163,7 +163,7 @@ const SingleInvoice = ({ invoice, onBack, onUpdate }) => {
       if (invoice.claimedCouponCode) {
         // Handle coupon case
         await setDoc(
-          doc(db, "claimedCouponsDetails", invoice.id),
+          doc(db, "invoiceDetails", invoice.id),
           {
             ...baseUpdateData,
             userCashback:
@@ -174,7 +174,7 @@ const SingleInvoice = ({ invoice, onBack, onUpdate }) => {
         );
 
         // Update user's collected cashback
-        const userDocRef = doc(db, "users", invoice.userId);
+        const userDocRef = doc(db, "users", invoice.customerId);
         const userDoc = await getDoc(userDocRef);
 
         if (userDoc.exists()) {
@@ -196,7 +196,7 @@ const SingleInvoice = ({ invoice, onBack, onUpdate }) => {
       } else {
         // Handle non-coupon case
         await setDoc(
-          doc(db, "claimedCouponsDetails", invoice.id),
+          doc(db, "invoiceDetails", invoice.id),
           baseUpdateData,
           { merge: true }
         );
@@ -229,7 +229,6 @@ const SingleInvoice = ({ invoice, onBack, onUpdate }) => {
       setIsDownloading(false);
     }
   };
-
   return (
     <div>
       <div className="print:hidden mx-10 mb-6 flex justify-between items-center">
@@ -259,8 +258,6 @@ const SingleInvoice = ({ invoice, onBack, onUpdate }) => {
           </button>
         </div>
       </div>
-
-      {/* Invoice Content */}
       <div
         id="invoice-content"
         className="max-w-4xl mx-auto bg-white p-8 shadow-lg rounded-lg"
@@ -433,4 +430,4 @@ const SingleInvoice = ({ invoice, onBack, onUpdate }) => {
   );
 };
 
-export default SingleInvoice;
+export default UpdateInvoice;

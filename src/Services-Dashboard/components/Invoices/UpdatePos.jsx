@@ -1,5 +1,5 @@
 import { collection, getDocs, query, where } from "firebase/firestore";
-import  { useCallback, useEffect, useState, useMemo } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import { db } from "../../../../firebase";
 import { useParams } from "react-router-dom";
 import InvoiceUpdate from "./InvoiceUpdate";
@@ -144,7 +144,11 @@ const UpdatePos = ({ invoiceDetails, onBack, onUpdate }) => {
       ...customerInfo,
       ...invoiceDetails,
       updateTime: new Date().toLocaleTimeString(),
-      ...(matchedCoupon || {}),
+      couponCode: matchedCoupon?.code || "",
+      userCashback: matchedCoupon?.userCashback || 0,
+      platformEarnings: matchedCoupon?.platformEarnings || 0,
+      customerId: matchedCoupon?.userId || "",
+      couponId: matchedCoupon?.id || "",
       businessId: id,
       docId: invoiceDetails.id,
       totalPrice,

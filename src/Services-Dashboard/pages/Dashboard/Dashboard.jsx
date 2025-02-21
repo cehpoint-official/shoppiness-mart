@@ -58,9 +58,7 @@ export default function Dashboard() {
 
   const fetchClaimedCouponsDetailsData = useCallback(async () => {
     try {
-      const querySnapshot = await getDocs(
-        collection(db, "claimedCouponsDetails")
-      );
+      const querySnapshot = await getDocs(collection(db, "invoiceDetails"));
       const data = [];
       querySnapshot.forEach((doc) => {
         const customersData = doc.data();
@@ -231,7 +229,7 @@ function ClaimedCoupons({ customers }) {
                   <td className="py-4">{customer.claimedCouponCode}</td>
                   <td>{customer.claimedCouponCodeUserName}</td>
                   <td className="whitespace-pre-line">
-                    {customer.claimedCouponCodeUserEmail}
+                    {customer.customerEmail}
                   </td>
                   <td>{customer.discount}%</td>
                 </tr>

@@ -1,27 +1,17 @@
 import { useCallback, useEffect, useState } from "react";
 import { AiOutlineEye } from "react-icons/ai";
 import { BiSortAlt2, BiSearch } from "react-icons/bi";
-import SingleInvoice from "./SingleInvoice";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../../../firebase";
 import UpdatePos from "../../components/Invoices/UpdatePos";
-
-const InvoiceSkeleton = () => (
-  <tr className="animate-pulse">
-    {[...Array(11)].map((_, index) => (
-      <td key={index} className="p-4">
-        <div className="h-4 bg-gray-200 rounded"></div>
-      </td>
-    ))}
-  </tr>
-);
+import { useSelector } from "react-redux";
 
 const Invoice = () => {
+  const { user } = useSelector((state) => state.businessUserReducer);
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [selectedInvoiceUpdate, setSelectedInvoiceUpdate] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
@@ -31,9 +21,7 @@ const Invoice = () => {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const querySnapshot = await getDocs(
-        collection(db, "claimedCouponsDetails")
-      );
+      const querySnapshot = await getDocs(collection(db, "invoiceDetails"));
       const data = [];
       querySnapshot.forEach((doc) => {
         const customersData = doc.data();
@@ -90,13 +78,7 @@ const Invoice = () => {
       setCurrentPage(currentPage - 1);
     }
   };
-
-  const handleViewInvoice = (invoice) => {
-    setSelectedInvoice(invoice);
-  };
-
   const handleBackToInvoices = () => {
-    setSelectedInvoice(null);
     setSelectedInvoiceUpdate(null);
     fetchData();
   };
@@ -105,15 +87,6 @@ const Invoice = () => {
     setSortOrder(sortOrder === "asc" ? "desc" : "asc");
   };
 
-  if (selectedInvoice) {
-    return (
-      <SingleInvoice
-        invoice={selectedInvoice}
-        onBack={handleBackToInvoices}
-        onUpdate={fetchData}
-      />
-    );
-  }
   if (selectedInvoiceUpdate) {
     return (
       <UpdatePos
@@ -123,7 +96,6 @@ const Invoice = () => {
       />
     );
   }
-  console.log(currentCustomers);
 
   return (
     <div className="p-10">
@@ -162,12 +134,10 @@ const Invoice = () => {
                   "Amount",
                   "Paid",
                   "Due",
-                  "Cashback Given",
-                  "Remaining Cashback",
                   "Billing Date",
                   "Due Date",
                   "Invoice",
-                  "Update Invoice",
+                  ...(user?.mode === "Offline" ? ["Update Invoice"] : []),
                 ].map((header) => (
                   <th
                     key={header}
@@ -180,7 +150,15 @@ const Invoice = () => {
             </thead>
             <tbody>
               {[...Array(5)].map((_, index) => (
-                <InvoiceSkeleton key={index} />
+                <tr className="animate-pulse" key={index}>
+                  {[...Array(user?.mode === "Offline" ? 11 : 10)].map(
+                    (_, index) => (
+                      <td key={index} className="p-4">
+                        <div className="h-4 bg-gray-200 rounded"></div>
+                      </td>
+                    )
+                  )}
+                </tr>
               ))}
             </tbody>
           </table>
@@ -209,12 +187,6 @@ const Invoice = () => {
                     Due
                   </th>
                   <th className="text-left p-4 text-gray-500 font-normal">
-                    Cashback Given
-                  </th>
-                  <th className="text-left p-4 text-gray-500 font-normal">
-                    Remaining Cashback
-                  </th>
-                  <th className="text-left p-4 text-gray-500 font-normal">
                     Billing Date
                   </th>
                   <th className="text-left p-4 text-gray-500 font-normal">
@@ -223,9 +195,11 @@ const Invoice = () => {
                   <th className="text-left p-4 text-gray-500 font-normal">
                     Invoice
                   </th>
-                  <th className="text-left p-4 text-gray-500 font-normal">
-                    Update Invoice
-                  </th>
+                  {user?.mode === "Offline" && (
+                    <th className="text-left p-4 text-gray-500 font-normal">
+                      Update Invoice
+                    </th>
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -242,27 +216,21 @@ const Invoice = () => {
                     <td className="p-4 text-gray-900">{invoice.paidAmount}</td>
                     <td className="p-4 text-gray-900">{invoice.dueAmount}</td>
                     <td className="p-4 text-gray-900">
-                      {invoice.userCashback || 0}
-                    </td>
-                    <td className="p-4 text-gray-900">
-                      {invoice.remainingCashback || 0}
-                    </td>
-                    <td className="p-4 text-gray-900">
                       {invoice.billingDate || "-"}
                     </td>
                     <td className="p-4 text-gray-900">
                       {invoice.dueAmount > 0 ? invoice.dueDate || "-" : "-"}
                     </td>
                     <td className="p-4">
-                      <button
-                        onClick={() => handleViewInvoice(invoice)}
-                        className="px-4 py-2 text-blue-500 border border-blue-500 rounded-md flex items-center gap-2"
+                      <Link
+                        to={invoice.pdfUrl}
+                        className="px-4 w-24 py-2 text-blue-500 border border-blue-500 rounded-md flex items-center gap-2"
                       >
                         <AiOutlineEye className="w-4 h-4" />
                         View
-                      </button>
+                      </Link>
                     </td>
-                    {!invoice.claimedCouponCode && (
+                    {user?.mode === "Offline" && !invoice.claimedCouponCode && (
                       <td className="p-4">
                         <button
                           onClick={() => setSelectedInvoiceUpdate(invoice)}
