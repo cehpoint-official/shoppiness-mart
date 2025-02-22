@@ -133,7 +133,7 @@ const UserDashBoard = () => {
       <UserDashboardNav profilePic={userData.profilePic} userId={userId} />
       <div className="userDashboardContainer">
         <div className="mainDashboard">
-          <div className="topSec">
+          <div className="topSec ">
             <div className="left">
               {loading ? (
                 <ProfileSkeleton />

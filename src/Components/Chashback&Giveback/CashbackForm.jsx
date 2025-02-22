@@ -1,8 +1,15 @@
-import { collection, doc, getDocs } from "firebase/firestore";
+import { addDoc, collection, doc, getDocs } from "firebase/firestore";
 import { useCallback, useEffect, useState } from "react";
-import { db } from "../../../firebase";
+import { db, storage } from "../../../firebase";
 import { useSelector } from "react-redux";
-
+import {
+  deleteObject,
+  getDownloadURL,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
+import toast from "react-hot-toast";
+import { FaSpinner } from "react-icons/fa";
 const CashbackForm = () => {
   const [showPaymentSelection, setShowPaymentSelection] = useState(false);
   const [existingPayments, setExistingPayments] = useState({
@@ -18,15 +25,15 @@ const CashbackForm = () => {
   const [loadingPayment, setLoadingPayment] = useState(true);
   const [couponCode, setCouponCode] = useState(""); // New state for coupon code
   const [uploadedPdf, setUploadedPdf] = useState(null); // New state for uploaded PDF
-
+  const [isLoading, setIsLoading] = useState(false);
   const fetchData = useCallback(async () => {
     try {
       const querySnapshot = await getDocs(collection(db, "businessDetails"));
       const data = [];
       querySnapshot.forEach((doc) => {
         const shopData = doc.data();
-        if (shopData.status === "Active") {
-          data.push({ id: doc.id, ...shopData });
+        if (shopData.status === "Active" && shopData.mode === "Online") {
+          data.push({ shopId: doc.id, ...shopData });
         }
       });
       setShops(data);
@@ -38,7 +45,6 @@ const CashbackForm = () => {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
-
 
   const handleShopChange = (e) => {
     setSelectedShop(e.target.value);
@@ -60,7 +66,43 @@ const CashbackForm = () => {
       alert("Please upload a valid PDF file.");
     }
   };
+  const uploadPdf = async (file) => {
+    const metadata = {
+      contentType: "application/pdf",
+    };
+    const storageRef = ref(storage, `online-receipts/${file.name}`);
+    const uploadTask = uploadBytesResumable(storageRef, file, metadata);
 
+    return new Promise((resolve, reject) => {
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log("Upload is " + progress + "% done");
+        },
+        (error) => {
+          console.error("Upload failed:", error);
+          reject(error);
+        },
+        async () => {
+          try {
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+            resolve(downloadURL);
+          } catch (error) {
+            console.error("Failed to get download URL:", error);
+            // Delete the uploaded file if we can't get its URL
+            try {
+              await deleteObject(storageRef);
+            } catch (deleteError) {
+              console.error("Failed to delete incomplete upload:", deleteError);
+            }
+            reject(error);
+          }
+        }
+      );
+    });
+  };
   useEffect(() => {
     const fetchAllPaymentMethods = async () => {
       if (!user?.uid) return;
@@ -140,19 +182,53 @@ const CashbackForm = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    try {
+      // Upload PDF to Firebase Storage
+      const pdfUrl = await uploadPdf(uploadedPdf);
 
-    const formData = {
-      selectedShop,
-      paidAmount,
-      selectedPayment,
-      couponCode, 
-      uploadedPdf, 
-      status: "New",
-    };
+      // Find the selected shop details
+      const selectedShopDetails = shops.find(
+        (shop) => shop.businessName === selectedShop
+      );
 
-    console.log("Form Data:", formData);
+      const formData = {
+        shopId: selectedShopDetails.shopId,
+        shopName: selectedShopDetails.businessName,
+        shopEmail: selectedShopDetails.email,
+        shopPhone: selectedShopDetails.mobileNumber,
+        shopOwnerName: selectedShopDetails.owner,
+        paidAmount,
+        selectedPayment,
+        couponCode,
+        invoiceName: uploadedPdf?.name,
+        invoiceUrl: pdfUrl,
+        userName: user.fname + " " + user.lname,
+        userEmail: user.email,
+        status: "New",
+        requestedAt: new Date().toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        }),
+      };
+      console.log(formData);
+
+      await addDoc(collection(db, "onlineCashbackRequests"), formData);
+      toast.success("Dispute request submitted successfully!");
+      // Reset form fields
+      setSelectedShop("");
+      setPaidAmount("");
+      setCouponCode("");
+      setUploadedPdf(null);
+    } catch (error) {
+      console.error("Error submitting dispute request:", error);
+      toast.error("Failed to submit dispute request. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -306,9 +382,15 @@ const CashbackForm = () => {
 
         <button
           type="submit"
-          className="w-full bg-blue-700 text-white rounded py-2 text-md mt-6"
+          className="w-full bg-blue-700 flex justify-center text-white rounded py-2 text-md mt-6"
+          disabled={isLoading}
         >
-          Claim Cashback
+          {" "}
+          {isLoading ? (
+            <FaSpinner className="animate-spin" />
+          ) : (
+            "Claim Cashback"
+          )}
         </button>
       </form>
     </div>
