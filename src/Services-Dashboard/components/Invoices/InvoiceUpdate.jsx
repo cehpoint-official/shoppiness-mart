@@ -159,36 +159,52 @@ const InvoiceUpdate = ({ updatedData, back }) => {
     userCashbackPercentage,
     platformEarningsPercentage
   ) => {
-    if (!userCashbackPercentage || !platformEarningsPercentage) {
+    // Validate inputs
+    if (!grandTotal || grandTotal <= 0) {
       return { platformCashback: 0, userCashback: 0, remainingCashback: 0 };
     }
-
+  
     try {
-      const duePercentage = ((grandTotal - cashCollected) / grandTotal) * 100;
-      const fullUserCashback = Number(
-        ((userCashbackPercentage / 100) * grandTotal).toFixed(1)
+      // For online shop, ensure exactly 50/50 split
+      // Total commission percentage is the sum of both percentages
+      const totalCommissionPercentage = userCashbackPercentage + platformEarningsPercentage;
+      
+      // Enforce 50/50 split for online shops
+      const adjustedUserPercentage = totalCommissionPercentage / 2;
+      const adjustedPlatformPercentage = totalCommissionPercentage / 2;
+      
+      // Calculate the total cashback amounts based on the grand total
+      const totalUserCashback = Number(
+        ((adjustedUserPercentage / 100) * grandTotal).toFixed(2)
       );
       const platformCashback = Number(
-        ((platformEarningsPercentage / 100) * grandTotal).toFixed(1)
+        ((adjustedPlatformPercentage / 100) * grandTotal).toFixed(2)
       );
-
+      
+      // Calculate how much of the invoice has been paid
+      const paymentPercentage = (cashCollected / grandTotal) * 100;
+      
       let userCashback, remainingCashback;
-
-      if (duePercentage === 100) {
+      
+      // Distribute user cashback based on payment status
+      if (paymentPercentage <= 0) {
+        // Nothing paid, no cashback for user
         userCashback = 0;
-        remainingCashback = 0;
-      } else if (duePercentage === 0) {
-        userCashback = fullUserCashback;
+        remainingCashback = totalUserCashback;
+      } else if (paymentPercentage >= 100) {
+        // Fully paid, full cashback for user
+        userCashback = totalUserCashback;
         remainingCashback = 0;
       } else {
+        // Partially paid, proportional cashback
         userCashback = Number(
-          (fullUserCashback * ((100 - duePercentage) / 100)).toFixed(1)
+          ((totalUserCashback * paymentPercentage) / 100).toFixed(2)
         );
         remainingCashback = Number(
-          (fullUserCashback - userCashback).toFixed(1)
+          (totalUserCashback - userCashback).toFixed(2)
         );
       }
-
+  
       return { platformCashback, userCashback, remainingCashback };
     } catch (error) {
       console.error("Error calculating cashback:", error);
