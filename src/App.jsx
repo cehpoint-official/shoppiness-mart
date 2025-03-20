@@ -11,6 +11,8 @@ import AllMoneySendToPlatform from "./Services-Dashboard/pages/MoneySendToPlatfo
 import PlatformEarningsFromBusiness from "./Admin/pages/Product&Services/PlatformEarningsFromBuisness/PlatformEarningsFromBuisness";
 import AllPaymentVarificationRequest from "./Admin/pages/Product&Services/PlatformEarningsFromBuisness/AllPaymentVarificationRequest";
 import ViewPaymentDetails from "./Admin/pages/Product&Services/PlatformEarningsFromBuisness/ViewPaymentDetails";
+import CashbackTracking from "./Admin/pages/Product&Services/CashbackTracking/CashbackTracking";
+
 // import ProtectedRoute from "./Components/ProtectedRoute";
 
 const BusinessDetails = lazy(() => import("./pages/BusinessDetails"));
@@ -353,6 +355,7 @@ const router = createBrowserRouter([
           { path: "maast/events", element: <Events /> },
           { path: "ngo/ngo-requests", element: <NgoRequest /> },
           { path: "ngo/all-ngo", element: <AllNgos /> },
+          { path: "services/cashback-tracking", element: <CashbackTracking /> }, 
           { path: "ngo/giveback-request", element: <GiveBackRecord /> },
           {
             path: "services/offlineshop-requests",

@@ -1,0 +1,37 @@
+.cashback-tracking {
+    padding: 20px;
+    background: #f5f5f5;
+  }
+  
+  h2 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  
+  th, td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: center;
+  }
+  
+  th {
+    background: #2c3e50;
+    color: #fff;
+  }
+  
+  tr:hover {
+    background: #f1f1f1;
+  }
+  
+  .loading {
+    text-align: center;
+    font-size: 18px;
+    color: #888;
+  }
+  
