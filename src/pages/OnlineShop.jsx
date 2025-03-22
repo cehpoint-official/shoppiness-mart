@@ -14,36 +14,18 @@ const OnlineShop = () => {
   const [shops, setShops] = useState([]);
   const [storeSearchTerm, setStoreSearchTerm] = useState("");
   const [serviceSearchTerm, setServiceSearchTerm] = useState("");
-const { userId } = useParams();
+  const { userId } = useParams();
+
   useEffect(() => {
-    // const fetchStores = async () => {
-    //   try {
-    //     const response = await fetch(
-    //       `${import.meta.env.VITE_AWS_SERVER}/inrdeals/stores`
-    //     );
-    //     const data = await response.json();
-    //     if (data.success) {
-    //       setStores(data.data.stores);
-    //     } else {
-    //       console.error("Failed to fetch stores:", data.message);
-    //     }
-    //   } catch (error) {
-    //     console.error("Error fetching stores:", error);
-    //   } finally {
-    //     setLoading(false);
-    //   }
-    // }; //old code
-    // import.meta.env.VITE_AWS_SERVER
-
-
     const fetchStores = async () => {
-      // console.log("API URL:", `${import.meta.env.VITE_AWS_SERVER}/inrdeals/stores`);  // ✅ Log the API URL
-    
+      // console.log("API URL:", `${import.meta.env.VITE_AWS_SERVER}/inrdeals/stores`);  
+      // ✅ Log the API URL
+
       try {
         const response = await fetch(
           `${import.meta.env.VITE_AWS_SERVER}/inrdeals/stores`
         );
-    
+
         const data = await response.json();
         if (data.success) {
           setStores(data.data.stores);
@@ -56,8 +38,7 @@ const { userId } = useParams();
         setLoading(false);
       }
     };
-    
-    
+
     fetchStores();
   }, []);
 
@@ -126,17 +107,15 @@ const { userId } = useParams();
             SAVINGS MODE &rarr;
           </div>
           <div
-            className={`py-2 px-4 rounded cursor-pointer text-sm ${
-              activeTab === "store" ? "bg-teal-500 text-white" : ""
-            }`}
+            className={`py-2 px-4 rounded cursor-pointer text-sm ${activeTab === "store" ? "bg-teal-500 text-white" : ""
+              }`}
             onClick={() => setActiveTab("store")}
           >
             Savings by Store
           </div>
           <div
-            className={`py-2 px-4 rounded cursor-pointer text-sm border-2 border-500-red ${
-              activeTab === "services" ? "bg-teal-500 text-white" : ""
-            }`}
+            className={`py-2 px-4 rounded cursor-pointer text-sm border-2 border-500-red ${activeTab === "services" ? "bg-teal-500 text-white" : ""
+              }`}
             onClick={() => setActiveTab("services")}
           >
             Savings by Services
@@ -147,9 +126,8 @@ const { userId } = useParams();
             <FiSearch className="absolute top-2.5 left-3 text-gray-400" />
             <input
               type="text"
-              placeholder={`Search ${
-                activeTab === "store" ? "stores" : "services"
-              }...`}
+              placeholder={`Search ${activeTab === "store" ? "stores" : "services"
+                }...`}
               className="pl-10 pr-4 py-2 w-full rounded bg-gray-100 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
               value={getCurrentSearchTerm()}
               onChange={handleSearchChange}
