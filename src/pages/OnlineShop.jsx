@@ -16,11 +16,34 @@ const OnlineShop = () => {
   const [serviceSearchTerm, setServiceSearchTerm] = useState("");
 const { userId } = useParams();
   useEffect(() => {
+    // const fetchStores = async () => {
+    //   try {
+    //     const response = await fetch(
+    //       `${import.meta.env.VITE_AWS_SERVER}/inrdeals/stores`
+    //     );
+    //     const data = await response.json();
+    //     if (data.success) {
+    //       setStores(data.data.stores);
+    //     } else {
+    //       console.error("Failed to fetch stores:", data.message);
+    //     }
+    //   } catch (error) {
+    //     console.error("Error fetching stores:", error);
+    //   } finally {
+    //     setLoading(false);
+    //   }
+    // }; //old code
+    import.meta.env.VITE_AWS_SERVER
+
+
     const fetchStores = async () => {
+      // console.log("API URL:", `${import.meta.env.VITE_AWS_SERVER}/inrdeals/stores`);  // ✅ Log the API URL
+    
       try {
         const response = await fetch(
           `${import.meta.env.VITE_AWS_SERVER}/inrdeals/stores`
         );
+    
         const data = await response.json();
         if (data.success) {
           setStores(data.data.stores);
@@ -33,6 +56,8 @@ const { userId } = useParams();
         setLoading(false);
       }
     };
+    
+    
     fetchStores();
   }, []);
 
