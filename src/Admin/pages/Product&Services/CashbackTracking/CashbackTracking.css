@@ -1,0 +1,43 @@
+.cashback-tracking {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+}
+
+h2 {
+  text-align: center;
+  color: #333;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
+button {
+  padding: 5px 10px;
+  margin: 5px;
+  cursor: pointer;
+  border: none;
+  color: white;
+  background-color: #4CAF50;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+select {
+  padding: 5px;
+  margin: 5px;
+}

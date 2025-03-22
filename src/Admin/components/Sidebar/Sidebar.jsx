@@ -172,6 +172,12 @@ const Sidebar = () => {
               >
                 Add Categories
               </Link>
+              <Link
+                to="/admin/shoppiness/services/cashback-tracking"
+                className="py-2 px-6 hover:bg-teal-600 transition-colors"
+              >
+                Cashback Tracking
+              </Link>
             </div>
           )}
         </div>
