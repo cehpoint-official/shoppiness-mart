@@ -33,7 +33,7 @@ const { userId } = useParams();
     //     setLoading(false);
     //   }
     // }; //old code
-    import.meta.env.VITE_AWS_SERVER
+    // import.meta.env.VITE_AWS_SERVER
 
 
     const fetchStores = async () => {
