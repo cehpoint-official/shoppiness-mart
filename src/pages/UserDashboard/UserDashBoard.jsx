@@ -26,6 +26,7 @@ import bag from "../../assets/RegisterBusiness/bag.jpg";
 import video from "../../assets/RegisterBusiness/vid.png";
 import { RiSearchFill } from "react-icons/ri";
 import EditProfileDialog from "./EditProfileDialog.jsx";
+import UserTransactions from "./UserTransactions.jsx";
 import { useDispatch } from "react-redux";
 import { userExist, userNotExist } from "../../redux/reducer/userReducer.js";
 
@@ -38,6 +39,7 @@ const UserDashBoard = () => {
   const [cashbackCollected, setCashbackCollected] = useState([]);
   const [cashbackRequest, setCashbackRequest] = useState([]);
   const [isFetchingCoupons, setIsFetchingCoupons] = useState(true);
+  const [activeTab, setActiveTab] = useState("dashboard"); // Adding state for tab navigation
 
   // Skeleton Components
   const SkeletonWidget = () => (
@@ -128,133 +130,82 @@ const UserDashBoard = () => {
     fetchCouponData();
   }, [fetchCouponData]);
 
-  return (
-    <div className="userDashboard">
-      <UserDashboardNav profilePic={userData.profilePic} userId={userId} />
-      <div className="userDashboardContainer">
-        <div className="mainDashboard">
-          <div className="topSec ">
-            <div className="left">
-              {loading ? (
-                <ProfileSkeleton />
-              ) : (
-                <>
-                  <div className="profile">
-                    <img
-                      src={
-                        userData.profilePic ||
-                        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8oghbsuzggpkknQSSU-Ch_xep_9v3m6EeBQ&s"
-                      }
-                      alt="user profile"
-                      className="rounded-full w-24 h-24 object-cover"
-                    />
-                  </div>
-                  <div className="info">
-                    <div className="name">
-                      <h3>{userData.fname}</h3>
-                      <h3>{userData.lname || ""}</h3>
-                    </div>
-                    <div className="email">
-                      <MdOutlineMailOutline />
-                      <p>{userData.email}</p>
-                    </div>
-                    <div className="phone">
-                      <FaPhoneAlt />
-                      <p>{userData.phone || "Not Added!"}</p>
-                    </div>
-                    <button
-                      onClick={() => setIsDialogOpen(true)}
-                      className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition duration-200"
-                    >
-                      Edit Profile
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-            <div className="right">
-              <h2>Let&apos;s start Shopping!</h2>
-              <div className="links">
-                <Link to={`/user-dashboard/${userId}/online-shop`}>
-                  <div className="link">
-                    Online Shop
-                    <IoArrowRedoSharp />
-                  </div>
-                </Link>
-                <Link to={`/user-dashboard/${userId}/offline-shop`}>
-                  <div className="link">
-                    Offline Shop
-                    <IoArrowRedoSharp />
-                  </div>
-                </Link>
-              </div>
-            </div>
+  // Tab navigation handler
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case "transactions":
+        return <UserTransactions userId={userId} />;
+      case "dashboard":
+      default:
+        return renderDashboardContent();
+    }
+  };
+
+  // Main dashboard content
+  const renderDashboardContent = () => (
+    <>
+      <div className="widgets">
+        {loading ? (
+          <>
+            <SkeletonWidget />
+            <SkeletonWidget />
+            <SkeletonWidget />
+            <SkeletonWidget />
+          </>
+        ) : (
+          <>
+            <Widget
+              title="Collected Cash backs"
+              heading={userData.collectedCashback || "0"}
+              icon={money}
+            />
+            <Widget
+              title="Collected Coupon"
+              heading={
+                isFetchingCoupons ? "0" : cashbackCollected.length.toString()
+              }
+              icon={tag}
+            />
+            <Widget
+              title="Give Back"
+              heading={userData.givebackAmount || "0"}
+              icon={giveback}
+            />
+            <Widget
+              title="Cash back requests"
+              heading={
+                isFetchingCoupons ? "0" : cashbackRequest.length.toString()
+              }
+              icon={cashback}
+            />
+          </>
+        )}
+      </div>
+
+      <div className="welcomeSec">
+        {loading ? (
+          <div className="space-y-4 animate-pulse">
+            <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+            <div className="h-4 bg-gray-200 rounded w-full"></div>
+            <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+            <div className="h-10 bg-gray-200 rounded w-48"></div>
           </div>
-        </div>
-
-        <div className="widgets">
-          {loading ? (
-            <>
-              <SkeletonWidget />
-              <SkeletonWidget />
-              <SkeletonWidget />
-              <SkeletonWidget />
-            </>
-          ) : (
-            <>
-              <Widget
-                title="Collected Cash backs"
-                heading={userData.collectedCashback || "0"}
-                icon={money}
-              />
-              <Widget
-                title="Collected Coupon"
-                heading={
-                  isFetchingCoupons ? "0" : cashbackCollected.length.toString()
-                }
-                icon={tag}
-              />
-              <Widget
-                title="Give Back"
-                heading={userData.givebackAmount || "0"}
-                icon={giveback}
-              />
-              <Widget
-                title="Cash back requests"
-                heading={
-                  isFetchingCoupons ? "0" : cashbackRequest.length.toString()
-                }
-                icon={cashback}
-              />
-            </>
-          )}
-        </div>
-
-        <div className="welcomeSec">
-          {loading ? (
-            <div className="space-y-4 animate-pulse">
-              <div className="h-6 bg-gray-200 rounded w-3/4"></div>
-              <div className="h-4 bg-gray-200 rounded w-full"></div>
-              <div className="h-4 bg-gray-200 rounded w-2/3"></div>
-              <div className="h-10 bg-gray-200 rounded w-48"></div>
-            </div>
-          ) : (
-            <>
-              <h2>
-                Hello <span>{userData.fname}</span>, Welcome to your Dashboard
-              </h2>
-              <p>
-                Thanks for signing up and choosing to support our mission. We
-                would like to help you get started and generating donations from
-                your everyday shopping.
-              </p>
-              <p>Get great offers & Cashback.</p>
-              <Link to={`/user-dashboard/${userId}/howitworks`}>
-                <button>Show Me how get cashback to give back</button>
-              </Link>
-            </>
-          )}
-        </div>
+        ) : (
+          <>
+            <h2>
+              Hello <span>{userData.fname}</span>, Welcome to your Dashboard
+            </h2>
+            <p>
+              Thanks for signing up and choosing to support our mission. We
+              would like to help you get started and generating donations from
+              your everyday shopping.
+            </p>
+            <p>Get great offers & Cashback.</p>
+            <Link to={`/user-dashboard/${userId}/howitworks`}>
+              <button>Show Me how get cashback to give back</button>
+            </Link>
+          </>
+        )}
       </div>
 
       <div className="banner">
@@ -434,6 +385,102 @@ const UserDashBoard = () => {
             </div>
           </div>
         </div>
+      </div>
+    </>
+  );
+
+  return (
+    <div className="userDashboard">
+      <UserDashboardNav profilePic={userData.profilePic} userId={userId} />
+      <div className="userDashboardContainer">
+        <div className="mainDashboard">
+          <div className="topSec">
+            <div className="left">
+              {loading ? (
+                <ProfileSkeleton />
+              ) : (
+                <>
+                  <div className="profile">
+                    <img
+                      src={
+                        userData.profilePic ||
+                        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8oghbsuzggpkknQSSU-Ch_xep_9v3m6EeBQ&s"
+                      }
+                      alt="user profile"
+                      className="rounded-full w-24 h-24 object-cover"
+                    />
+                  </div>
+                  <div className="info">
+                    <div className="name">
+                      <h3>{userData.fname}</h3>
+                      <h3>{userData.lname || ""}</h3>
+                    </div>
+                    <div className="email">
+                      <MdOutlineMailOutline />
+                      <p>{userData.email}</p>
+                    </div>
+                    <div className="phone">
+                      <FaPhoneAlt />
+                      <p>{userData.phone || "Not Added!"}</p>
+                    </div>
+                    <button
+                      onClick={() => setIsDialogOpen(true)}
+                      className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition duration-200"
+                    >
+                      Edit Profile
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+            <div className="right">
+              <h2>Let&apos;s start Shopping!</h2>
+              <div className="links">
+                <Link to={`/user-dashboard/${userId}/online-shop`}>
+                  <div className="link">
+                    Online Shop
+                    <IoArrowRedoSharp />
+                  </div>
+                </Link>
+                <Link to={`/user-dashboard/${userId}/offline-shop`}>
+                  <div className="link">
+                    Offline Shop
+                    <IoArrowRedoSharp />
+                  </div>
+                </Link>
+              </div>
+            </div>
+          </div>
+          
+          {/* New navigation tabs */}
+          <div className="dashboard-tabs mt-6 mb-4 border-b">
+            <div className="flex space-x-4">
+              <button
+                onClick={() => setActiveTab("dashboard")}
+                className={`py-2 px-4 font-medium transition-colors duration-200 ${
+                  activeTab === "dashboard" 
+                    ? "text-blue-600 border-b-2 border-blue-600" 
+                    : "text-gray-500 hover:text-blue-500"
+                }`}
+              >
+                Dashboard
+              </button>
+              <button
+                onClick={() => setActiveTab("transactions")}
+                className={`py-2 px-4 font-medium transition-colors duration-200 ${
+                  activeTab === "transactions" 
+                    ? "text-blue-600 border-b-2 border-blue-600" 
+                    : "text-gray-500 hover:text-blue-500"
+                }`}
+              >
+                Transactions
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Content based on selected tab */}
+        {renderTabContent()}
       </div>
 
       {isDialogOpen && (

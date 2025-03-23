@@ -5,7 +5,7 @@ import { BiDonateHeart } from "react-icons/bi"
 import { HiOutlineTicket } from "react-icons/hi"
 import GeneratedCoupons from '../../components/AdminDashboard/GeneratedCoupons'
 import ListedShops from '../../components/AdminDashboard/ListedShops'
-
+import AdminTransactions from "../../components/AdminDashboard/AdminTransactions"
 
 const donationData = [
   {
@@ -54,6 +54,11 @@ const AdminDashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <GeneratedCoupons />
           <ListedShops />
+        </div>
+
+        {/* Transactions Section */}
+        <div className="mb-6">
+          <AdminTransactions />
         </div>
 
         {/* Bottom Grid */}
@@ -117,7 +122,6 @@ const AdminDashboard = () => {
     </div>
   )
 }
-
 
 export default AdminDashboard
 
