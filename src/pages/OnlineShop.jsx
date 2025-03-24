@@ -160,7 +160,7 @@ const OnlineShop = () => {
         key={item.id}
       >
         <a 
-          href={trackingUrl} 
+          href={item?.url} // Use the tracking URL
           target="_blank" 
           rel="noopener noreferrer"
           onClick={() => trackPurchase(item)}
@@ -175,9 +175,9 @@ const OnlineShop = () => {
           <p className="text-center font-bold text-base m-2">
             {item?.merchant}
           </p>
-          {/* <button className="bg-[#0F9B03] text-white rounded-md px-2 m-auto flex">
-            {item?.payout} cashback
-          </button> */}
+          <button className="bg-[#0F9B03] text-white rounded-md px-2 m-auto flex">
+            {item?.payout} cashback - All to charity.
+          </button>
         </a>
       </div>
     );
