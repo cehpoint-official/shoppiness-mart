@@ -8,31 +8,59 @@ $breakpoint2: 736px;
 
 .userDashboard {
   font-family: $font;
+
   .userDashboardContainer {
     padding: $padding;
 
+    @media (max-width: $breakpoint) {
+      padding: 20px;
+    }
+
     .mainDashboard {
       display: flex;
+      flex-direction: column;
       padding-bottom: 40px;
 
       .topSec {
         display: flex;
+        flex-direction: column;
         width: 100%;
-        gap: 10px;
+        gap: 20px;
+
+        @media (min-width: $breakpoint) {
+          flex-direction: row;
+          gap: 10px;
+        }
 
         .left {
-          width: 75%;
-          padding: 40px 50px;
+          width: 100%;
+          padding: 30px;
           display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
           border-radius: 10px;
-          gap: 70px;
           box-shadow: 0px 1px 15px 0px #0000002e;
+
+          @media (min-width: $breakpoint) {
+            width: 75%;
+            flex-direction: row;
+            align-items: flex-start;
+            text-align: left;
+            gap: 30px;
+            padding: 40px 50px;
+          }
 
           .profile {
             width: 130px;
             height: 130px;
             border-radius: 50%;
             overflow: hidden;
+            margin-bottom: 20px;
+
+            @media (min-width: $breakpoint) {
+              margin-bottom: 0;
+            }
 
             img {
               width: 100%;
@@ -45,15 +73,29 @@ $breakpoint2: 736px;
             display: flex;
             flex-direction: column;
             gap: 18px;
+            align-items: center;
+
+            @media (min-width: $breakpoint) {
+              align-items: flex-start;
+            }
 
             .name {
               display: flex;
               gap: 5px;
+              justify-content: center;
+
+              @media (min-width: $breakpoint) {
+                justify-content: flex-start;
+              }
 
               h3 {
-                font-size: 43px;
-                font-weight: 500px;
+                font-size: 28px;
+                font-weight: 500;
                 text-transform: uppercase;
+
+                @media (min-width: $breakpoint) {
+                  font-size: 43px;
+                }
               }
             }
 
@@ -62,8 +104,12 @@ $breakpoint2: 736px;
               display: flex;
               align-items: center;
               gap: 10px;
-              font-size: 18px;
+              font-size: 16px;
               color: #4f4e4e;
+
+              @media (min-width: $breakpoint) {
+                font-size: 18px;
+              }
 
               svg {
                 font-size: 20px;
@@ -73,10 +119,15 @@ $breakpoint2: 736px;
             button {
               width: max-content;
               background-color: #0059de;
-              font-size: 18px;
+              font-size: 16px;
               color: #fff;
               padding: 5px 10px;
               transition: 0.35s all ease-in-out;
+              margin-top: 10px;
+
+              @media (min-width: $breakpoint) {
+                font-size: 18px;
+              }
 
               &:hover {
                 background-color: #fff;
@@ -88,37 +139,57 @@ $breakpoint2: 736px;
         }
 
         .right {
-          width: 25%;
+          width: 100%;
           padding: 15px;
           box-shadow: 0px 1px 15px 0px #0000002e;
           border-radius: 10px;
           display: flex;
           flex-direction: column;
-          gap: 30px;
+          gap: 20px;
+          text-align: center;
+
+          @media (min-width: $breakpoint) {
+            width: 25%;
+            text-align: left;
+            gap: 30px;
+          }
 
           h2 {
-            font-size: 30px;
+            font-size: 24px;
             font-weight: 600;
+
+            @media (min-width: $breakpoint) {
+              font-size: 30px;
+            }
           }
 
           .links {
             display: flex;
             flex-direction: column;
-            padding: 0px 20px;
-            gap: 20px;
+            align-items: center;
+            gap: 15px;
+
+            @media (min-width: $breakpoint) {
+              padding: 0px 20px;
+              align-items: flex-start;
+            }
 
             .link {
               border: 2px solid #0059de;
               padding: 6px 30px;
               border-radius: 10px;
               color: #0059de;
-              font-size: 18px;
+              font-size: 16px;
               font-weight: 500;
               display: flex;
               align-items: center;
               justify-content: center;
               gap: 10px;
               width: 210px;
+
+              @media (min-width: $breakpoint) {
+                font-size: 18px;
+              }
 
               svg {
                 font-size: 20px;
@@ -127,300 +198,365 @@ $breakpoint2: 736px;
           }
         }
       }
-    }
 
-    .widgets {
-      display: flex;
-      gap: 10px;
-    }
-
-    .welcomeSec {
-      width: 100%;
-      box-shadow: 0px 1px 15px 0px #0000002e;
-      padding: 30px;
-      border-radius: 10px;
-      font-family: $font;
-      display: flex;
-      flex-direction: column;
-      gap: 30px;
-      margin-bottom: 10px;
-
-      h2 {
-        font-size: 35px;
-        color: #383a3f;
-        font-weight: 500;
-
-        span {
-          text-transform: uppercase;
-        }
-      }
-      p {
-        font-size: 19px;
-        color: #4d4d4d;
-        width: 70%;
-      }
-      button {
-        background-color: #04b455;
-        padding: 15px 20px;
-        width: max-content;
-        border-radius: 15px;
-        color: white;
-      }
-    }
-    .featuresSec {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      padding-top: 100px;
-
-      gap: 60px;
-      h2 {
-        font-size: 33px;
-        font-weight: 500;
-
-        span {
-          color: orange;
-        }
-      }
-      .featuresSecLowerSection {
+      .dashboard-tabs {
         display: flex;
-        align-items: center;
-        justify-content: space-around;
-        width: 100%;
+        justify-content: center;
+        margin-top: 20px;
+        border-bottom: 1px solid #e5e7eb;
 
-        .featuresSecItem {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
+        @media (min-width: $breakpoint) {
           justify-content: flex-start;
+        }
+
+        .flex {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+
+          @media (min-width: $breakpoint) {
+            flex-direction: row;
+            gap: 20px;
+          }
+        }
+
+        button {
+          padding: 8px 16px;
+          font-weight: 500;
+          transition: colors 200ms;
           text-align: center;
-          width: 200px;
-          gap: 10px;
-          transition: 0.34s ease;
-          &:hover {
-            scale: 1.1;
-          }
-          img {
-            width: 100px;
-            height: 100px;
-            object-fit: contain;
-          }
-          p {
-            width: 90%;
-            font-size: 15px;
-            color: #545050;
-          }
-        }
-      }
-    }
-    .popularOfflineShops {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding-top: 100px;
-      gap: 50px;
-      h2 {
-        font-size: 33px;
-        font-weight: 500;
+          width: 100%;
 
-        span {
-          color: orange;
-        }
-      }
-      .shopsContainer {
-        display: flex;
-        gap: 30px;
-        width: 100%;
-        justify-content: space-around;
-
-        .offlineShop {
-          display: flex;
-          flex-direction: column;
-          gap: 10px;
-
-          img {
-            width: 230px;
-            height: 130px;
-            object-fit: cover;
-            border-radius: 20px;
-          }
-
-          h1 {
-            font-size: 20px;
-            font-weight: 600;
-          }
-          p {
-            font-size: 18px;
-            color: #0000007d;
-            word-wrap: break-word;
-            width: 250px;
-          }
-          .cashback {
-            width: max-content;
-            color: white;
-            font-size: 14px;
-            padding: 10px;
-            border-radius: 20px;
-            background-color: #0059de;
-          }
-        }
-
-        .viewMoreBtn {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: space-around;
-          background-color: #ffc6c626;
-          padding: 20px;
-          border-radius: 30px;
-          .text {
-            gap: 10px;
-            display: flex;
-            flex-direction: column;
-            span {
-              color: #fb6767;
-              font-weight: 600;
-            }
-          }
-
-          .moreIcon {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #fff;
-            width: 50px;
-            height: 50px;
-            border-radius: 100%;
-            cursor: pointer;
-            box-shadow: 0px 5px 4px 0px #00000040;
+          @media (min-width: $breakpoint) {
+            width: auto;
+            text-align: left;
           }
         }
       }
     }
   }
-  .banner {
+
+  .widgets {
+    display: flex;
+    gap: 10px;
+  }
+
+  .welcomeSec {
+    width: 100%;
+    box-shadow: 0px 1px 15px 0px #0000002e;
+    padding: 30px;
+    border-radius: 10px;
+    font-family: $font;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    margin-bottom: 10px;
+
+    h2 {
+      font-size: 35px;
+      color: #383a3f;
+      font-weight: 500;
+
+      span {
+        text-transform: uppercase;
+      }
+    }
+
+    p {
+      font-size: 19px;
+      color: #4d4d4d;
+      width: 70%;
+    }
+
+    button {
+      background-color: #04b455;
+      padding: 15px 20px;
+      width: max-content;
+      border-radius: 15px;
+      color: white;
+    }
+  }
+
+  .featuresSec {
     display: flex;
     align-items: center;
-    justify-content: space-around;
-    background-color: #ffe0cf;
-    padding: 10px 100px;
+    justify-content: center;
+    flex-direction: column;
+    padding-top: 100px;
 
-    .item {
-      width: 60px;
-      height: 60px;
+    gap: 60px;
+
+    h2 {
+      font-size: 33px;
+      font-weight: 500;
+
+      span {
+        color: orange;
+      }
+    }
+
+    .featuresSecLowerSection {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      width: 100%;
+
+      .featuresSecItem {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        text-align: center;
+        width: 200px;
+        gap: 10px;
+        transition: 0.34s ease;
+
+        &:hover {
+          scale: 1.1;
+        }
+
+        img {
+          width: 100px;
+          height: 100px;
+          object-fit: contain;
+        }
+
+        p {
+          width: 90%;
+          font-size: 15px;
+          color: #545050;
+        }
+      }
+    }
+  }
+
+  .popularOfflineShops {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 100px;
+    gap: 50px;
+
+    h2 {
+      font-size: 33px;
+      font-weight: 500;
+
+      span {
+        color: orange;
+      }
+    }
+
+    .shopsContainer {
+      display: flex;
+      gap: 30px;
+      width: 100%;
+      justify-content: space-around;
+
+      .offlineShop {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        img {
+          width: 230px;
+          height: 130px;
+          object-fit: cover;
+          border-radius: 20px;
+        }
+
+        h1 {
+          font-size: 20px;
+          font-weight: 600;
+        }
+
+        p {
+          font-size: 18px;
+          color: #0000007d;
+          word-wrap: break-word;
+          width: 250px;
+        }
+
+        .cashback {
+          width: max-content;
+          color: white;
+          font-size: 14px;
+          padding: 10px;
+          border-radius: 20px;
+          background-color: #0059de;
+        }
+      }
+
+      .viewMoreBtn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-around;
+        background-color: #ffc6c626;
+        padding: 20px;
+        border-radius: 30px;
+
+        .text {
+          gap: 10px;
+          display: flex;
+          flex-direction: column;
+
+          span {
+            color: #fb6767;
+            font-weight: 600;
+          }
+        }
+
+        .moreIcon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-color: #fff;
+          width: 50px;
+          height: 50px;
+          border-radius: 100%;
+          cursor: pointer;
+          box-shadow: 0px 5px 4px 0px #00000040;
+        }
+      }
+    }
+  }
+}
+
+.banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background-color: #ffe0cf;
+  padding: 10px 100px;
+
+  .item {
+    width: 60px;
+    height: 60px;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+}
+
+.moneyRaisingSec {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  padding: 50px 100px;
+  gap: 30px;
+  margin-top: 50px;
+  background-color: #fffcee;
+
+  @media (max-width: $breakpoint2) {
+    padding: 20px;
+  }
+
+  h1 {
+    font-size: 40px;
+    font-weight: 600;
+    font-family: $font;
+
+    @media (max-width: $breakpoint) {
+      font-size: 35px;
+    }
+  }
+
+  .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-align: start;
+    gap: 40px;
+
+    @media (max-width: $breakpoint) {
+      flex-direction: column;
+      align-items: center;
+      gap: 50px;
+    }
+
+    .left {
+      width: 50%;
+
+      @media (max-width: $breakpoint) {
+        width: 100%;
+      }
 
       img {
         width: 100%;
         height: 100%;
-        object-fit: cover;
+        object-fit: contain;
       }
     }
-  }
 
-  .moneyRaisingSec {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    text-align: center;
-    padding: 50px 100px;
-    gap: 30px;
-    margin-top: 50px;
-    background-color: #fffcee;
-    @media (max-width: $breakpoint2) {
-      padding: 20px;
-    }
-    h1 {
-      font-size: 40px;
-      font-weight: 600;
-      font-family: $font;
+    .right {
+      width: 50%;
+
       @media (max-width: $breakpoint) {
-        font-size: 35px;
+        width: 100%;
       }
-    }
-    .container {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      text-align: start;
-      gap: 40px;
-      @media (max-width: $breakpoint) {
+
+      .points {
+        display: flex;
         flex-direction: column;
-        align-items: center;
-        gap: 50px;
-      }
+        gap: 20px;
 
-      .left {
-        width: 50%;
-        @media (max-width: $breakpoint) {
-          width: 100%;
-        }
-        img {
-          width: 100%;
-          height: 100%;
-          object-fit: contain;
-        }
-      }
-
-      .right {
-        width: 50%;
-        @media (max-width: $breakpoint) {
-          width: 100%;
-        }
-
-        .points {
+        .point {
           display: flex;
-          flex-direction: column;
-          gap: 20px;
+          gap: 30px;
 
-          .point {
+          .img {
+            width: 70px;
+            height: 70px;
             display: flex;
-            gap: 30px;
-            .img {
-              width: 70px;
-              height: 70px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              img {
-                object-fit: contain;
-                width: 100%;
-                height: 100%;
-              }
-              svg {
-                color: rgb(5, 5, 86);
-              }
+            align-items: center;
+            justify-content: center;
+
+            img {
+              object-fit: contain;
+              width: 100%;
+              height: 100%;
             }
-            > p {
-              font-size: 18px;
-              line-height: 30px;
-              color: $gray;
-              font-weight: 400;
-              width: 80%;
-            }
-            span {
-              font-weight: bold;
-              color: rgb(36, 38, 70);
-              font-size: 19px;
+
+            svg {
+              color: rgb(5, 5, 86);
             }
           }
 
-          .signup {
-            background-color: #047e72;
-            padding: 15px 5px;
-            text-align: center;
+          >p {
             font-size: 18px;
-            font-weight: 600;
-            color: white;
-            border-radius: 10px;
-            cursor: pointer;
-            width: 250px;
-            margin-left: 90px;
-            @media (max-width: $breakpoint2) {
-              margin: 10px 0 0 0;
-              align-self: center;
-            }
+            line-height: 30px;
+            color: $gray;
+            font-weight: 400;
+            width: 80%;
+          }
+
+          span {
+            font-weight: bold;
+            color: rgb(36, 38, 70);
+            font-size: 19px;
+          }
+        }
+
+        .signup {
+          background-color: #047e72;
+          padding: 15px 5px;
+          text-align: center;
+          font-size: 18px;
+          font-weight: 600;
+          color: white;
+          border-radius: 10px;
+          cursor: pointer;
+          width: 250px;
+          margin-left: 90px;
+
+          @media (max-width: $breakpoint2) {
+            margin: 10px 0 0 0;
+            align-self: center;
           }
         }
       }
