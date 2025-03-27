@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import "./DashboardHeader.scss";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { CiSearch } from "react-icons/ci";
@@ -9,7 +9,15 @@ import {
   ngoUserExist,
   setLoading,
 } from "../../../redux/reducer/ngoUserReducer";
-import { doc, setDoc } from "firebase/firestore";
+import {
+  doc,
+  setDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  updateDoc,
+} from "firebase/firestore";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 
@@ -18,9 +26,78 @@ const DashboardHeader = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
 
-  // Remove local state for `image` and directly use `user.logoUrl`
   const image = user?.logoUrl;
+
+  const fetchNotifications = useCallback(async () => {
+    try {
+      const q = query(
+        collection(db, "ngoNotifications"),
+        where("ngoId", "==", id)
+      );
+      const querySnapshot = await getDocs(q);
+      const notificationData = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      // Sort notifications by createdAt string in descending order
+      notificationData.sort((a, b) => {
+        const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
+        const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0);
+        return dateB - dateA; // Descending order
+      });
+
+      // Separate unread and read notifications
+      const unreadNotifications = notificationData.filter(
+        (notif) => !notif.read
+      );
+      const readNotifications = notificationData.filter((notif) => notif.read);
+      setUnreadCount(unreadNotifications.length);
+
+      // Logic: Show up to 4 notifications, prioritizing unread
+      let displayedNotifications = [];
+      if (unreadNotifications.length >= 4) {
+        displayedNotifications = unreadNotifications.slice(0, 4);
+      } else {
+        displayedNotifications = [...unreadNotifications];
+        const remainingSlots = 4 - unreadNotifications.length;
+        if (remainingSlots > 0 && readNotifications.length > 0) {
+          displayedNotifications = [
+            ...displayedNotifications,
+            ...readNotifications.slice(0, remainingSlots),
+          ];
+        }
+      }
+
+      setNotifications(displayedNotifications);
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    fetchNotifications();
+  }, [fetchNotifications]);
+
+  const handleMarkAsRead = async (notificationId) => {
+    try {
+      const notificationRef = doc(db, "ngoNotifications", notificationId);
+      await updateDoc(notificationRef, { read: true });
+      setNotifications((prev) =>
+        prev.map((notif) =>
+          notif.id === notificationId ? { ...notif, read: true } : notif
+        )
+      );
+      setUnreadCount((prev) => Math.max(prev - 1, 0));
+      fetchNotifications();
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+    }
+  };
 
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
@@ -29,34 +106,26 @@ const DashboardHeader = () => {
     dispatch(setLoading(true));
 
     try {
-      const metadata = {
-        contentType: "image/jpeg",
-      };
+      const metadata = { contentType: "image/jpeg" };
       const storageRef = ref(storage, "images/" + file.name);
       const uploadTask = uploadBytesResumable(storageRef, file, metadata);
 
       uploadTask.on(
         "state_changed",
         (snapshot) => {
-          // Handle upload progress here if needed
           const progress =
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           console.log("Upload is " + progress + "% done");
         },
         (error) => {
-          // Handle actual errors here
           console.error("Error uploading image:", error);
           dispatch(setLoading(false));
         },
         async () => {
           try {
-            // Upload completed successfully, now we can get the download URL
             const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-
-            // Update the user data in Firestore and Redux
             const updatedData = { ...user, logoUrl: downloadURL };
             await handleSave(updatedData);
-
             dispatch(ngoUserExist(updatedData));
           } catch (error) {
             console.error("Error getting download URL:", error);
@@ -67,24 +136,24 @@ const DashboardHeader = () => {
       );
     } catch (error) {
       console.error("Error uploading image:", error);
-      dispatch(setLoading(false)); // Set loading state to false on error
+      dispatch(setLoading(false));
     }
   };
 
   const handleSave = async (updatedData) => {
     try {
-      // Update the Firestore document with the new data
-      await setDoc(doc(db, "causeDetails", id), updatedData, {
-        merge: true,
-      });
-
-      // Dispatch the updated user data to Redux
+      await setDoc(doc(db, "causeDetails", id), updatedData, { merge: true });
       dispatch(ngoUserExist(updatedData));
-
       console.log("User data updated successfully!");
     } catch (error) {
       console.error("Error updating user data:", error);
     }
+  };
+
+  // Helper function to format ISO string date
+  const formatDate = (isoString) => {
+    if (!isoString) return "Unknown time";
+    return new Date(isoString).toLocaleString();
   };
 
   return (
@@ -97,8 +166,79 @@ const DashboardHeader = () => {
           <CiSearch />
           <input type="text" placeholder="Search Here" />
         </div>
-        <div className="notifications">
-          <IoIosNotifications />
+        <div className="notifications relative">
+          <div
+            className="cursor-pointer relative"
+            onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+          >
+            <IoIosNotifications className="w-6 h-6 text-gray-600" />
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                {unreadCount}
+              </span>
+            )}
+          </div>
+
+          {isNotificationOpen && (
+            <div className="absolute right-0 mt-2 w-96 bg-white rounded-2xl shadow-2xl border border-green-50 z-50 max-h-[500px] overflow-y-auto">
+              <div className="p-5">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm md:text-xl font-bold text-green-800 flex items-center gap-2">
+                    Notifications
+                  </h3>
+                  <span className="text-sm text-green-600 font-medium">
+                    {unreadCount} New
+                  </span>
+                </div>
+                {notifications.length === 0 ? (
+                  <div className="text-center py-6 bg-green-50 rounded-xl">
+                    <p className="text-green-600 font-medium">
+                      No new notifications
+                    </p>
+                    <p className="text-xs text-green-500 mt-1">
+                      You're all caught up!
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {notifications.map((notif) => (
+                      <div
+                        key={notif.id}
+                        className={`transition-all duration-300 ease-in-out transform hover:scale-[1.02] ${
+                          notif.read ? "" : ""
+                        } border-y-2 py-2`}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="flex-grow">
+                            <p
+                              className={`text-xs ${
+                                notif.read
+                                  ? "text-gray-700"
+                                  : "text-green-800 font-semibold"
+                              }`}
+                            >
+                              {notif.message}
+                            </p>
+                            <p className="text-xs text-gray-500 mt-1">
+                              {formatDate(notif.createdAt)}
+                            </p>
+                          </div>
+                          {!notif.read && (
+                            <button
+                              onClick={() => handleMarkAsRead(notif.id)}
+                              className="bg-green-500 text-white text-xs rounded p-1 hover:bg-green-600 transition-colors duration-200"
+                            >
+                              Mark as Read
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
         <div className="relative">
           <div className="flex items-center gap-4">
@@ -157,7 +297,6 @@ const DashboardHeader = () => {
                     onChange={handleImageChange}
                   />
                 </div>
-
                 <div className="mt-4 text-center">
                   <h3 className="text-lg font-semibold">{user?.name}</h3>
                   <p className="text-gray-600 text-sm mt-1">{user?.email}</p>

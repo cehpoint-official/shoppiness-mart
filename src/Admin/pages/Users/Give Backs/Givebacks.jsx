@@ -1,12 +1,10 @@
-import {
-  collection,
-  getDocs,
-  doc,
+import { 
+  collection, 
+  getDocs, 
+  doc, 
   getDoc,
-  addDoc,
-  serverTimestamp,
+  writeBatch
 } from "firebase/firestore";
-import { writeBatch } from "firebase/firestore";
 import { useCallback, useEffect, useState } from "react";
 import { db } from "../../../../../firebase";
 import {
@@ -16,10 +14,10 @@ import {
   BsBank2,
   BsCalendar,
 } from "react-icons/bs";
-import { FiBell, FiX } from "react-icons/fi";
 import { IoArrowBack } from "react-icons/io5";
 import toast from "react-hot-toast";
 import { BiLoaderAlt } from "react-icons/bi";
+
 const SkeletonRow = () => {
   return (
     <tr className="border-b animate-pulse">
@@ -88,8 +86,6 @@ const Givebacks = () => {
   const [ngoLoading, setNgoLoading] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [selectedGivebackRequest, setSelectedGivebackRequest] = useState(null);
-  const [notificationRequest, setNotificationRequest] = useState(null);
-  const [isSendingNotification, setIsSendingNotification] = useState(false);
   const itemsPerPage = 5;
 
   const fetchData = useCallback(async () => {
@@ -157,105 +153,78 @@ const Givebacks = () => {
     startIndex,
     startIndex + itemsPerPage
   );
-
-  const saveNotification = async (message, userId) => {
-    try {
-      await addDoc(collection(db, 'userNotifications'), {
-        message,
-        userId,
-        read: false,
-        createdAt: serverTimestamp(),
-      });
-      toast.success("Notification sent successfully");
-    } catch (error) {
-      console.error("Error saving notification: ", error);
-      toast.error("Failed to send notification");
-    }
-  };
-
-  const handleSendNotification = async () => {
-    if (notificationRequest) {
-      setIsSendingNotification(true);
-      try {
-        let message;
-        // Determine notification message based on status
-        switch (notificationRequest.status) {
-          case 'Pending':
-            message = `Your giveback request for ${notificationRequest.ngoName} is under review. We will process it shortly.`;
-            break;
-          case 'Completed':
-            message = `Great news! Your giveback request for ${notificationRequest.ngoName} has been processed and paid.`;
-            break;
-          default:
-            message = `Notification about your giveback request for ${notificationRequest.ngoName}.`;
-        }
-
-        await saveNotification(message, notificationRequest.userEmail);
-        setNotificationRequest(null);
-      } catch (error) {
-        console.error("Error sending notification:", error);
-      } finally {
-        setIsSendingNotification(false);
-      }
-    }
-  };
-
-  const triggerNotificationPopup = (request) => {
-    setNotificationRequest(request);
-  };
+ 
 
   const handleMarkAsPaid = async (givebackRequest) => {
     setIsProcessingPayment(true);
+    const batch = writeBatch(db);
+  
     try {
-      // Create a Firestore batch
-      const batch = writeBatch(db);
-
-      // 1. Update NGO's total donation amount and total givebacks
+      // References to documents
       const ngoRef = doc(db, "causeDetails", givebackRequest.ngoId);
-      const ngoDoc = await getDoc(ngoRef);
-      if (!ngoDoc.exists()) {
-        throw new Error("NGO document not found");
+      const userRef = doc(db, "users", givebackRequest.userId);
+      const withdrawalRef = doc(db, "givebackCashbacks", givebackRequest.historyId);
+      const ngoNotificationRef = doc(collection(db, "ngoNotifications"));
+      const userNotificationRef = doc(collection(db, "userNotifications"));
+  
+      // Get required data
+      const [ngoDoc, userDoc] = await Promise.all([
+        getDoc(ngoRef),
+        getDoc(userRef)
+      ]);
+  
+      if (!ngoDoc.exists() || !userDoc.exists()) {
+        throw new Error("Required document not found");
       }
+  
       const ngoData = ngoDoc.data();
-
+      const userData = userDoc.data();
+  
+      // 1. Update NGO totals
       batch.update(ngoRef, {
         totalDonationAmount: (ngoData.totalDonationAmount || 0) + givebackRequest.amount,
         totalGiveBacks: (ngoData.totalGiveBacks || 0) + 1,
       });
-
-      // 2. Update user's pending giveback amount and giveback amount
-      const userRef = doc(db, "users", givebackRequest.userId);
-      const userDoc = await getDoc(userRef);
-
-      if (!userDoc.exists()) {
-        throw new Error("User document not found");
-      }
-
-      const userData = userDoc.data();
-
+  
+      // 2. Update user amounts
       batch.update(userRef, {
         pendingGivebackAmount: Math.max(0, (userData.pendingGivebackAmount || 0) - givebackRequest.amount),
         givebackAmount: (userData.givebackAmount || 0) + givebackRequest.amount,
       });
-
-      // 3. Update the giveback request status to "Completed"
-      const withdrawalRef = doc(db, "givebackCashbacks", givebackRequest.historyId);
+  
+      // 3. Update giveback request status
+      const currentTime = new Date().toISOString();
       batch.update(withdrawalRef, {
         status: "Completed",
-        paidAt: new Date().toISOString(),
+        paidAt: currentTime,
       });
-
-      // Commit the batch (all updates happen atomically)
+  
+      // 4. Add NGO notification
+      batch.set(ngoNotificationRef, {
+        message: `A donation of ₹${givebackRequest.amount} has been successfully made by ${userData.fname} ${userData.lname}.`,
+        ngoId: givebackRequest.ngoId,
+        read: false,
+        createdAt: currentTime,
+      });
+  
+      // 5. Add user notification
+      batch.set(userNotificationRef, {
+        message: `Great news! Your giveback request for ${givebackRequest.ngoName} has been processed and paid.`,
+        userId: userData.email,
+        read: false,
+        createdAt: currentTime,
+      });
+    
+      // Commit all operations atomically
       await batch.commit();
-
-      // 4. Refresh the giveback requests list
+  
+      // Refresh data and show success
       await fetchData();
-
-      // 5. Reset selected giveback request and show success message
       setSelectedGivebackRequest(null);
       toast.success("Payment marked as completed successfully!");
+  
     } catch (error) {
-      console.error("Error processing payment:", error);
+      console.error("Error processing payment and notifications:", error);
       toast.error("Failed to process payment. Please try again.");
     } finally {
       setIsProcessingPayment(false);
@@ -297,13 +266,12 @@ const Givebacks = () => {
       { key: "requestDate", label: "Request Date" },
       { key: "amount", label: "Donated Amount" },
       { key: "status", label: "Status" },
-      { key: "notification", label: "Notification" },
       { key: "action", label: "Action" },
     ];
 
     if (activeTab === "Completed") {
       // Insert paid date header before status for collected withdrawals
-      commonHeaders.splice(7, 0, { key: "paidDate", label: "Paid Date" });
+      commonHeaders.splice(6, 0, { key: "paidDate", label: "Paid Date" });
     }
 
     return (
@@ -316,7 +284,6 @@ const Givebacks = () => {
       </tr>
     );
   };
-
   const renderEmptyMessage = () => {
     if (loading) return null;
 
@@ -362,15 +329,6 @@ const Givebacks = () => {
             </td>
             <td className="py-4">
               <button
-                onClick={() => triggerNotificationPopup(donation)}
-                className="px-3 py-1 bg-[#F59E0B] text-white rounded flex items-center gap-2 hover:bg-[#D97706] transition-colors"
-              >
-                <FiBell className="w-4 h-4" />
-                Send
-              </button>
-            </td>
-            <td className="py-4">
-              <button
                 onClick={() => setSelectedGivebackRequest(donation)}
                 className="border px-2 py-1 border-[#F59E0B] hover:bg-[#F59E0B] hover:text-white transition-colors duration-200"
               >
@@ -381,51 +339,6 @@ const Givebacks = () => {
         ))
       : renderEmptyMessage();
   };
-
-  // Notification Popup
-  const renderNotificationPopup = () => {
-    if (!notificationRequest) return null;
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-6 w-96 relative">
-          <button
-            onClick={() => setNotificationRequest(null)}
-            className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
-          >
-            <FiX className="w-6 h-6" />
-          </button>
-          <h2 className="text-xl font-semibold mb-4">Send Notification</h2>
-          <p className="mb-4 text-gray-600">
-            Send a notification for giveback request from {notificationRequest.userName}?
-          </p>
-          <div className="flex justify-end gap-4">
-            <button
-              onClick={() => setNotificationRequest(null)}
-              className="px-4 py-2 bg-gray-100 text-gray-700 rounded"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleSendNotification}
-              disabled={isSendingNotification}
-              className="px-4 py-2 bg-[#F59E0B] text-white rounded flex items-center gap-2"
-            >
-              {isSendingNotification ? (
-                <>
-                  <BiLoaderAlt className="w-5 h-5 animate-spin" />
-                  Sending...
-                </>
-              ) : (
-                "Send"
-              )}
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   useEffect(() => {
     if (selectedGivebackRequest) {
       const fetchNgoDetails = async () => {
@@ -621,9 +534,6 @@ const Givebacks = () => {
   };
   return (
     <div className="p-6">
-      {/* Notification Popup */}
-      {renderNotificationPopup()}
-
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-2">
           <h1 className="text-xl">Give Backs</h1>
@@ -645,10 +555,11 @@ const Givebacks = () => {
       <div className="bg-white p-6 rounded-lg shadow-lg">
         <div className="flex gap-4 mb-8">
           <button
-            className={`px-4 py-2 rounded-full ${activeTab === "requested"
-              ? "bg-[#F59E0B] text-white"
-              : "border border-black text-gray-600"
-              }`}
+            className={`px-4 py-2 rounded-full ${
+              activeTab === "requested"
+                ? "bg-[#F59E0B] text-white"
+                : "border border-black text-gray-600"
+            }`}
             onClick={() => {
               setActiveTab("requested");
               setCurrentPage(1);
@@ -657,10 +568,11 @@ const Givebacks = () => {
             Pending Givebacks
           </button>
           <button
-            className={`px-4 py-2 rounded-full ${activeTab === "Completed"
-              ? "bg-[#F59E0B] text-white"
-              : "border border-black text-gray-600"
-              }`}
+            className={`px-4 py-2 rounded-full ${
+              activeTab === "Completed"
+                ? "bg-[#F59E0B] text-white"
+                : "border border-black text-gray-600"
+            }`}
             onClick={() => {
               setActiveTab("Completed");
               setCurrentPage(1);
@@ -696,10 +608,11 @@ const Givebacks = () => {
             {[...Array(totalPages)].map((_, i) => (
               <button
                 key={i + 1}
-                className={`w-8 h-8 rounded ${currentPage === i + 1
-                  ? "bg-blue-500 text-white"
-                  : "hover:bg-gray-100"
-                  }`}
+                className={`w-8 h-8 rounded ${
+                  currentPage === i + 1
+                    ? "bg-blue-500 text-white"
+                    : "hover:bg-gray-100"
+                }`}
                 onClick={() => setCurrentPage(i + 1)}
               >
                 {i + 1}
