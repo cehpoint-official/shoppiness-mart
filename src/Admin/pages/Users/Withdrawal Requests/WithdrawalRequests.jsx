@@ -4,6 +4,8 @@ import {
   getDoc,
   getDocs,
   updateDoc,
+  addDoc,
+  serverTimestamp,
 } from "firebase/firestore";
 import { useCallback, useEffect, useState } from "react";
 import { IoArrowBack } from "react-icons/io5";
@@ -15,6 +17,7 @@ import {
   BsCalendar,
 } from "react-icons/bs";
 import { BiLoaderAlt } from "react-icons/bi";
+import { FiBell, FiX } from "react-icons/fi";
 import { db } from "../../../../../firebase";
 import toast from "react-hot-toast";
 
@@ -22,10 +25,11 @@ const WithdrawalRequests = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [activeTab, setActiveTab] = useState("Pending");
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-  const [selectedWithdrawalRequest, setSelectedWithdrawalRequest] =
-    useState(null);
+  const [selectedWithdrawalRequest, setSelectedWithdrawalRequest] = useState(null);
   const [withdraws, setWithdraws] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [notificationRequest, setNotificationRequest] = useState(null);
+  const [isSendingNotification, setIsSendingNotification] = useState(false);
   const itemsPerPage = 5;
 
   const fetchData = useCallback(async () => {
@@ -48,6 +52,96 @@ const WithdrawalRequests = () => {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  const saveNotification = async (message, userId) => {
+    try {
+      await addDoc(collection(db, 'userNotifications'), {
+        message,
+        userId,
+        read: false,
+        createdAt: serverTimestamp(),
+      });
+      toast.success("Notification sent successfully");
+    } catch (error) {
+      console.error("Error saving notification: ", error);
+      toast.error("Failed to send notification");
+    }
+  };
+
+  const handleSendNotification = async () => {
+    if (notificationRequest) {
+      setIsSendingNotification(true);
+      try {
+        let message;
+        // Determine notification message based on status
+        switch (notificationRequest.status) {
+          case 'Pending':
+            message = `Your withdrawal request of ₹${notificationRequest.amount} is under review. We will process it shortly.`;
+            break;
+          case 'Collected':
+            message = `Great news! Your withdrawal request of ₹${notificationRequest.amount} has been processed and paid.`;
+            break;
+          default:
+            message = `Notification about your withdrawal request of ₹${notificationRequest.amount}.`;
+        }
+
+        await saveNotification(message, notificationRequest.userEmail);
+        setNotificationRequest(null);
+      } catch (error) {
+        console.error("Error sending notification:", error);
+      } finally {
+        setIsSendingNotification(false);
+      }
+    }
+  };
+
+  const triggerNotificationPopup = (request) => {
+    setNotificationRequest(request);
+  };
+
+  const renderNotificationPopup = () => {
+    if (!notificationRequest) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-lg p-6 w-96 relative">
+          <button
+            onClick={() => setNotificationRequest(null)}
+            className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+          >
+            <FiX className="w-6 h-6" />
+          </button>
+          <h2 className="text-xl font-semibold mb-4">Send Notification</h2>
+          <p className="mb-4 text-gray-600">
+            Send a notification for withdrawal request from {notificationRequest.userName}?
+          </p>
+          <div className="flex justify-end gap-4">
+            <button
+              onClick={() => setNotificationRequest(null)}
+              className="px-4 py-2 bg-gray-100 text-gray-700 rounded"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSendNotification}
+              disabled={isSendingNotification}
+              className="px-4 py-2 bg-[#F59E0B] text-white rounded flex items-center gap-2"
+            >
+              {isSendingNotification ? (
+                <>
+                  <BiLoaderAlt className="w-5 h-5 animate-spin" />
+                  Sending...
+                </>
+              ) : (
+                "Send"
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const handleMarkAsPaid = async (withdrawalRequest) => {
     setIsProcessingPayment(true);
     try {
@@ -132,12 +226,13 @@ const WithdrawalRequests = () => {
       { key: "amount", label: "Requested Amount" },
       { key: "paymentType", label: "Payment Type" },
       { key: "status", label: "Status" },
+      { key: "notification", label: "Notification" }, // New column
       { key: "action", label: "Action" },
     ];
 
     if (activeTab === "Collected") {
-      // Insert paid date header before status for collected withdrawals
-      commonHeaders.splice(6, 0, { key: "paidDate", label: "Paid Date" });
+      // Insert paid date header before notification column
+      commonHeaders.splice(7, 0, { key: "paidDate", label: "Paid Date" });
     }
 
     return (
@@ -181,35 +276,45 @@ const WithdrawalRequests = () => {
   const renderTableRows = () => {
     return displayedWithdraws.length > 0
       ? displayedWithdraws.map((withdraw, index) => (
-          <tr key={withdraw.paymentId} className="border-t">
-            <td className="py-4">{startIndex + index + 1}.</td>
-            <td className="py-4">{withdraw.userEmail}</td>
-            <td className="py-4">{withdraw.userName}</td>
-            <td className="py-4">{formatDate(withdraw.requestedAt)}</td>
-            <td className="py-4">{withdraw.amount}</td>
-            <td className="py-4 uppercase">
-              {withdraw.selectedPayment?.type || "N/A"}
-            </td>
-            {activeTab === "Collected" && (
-              <td className="py-4">{formatDate(withdraw.paidAt)}</td>
-            )}
-            <td
-              className={`py-4 font-medium ${getStatusColor(withdraw.status)}`}
+        <tr key={withdraw.paymentId} className="border-t">
+          <td className="py-4">{startIndex + index + 1}.</td>
+          <td className="py-4">{withdraw.userEmail}</td>
+          <td className="py-4">{withdraw.userName}</td>
+          <td className="py-4">{formatDate(withdraw.requestedAt)}</td>
+          <td className="py-4">{withdraw.amount}</td>
+          <td className="py-4 uppercase">
+            {withdraw.selectedPayment?.type || "N/A"}
+          </td>
+          {activeTab === "Collected" && (
+            <td className="py-4">{formatDate(withdraw.paidAt)}</td>
+          )}
+          <td
+            className={`py-4 font-medium ${getStatusColor(withdraw.status)}`}
+          >
+            {withdraw.status}
+          </td>
+          <td className="py-4">
+            <button
+              onClick={() => triggerNotificationPopup(withdraw)}
+              className="px-3 py-1 bg-[#F59E0B] text-white rounded flex items-center gap-2 hover:bg-[#D97706] transition-colors"
             >
-              {withdraw.status}
-            </td>
-            <td className="py-4">
-              <button
-                onClick={() => setSelectedWithdrawalRequest(withdraw)}
-                className="border px-2 py-1 border-[#F59E0B] hover:bg-[#F59E0B] hover:text-white transition-colors duration-200"
-              >
-                View Details
-              </button>
-            </td>
-          </tr>
-        ))
+              <FiBell className="w-4 h-4" />
+              Send
+            </button>
+          </td>
+          <td className="py-4">
+            <button
+              onClick={() => setSelectedWithdrawalRequest(withdraw)}
+              className="border px-2 py-1 border-[#F59E0B] hover:bg-[#F59E0B] hover:text-white transition-colors duration-200"
+            >
+              View Details
+            </button>
+          </td>
+        </tr>
+      ))
       : renderEmptyMessage();
   };
+
   const formatDate = (dateString) => {
     if (!dateString || typeof dateString !== "string") return "";
     return dateString.split("T")[0];
@@ -308,12 +413,12 @@ const WithdrawalRequests = () => {
                     </div>
                     <div className="font-medium text-gray-900 mb-2">
                       {selectedWithdrawalRequest.selectedPayment?.type ===
-                      "bank"
+                        "bank"
                         ? "Bank Transfer"
                         : "UPI Payment"}
                     </div>
                     {selectedWithdrawalRequest.selectedPayment?.type ===
-                    "bank" ? (
+                      "bank" ? (
                       <div className="space-y-1">
                         <div className="text-sm text-gray-600">
                           {selectedWithdrawalRequest.selectedPayment?.bankName}
@@ -378,25 +483,26 @@ const WithdrawalRequests = () => {
 
   return (
     <div className="p-6">
+      {/* Notification Popup */}
+      {renderNotificationPopup()}
+
       <h1 className="text-2xl font-normal mb-8">Withdrawal Requests</h1>
       <div className="bg-white rounded-lg border shadow-lg p-6">
         <div className="flex gap-4 mb-8">
           <button
-            className={`px-4 py-2 rounded-full ${
-              activeTab === "Pending"
+            className={`px-4 py-2 rounded-full ${activeTab === "Pending"
                 ? "bg-[#F59E0B] text-white"
                 : "border border-black text-gray-600"
-            }`}
+              }`}
             onClick={() => setActiveTab("Pending")}
           >
             Pending Withdrawals
           </button>
           <button
-            className={`px-4 py-2 rounded-full ${
-              activeTab === "Collected"
+            className={`px-4 py-2 rounded-full ${activeTab === "Collected"
                 ? "bg-[#F59E0B] text-white"
                 : "border border-black text-gray-600"
-            }`}
+              }`}
             onClick={() => setActiveTab("Collected")}
           >
             Paid Withdrawals
@@ -441,11 +547,10 @@ const WithdrawalRequests = () => {
               {[...Array(totalPages)].map((_, i) => (
                 <button
                   key={i + 1}
-                  className={`w-8 h-8 rounded-sm text-sm ${
-                    currentPage === i + 1
+                  className={`w-8 h-8 rounded-sm text-sm ${currentPage === i + 1
                       ? "bg-[#F59E0B] text-white"
                       : "hover:bg-gray-100"
-                  }`}
+                    }`}
                   onClick={() => setCurrentPage(i + 1)}
                 >
                   {i + 1}

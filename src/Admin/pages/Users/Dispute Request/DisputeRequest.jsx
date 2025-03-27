@@ -1,6 +1,6 @@
-import { collection, doc, getDocs, updateDoc } from "firebase/firestore";
+import { collection, doc, getDocs, updateDoc, addDoc, serverTimestamp } from "firebase/firestore";
 import { useCallback, useEffect, useState } from "react";
-import { FiArrowLeft, FiMoreVertical, FiFileText } from "react-icons/fi";
+import { FiArrowLeft, FiMoreVertical, FiFileText, FiX, FiBell } from "react-icons/fi";
 import { FaSpinner } from "react-icons/fa";
 import { db } from "../../../../../firebase";
 import { Link } from "react-router-dom";
@@ -11,9 +11,11 @@ const DisputeRequest = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [activeTab, setActiveTab] = useState("Pending");
   const [selectedDisputeRequest, setSelectedDisputeRequest] = useState(null);
+  const [notificationDisputeRequest, setNotificationDisputeRequest] = useState(null);
   const [allDisputeRequest, setAllDisputeRequest] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isRejecting, setIsRejecting] = useState(false);
+  const [isSendingNotification, setIsSendingNotification] = useState(false);
   const itemsPerPage = 5;
 
   const fetchData = useCallback(async () => {
@@ -38,6 +40,41 @@ const DisputeRequest = () => {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  const saveNotification = async (message, userId) => {
+    try {
+      await addDoc(collection(db, 'userNotifications'), {
+        message,
+        userId,
+        read: false,
+        createdAt: serverTimestamp(),
+      });
+      console.log("Notification saved successfully");
+      toast.success("Notification sent successfully");
+    } catch (error) {
+      console.error("Error saving notification: ", error);
+      toast.error("Failed to send notification");
+    }
+  };
+
+  const handleSendNotification = async () => {
+    if (notificationDisputeRequest) {
+      setIsSendingNotification(true);
+      try {
+        const message = `Your dispute request for ${notificationDisputeRequest.shopName} has been ${notificationDisputeRequest.status.toLowerCase()}.`;
+        await saveNotification(message, notificationDisputeRequest.userEmail);
+        setNotificationDisputeRequest(null);
+      } catch (error) {
+        console.error("Error sending notification:", error);
+      } finally {
+        setIsSendingNotification(false);
+      }
+    }
+  };
+
+  const triggerNotificationPopup = (disputeRequest) => {
+    setNotificationDisputeRequest(disputeRequest);
+  };
 
   const filteredDisputeRequests = allDisputeRequest.filter((dispute) => {
     switch (activeTab) {
@@ -116,6 +153,9 @@ const DisputeRequest = () => {
           </div>
         `,
       });
+
+      // Set notification dispute request to trigger popup
+      setNotificationDisputeRequest(disputeRequest);
 
       toast.success("Dispute request rejected successfully");
       setSelectedDisputeRequest(null);
@@ -265,16 +305,47 @@ const DisputeRequest = () => {
       <h1 className="text-2xl font-normal mb-8">Dispute Requests</h1>
 
       <div className="bg-white rounded-lg border shadow-lg p-6">
+        {/* Notification Popup */}
+        {notificationDisputeRequest && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-96 relative">
+              <button
+                onClick={() => setNotificationDisputeRequest(null)}
+                className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+              >
+                <FiX className="w-6 h-6" />
+              </button>
+              <h2 className="text-xl font-semibold mb-4">Send Notification</h2>
+              <p className="mb-4 text-gray-600">
+                Send a notification for dispute request from {notificationDisputeRequest.userName}?
+              </p>
+              <div className="flex justify-end gap-4">
+                <button
+                  onClick={() => setNotificationDisputeRequest(null)}
+                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSendNotification}
+                  className="px-4 py-2 bg-[#F59E0B] text-white rounded"
+                >
+                  Send
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Tabs */}
         <div className="flex gap-4 mb-6">
           {["Pending", "Resolved", "Rejected"].map((tab) => (
             <button
               key={tab}
-              className={`px-4 py-2 rounded-full ${
-                activeTab === tab
+              className={`px-4 py-2 rounded-full ${activeTab === tab
                   ? "bg-[#F59E0B] text-white"
                   : "border border-black text-gray-600"
-              }`}
+                }`}
               onClick={() => {
                 setActiveTab(tab);
                 setCurrentPage(1);
@@ -289,11 +360,11 @@ const DisputeRequest = () => {
           <table className="w-full">
             <thead>
               <tr className="text-left font-medium">
-                <th className="pb-4  text-gray-500">#</th>
-                <th className="pb-4  text-gray-500">Code</th>
+                <th className="pb-4 text-gray-500">#</th>
+                <th className="pb-4 text-gray-500">Code</th>
                 <th className="pb-4 text-gray-500">Shop Name</th>
-                <th className="pb-4  text-gray-500">Shop Email</th>
-                <th className="pb-4  text-gray-500">User Name</th>
+                <th className="pb-4 text-gray-500">Shop Email</th>
+                <th className="pb-4 text-gray-500">User Name</th>
                 <th className="pb-4 text-gray-500">Requested Date</th>
                 {activeTab === "Resolved" && (
                   <th className="pb-4 text-gray-500">Resolved Date</th>
@@ -301,7 +372,8 @@ const DisputeRequest = () => {
                 {activeTab === "Rejected" && (
                   <th className="pb-4 text-gray-500">Rejected Date</th>
                 )}
-                <th className="pb-4  text-gray-500">Status</th>
+                <th className="pb-4 text-gray-500">Status</th>
+                <th className="pb-4 text-gray-500">Notification</th>
                 <th className="pb-4 text-gray-500">Action</th>
               </tr>
             </thead>
@@ -334,13 +406,16 @@ const DisputeRequest = () => {
                     <td className="py-4">
                       <div className="h-4 bg-gray-200 rounded w-1/2"></div>
                     </td>
+                    <td className="py-4">
+                      <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                    </td>
                   </tr>
                 ))
               ) : displayedDisputeRequests.length === 0 ? (
                 // Empty state message
                 <tr>
                   <td
-                    colSpan={activeTab === "Rejected" ? "9" : "8"}
+                    colSpan="9"
                     className="py-4 text-center text-gray-500"
                   >
                     No {activeTab.toLowerCase()} dispute requests found.
@@ -366,7 +441,15 @@ const DisputeRequest = () => {
                         {dispute.status}
                       </span>
                     </td>
-
+                    <td className="py-4">
+                      <button
+                        onClick={() => triggerNotificationPopup(dispute)}
+                        className="px-3 py-1 bg-[#F59E0B] text-white rounded flex items-center gap-2 hover:bg-[#D97706] transition-colors"
+                      >
+                        <FiBell className="w-4 h-4" />
+                        Send
+                      </button>
+                    </td>
                     <td className="py-4">
                       <div className="relative group">
                         <button className="p-1 hover:bg-gray-100 rounded-full">
@@ -406,11 +489,10 @@ const DisputeRequest = () => {
             {[...Array(totalPages)].map((_, i) => (
               <button
                 key={i + 1}
-                className={`w-8 h-8 rounded-sm text-sm ${
-                  currentPage === i + 1
+                className={`w-8 h-8 rounded-sm text-sm ${currentPage === i + 1
                     ? "bg-[#F59E0B] text-white"
                     : "hover:bg-gray-100"
-                }`}
+                  }`}
                 onClick={() => setCurrentPage(i + 1)}
               >
                 {i + 1}
@@ -429,4 +511,5 @@ const DisputeRequest = () => {
     </div>
   );
 };
+
 export default DisputeRequest;
