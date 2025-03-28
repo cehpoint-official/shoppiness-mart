@@ -1,7 +1,31 @@
-// Navbar.js
+import { useEffect, useState } from "react";
 import { FiBell } from "react-icons/fi";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../../../firebase";
 
-const Navbar = () => {
+const Navbar = ({ userId }) => {
+  const [profilePic, setProfilePic] = useState("");
+
+  useEffect(() => {
+    const fetchProfilePic = async () => {
+      try {
+        if (!userId) return;
+        const userRef = doc(db, "users", userId);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+          setProfilePic(userSnap.data().profilePic);
+        } else {
+          console.log("No such document!");
+        }
+      } catch (error) {
+        console.error("Error fetching profile picture:", error);
+      }
+    };
+
+    fetchProfilePic();
+  }, [userId]);
+
   return (
     <div className="bg-white shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -43,7 +67,7 @@ const Navbar = () => {
             </div>
             <img
               className="h-8 w-8 rounded-full"
-              src="path/to/profile.jpg"
+              src={profilePic}
               alt="Profile"
             />
           </div>
