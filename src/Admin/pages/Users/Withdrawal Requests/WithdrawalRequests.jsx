@@ -4,8 +4,7 @@ import {
   getDoc,
   getDocs,
   updateDoc,
-  addDoc,
-  serverTimestamp,
+  setDoc,
 } from "firebase/firestore";
 import { useCallback, useEffect, useState } from "react";
 import { IoArrowBack } from "react-icons/io5";
@@ -17,7 +16,6 @@ import {
   BsCalendar,
 } from "react-icons/bs";
 import { BiLoaderAlt } from "react-icons/bi";
-import { FiBell, FiX } from "react-icons/fi";
 import { db } from "../../../../../firebase";
 import toast from "react-hot-toast";
 
@@ -28,8 +26,6 @@ const WithdrawalRequests = () => {
   const [selectedWithdrawalRequest, setSelectedWithdrawalRequest] = useState(null);
   const [withdraws, setWithdraws] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [notificationRequest, setNotificationRequest] = useState(null);
-  const [isSendingNotification, setIsSendingNotification] = useState(false);
   const itemsPerPage = 5;
 
   const fetchData = useCallback(async () => {
@@ -53,136 +49,53 @@ const WithdrawalRequests = () => {
     fetchData();
   }, [fetchData]);
 
-  const saveNotification = async (message, userId) => {
-    try {
-      await addDoc(collection(db, 'userNotifications'), {
-        message,
-        userId,
-        read: false,
-        createdAt: serverTimestamp(),
-      });
-      toast.success("Notification sent successfully");
-    } catch (error) {
-      console.error("Error saving notification: ", error);
-      toast.error("Failed to send notification");
-    }
-  };
-
-  const handleSendNotification = async () => {
-    if (notificationRequest) {
-      setIsSendingNotification(true);
-      try {
-        let message;
-        // Determine notification message based on status
-        switch (notificationRequest.status) {
-          case 'Pending':
-            message = `Your withdrawal request of ₹${notificationRequest.amount} is under review. We will process it shortly.`;
-            break;
-          case 'Collected':
-            message = `Great news! Your withdrawal request of ₹${notificationRequest.amount} has been processed and paid.`;
-            break;
-          default:
-            message = `Notification about your withdrawal request of ₹${notificationRequest.amount}.`;
-        }
-
-        await saveNotification(message, notificationRequest.userEmail);
-        setNotificationRequest(null);
-      } catch (error) {
-        console.error("Error sending notification:", error);
-      } finally {
-        setIsSendingNotification(false);
-      }
-    }
-  };
-
-  const triggerNotificationPopup = (request) => {
-    setNotificationRequest(request);
-  };
-
-  const renderNotificationPopup = () => {
-    if (!notificationRequest) return null;
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-6 w-96 relative">
-          <button
-            onClick={() => setNotificationRequest(null)}
-            className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
-          >
-            <FiX className="w-6 h-6" />
-          </button>
-          <h2 className="text-xl font-semibold mb-4">Send Notification</h2>
-          <p className="mb-4 text-gray-600">
-            Send a notification for withdrawal request from {notificationRequest.userName}?
-          </p>
-          <div className="flex justify-end gap-4">
-            <button
-              onClick={() => setNotificationRequest(null)}
-              className="px-4 py-2 bg-gray-100 text-gray-700 rounded"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleSendNotification}
-              disabled={isSendingNotification}
-              className="px-4 py-2 bg-[#F59E0B] text-white rounded flex items-center gap-2"
-            >
-              {isSendingNotification ? (
-                <>
-                  <BiLoaderAlt className="w-5 h-5 animate-spin" />
-                  Sending...
-                </>
-              ) : (
-                "Send"
-              )}
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   const handleMarkAsPaid = async (withdrawalRequest) => {
     setIsProcessingPayment(true);
     try {
-      // 1. Update the withdrawal request status
-      const withdrawalRef = doc(
-        db,
-        "WithdrawCashback",
-        withdrawalRequest.paymentId
-      );
-      await updateDoc(withdrawalRef, {
-        status: "Collected",
-        paidAt: new Date().toISOString(),
-      });
-
-      // 2. Update user's cashback balances
+      // References to documents
       const userRef = doc(db, "users", withdrawalRequest.userId);
+      const withdrawalRef = doc(db, "WithdrawCashback", withdrawalRequest.paymentId);
+      const userNotificationRef = doc(collection(db, "userNotifications"));
+  
+      // Get user document
       const userDoc = await getDoc(userRef);
-
+  
       if (!userDoc.exists()) {
         throw new Error("User document not found");
       }
-
+  
       const userData = userDoc.data();
-
-      await updateDoc(userRef, {
-        pendingCashback: Math.max(
-          0,
-          (userData.pendingCashback || 0) - withdrawalRequest.amount
-        ),
-        withdrawAmount:
-          (userData.withdrawAmount || 0) + withdrawalRequest.amount,
+      const currentTime = new Date().toISOString();
+  
+      // 1. Update withdrawal request status
+      await updateDoc(withdrawalRef, {
+        status: "Collected",
+        paidAt: currentTime,
       });
-
+  
+      // 2. Update user's cashback balances
+      await updateDoc(userRef, {
+        pendingCashback: Math.max(0, (userData.pendingCashback || 0) - withdrawalRequest.amount),
+        withdrawAmount: (userData.withdrawAmount || 0) + withdrawalRequest.amount,
+      });
+  
+      // 3. Add user notification
+      await setDoc(userNotificationRef, {
+        message: `Great news! Your withdrawal request of ₹${withdrawalRequest.amount} has been processed and paid.`,
+        userId: userData.email,
+        read: false,
+        createdAt: currentTime,
+      });
+  
       // 4. Refresh the withdrawals list
       await fetchData();
-
+  
       // 5. Reset selected withdrawal request and show success message
       setSelectedWithdrawalRequest(null);
       toast.success("Payment marked as completed successfully!");
+  
     } catch (error) {
-      console.error("Error processing payment:", error);
+      console.error("Error processing payment and notifications:", error);
       toast.error("Failed to process payment. Please try again.");
     } finally {
       setIsProcessingPayment(false);
@@ -217,6 +130,7 @@ const WithdrawalRequests = () => {
     }
     return null;
   };
+
   const renderTableHeaders = () => {
     const commonHeaders = [
       { key: "number", label: "#" },
@@ -226,12 +140,11 @@ const WithdrawalRequests = () => {
       { key: "amount", label: "Requested Amount" },
       { key: "paymentType", label: "Payment Type" },
       { key: "status", label: "Status" },
-      { key: "notification", label: "Notification" }, // New column
       { key: "action", label: "Action" },
     ];
 
     if (activeTab === "Collected") {
-      // Insert paid date header before notification column
+      // Insert paid date header before action column
       commonHeaders.splice(7, 0, { key: "paidDate", label: "Paid Date" });
     }
 
@@ -251,7 +164,7 @@ const WithdrawalRequests = () => {
 
     return (
       <tr>
-        <td colSpan={activeTab === "Collected" ? 9 : 8} className="py-8">
+        <td colSpan={activeTab === "Collected" ? 8 : 7} className="py-8">
           <div className="text-center text-gray-500">
             {activeTab === "Pending" ? (
               <p className="text-lg">
@@ -292,15 +205,6 @@ const WithdrawalRequests = () => {
             className={`py-4 font-medium ${getStatusColor(withdraw.status)}`}
           >
             {withdraw.status}
-          </td>
-          <td className="py-4">
-            <button
-              onClick={() => triggerNotificationPopup(withdraw)}
-              className="px-3 py-1 bg-[#F59E0B] text-white rounded flex items-center gap-2 hover:bg-[#D97706] transition-colors"
-            >
-              <FiBell className="w-4 h-4" />
-              Send
-            </button>
           </td>
           <td className="py-4">
             <button
@@ -483,9 +387,6 @@ const WithdrawalRequests = () => {
 
   return (
     <div className="p-6">
-      {/* Notification Popup */}
-      {renderNotificationPopup()}
-
       <h1 className="text-2xl font-normal mb-8">Withdrawal Requests</h1>
       <div className="bg-white rounded-lg border shadow-lg p-6">
         <div className="flex gap-4 mb-8">

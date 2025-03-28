@@ -1,16 +1,14 @@
-import { collection, getDocs, addDoc, doc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { collection, getDocs, doc, updateDoc, setDoc } from "firebase/firestore";
 import { useCallback, useEffect, useState } from "react";
-import { FiArrowLeft, FiFileText, FiBell, FiX } from "react-icons/fi";
-import toast from "react-hot-toast";
+import { FiArrowLeft, FiFileText } from "react-icons/fi";
 import { db } from "../../../../../firebase";
+import toast from "react-hot-toast";
 
 const CashbackRequests = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [allCashbackRequests, setAllCashbackRequests] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [notificationRequest, setNotificationRequest] = useState(null);
-  const [isSendingNotification, setIsSendingNotification] = useState(false);
 
   const itemsPerPage = 5;
 
@@ -37,58 +35,6 @@ const CashbackRequests = () => {
     fetchData();
   }, [fetchData]);
 
-  const saveNotification = async (message, userId) => {
-    try {
-      await addDoc(collection(db, 'userNotifications'), {
-        message,
-        userId,
-        read: false,
-        createdAt: serverTimestamp(),
-      });
-      toast.success("Notification sent successfully");
-    } catch (error) {
-      console.error("Error saving notification: ", error);
-      toast.error("Failed to send notification");
-    }
-  };
-
-  const handleSendNotification = async () => {
-    if (notificationRequest) {
-      setIsSendingNotification(true);
-      try {
-        let message;
-        // Determine notification message based on status
-        switch (notificationRequest.status) {
-          case 'New':
-            message = `Your cashback request for ${notificationRequest.shopName} is under review. We will process it shortly.`;
-            break;
-          case 'Approved':
-            message = `Great news! Your cashback request for ${notificationRequest.shopName} has been approved. Funds will be credited soon.`;
-            break;
-          case 'Pending':
-            message = `Your cashback request for ${notificationRequest.shopName} is currently pending. We're working on processing it.`;
-            break;
-          case 'Rejected':
-            message = `We regret to inform you that your cashback request for ${notificationRequest.shopName} has been rejected.`;
-            break;
-          default:
-            message = `Notification about your cashback request for ${notificationRequest.shopName}.`;
-        }
-
-        await saveNotification(message, notificationRequest.userEmail);
-        setNotificationRequest(null);
-      } catch (error) {
-        console.error("Error sending notification:", error);
-      } finally {
-        setIsSendingNotification(false);
-      }
-    }
-  };
-
-  const triggerNotificationPopup = (request) => {
-    setNotificationRequest(request);
-  };
-
   const markCashbackRequestAsRead = async (couponCode) => {
     try {
       const snapshot = await getDocs(collection(db, 'onlineCashbackRequests'));
@@ -108,6 +54,46 @@ const CashbackRequests = () => {
       console.log("Cashback request marked as approved");
     } catch (error) {
       console.error("Error marking cashback request as read: ", error);
+    }
+  };
+
+  const handleCashbackRequest = async (request, action) => {
+    try {
+      // Determine status and message based on action
+      const statusMapping = {
+        'paid': {
+          status: 'Paid',
+          message: `Great news! Your cashback request for ${request.shopName} has been paid.`
+        },
+        'denied': {
+          status: 'Denied',
+          message: `We regret to inform you that your cashback request for ${request.shopName} has been denied.`
+        }
+      };
+
+      const actionDetails = statusMapping[action];
+
+      if (!actionDetails) {
+        throw new Error('Invalid action');
+      }
+
+      // Create a user notification
+      const userNotificationRef = doc(collection(db, "userNotifications"));
+      const currentTime = new Date().toISOString();
+
+      await setDoc(userNotificationRef, {
+        message: actionDetails.message,
+        userId: request.userEmail,
+        read: false,
+        createdAt: currentTime,
+      });
+      toast.success(`Cashback request ${action} successfully!`);
+
+      await fetchData();
+      setSelectedRequest(null);
+    } catch (error) {
+      console.error(`Error handling cashback request ${action}:`, error);
+      toast.error("Failed to process cashback request. Please try again.");
     }
   };
 
@@ -186,10 +172,14 @@ const CashbackRequests = () => {
             </div>
           </div>
           <div className="mt-8 flex justify-end gap-4">
-            <button className="bg-gray-100 text-gray-700 px-4 py-2 rounded">
+            <button 
+              onClick={() => handleCashbackRequest(selectedRequest, 'denied')}
+              className="bg-gray-100 text-gray-700 px-4 py-2 rounded">
               Request Denied
             </button>
-            <button className="bg-orange-500 text-white px-4 py-2 rounded">
+            <button 
+              onClick={() => handleCashbackRequest(selectedRequest, 'paid')}
+              className="bg-orange-500 text-white px-4 py-2 rounded">
               Mark as Paid
             </button>
           </div>
@@ -200,39 +190,6 @@ const CashbackRequests = () => {
 
   return (
     <div className="p-6">
-      {/* Notification Popup */}
-      {notificationRequest && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-96 relative">
-            <button
-              onClick={() => setNotificationRequest(null)}
-              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
-            >
-              <FiX className="w-6 h-6" />
-            </button>
-            <h2 className="text-xl font-semibold mb-4">Send Notification</h2>
-            <p className="mb-4 text-gray-600">
-              Send a notification for cashback request from {notificationRequest.userName}?
-            </p>
-            <div className="flex justify-end gap-4">
-              <button
-                onClick={() => setNotificationRequest(null)}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSendNotification}
-                disabled={isSendingNotification}
-                className="px-4 py-2 bg-[#F59E0B] text-white rounded flex items-center gap-2"
-              >
-                {isSendingNotification ? "Sending..." : "Send"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       <h1 className="text-2xl font-normal mb-8">Cashback Requests</h1>
       <div className="bg-white rounded-lg border shadow-lg p-6">
         <div className="overflow-x-auto">
@@ -245,7 +202,6 @@ const CashbackRequests = () => {
                 <th className="pb-4 text-gray-500">User Name</th>
                 <th className="pb-4 text-gray-500">Requested Date</th>
                 <th className="pb-4 text-gray-500">Status</th>
-                <th className="pb-4 text-gray-500">Notification</th>
                 <th className="pb-4 text-gray-500">Action</th>
               </tr>
             </thead>
@@ -254,7 +210,7 @@ const CashbackRequests = () => {
                 [...Array(itemsPerPage)].map((_, index) => (
                   <tr key={index} className="border-t animate-pulse">
                     <td className="py-4"><div className="h-4 w-4 bg-gray-200 rounded"></div></td>
-                    <td className="py-4" colSpan="7"><div className="h-4 bg-gray-200 rounded"></div></td>
+                    <td className="py-4" colSpan="6"><div className="h-4 bg-gray-200 rounded"></div></td>
                   </tr>
                 ))
               ) : (
@@ -267,15 +223,6 @@ const CashbackRequests = () => {
                     <td className="py-4">{request.requestedAt}</td>
                     <td className="py-4">
                       <span className="text-[#F59E0B]">{request.status || 'New'}</span>
-                    </td>
-                    <td className="py-4">
-                      <button
-                        onClick={() => triggerNotificationPopup(request)}
-                        className="px-3 py-1 bg-[#F59E0B] text-white rounded flex items-center gap-2 hover:bg-[#D97706] transition-colors"
-                      >
-                        <FiBell className="w-4 h-4" />
-                        Send
-                      </button>
                     </td>
                     <td className="py-4">
                       <button
