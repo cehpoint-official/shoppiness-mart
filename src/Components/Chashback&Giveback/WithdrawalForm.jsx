@@ -155,7 +155,12 @@ const WithdrawalForm = () => {
         collectedCashback: increment(-numAmount),
         pendingCashback: increment(numAmount),
       });
-
+      // Add notification to adminNotifications collection
+      await addDoc(collection(db, "adminNotifications"), {
+      message: `New Withdrawal request from ${user.fname} ${user.lname} for amount ${numAmount} .`,
+      createdAt: new Date().toISOString(),
+      read: false,
+    });
       // Update Redux state immediately
       const updatedUser = {
         ...user,

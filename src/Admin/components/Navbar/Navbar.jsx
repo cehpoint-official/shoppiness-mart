@@ -1,7 +1,85 @@
-// Navbar.js
+import { useState, useEffect, useCallback } from "react";
 import { FiBell } from "react-icons/fi";
 
+import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
+import { db } from "../../../../firebase";
+
 const Navbar = () => {
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  // Fetch notifications from adminNotifications collection
+  const fetchNotifications = useCallback(async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "adminNotifications"));
+      const notificationData = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      // Sort notifications by createdAt in descending order (newest first)
+      notificationData.sort((a, b) => {
+        const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
+        const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0);
+        return dateB - dateA; // Descending order
+      });
+
+      // Separate unread and read notifications
+      const unreadNotifications = notificationData.filter(
+        (notif) => !notif.read
+      );
+      const readNotifications = notificationData.filter((notif) => notif.read);
+      setUnreadCount(unreadNotifications.length);
+
+      // Logic: Show up to 4 notifications, prioritizing unread
+      let displayedNotifications = [];
+      if (unreadNotifications.length >= 4) {
+        displayedNotifications = unreadNotifications.slice(0, 4);
+      } else {
+        displayedNotifications = [...unreadNotifications];
+        const remainingSlots = 4 - unreadNotifications.length;
+        if (remainingSlots > 0 && readNotifications.length > 0) {
+          displayedNotifications = [
+            ...displayedNotifications,
+            ...readNotifications.slice(0, remainingSlots),
+          ];
+        }
+      }
+
+      setNotifications(displayedNotifications);
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchNotifications();
+  }, [fetchNotifications]);
+
+  // Handle marking a notification as read
+  const handleMarkAsRead = async (notificationId) => {
+    try {
+      const notificationRef = doc(db, "adminNotifications", notificationId);
+      await updateDoc(notificationRef, { read: true });
+      setNotifications((prev) =>
+        prev.map((notif) =>
+          notif.id === notificationId ? { ...notif, read: true } : notif
+        )
+      );
+      setUnreadCount((prev) => Math.max(prev - 1, 0));
+      fetchNotifications(); // Refresh notifications
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+    }
+  };
+
+  // Format date helper function
+  const formatDate = (isoString) => {
+    if (!isoString) return "Unknown time";
+    return new Date(isoString).toLocaleString();
+  };
+
   return (
     <div className="bg-white shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -34,12 +112,78 @@ const Navbar = () => {
               </div>
             </div>
             <div className="relative">
-              <button className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 focus:outline-none">
+              <button
+                className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 focus:outline-none"
+                onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+              >
                 <FiBell className="w-6 h-6 text-gray-600" />
-                <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">
-                  4
-                </span>
+                {unreadCount > 0 && (
+                  <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">
+                    {unreadCount}
+                  </span>
+                )}
               </button>
+
+              {isNotificationOpen && (
+                <div className="absolute right-0 mt-2 w-96 bg-white rounded-2xl shadow-2xl border border-green-50 z-50 max-h-[500px] overflow-y-auto">
+                  <div className="p-5">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-sm md:text-xl font-bold text-green-800 flex items-center gap-2">
+                        Notifications
+                      </h3>
+                      <span className="text-sm text-green-600 font-medium">
+                        {unreadCount} New
+                      </span>
+                    </div>
+                    {notifications.length === 0 ? (
+                      <div className="text-center py-6 bg-green-50 rounded-xl">
+                        <p className="text-green-600 font-medium">
+                          No new notifications
+                        </p>
+                        <p className="text-xs text-green-500 mt-1">
+                          You're all caught up!
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {notifications.map((notif) => (
+                          <div
+                            key={notif.id}
+                            className={`transition-all duration-300 ease-in-out transform hover:scale-[1.02] ${
+                              notif.read ? "" : ""
+                            } border-y-2 py-2`}
+                          >
+                            <div className="flex items-start gap-3">
+                              <div className="flex-grow">
+                                <p
+                                  className={`text-xs ${
+                                    notif.read
+                                      ? "text-gray-700"
+                                      : "text-green-800 font-semibold"
+                                  }`}
+                                >
+                                  {notif.message}
+                                </p>
+                                <p className="text-xs text-gray-500 mt-1">
+                                  {formatDate(notif.createdAt)}
+                                </p>
+                              </div>
+                              {!notif.read && (
+                                <button
+                                  onClick={() => handleMarkAsRead(notif.id)}
+                                  className="bg-green-500 text-white text-xs rounded p-1 hover:bg-green-600 transition-colors duration-200"
+                                >
+                                  Mark as Read
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
             <img
               className="h-8 w-8 rounded-full"
