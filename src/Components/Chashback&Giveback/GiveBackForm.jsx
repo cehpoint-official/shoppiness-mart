@@ -5,6 +5,7 @@ import {
   getDoc,
   getDocs,
   increment,
+  serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
 import { useCallback, useEffect, useState } from "react";
@@ -54,40 +55,41 @@ const GiveBackForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsProcessingGiveback(true);
-    // Validate NGO selection
+  
+    // Validation logic remains unchanged
     if (!selectedNgo) {
       toast.error("Please select an NGO");
       setIsProcessingGiveback(false);
       return;
     }
-
+  
     if (!amount || isNaN(amount) || Number(amount) <= 0) {
       toast.error("Enter a valid Giveback amount");
       setIsProcessingGiveback(false);
       return;
     }
-
+  
     const docRef = doc(db, "users", userId);
     const docSnap = await getDoc(docRef);
-
+  
     if (!docSnap.exists()) {
       toast.error("Error fetching user data");
       setIsProcessingGiveback(false);
       return;
     }
-
+  
     const userData = docSnap.data();
     const availableCashback = userData.collectedCashback || 0;
-
+  
     if (Number(amount) > availableCashback) {
       toast.error("Insufficient cashback balance");
       setIsProcessingGiveback(false);
       return;
     }
-
+  
     try {
       const numAmount = Number(amount);
-
+  
       // Store the giveback request
       await addDoc(collection(db, "givebackCashbacks"), {
         userId,
@@ -102,25 +104,25 @@ const GiveBackForm = () => {
         requestedAt: new Date().toISOString(),
         status: "Pending",
       });
-
+  
       // Update Firestore
       await updateDoc(docRef, {
         collectedCashback: increment(-numAmount),
         pendingGivebackAmount: increment(numAmount),
       });
-
-      // Update Redux state immediately
+  
+      // Update Redux state
       const updatedUser = {
         ...user,
         collectedCashback: (user.collectedCashback || 0) - numAmount,
         pendingGivebackAmount: (user.pendingGivebackAmount || 0) + numAmount,
       };
       dispatch(userExist(updatedUser));
-
+  
       toast.success(
         `Successfully transferred ₹${numAmount} to ${selectedNgo.causeName}`
       );
-
+  
       // Reset form
       setAmount("");
       setSelectedNgo(null);

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, updateDoc } from "firebase/firestore";
 import { FaArrowLeft, FaSpinner, FaCheckCircle } from "react-icons/fa";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
@@ -65,7 +65,13 @@ const ViewPaymentDetails = () => {
           totalPlatformEarningsPaid: currentPaidAmount + request.amount,
         });
       }
-
+      //  notification document
+      await addDoc(collection(db, "businessNotifications"), {
+        message: `Your payment amount ₹${request.amount} for Invoice #${request.invoiceId} has been verified successfully. Thank you for your payment!`,
+        businessId: request.businessId,
+        read: false,
+        createdAt: new Date().toISOString(),
+      });
       // Send email to business owner
       await axios.post(`${import.meta.env.VITE_AWS_SERVER}/send-email`, {
         email: request.businessEmail,
