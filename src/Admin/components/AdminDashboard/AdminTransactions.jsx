@@ -67,10 +67,10 @@ const AdminTransactions = () => {
       
       // You would need to store this token securely, possibly in environment variables
       const token = import.meta.env.VITE_INRDEALS_API_TOKEN;
-	  const serverUrl = import.meta.env.VITE_AWS_SERVER;
+	    const serverUrl = import.meta.env.VITE_AWS_SERVER;
       
       const response = await fetch(
-        `${serverUrl}/api/inrdeals/transactions?token=${token}&startdate=${startdate}&enddate=${enddate}`
+        `${serverUrl}/inrdeals/transactions?token=${token}&startdate=${startdate}&enddate=${enddate}`
       );
 
 	  if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
