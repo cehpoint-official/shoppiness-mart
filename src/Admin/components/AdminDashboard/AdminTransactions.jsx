@@ -3,7 +3,7 @@ import { collection, query, onSnapshot, orderBy } from "firebase/firestore";
 import { db } from "../../../../firebase";
 import Loader from "../../../Components/Loader/Loader";
 
-const AdminTransactions = () => {
+const AdminTransactions = ({ startDate, endDate }) => {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all"); // "all", "pending", "verified", "rejected"
@@ -46,10 +46,53 @@ const AdminTransactions = () => {
     };
   }, [fetchTransactions]);
 
-  // Filter transactions based on selected filter
+  // Parse date strings like "21 Jan 2025" to Date objects
+  const parseInputDate = (dateString) => {
+    if (!dateString) return null;
+    const parts = dateString.split(' ');
+    const day = parseInt(parts[0]);
+    const month = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
+      .indexOf(parts[1].toLowerCase());
+    const year = parseInt(parts[2]);
+    
+    if (month === -1) return null;
+    
+    // Create date at beginning of day
+    return new Date(year, month, day, 0, 0, 0);
+  };
+
+  // Filter transactions based on status and date range
   const filteredTransactions = transactions.filter(transaction => {
-    if (filter === "all") return true;
-    return transaction.status === filter;
+    // First filter by status
+    if (filter !== "all" && transaction.status !== filter) return false;
+    
+    // Then filter by date range
+    const start = parseInputDate(startDate);
+    const end = parseInputDate(endDate);
+    
+    // If dates are invalid or not provided, don't filter by date
+    if (!start && !end) return true;
+    
+    // Get the transaction date
+    let transactionDate = null;
+    if (transaction.saleDate && transaction.saleDate.seconds) {
+      transactionDate = new Date(transaction.saleDate.seconds * 1000);
+    }
+    
+    // If transaction has no valid date, exclude it
+    if (!transactionDate) return false;
+    
+    // Check if transaction date is within range
+    if (start && transactionDate < start) return false;
+    
+    // For end date, set it to end of day for inclusive comparison
+    if (end) {
+      const endOfDay = new Date(end);
+      endOfDay.setHours(23, 59, 59, 999);
+      if (transactionDate > endOfDay) return false;
+    }
+    
+    return true;
   });
 
   // Function to refresh transactions data from INRDeals API
@@ -57,23 +100,44 @@ const AdminTransactions = () => {
     setLoading(true);
     
     try {
-      // Call your backend API to fetch and update transactions
-      const today = new Date();
-      const fourMonthsAgo = new Date();
-      fourMonthsAgo.setMonth(today.getMonth() - 4);
+      // Convert the startDate and endDate props to the required format (YYYY-MM-DD)
+      let apiStartDate, apiEndDate;
       
-      const startdate = fourMonthsAgo.toISOString().split('T')[0]; // Format as YYYY-MM-DD
-      const enddate = today.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+      // Use the provided dates if available, otherwise use default of 4 months ago to today
+      if (startDate) {
+        const parsedDate = parseInputDate(startDate);
+        if (parsedDate) {
+          apiStartDate = parsedDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+        }
+      }
+      
+      if (endDate) {
+        const parsedDate = parseInputDate(endDate);
+        if (parsedDate) {
+          apiEndDate = parsedDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+        }
+      }
+      
+      // Fallback to default dates if parsing failed or dates weren't provided
+      if (!apiStartDate) {
+        const fourMonthsAgo = new Date();
+        fourMonthsAgo.setMonth(fourMonthsAgo.getMonth() - 4);
+        apiStartDate = fourMonthsAgo.toISOString().split('T')[0];
+      }
+      
+      if (!apiEndDate) {
+        apiEndDate = new Date().toISOString().split('T')[0];
+      }
       
       // You would need to store this token securely, possibly in environment variables
       const token = import.meta.env.VITE_INRDEALS_API_TOKEN;
-	    const serverUrl = import.meta.env.VITE_AWS_SERVER;
+      const serverUrl = import.meta.env.VITE_AWS_SERVER;
       
       const response = await fetch(
-        `${serverUrl}/inrdeals/transactions?token=${token}&startdate=${startdate}&enddate=${enddate}`
+        `${serverUrl}/inrdeals/transactions?token=${token}&startdate=${apiStartDate}&enddate=${apiEndDate}`
       );
 
-	  if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
       
       const data = await response.json();
       

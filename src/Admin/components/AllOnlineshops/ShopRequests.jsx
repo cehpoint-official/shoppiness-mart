@@ -104,35 +104,29 @@ const [activeTab, setActiveTab] = useState("Active");
                       </div>
                     </td>
                     <td className="py-4 px-6">
-                      <div className="grid grid-cols-4 gap-8">
-                        <div>
-                          <p className="text-sm">{shop.mobileNumber}</p>
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-8">
+                        <div className="min-w-[120px]">
+                          <p className="text-sm truncate">{shop.mobileNumber}</p>
                           <p className="text-xs text-gray-500">Phone</p>
                         </div>
-                        <div>
-                          <p className="text-sm">{shop.email}</p>
+                        <div className="min-w-[180px] pr-4">
+                          <p className="text-sm truncate">{shop.email}</p>
                           <p className="text-xs text-gray-500">Email</p>
                         </div>
                         <div>
                           <p className="text-sm">{shop.createdDate}</p>
-                          <p className="text-xs text-gray-500">
-                            Requested date
-                          </p>
+                          <p className="text-xs text-gray-500">Requested date</p>
                         </div>
                         <div>
                           {activeTab === "Active" ? (
                             <div>
                               <p className="text-sm">{shop.approvedDate}</p>
-                              <p className="text-xs text-gray-500">
-                                Activation Date
-                              </p>
+                              <p className="text-xs text-gray-500">Activation Date</p>
                             </div>
                           ) : (
                             <div>
                               <p className="text-sm">{shop.inactiveDate}</p>
-                              <p className="text-xs text-red-500">
-                                Inactivation Date
-                              </p>
+                              <p className="text-xs text-red-500">Inactivation Date</p>
                             </div>
                           )}
                         </div>

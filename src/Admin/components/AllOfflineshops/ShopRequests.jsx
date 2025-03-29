@@ -59,21 +59,19 @@ function ShopRequests({ onViewDetails, offlineShops, loading }) {
       <div className="bg-white p-6 rounded-xl border shadow-md">
         <div className="flex gap-4 mb-6">
           <button
-            className={`px-6 py-2 rounded-full border transition-all ${
-              activeTab === "Active"
+            className={`px-6 py-2 rounded-full border transition-all ${activeTab === "Active"
                 ? "bg-orange-400 text-white border-orange-400"
                 : "border-gray-300 text-gray-700"
-            }`}
+              }`}
             onClick={() => setActiveTab("Active")}
           >
             Active Product/Service
           </button>
           <button
-            className={`px-6 py-2 rounded-full border transition-all ${
-              activeTab === "Inactive"
+            className={`px-6 py-2 rounded-full border transition-all ${activeTab === "Inactive"
                 ? "bg-orange-400 text-white border-orange-400"
                 : "border-gray-300 text-gray-700"
-            }`}
+              }`}
             onClick={() => setActiveTab("Inactive")}
           >
             Inactive Product/Service
@@ -105,35 +103,29 @@ function ShopRequests({ onViewDetails, offlineShops, loading }) {
                       </div>
                     </td>
                     <td className="py-4 px-6">
-                      <div className="grid grid-cols-4 gap-8">
-                        <div>
-                          <p className="text-sm">{shop.mobileNumber}</p>
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-8">
+                        <div className="min-w-[120px]">
+                          <p className="text-sm truncate">{shop.mobileNumber}</p>
                           <p className="text-xs text-gray-500">Phone</p>
                         </div>
-                        <div>
-                          <p className="text-sm">{shop.email}</p>
+                        <div className="min-w-[180px] pr-4">
+                          <p className="text-sm truncate">{shop.email}</p>
                           <p className="text-xs text-gray-500">Email</p>
                         </div>
                         <div>
                           <p className="text-sm">{shop.createdDate}</p>
-                          <p className="text-xs text-gray-500">
-                            Requested date
-                          </p>
+                          <p className="text-xs text-gray-500">Requested date</p>
                         </div>
                         <div>
                           {activeTab === "Active" ? (
                             <div>
                               <p className="text-sm">{shop.approvedDate}</p>
-                              <p className="text-xs text-gray-500">
-                                Activation Date
-                              </p>
+                              <p className="text-xs text-gray-500">Activation Date</p>
                             </div>
                           ) : (
                             <div>
                               <p className="text-sm">{shop.inactiveDate}</p>
-                              <p className="text-xs text-red-500">
-                                Inactivation Date
-                              </p>
+                              <p className="text-xs text-red-500">Inactivation Date</p>
                             </div>
                           )}
                         </div>
@@ -185,11 +177,10 @@ function ShopRequests({ onViewDetails, offlineShops, loading }) {
                 (page) => (
                   <button
                     key={page}
-                    className={`w-8 h-8 rounded ${
-                      currentPage === page
+                    className={`w-8 h-8 rounded ${currentPage === page
                         ? "bg-blue-500 text-white"
                         : "text-gray-600 hover:bg-gray-100"
-                    }`}
+                      }`}
                     onClick={() => setCurrentPage(page)}
                   >
                     {page}
