@@ -1,13 +1,39 @@
 import { useState, useEffect, useCallback } from "react";
 import { FiBell } from "react-icons/fi";
-
-import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
+import { collection, getDocs, updateDoc, doc, getDoc } from "firebase/firestore";
 import { db } from "../../../../firebase";
+import { useDispatch } from "react-redux";
+import { userNotExist } from "../../../redux/reducer/userReducer";
+import { useNavigate } from "react-router-dom";
 
-const Navbar = () => {
+const Navbar = ({ userId }) => {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [profilePic, setProfilePic] = useState("");
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  // Fetch profile picture from user document
+  useEffect(() => {
+    const fetchProfilePic = async () => {
+      try {
+        if (!userId) return;
+        const userRef = doc(db, "users", userId);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+          setProfilePic(userSnap.data().profilePic);
+        } else {
+          console.log("No such document!");
+        }
+      } catch (error) {
+        console.error("Error fetching profile picture:", error);
+      }
+    };
+
+    fetchProfilePic();
+  }, [userId]);
 
   // Fetch notifications from adminNotifications collection
   const fetchNotifications = useCallback(async () => {
@@ -78,6 +104,18 @@ const Navbar = () => {
   const formatDate = (isoString) => {
     if (!isoString) return "Unknown time";
     return new Date(isoString).toLocaleString();
+  };
+
+  // Handle logout functionality
+  const handleLogout = () => {
+    // Clear user from Redux
+    dispatch(userNotExist());
+    
+    // Clear localStorage
+    localStorage.removeItem("userRole");
+    
+    // Navigate to login page
+    navigate("/login/user");
   };
 
   return (
