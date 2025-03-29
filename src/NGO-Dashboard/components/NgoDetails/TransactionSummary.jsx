@@ -36,7 +36,7 @@ const TransactionSummary = () => {
     .filter((item) => item.status === "Completed") // Only include completed transactions
     .map((item) => ({
       id: item.id, // Use the transaction ID from givebacks
-      name: "SHOPNESSMART", // Static merchant name
+      name: item.userName,
       date: new Date(item.paidAt || item.requestedAt).toLocaleDateString(
         "en-GB",
         {

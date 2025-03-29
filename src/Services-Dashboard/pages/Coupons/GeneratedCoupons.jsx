@@ -30,14 +30,12 @@ const GeneratedCoupons = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [id]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
-
-  // Filter coupons based on active tab and search term
   const filteredCoupons = coupons
     .filter((coupon) =>
       activeTab === "generated"
@@ -48,7 +46,6 @@ const GeneratedCoupons = () => {
       coupon.code.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-  // Calculate pagination
   const totalPages = Math.ceil(filteredCoupons.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const displayedCoupons = filteredCoupons.slice(
@@ -58,7 +55,6 @@ const GeneratedCoupons = () => {
 
   const getNoDataMessage = () => {
     if (loading) return null;
-
     return {
       generated: {
         title: "No Generated Coupons",
@@ -74,54 +70,114 @@ const GeneratedCoupons = () => {
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-normal mb-8">Coupons</h1>
+    <div className="p-4 sm:p-6 max-w-full mx-auto">
+      <h1 className="text-xl sm:text-2xl font-normal mb-6 sm:mb-8">Coupons</h1>
 
-      <div className="bg-white rounded-lg border shadow-lg p-6">
+      <div className="bg-white rounded-lg border p-4 shadow-lg w-full">
         {/* Tabs and Search Bar */}
-        <div className="flex justify-between items-center mb-8">
-          <div className="flex gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4">
+          <div className="flex flex-wrap gap-3 sm:gap-4">
             <button
-              className={`px-4 py-2 rounded-full ${
+              className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-sm sm:text-base whitespace-nowrap ${
                 activeTab === "generated"
                   ? "bg-[#F59E0B] text-white"
                   : "border border-black text-gray-600"
               }`}
               onClick={() => {
                 setActiveTab("generated");
-                setCurrentPage(1); // Reset page when changing tabs
+                setCurrentPage(1);
               }}
             >
               Generated coupons
             </button>
             <button
-              className={`px-4 py-2 rounded-full ${
+              className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-sm sm:text-base whitespace-nowrap ${
                 activeTab === "claimed"
                   ? "bg-[#F59E0B] text-white"
                   : "border border-black text-gray-600"
               }`}
               onClick={() => {
                 setActiveTab("claimed");
-                setCurrentPage(1); // Reset page when changing tabs
+                setCurrentPage(1);
               }}
             >
               Claimed coupons
             </button>
           </div>
-          <div className="relative">
+          <div className="relative w-full sm:w-auto">
             <input
               type="text"
               placeholder="Search by coupon code..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#F59E0B] focus:border-transparent"
+              className="w-full sm:w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#F59E0B] focus:border-transparent text-sm sm:text-base"
             />
             <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
           </div>
         </div>
 
-        {/* Table */}
-        <div className="overflow-x-auto">
+        {/* Mobile View - Card Layout */}
+        <div className="md:hidden space-y-4">
+          {loading ? (
+            Array.from({ length: itemsPerPage }).map((_, index) => (
+              <div
+                key={index}
+                className="border rounded-lg p-4 animate-pulse space-y-3"
+              >
+                <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+              </div>
+            ))
+          ) : displayedCoupons.length === 0 ? (
+            <div className="text-center py-8">
+              <h3 className="text-lg font-medium text-gray-900">
+                {getNoDataMessage()?.title}
+              </h3>
+              <p className="text-sm text-gray-500 mt-2">
+                {getNoDataMessage()?.description}
+              </p>
+            </div>
+          ) : (
+            displayedCoupons.map((coupon, index) => (
+              <div key={coupon.id} className="border rounded-lg p-4">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="font-medium">#{startIndex + index + 1}</p>
+                    <p className="text-sm text-gray-600">Code: {coupon.code}</p>
+                  </div>
+                  <button className="p-1 hover:bg-gray-100 rounded-full">
+                    <FiMoreVertical className="w-5 h-5 text-gray-500" />
+                  </button>
+                </div>
+                <div className="mt-2 space-y-1 text-sm">
+                  <p>Shop: {coupon.businessName}</p>
+                  <p>Email: {coupon.email}</p>
+                  <p>Name: {coupon.fullName}</p>
+                  <p>Created: {coupon.createdAt}</p>
+                  {activeTab === "claimed" && (
+                    <p>Claimed: {coupon.claimedAt}</p>
+                  )}
+                  <p>
+                    Status:{" "}
+                    <span
+                      className={`${
+                        coupon.status === "Pending"
+                          ? "text-[#F59E0B]"
+                          : "text-[#22C55E]"
+                      }`}
+                    >
+                      {coupon.status}
+                    </span>
+                  </p>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Desktop View - Table Layout */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="text-left font-medium">
@@ -224,17 +280,17 @@ const GeneratedCoupons = () => {
           </table>
         </div>
 
-        {/* Pagination - Only show if there are items */}
+        {/* Pagination */}
         {displayedCoupons.length > 0 && (
-          <div className="mt-6 flex items-center justify-between">
+          <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="text-sm text-gray-500">
               Showing {startIndex + 1} -{" "}
               {Math.min(startIndex + itemsPerPage, filteredCoupons.length)} of{" "}
               {filteredCoupons.length}
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap justify-center">
               <button
-                className="px-4 py-2 text-sm disabled:opacity-50"
+                className="px-3 py-1.5 sm:px-4 sm:py-2 text-sm disabled:opacity-50"
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage(currentPage - 1)}
               >
@@ -254,7 +310,7 @@ const GeneratedCoupons = () => {
                 </button>
               ))}
               <button
-                className="px-4 py-2 text-sm disabled:opacity-50"
+                className="px-3 py-1.5 sm:px-4 sm:py-2 text-sm disabled:opacity-50"
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage(currentPage + 1)}
               >

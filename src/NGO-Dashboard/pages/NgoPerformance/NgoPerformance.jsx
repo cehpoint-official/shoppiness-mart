@@ -45,6 +45,7 @@ const NgoPerformance = () => {
       .map((item) => item.userId)
   );
   const totalSupporters = supporterIds.size;
+console.log(givebacks);
 
   if (currentView === "transactionHistory") {
     return <TransactionHistory onBack={() => setCurrentView("performance")} givebacks={givebacks} />;

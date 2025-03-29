@@ -1,3 +1,4 @@
+// Products.jsx
 import { useCallback, useEffect, useState } from "react";
 import { IoMdMore, IoMdClose } from "react-icons/io";
 import "./Products.scss";
@@ -15,25 +16,13 @@ import { useParams } from "react-router-dom";
 import EditProductDialog from "../../components/Product/EditProductDialog";
 import toast from "react-hot-toast";
 
-// Skeleton Component
 const ProductSkeleton = () => {
   return (
-    <div className="relative flex justify-between border text-[18px] p-3 rounded-[15px] animate-pulse">
-      <div className="w-[100px] h-[100px] bg-gray-200 rounded-[10px]"></div>
-      <div className="flex flex-col gap-2.5">
-        <div className="h-4 bg-gray-200 rounded w-24"></div>
-        <div className="flex gap-5">
-          <div className="h-4 bg-gray-200 rounded w-16"></div>
-          <div className="h-4 bg-gray-200 rounded w-16"></div>
-        </div>
-      </div>
-      <div className="flex flex-col gap-2.5">
-        <div className="h-4 bg-gray-200 rounded w-24"></div>
-        <div className="h-4 bg-gray-200 rounded w-16"></div>
-      </div>
-      <div className="flex flex-col gap-2.5 items-center">
-        <div className="h-4 bg-gray-200 rounded w-16"></div>
-        <div className="w-[35px] h-[35px] bg-gray-200 rounded-full"></div>
+    <div className="product-skeleton animate-pulse">
+      <div className="skeleton-image"></div>
+      <div className="skeleton-content">
+        <div className="skeleton-line"></div>
+        <div className="skeleton-line short"></div>
       </div>
     </div>
   );
@@ -65,7 +54,6 @@ const Products = () => {
       setLoading(false);
     }
   }, [id]);
-  console.log(products);
 
   useEffect(() => {
     fetchData();
@@ -86,7 +74,7 @@ const Products = () => {
         merge: true,
       });
       toast.success("Product updated successfully!");
-      fetchData(); // Refresh the product list
+      fetchData();
     } catch (error) {
       console.error("Error updating product: ", error);
       toast.error("Failed to update product.");
@@ -94,13 +82,14 @@ const Products = () => {
       setIsEditDialogOpen(false);
     }
   };
+
   const handleDeleteClick = async (productId) => {
     try {
       await deleteDoc(doc(db, "productDetails", productId));
       toast.success("Product deleted successfully!");
-      fetchData(); // Refresh the product list
+      fetchData();
     } catch (error) {
-      console.error("Error updating product: ", error);
+      console.error("Error deleting product: ", error);
       toast.error("Failed to delete product: " + error.message);
     }
   };
@@ -119,104 +108,98 @@ const Products = () => {
   }
 
   return (
-    <div className="p-10 mt-[30px] flex flex-col gap-[30px]">
-      <div className="flex justify-between">
-        <div className="text-[22px]">Add product/Service</div>
-        <div className="flex gap-5">
+    <div className="products">
+      <div className="top-section">
+        <div className="title">Add Product/Service</div>
+        <div className="buttons">
           <button
-            className="bg-green-600 rounded-md text-white px-5 py-2 min-w-[170px]"
+            className="category-btn"
             onClick={() => setCurrentView("addCategory")}
           >
             +Add Category
           </button>
           <button
-            className="bg-blue-600 rounded-md text-white px-5 py-2 min-w-[170px]"
+            className="product-btn"
             onClick={() => setCurrentView("addProduct")}
           >
             +Add New
           </button>
         </div>
       </div>
-      <div className="max-h-[500px] overflow-auto p-5 bg-white rounded-[20px] flex flex-col gap-10 scrollbar-hide">
+
+      <div className="bottom-section">
         {loading ? (
-          Array.from({ length: 5 }).map((_, index) => (
+          Array.from({ length: 3 }).map((_, index) => (
             <ProductSkeleton key={index} />
           ))
         ) : products.length === 0 ? (
-          <div className="text-center text-gray-500 text-[18px]">
-            There are no products listed yet.
-          </div>
+          <div className="no-products">No products listed yet.</div>
         ) : (
-          products.map((product, index) => (
-            <div
-              key={index}
-              className="relative flex justify-between border text-[18px] p-3 rounded-[15px] hover:bg-gray-100 transition-colors"
-            >
-              <div className="w-[100px] h-[100px]">
-                <img
-                  src={product.imageUrl}
-                  alt={product.name}
-                  className="w-full h-full object-cover rounded-[10px]"
-                />
-              </div>
-
-              <div className="flex flex-col gap-2.5">
-                <p>{product.name}</p>
-                <div className="flex gap-5">
-                  <p className="font-medium">₹{product.price}</p>
-                  {product.discountType === "percentage" ? (
-                    <p className="text-green-600">{product.discount}% off</p>
-                  ) : (
-                    <p className="text-green-600">
-                      ₹{product.discount} discount
+          <div className="products-table">
+            <div className="table-header">
+              <span>Image</span>
+              <span>Name & Price</span>
+              <span>Category</span>
+              <span>Date</span>
+              <span>Action</span>
+            </div>
+            {products.map((product, index) => (
+              <div key={index} className="table-row">
+                <div className="sec-1">
+                  <img src={product.imageUrl} alt={product.name} />
+                </div>
+                <div className="sec-2">
+                  <p className="product-name">{product.name}</p>
+                  <div className="price-sec">
+                    <p>₹{product.price}</p>
+                    <p className="discount">
+                      {product.discountType === "percentage"
+                        ? `${product.discount}% off`
+                        : `₹${product.discount} off`}
                     </p>
+                  </div>
+                </div>
+                <div className="sec-3">
+                  <span className="label">Category:</span>
+                  <p>{product.category}</p>
+                </div>
+                <div className="sec-4">
+                  <span className="label">Created:</span>
+                  <p>{product.createdDate}</p>
+                </div>
+                <div className="sec-5">
+                  <button
+                    className="more"
+                    onClick={() => toggleActionMenu(product)}
+                  >
+                    <IoMdMore />
+                  </button>
+                  {selectedProduct === product && (
+                    <div className="action-menu">
+                      <button
+                        className="close-btn"
+                        onClick={() => setSelectedProduct(null)}
+                      >
+                        <IoMdClose />
+                      </button>
+                      <button
+                        className="edit-btn"
+                        onClick={() => handleEditClick(product)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="delete-btn"
+                        onClick={() => handleDeleteClick(product.id)}
+                      >
+                        Remove
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>
-
-              <div className="flex flex-col gap-2.5">
-                <p>Category</p>
-                <p>{product.category}</p>
-              </div>
-              <div className="flex flex-col gap-2.5">
-                <p>Creation Date</p>
-                <p>{product.createdDate}</p>
-              </div>
-              <div className="flex flex-col gap-2.5 items-center">
-                <p>Action</p>
-                <button
-                  className="flex items-center justify-center w-[35px] h-[35px] rounded-full bg-black/5 cursor-pointer hover:bg-black/10"
-                  onClick={() => toggleActionMenu(product)}
-                >
-                  <IoMdMore className="text-[27px]" />
-                </button>
-              </div>
-              {selectedProduct === product && (
-                <div className="absolute w-[200px] top-1 right-0 mt-2 bg-white shadow-md rounded-md p-3 z-10">
-                  <div className="flex justify-end mb-2">
-                    <button
-                      onClick={() => setSelectedProduct(null)}
-                      className="text-gray-500 hover:text-gray-700"
-                    >
-                      <IoMdClose className="text-[24px]" />
-                    </button>
-                  </div>
-                  <button
-                    className="block w-full text-left text-blue-500 px-3 py-2 rounded-md hover:bg-blue-50"
-                    onClick={() => handleEditClick(product)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDeleteClick(product.id)}
-                    className="block w-full text-left text-red-500 px-3 py-2 rounded-md hover:bg-red-50"
-                  >
-                    Remove
-                  </button>
-                </div>
-              )}
-            </div>
-          ))
+            ))}
+          </div>
         )}
       </div>
 

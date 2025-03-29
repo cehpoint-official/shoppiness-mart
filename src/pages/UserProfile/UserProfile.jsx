@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import "./UserProfile.scss";
-import { IoReload } from "react-icons/io5"; // Import IoReload for the loader
+import { IoReload } from "react-icons/io5";
 import CashbackGiveback from "./../Cashback&GiveBack/CashbackGiveback";
 import { useDispatch } from "react-redux";
 import ProfileInfo from "../ProfileInfo";
@@ -16,76 +16,98 @@ const UserProfile = () => {
   const dispatch = useDispatch();
   const [currentPage, setCurrentPage] = useState("coupons");
   const [userData, setUserData] = useState({});
-  const [isLoading, setIsLoading] = useState(true); // Add loading state
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // State for dropdown visibility
+  const [isLoading, setIsLoading] = useState(true);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { userId } = useParams();
 
   const fetchDoc = async () => {
-    const docRef = doc(db, "users", userId);
-    const docSnap = await getDoc(docRef);
+    try {
+      const docRef = doc(db, "users", userId);
+      const docSnap = await getDoc(docRef);
 
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-      setUserData(data);
-      dispatch(userExist(data));
-    } else {
-      alert("No such document!");
-      dispatch(userNotExist());
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setUserData(data);
+        dispatch(userExist(data));
+      } else {
+        alert("No such document!");
+        dispatch(userNotExist());
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false); // Set loading to false after data is fetched
   };
 
   useEffect(() => {
     fetchDoc();
-  }, []);
+  }, [userId]); // Added userId as dependency to refetch if it changes
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
+    // On mobile, might want to close the dropdown after selection
+    if (window.innerWidth <= 768) {
+      setIsDropdownOpen(false);
+    }
   };
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
+  // Loader component to avoid duplication
+  const Loader = () => (
+    <div className="loader">
+      <IoReload className="spin" />
+    </div>
+  );
+
+  // User info section
+  const UserInfo = () => (
+    <>
+      <div className="profile">
+        <img
+          src={
+            userData.profilePic ||
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8oghbsuzggpkknQSSU-Ch_xep_9v3m6EeBQ&s"
+          }
+          alt="user profile"
+        />
+      </div>
+      <div className="details">
+        <p>Hello,</p>
+        <p>
+          {userData.fname} {userData.lname}
+        </p>
+      </div>
+    </>
+  );
+
   return (
     <div className="userProfile">
       <div className="left">
         <div className="top">
-          {isLoading ? (
-            <div className="loader">
-              <IoReload className="spin" /> {/* Spinning icon */}
-            </div>
-          ) : (
-            <>
-              <div className="profile">
-                <img
-                  src={
-                    userData.profilePic ||
-                    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8oghbsuzggpkknQSSU-Ch_xep_9v3m6EeBQ&s"
-                  }
-                  alt="user profile"
-                />
-              </div>
-              <div className="details">
-                <p>Hello,</p>
-                <p>
-                  {userData.fname} {userData.lname}
-                </p>
-              </div>
-            </>
-          )}
+          {isLoading ? <Loader /> : <UserInfo />}
         </div>
         <div className="bottom">
-          <div className="item" onClick={() => handlePageChange("coupons")}>
+          <div 
+            className="item" 
+            onClick={() => handlePageChange("coupons")}
+          >
             My Coupons
           </div>
-          <div className="item" onClick={() => handlePageChange("cashback")}>
+          <div 
+            className="item" 
+            onClick={() => handlePageChange("cashback")}
+          >
             Cashback & Giveback
           </div>
           <div className="item" onClick={toggleDropdown}>
             Account Settings
+            {/* You could add an arrow icon here that rotates based on dropdown state */}
           </div>
-          {/* Dropdown items */}
+          
           <div
             className={`transition-all duration-300 ease-in-out ${
               isDropdownOpen ? "max-h-40" : "max-h-0"
@@ -115,27 +137,13 @@ const UserProfile = () => {
 
       <div className="right">
         {isLoading ? (
-          <div className="loader">
-            <IoReload className="spin" /> {/* Spinning icon */}
-          </div>
+          <Loader />
         ) : (
           <>
             {currentPage === "coupons" && <Coupons />}
-
-            {currentPage === "cashback" && <CashbackGiveback userData={userData}/>}
-
-            {currentPage === "settings" && (
-              <div className="settings">
-                <h1>Account Settings</h1>
-                <p>Your account settings details go here...</p>
-              </div>
-            )}
-            {currentPage === "profileinfo" && (
-              <ProfileInfo userData={userData} />
-            )}
-            {currentPage === "manageaddress" && (
-              <ManageAddress userData={userData} />
-            )}
+            {currentPage === "cashback" && <CashbackGiveback userData={userData} />}
+            {currentPage === "profileinfo" && <ProfileInfo userData={userData} />}
+            {currentPage === "manageaddress" && <ManageAddress userData={userData} />}
             {currentPage === "payment" && <Payment userData={userData} />}
           </>
         )}

@@ -64,7 +64,7 @@ const HelpSupport = () => (
       <div className="px-6 py-5">
         <h2 className="text-xl font-medium">Help & Support</h2>
       </div>
-      <div className="grid grid-cols-2 gap-4 p-6">
+      <div className="grid md:grid-cols-2 gap-4 p-6">
         {SUPPORT_OPTIONS.map((option) => (
           <HelpSupportCard key={option.id} {...option} />
         ))}

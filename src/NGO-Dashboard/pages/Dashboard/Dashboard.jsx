@@ -36,6 +36,7 @@ function Dashboard() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+  //console.log(givebacks);
 
   // Calculate total donations (sum of completed transactions)
   const totalDonations = givebacks
@@ -83,7 +84,7 @@ function Dashboard() {
     )
     .slice(0, 3) // Limit to 3 transactions
     .map((item) => ({
-      merchant: "SPHOPINESSMART",
+      merchant: item.userName,
       date: new Date(item.paidAt || item.requestedAt).toLocaleDateString(
         "en-GB",
         {
@@ -103,30 +104,45 @@ function Dashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
         {/* NGO Info Card */}
-        <div className="bg-white rounded-lg p-6 shadow-sm">
-          <div className="flex items-start gap-4">
+        <div className="bg-white rounded-lg p-4 sm:p-6 shadow-sm">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
             <img
               src={user?.logoUrl}
               alt="NGO Logo"
-              className="w-20 h-20 rounded-full"
+              className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover flex-shrink-0"
             />
-            <div className="flex flex-col">
-              <h2 className="text-2xl font-bold">{user?.causeName}</h2>
-              <div className="space-y-1 mt-2">
-                <p className="text-gray-600 flex items-center gap-2">
-                  <LiaEnvelopeSolid className="w-4 h-4" />
-                  {user?.email}
+            <div className="flex flex-col w-full text-center sm:text-left">
+              <h2 className="text-xl sm:text-2xl font-bold truncate">
+                {user?.causeName}
+              </h2>
+              <div className="space-y-2 mt-2 sm:mt-3">
+                <p className="text-gray-600 flex items-center justify-center sm:justify-start gap-2 text-sm sm:text-base">
+                  <LiaEnvelopeSolid className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                  <span className="truncate">{user?.email}</span>
                 </p>
-                <p className="text-gray-600 flex items-center gap-2">
-                  <MdLocalPhone className="w-4 h-4" />
-                  {user?.mobileNumber}
+                <p className="text-gray-600 flex items-center justify-center sm:justify-start gap-2 text-sm sm:text-base">
+                  <MdLocalPhone className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                  <span>{user?.mobileNumber}</span>
                 </p>
               </div>
-              <Link to={`/ngo-dashboard/${id}/details`}>
-                <button className="mt-4 px-4 py-2 bg-orange-400 text-white rounded-md hover:bg-orange-500 transition-colors">
-                  Cause/NGO Details
-                </button>
-              </Link>
+              <div className="mt-4 sm:mt-6 flex justify-center sm:justify-start">
+                <Link to={`/ngo-dashboard/${id}/details`}>
+                  <button
+                    className="
+              px-4 py-2 
+              bg-orange-400 text-white 
+              rounded-md 
+              text-sm sm:text-base
+              hover:bg-orange-500 
+              transition-colors 
+              w-full sm:w-auto
+              touch-manipulation
+            "
+                  >
+                    Cause/NGO Details
+                  </button>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
