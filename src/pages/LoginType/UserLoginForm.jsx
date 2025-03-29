@@ -4,7 +4,7 @@ import Googleicon from "../../assets/googleicon.png";
 import Facebookicon from "../../assets/facebookicon.png";
 import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { auth, db, provider } from "../../../firebase";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { userExist } from "../../redux/reducer/userReducer";
@@ -13,6 +13,7 @@ const UserLoginForm = () => {
   const [userData, setUserData] = useState({
     email: "",
     password: "",
+    role: "",
   });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -28,13 +29,41 @@ const UserLoginForm = () => {
         userData.password
       );
       const user = res.user;
+  
+      // Check if user exists in Firestore
+      const userDocRef = doc(db, "users", user.uid);
+      const userDocSnap = await getDoc(userDocRef);
+  
+      let userRole = "user";  // Default role
+      if (userDocSnap.exists()) {
+        // If user document exists, get the role from Firestore
+        const existingUserData = userDocSnap.data();
+        userRole = existingUserData.role || "user";
+      } else {
+        // Create user document if it doesn't exist
+        await setDoc(userDocRef, {
+          email: user.email,
+          role: "user",
+          // Add other default fields as needed
+        });
+      }
 
+      // Store user role in localStorage
+      localStorage.setItem("userRole", userRole);
+  
       // Dispatch user data to Redux
-      dispatch(userExist(user));
-
+      dispatch(userExist({
+        ...user,
+        role: userRole
+      }));
+  
       toast.success("Login successful!");
       setTimeout(() => {
-        navigate(`/user-dashboard/${user.uid}/dashboard`);
+        if (userRole === "admin") {
+          navigate(`/admin/${user.uid}/shoppiness/dashboard`);
+        } else {
+          navigate(`/user-dashboard/${user.uid}/dashboard`);
+        }
       }, 1000);
     } catch (error) {
       toast.error(
@@ -53,20 +82,42 @@ const UserLoginForm = () => {
     try {
       const res = await signInWithPopup(auth, provider);
       const user = res.user;
+  
+      // Check if user already exists in Firestore
+      const userDocRef = doc(db, "users", user.uid);
+      const userDocSnap = await getDoc(userDocRef);
+  
+      let userRole = "user";  // Default role
+      if (!userDocSnap.exists()) {
+        // Save user data to Firestore only if it doesn't exist
+        await setDoc(userDocRef, {
+          fname: user.displayName,
+          email: user.email,
+          profilePic: user.photoURL,
+          role: "user",
+        });
+      } else {
+        // If user exists, get the existing role
+        const existingUserData = userDocSnap.data();
+        userRole = existingUserData.role || "user";
+      }
 
-      // Save user data to Firestore
-      await setDoc(doc(db, "users", user.uid), {
-        fname: user.displayName,
-        email: user.email,
-        profilePic: user.photoURL,
-      });
-
+      // Store user role in localStorage
+      localStorage.setItem("userRole", userRole);
+  
       // Dispatch user data to Redux
-      dispatch(userExist(user));
-
+      dispatch(userExist({
+        ...user,
+        role: userRole
+      }));
+  
       setLoading(false);
       toast.success("Google sign-in successful!");
-      navigate(`/user-dashboard/${user.uid}`);
+      if (userRole === "admin") {
+        navigate(`/admin/${user.uid}/shoppiness/dashboard`);
+      } else {
+        navigate(`/user-dashboard/${user.uid}`);
+      }
     } catch (error) {
       toast.error(error.message);
     }

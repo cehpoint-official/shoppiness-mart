@@ -2,9 +2,14 @@ import { useEffect, useState } from "react";
 import { FiBell } from "react-icons/fi";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../../../firebase";
+import { useDispatch } from "react-redux";
+import { userNotExist } from "../../../redux/reducer/userReducer";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = ({ userId }) => {
   const [profilePic, setProfilePic] = useState("");
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProfilePic = async () => {
@@ -26,6 +31,17 @@ const Navbar = ({ userId }) => {
     fetchProfilePic();
   }, [userId]);
 
+  const handleLogout = () => {
+    // Clear user from Redux
+    dispatch(userNotExist());
+    
+    // Clear localStorage
+    localStorage.removeItem("userRole");
+    
+    // Navigate to login page
+    navigate("/login/user");
+  };
+
   return (
     <div className="bg-white shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -34,7 +50,7 @@ const Navbar = ({ userId }) => {
             <span className="text-lg font-bold">Welcome Edmund 👋</span>
           </div>
           <div className="flex items-center space-x-4">
-            <div className="relative">
+            <div className="relative mr-4">
               <input
                 type="text"
                 className="block w-full pl-10 pr-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-600"
@@ -65,8 +81,14 @@ const Navbar = ({ userId }) => {
                 </span>
               </button>
             </div>
+            <button
+              onClick={handleLogout}
+              className="text-blue-600 font-medium hover:text-blue-800 transition-colors pr-4"
+            >
+              Logout
+            </button>
             <img
-              className="h-8 w-8 rounded-full"
+              className="h-10 w-10 rounded-full"
               src={profilePic}
               alt="Profile"
             />

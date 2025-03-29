@@ -340,47 +340,57 @@ const router = createBrowserRouter([
       // Admin routes
       {
         path: "/admin/:userId/shoppiness/",
-        element: <AdminDashboardOutlet />,
+        element: (<AdminDashboardOutlet />),
         children: [
-          { path: "/admin/:userId/shoppiness/dashboard", element: <AdminDashboard /> },
-          { path: "/admin/:userId/shoppiness/edit-pages", element: <WebsiteEditPages /> },
-          { path: "/admin/:userId/shoppiness/contact-info", element: <ContactInfo /> },
-          { path: "/admin/:userId/shoppiness/faq", element: <AllFaqs /> },
-          { path: "/admin/:userId/shoppiness/privacy-policy", element: <PrivacyPolicy /> },
-          { path: "/admin/:userId/shoppiness/newsletter", element: <Newsletter /> },
-          { path: "/admin/:userId/shoppiness/blog", element: <MainBlog /> },
-          { path: "/admin/:userId/shoppiness/social-media", element: <MainSocialmedia /> },
-          { path: "/admin/:userId/shoppiness/maast/edit", element: <EditPage /> },
-          { path: "/admin/:userId/shoppiness/maast/donations", element: <AllDonations /> },
-          { path: "/admin/:userId/shoppiness/maast/events", element: <Events /> },
-          { path: "/admin/:userId/shoppiness/ngo/ngo-requests", element: <NgoRequest /> },
-          { path: "/admin/:userId/shoppiness/ngo/all-ngo", element: <AllNgos /> },
-          { path: "/admin/:userId/shoppiness/services/cashback-tracking", element: <CashbackTracking /> }, 
-          { path: "/admin/:userId/shoppiness/ngo/giveback-request", element: <GiveBackRecord /> },
+          { path: "dashboard", element: <AdminDashboard /> },
+          { path: "edit-pages", element: <WebsiteEditPages /> },
+          { path: "contact-info", element: <ContactInfo /> },
+          { path: "faq", element: <AllFaqs /> },
+          { path: "privacy-policy", element: <PrivacyPolicy /> },
+          { path: "newsletter", element: <Newsletter /> },
+          { path: "blog", element: <MainBlog /> },
+          { path: "social-media", element: <MainSocialmedia /> },
           {
-            path: "/admin/:userId/shoppiness/services/offlineshop-requests",
-            element: <OfflineShopRequests />,
+            path: "maast",
+            children: [
+              { path: "edit", element: <EditPage /> },
+              { path: "donations", element: <AllDonations /> },
+              { path: "events", element: <Events /> }
+            ]
           },
           {
-            path: "/admin/:userId/shoppiness/services/onlineshop-requests",
-            element: <OnlineShopRequests />,
+            path: "ngo",
+            children: [
+              { path: "ngo-requests", element: <NgoRequest /> },
+              { path: "all-ngo", element: <AllNgos /> },
+              { path: "giveback-request", element: <GiveBackRecord /> }
+            ]
           },
-          { path: "/admin/:userId/shoppiness/services/all-offlineshops", element: <AllOfflineShops /> },
-          { path: "/admin/:userId/shoppiness/services/all-onlineshops", element: <AllOnlineShops /> },
-          { path: "/admin/:userId/shoppiness/services/add-categories", element: <AddCategories /> },
-          { path: "/admin/:userId/shoppiness/services/earnings", element: <PlatformEarningsFromBusiness /> },
-          { path: "/admin/:userId/shoppiness/services/earnings/:id", element: <AllPaymentVarificationRequest /> },
-          { path: "/admin/:userId/shoppiness/services/earnings/:id/:id", element: <ViewPaymentDetails /> },
-          { path: "/admin/:userId/shoppiness/users/coupons", element: <Coupons /> },
           {
-            path: "/admin/:userId/shoppiness/users/withdrawal-requests",
-            element: <WithdrawalRequests />,
+            path: "services",
+            children: [
+              { path: "cashback-tracking", element: <CashbackTracking /> },
+              { path: "offlineshop-requests", element: <OfflineShopRequests /> },
+              { path: "onlineshop-requests", element: <OnlineShopRequests /> },
+              { path: "all-offlineshops", element: <AllOfflineShops /> },
+              { path: "all-onlineshops", element: <AllOnlineShops /> },
+              { path: "add-categories", element: <AddCategories /> },
+              { path: "earnings", element: <PlatformEarningsFromBusiness /> },
+              { path: "earnings/:id", element: <AllPaymentVarificationRequest /> },
+              { path: "earnings/:id/:id", element: <ViewPaymentDetails /> }
+            ]
           },
-          { path: "/admin/:userId/shoppiness/users/cashback-requests", element: <CashbackRequests /> },
-          { path: "/admin/:userId/shoppiness/users/cashback-status", element: <CashbackStatus /> },
-          { path: "/admin/:userId/shoppiness/users/givebacks", element: <Givebacks /> },
-
-          { path: "/admin/:userId/shoppiness/users/dispute-requests", element: <DisputeRequest /> },
+          {
+            path: "users",
+            children: [
+              { path: "coupons", element: <Coupons /> },
+              { path: "withdrawal-requests", element: <WithdrawalRequests /> },
+              { path: "cashback-requests", element: <CashbackRequests /> },
+              { path: "cashback-status", element: <CashbackStatus /> },
+              { path: "givebacks", element: <Givebacks /> },
+              { path: "dispute-requests", element: <DisputeRequest /> }
+            ]
+          }
         ],
       },
       // Protected Services Dashboard Routes
