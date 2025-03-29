@@ -119,6 +119,12 @@ const CauseForm = () => {
         }
 
         await addData(); // Add data to Firebase
+        // Add notification to adminNotifications collection
+        await addDoc(collection(db, "adminNotifications"), {
+          message: `New Cause/NGO registration request from ${causeDetails.firstName} ${causeDetails.lastName} for "${causeDetails.causeName}".`,
+          createdAt: new Date().toISOString(),
+          read: false,
+        });
         // Send confirmation email
         try {
           await axios.post(`${import.meta.env.VITE_AWS_SERVER}/send-email`, {

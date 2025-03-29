@@ -122,6 +122,12 @@ const BusinessForm = () => {
         }
 
         await addData(); // Add data to Firebase
+        // Add notification to adminNotifications collection
+        await addDoc(collection(db, "adminNotifications"), {
+          message: `New Business/Services registration request from ${formData.firstName} ${formData.lastName} for "${formData.businessName}".`,
+          createdAt: new Date().toISOString(),
+          read: false,
+        });
         // Send confirmation email
         try {
           await axios.post(`${import.meta.env.VITE_AWS_SERVER}/send-email`, {
@@ -259,7 +265,7 @@ const BusinessForm = () => {
         rate: "0",
         totalPlatformEarnings: 0,
         totalPlatformEarningsPaid: 0,
-        totalPlatformEarningsDue :0,
+        totalPlatformEarningsDue: 0,
         createdDate: formatDate(new Date()),
       });
     } catch (e) {

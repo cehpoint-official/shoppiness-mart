@@ -138,7 +138,12 @@ const DisputeForm = () => {
       console.log(formData);
 
       await addDoc(collection(db, "cashbackDisputeRequests"), formData);
-
+     // Add notification to adminNotifications collection
+     await addDoc(collection(db, "adminNotifications"), {
+      message: `Dispute Request from ${user.fname} ${user.lname} for ${selectedShopDetails.businessName}.`,
+      createdAt: new Date().toISOString(),
+      read: false,
+    });
       // Send confirmation email
       await axios.post(`${import.meta.env.VITE_AWS_SERVER}/send-email`, {
         email: user.email,

@@ -217,15 +217,21 @@ const CashbackForm = () => {
       console.log(formData);
 
       await addDoc(collection(db, "onlineCashbackRequests"), formData);
-      toast.success("Dispute request submitted successfully!");
+      // Add notification to adminNotifications collection
+      await addDoc(collection(db, "adminNotifications"), {
+        message: `New online cashback request from ${user.fname} ${user.lname} for ${selectedShopDetails.businessName}.`,
+        createdAt: new Date().toISOString(),
+        read: false,
+      });
+      toast.success("Cashback claim request submitted successfully!");
       // Reset form fields
       setSelectedShop("");
       setPaidAmount("");
       setCouponCode("");
       setUploadedPdf(null);
     } catch (error) {
-      console.error("Error submitting dispute request:", error);
-      toast.error("Failed to submit dispute request. Please try again.");
+      console.error("Error submitting claim request:", error);
+      toast.error("Failed to submit claim request. Please try again.");
     } finally {
       setIsLoading(false);
     }

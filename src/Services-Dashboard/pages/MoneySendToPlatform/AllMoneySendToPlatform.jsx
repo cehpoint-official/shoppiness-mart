@@ -245,7 +245,14 @@ const AllMoneySendToPlatform = () => {
           // We don't update paid amount yet since it's still being verified
         });
       }
-
+      // Add notification to adminNotifications collection
+      await addDoc(collection(db, "adminNotifications"), {
+        message: `New payment verification request from ${
+          user.businessName || businessDetails?.businessName
+        } for invoice ${earning.invoiceId}.`,
+        createdAt: new Date().toISOString(),
+        read: false,
+      });
       // 5. Send email notification to admin
       const emailData = {
         email: "admin@shoppinessmart.com", // Replace with the admin's email
@@ -514,12 +521,8 @@ const AllMoneySendToPlatform = () => {
               )}
               {selectedEarning.paidAt && (
                 <div>
-                  <span className="text-gray-600 font-medium">
-                    Paid Date:
-                  </span>
-                  <p className="text-gray-800">
-                    {selectedEarning.paidAt}
-                  </p>
+                  <span className="text-gray-600 font-medium">Paid Date:</span>
+                  <p className="text-gray-800">{selectedEarning.paidAt}</p>
                 </div>
               )}
               <div>
@@ -882,7 +885,7 @@ const AllMoneySendToPlatform = () => {
                       </div>
                     </td>
                   )}
-                  
+
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
                       className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
