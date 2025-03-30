@@ -1,21 +1,43 @@
 import { useState, useEffect } from "react";
 import { AiOutlineEdit, AiOutlineSave, AiOutlineLoading3Quarters, AiOutlineDelete } from "react-icons/ai";
 import { toast } from "react-toastify";
+import { doc, setDoc, getDoc } from "firebase/firestore";
+import { db } from "../../../../../firebase";
 
-const WriteStory = ({ story, updateStory }) => {
+const WriteStory = () => {
   const [content, setContent] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [wordCount, setWordCount] = useState(0);
   const [initialLoaded, setInitialLoaded] = useState(false);
+  const [loading, setLoading] = useState(true);
 
+  // Fetch the story from Firebase on component mount
   useEffect(() => {
-    // Only update if we haven't loaded the story yet or if story changes externally
-    if (!initialLoaded || (story !== content && !isEditing)) {
-      setContent(story || "");
-      setInitialLoaded(true);
-    }
-  }, [story, initialLoaded, isEditing, content]);
+    const fetchStory = async () => {
+      try {
+        setLoading(true);
+        const storyRef = doc(db, "content", "story");
+        const storyDoc = await getDoc(storyRef);
+        
+        if (storyDoc.exists()) {
+          const storyData = storyDoc.data();
+          setContent(storyData.content || "");
+          setInitialLoaded(true);
+        } else {
+          setContent("");
+          setInitialLoaded(true);
+        }
+      } catch (error) {
+        console.error("Error fetching story:", error);
+        toast.error("Failed to load story content");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStory();
+  }, []);
 
   useEffect(() => {
     // Calculate word count
@@ -28,7 +50,24 @@ const WriteStory = ({ story, updateStory }) => {
   };
 
   const handleCancel = () => {
-    setContent(story || "");
+    // Reset to the last saved content
+    const fetchStory = async () => {
+      try {
+        const storyRef = doc(db, "content", "story");
+        const storyDoc = await getDoc(storyRef);
+        
+        if (storyDoc.exists()) {
+          const storyData = storyDoc.data();
+          setContent(storyData.content || "");
+        } else {
+          setContent("");
+        }
+      } catch (error) {
+        console.error("Error fetching story:", error);
+      }
+    };
+
+    fetchStory();
     setIsEditing(false);
   };
 
@@ -36,13 +75,15 @@ const WriteStory = ({ story, updateStory }) => {
     setSaving(true);
 
     try {
-      // Allow saving empty content to clear the story
-      const success = await updateStory(content);
+      // Save content to Firebase
+      const storyRef = doc(db, "content", "story");
+      await setDoc(storyRef, {
+        content: content,
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
 
-      if (success) {
-        setIsEditing(false);
-        toast.success(content.trim() ? "Story updated successfully" : "Story cleared successfully");
-      }
+      setIsEditing(false);
+      toast.success(content.trim() ? "Story updated successfully" : "Story cleared successfully");
     } catch (error) {
       console.error("Error saving story:", error);
       toast.error(`Failed to save story: ${error.message}`);
@@ -59,12 +100,16 @@ const WriteStory = ({ story, updateStory }) => {
     if (window.confirm("Are you sure you want to delete this story?")) {
       setSaving(true);
       try {
-        const success = await updateStory("");
-        if (success) {
-          setContent("");
-          setIsEditing(false);
-          toast.success("Story deleted successfully");
-        }
+        // Delete content by setting it to empty in Firebase
+        const storyRef = doc(db, "content", "story");
+        await setDoc(storyRef, {
+          content: "",
+          updatedAt: new Date().toISOString()
+        }, { merge: true });
+
+        setContent("");
+        setIsEditing(false);
+        toast.success("Story deleted successfully");
       } catch (error) {
         console.error("Error deleting story:", error);
         toast.error(`Failed to delete story: ${error.message}`);
@@ -73,6 +118,14 @@ const WriteStory = ({ story, updateStory }) => {
       }
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <AiOutlineLoading3Quarters className="animate-spin text-3xl text-blue-500" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

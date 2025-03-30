@@ -2,9 +2,10 @@ import { useState, useRef, useEffect } from "react";
 import { AiOutlineCloudUpload, AiOutlineDelete, AiOutlineEdit, AiOutlineLoading3Quarters } from "react-icons/ai";
 import { toast } from "react-toastify";
 import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage";
-import { storage } from "../../../../../firebase";
+import { doc, updateDoc, arrayUnion, arrayRemove, getDoc, setDoc } from "firebase/firestore";
+import { storage, db } from "../../../../../firebase";
 
-const UploadMembers = ({ members, updateMember, deleteMember }) => {
+const UploadMembers = () => {
   const [memberName, setMemberName] = useState("");
   const [memberTitle, setMemberTitle] = useState("");
   const [memberBio, setMemberBio] = useState("");
@@ -13,10 +14,14 @@ const UploadMembers = ({ members, updateMember, deleteMember }) => {
   const [progress, setProgress] = useState(0);
   const [editingMember, setEditingMember] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [members, setMembers] = useState([]);
   
   const fileInputRef = useRef(null);
   
   useEffect(() => {
+    // Fetch members when component mounts
+    fetchMembers();
+    
     // Reset preview when editing is canceled
     if (!editingMember) {
       setPreviewUrl(null);
@@ -24,6 +29,25 @@ const UploadMembers = ({ members, updateMember, deleteMember }) => {
       setPreviewUrl(editingMember.imageUrl);
     }
   }, [editingMember]);
+  
+  const fetchMembers = async () => {
+    try {
+      const membersRef = doc(db, "content", "members");
+      const membersDoc = await getDoc(membersRef);
+      
+      if (membersDoc.exists()) {
+        const membersData = membersDoc.data();
+        setMembers(membersData.items || []);
+      } else {
+        // Initialize the document if it doesn't exist
+        await setDoc(membersRef, { items: [] });
+        setMembers([]);
+      }
+    } catch (error) {
+      console.error("Error fetching members:", error);
+      toast.error(`Failed to load members: ${error.message}`);
+    }
+  };
   
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -88,15 +112,17 @@ const UploadMembers = ({ members, updateMember, deleteMember }) => {
     
     // If we're editing and no new file is selected, just update the text fields
     if (editingMember && !file) {
-      const success = await updateMember({
-        name: memberName,
-        title: memberTitle,
-        bio: memberBio,
-        imageUrl: editingMember.imageUrl
-      }, editingMember.id);
-      
-      if (success) {
+      try {
+        await updateMember({
+          ...editingMember,
+          name: memberName,
+          title: memberTitle,
+          bio: memberBio,
+        });
         resetForm();
+        toast.success('Member updated successfully');
+      } catch (error) {
+        toast.error(`Update failed: ${error.message}`);
       }
       return;
     }
@@ -150,6 +176,7 @@ const UploadMembers = ({ members, updateMember, deleteMember }) => {
       
       // Create/update member document
       const memberData = {
+        id: editingMember?.id || Date.now().toString(),
         name: memberName,
         title: memberTitle,
         bio: memberBio,
@@ -158,11 +185,10 @@ const UploadMembers = ({ members, updateMember, deleteMember }) => {
         updatedAt: Date.now()
       };
       
-      const success = await updateMember(memberData, editingMember?.id);
+      await updateMember(memberData);
       
-      if (success) {
-        resetForm();
-      }
+      toast.success(editingMember ? 'Member updated successfully' : 'Member added successfully');
+      resetForm();
     } catch (error) {
       console.error("Error uploading member:", error);
       toast.error(`Upload failed: ${error.message}`);
@@ -170,6 +196,41 @@ const UploadMembers = ({ members, updateMember, deleteMember }) => {
       setUploading(false);
       setProgress(0);
     }
+  };
+  
+  const updateMember = async (memberData) => {
+    const membersRef = doc(db, "content", "members");
+    
+    // Get current members
+    const membersDoc = await getDoc(membersRef);
+    
+    if (membersDoc.exists()) {
+      const currentMembers = membersDoc.data().items || [];
+      
+      if (editingMember) {
+        // Update existing member
+        const updatedMembers = currentMembers.map(member => 
+          member.id === memberData.id ? memberData : member
+        );
+        
+        await updateDoc(membersRef, {
+          items: updatedMembers
+        });
+      } else {
+        // Add new member
+        await updateDoc(membersRef, {
+          items: arrayUnion(memberData)
+        });
+      }
+    } else {
+      // Create the document with the first member
+      await setDoc(membersRef, {
+        items: [memberData]
+      });
+    }
+    
+    // Refresh members list
+    await fetchMembers();
   };
   
   const handleEdit = (member) => {
@@ -181,20 +242,34 @@ const UploadMembers = ({ members, updateMember, deleteMember }) => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
   
-  const handleDelete = async (id, imageUrl) => {
+  const handleDelete = async (member) => {
     if (!window.confirm("Are you sure you want to delete this member?")) {
       return;
     }
     
     try {
       // Delete image from storage
-      if (imageUrl) {
-        const imageRef = ref(storage, imageUrl);
-        await deleteObject(imageRef);
+      if (member.imageUrl) {
+        try {
+          const imageRef = ref(storage, member.imageUrl);
+          await deleteObject(imageRef);
+        } catch (error) {
+          console.error("Error deleting image:", error);
+          // Continue even if image deletion fails
+        }
       }
       
-      // Delete document
-      await deleteMember(id);
+      // Remove member from Firestore
+      const membersRef = doc(db, "content", "members");
+      
+      await updateDoc(membersRef, {
+        items: arrayRemove(member)
+      });
+      
+      toast.success('Member deleted successfully');
+      
+      // Refresh members list
+      await fetchMembers();
     } catch (error) {
       console.error("Error deleting member:", error);
       toast.error(`Delete failed: ${error.message}`);
@@ -405,7 +480,7 @@ const UploadMembers = ({ members, updateMember, deleteMember }) => {
                           <AiOutlineEdit size={18} />
                         </button>
                         <button
-                          onClick={() => handleDelete(member.id, member.imageUrl)}
+                          onClick={() => handleDelete(member)}
                           className="text-red-600 hover:text-red-900"
                         >
                           <AiOutlineDelete size={18} />
