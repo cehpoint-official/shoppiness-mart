@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate, useParams, Link } from "react-router-dom";
-import { IoLogOutOutline } from "react-icons/io5";
+import { useNavigate, useParams, Link, useLocation } from "react-router-dom";
+import { IoLogOutOutline, IoClose } from "react-icons/io5";
+import { HiMenuAlt2 } from "react-icons/hi";
+import { RiCoupon2Line } from "react-icons/ri";
 import "./Sidebar.scss";
 import headerLogo from "../../assets/header-logo.png";
 import iconDashboard from "../../assets/icon-dashboard.png";
@@ -11,13 +13,24 @@ import iconPOS from "../../assets/icon-pos.png";
 import iconInvoices from "../../assets/icon-invoice.png";
 import iconLogout from "../../assets/icon-logout.png";
 import { businessUserExist } from "../../../redux/reducer/businessUserReducer";
-import { RiCoupon2Line } from "react-icons/ri";
 
 const Sidebar = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Toggle mobile menu
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  // Close sidebar when route changes on mobile
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
 
   const LogoutDialog = () => {
     if (!showLogoutDialog) return null;
@@ -57,7 +70,39 @@ const Sidebar = () => {
 
   return (
     <>
-      <div className="sidebar">
+      {/* Mobile Menu Button - Only visible on small screens */}
+      {isMobileMenuOpen ? (
+        <></>
+      ) : (
+        <>
+          {" "}
+          <div className="lg:hidden fixed top-4 left-4 z-40">
+            <button
+              onClick={toggleMobileMenu}
+              className="p-2 rounded-md bg-[#048c7e] text-white"
+            >
+              <HiMenuAlt2 className="w-6 h-6" />
+            </button>
+          </div>
+        </>
+      )}
+
+      {/* Sidebar - Hidden on small screens, shown when menu is toggled */}
+      <div
+        className={`sidebar ${
+          isMobileMenuOpen ? "block  fixed top-0 left-0" : "hidden"
+        } lg:block h-full z-30`}
+      >
+        {/* Close button inside sidebar - only visible on mobile */}
+        {isMobileMenuOpen && (
+          <button
+            onClick={toggleMobileMenu}
+            className="lg:hidden absolute top-4 right-4 p-2 text-white hover:text-gray-300"
+          >
+            <IoClose className="w-6 h-6" />
+          </button>
+        )}
+
         <div className="logo">
           <Link to={`/services-dashboard/${id}/dashboard`}>
             <img src={headerLogo} alt="loading" />
@@ -95,8 +140,8 @@ const Sidebar = () => {
 
           <Link to={`/services-dashboard/${id}/coupons`}>
             <li>
-            <RiCoupon2Line className="w-5 h-5"/>
-             Generated Coupons
+              <RiCoupon2Line className="w-5 h-5" />
+              Generated Coupons
             </li>
           </Link>
 
@@ -114,13 +159,6 @@ const Sidebar = () => {
             </li>
           </Link>
 
-          {/* <Link to={`/services-dashboard/${id}/sales-record`}>
-            <li>
-              <img src={iconSales} alt="loading" />
-              Sales Record
-            </li>
-          </Link> */}
-
           <Link to={`/services-dashboard/${id}/shopinfo`}>
             <li>
               <img src={iconCustomers} alt="loading" />
@@ -134,6 +172,15 @@ const Sidebar = () => {
           </li>
         </ul>
       </div>
+
+      {/* Overlay for mobile menu - only shows when mobile menu is open */}
+      {isMobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-30 z-20 lg:hidden"
+          onClick={toggleMobileMenu}
+        ></div>
+      )}
+
       <LogoutDialog />
     </>
   );

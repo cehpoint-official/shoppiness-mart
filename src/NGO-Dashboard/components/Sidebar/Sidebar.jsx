@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import "./Sidebar.scss";
 import { IoLogOutOutline } from "react-icons/io5";
+import { HiMenuAlt2 } from "react-icons/hi";
+import { IoClose } from "react-icons/io5";
 import headerLogo from "../../assets/header-logo.png";
 import iconDashboard from "../../assets/icon-dashboard.png";
 import iconProducts from "../../assets/icon-products.png";
@@ -21,10 +23,20 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const [activeLink, setActiveLink] = useState("");
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     setActiveLink(location.pathname);
   }, [location]);
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  // Close sidebar when route changes on mobile
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
 
   const LogoutDialog = () => {
     if (!showLogoutDialog) return null;
@@ -64,7 +76,26 @@ const Sidebar = () => {
 
   return (
     <>
-      <div className="sidebar">
+      {/* Mobile Menu Button - Only visible on small screens */}
+      <div className="lg:hidden fixed top-4 left-4 z-40">
+        <button
+          onClick={toggleMobileMenu}
+          className="p-2 rounded-md bg-[#048c7e] text-white"
+        >
+          {isMobileMenuOpen ? (
+            <IoClose className="w-6 h-6" />
+          ) : (
+            <HiMenuAlt2 className="w-6 h-6 " />
+          )}
+        </button>
+      </div>
+
+      {/* Sidebar - Hidden on small screens, shown when menu is toggled */}
+      <div
+        className={`sidebar ${
+          isMobileMenuOpen ? "block  fixed top-0 left-0" : "hidden"
+        } lg:block h-full z-30`}
+      >
         <div className="logo">
           <Link to={`/ngo-dashboard/${id}/dashboard`}>
             <img src={headerLogo} alt="loading" />
@@ -176,6 +207,15 @@ const Sidebar = () => {
           </li>
         </ul>
       </div>
+
+      {/* Overlay for mobile menu - only shows when mobile menu is open */}
+      {isMobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-30 z-20 lg:hidden"
+          onClick={toggleMobileMenu}
+        ></div>
+      )}
+
       <LogoutDialog />
     </>
   );

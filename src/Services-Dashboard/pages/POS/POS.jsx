@@ -280,13 +280,13 @@ const POS = ({ onGenerateInvoice }) => {
       setCashCollected(parseFloat(value));
     }
   };
-  console.log(matchedCoupon);
+  //console.log(matchedCoupon);
 
   return (
-    <div className="flex flex-col gap-6 p-10">
-      <div className=" bg-white shadow-md rounded-xl p-6">
-        <div className="flex justify-between">
-          <div className="w-[550px]">
+    <div className="flex flex-col gap-4 p-4 sm:p-6 md:p-10 min-h-screen">
+      <div className="bg-white shadow-md rounded-xl p-4 sm:p-6 w-full">
+        <div className="flex flex-col md:flex-row justify-between gap-4">
+          <div className="w-full md:w-[550px]">
             <h2 className="text-md mb-2">Verify coupon</h2>
             <div className="relative w-full">
               <input
@@ -309,7 +309,7 @@ const POS = ({ onGenerateInvoice }) => {
               </button>
             </div>
           </div>
-          <div className="bg-[#00639A26] text-[#0E2744] w-1/2 p-4">
+          <div className="bg-[#00639A26] text-[#0E2744] w-full md:w-1/2 p-4">
             {matchedCoupon ? (
               <p>{getOfferText(matchedCoupon)}</p>
             ) : (
@@ -322,85 +322,86 @@ const POS = ({ onGenerateInvoice }) => {
           </div>
         </div>
 
-        <form className="space-y-4 mt-10">
-          <div className="grid grid-cols-3 gap-4 text-black font-medium">
+        <form className="space-y-4 mt-6 sm:mt-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-black font-medium">
             <div className="flex flex-col gap-3">
-              <span className="">Customer Name:</span>
+              <span>Customer Name:</span>
               <input
                 type="text"
                 required
                 name="customerName"
                 value={customerInfo.customerName}
                 onChange={handleCustomerInfoChange}
-                className="bg-gray-50 rounded px-2 py-2"
+                className="bg-gray-50 rounded px-2 py-2 w-full"
               />
             </div>
             <div className="flex flex-col gap-3">
-              <span className="font-medium">Phone No.:</span>
+              <span>Phone No.:</span>
               <input
                 type="text"
                 required
                 name="phoneNumber"
                 value={customerInfo.phoneNumber}
                 onChange={handleCustomerInfoChange}
-                className="bg-gray-50 rounded px-2 py-2"
+                className="bg-gray-50 rounded px-2 py-2 w-full"
               />
             </div>
             <div className="flex flex-col gap-3">
-              <span className="font-medium">Email:</span>
+              <span>Email:</span>
               <input
                 type="text"
                 name="email"
                 required
                 value={customerInfo.email}
                 onChange={handleCustomerInfoChange}
-                className="bg-gray-50 rounded px-2 py-2"
+                className="bg-gray-50 rounded px-2 py-2 w-full"
               />
             </div>
           </div>
           <div className="mt-6 space-y-4">
-            <div className="grid grid-cols-3 gap-4 text-black font-medium">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-black font-medium">
               <div className="flex flex-col gap-3">
-                <span className="font-medium">Biller Name:</span>
+                <span>Biller Name:</span>
                 <input
                   type="text"
                   required
                   name="billerName"
                   value={customerInfo.billerName}
                   onChange={handleCustomerInfoChange}
-                  className="bg-gray-50 rounded px-2 py-2"
+                  className="bg-gray-50 rounded px-2 py-2 w-full"
                 />
               </div>
               <div className="flex flex-col gap-3">
-                <span className="font-medium">Billing Date:</span>
+                <span>Billing Date:</span>
                 <input
                   type="date"
                   name="billingDate"
                   value={customerInfo.billingDate}
                   onChange={handleCustomerInfoChange}
-                  className="bg-gray-50 rounded px-2 py-2"
+                  className="bg-gray-50 rounded px-2 py-2 w-full"
                 />
               </div>
               <div className="flex flex-col gap-3">
-                <span className="font-medium">Due Date:</span>
+                <span>Due Date:</span>
                 <input
                   type="date"
                   name="dueDate"
                   required
                   value={customerInfo.dueDate}
                   onChange={handleCustomerInfoChange}
-                  className="bg-gray-50 rounded px-2 py-2"
+                  className="bg-gray-50 rounded px-2 py-2 w-full"
                 />
               </div>
             </div>
           </div>
         </form>
       </div>
-      <div className=" flex gap-4 bg-white shadow-md rounded-xl p-6">
-        <div className="bg-gray-50 w-[500px] p-6 rounded-lg shadow-md ">
-          <h2 className="text-2xl font-bold mb-4">Add Product</h2>
-          <form>
-            <div className="relative mb-4">
+
+      <div className="flex flex-col lg:flex-row gap-4 bg-white shadow-md rounded-xl p-4 sm:p-6">
+        <div className="bg-gray-50 w-full lg:w-[500px] p-4 sm:p-6 rounded-lg shadow-md">
+          <h2 className="text-xl sm:text-2xl font-bold mb-4">Add Product</h2>
+          <form className="space-y-4">
+            <div className="relative">
               <label
                 htmlFor="productName"
                 className="block text-gray-700 font-medium mb-2"
@@ -414,7 +415,7 @@ const POS = ({ onGenerateInvoice }) => {
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
                   setIsDropdownOpen(true);
-                  setSelectedProduct(null); // Clear selected product when user types
+                  setSelectedProduct(null);
                 }}
                 onFocus={() => setIsDropdownOpen(true)}
                 className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -425,7 +426,7 @@ const POS = ({ onGenerateInvoice }) => {
                   {filteredProducts.map((product) => (
                     <div
                       key={product.id}
-                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
                       onClick={() => handleProductSelect(product)}
                     >
                       {product.name}
@@ -434,38 +435,38 @@ const POS = ({ onGenerateInvoice }) => {
                 </div>
               )}
             </div>
-            <div className="mb-4">
+            <div>
               <label
                 htmlFor="quantity"
                 className="block text-gray-700 font-medium mb-2"
               >
                 Quantity*
               </label>
-              <div className="mb-4 w-full flex justify-between bg-white items-center">
+              <div className="flex items-center justify-between bg-white">
                 <button
                   type="button"
                   onClick={() =>
                     setProductQuantity(Math.max(1, productQuantity - 1))
                   }
-                  className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md mr-2"
+                  className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-3 sm:px-4 rounded-md"
                 >
                   -
                 </button>
-                <span className="mx-4 text-gray-700 font-medium">
+                <span className="mx-2 sm:mx-4 text-gray-700 font-medium">
                   {productQuantity}X
                 </span>
                 <button
                   type="button"
                   onClick={() => setProductQuantity(productQuantity + 1)}
-                  className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md ml-2"
+                  className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-3 sm:px-4 rounded-md"
                 >
                   +
                 </button>
               </div>
             </div>
-            <div className="mb-4">
+            <div>
               <label
-                htmlFor="price"
+                htmlFor="discountType"
                 className="block text-gray-700 font-medium mb-2"
               >
                 Price*
@@ -479,7 +480,7 @@ const POS = ({ onGenerateInvoice }) => {
                 placeholder="Enter product price"
               />
             </div>
-            <div className="mb-4">
+            <div>
               <label
                 htmlFor="discountType"
                 className="block text-gray-700 font-medium mb-2"
@@ -496,7 +497,7 @@ const POS = ({ onGenerateInvoice }) => {
                 <option value="amount">Amount</option>
               </select>
             </div>
-            <div className="mb-4">
+            <div>
               <label
                 htmlFor="discount"
                 className="block text-gray-700 font-medium mb-2"
@@ -515,42 +516,50 @@ const POS = ({ onGenerateInvoice }) => {
             <button
               type="button"
               onClick={handleAddProduct}
-              className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md"
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md"
             >
               Add
             </button>
           </form>
         </div>
-        <div className="max-w-5xl mx-auto p-6 bg-white">
-          <h1 className="text-xl font-bold mb-6">SELECTED PRODUCTS</h1>
 
-          {/* Products Table */}
+        <div className="w-full p-4 sm:p-6">
+          <h1 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6">
+            SELECTED PRODUCTS
+          </h1>
+
           <div className="w-full overflow-x-auto">
-            <table className="w-full min-w-[800px]">
+            <table className="w-full text-sm sm:text-base">
               <thead>
                 <tr className="border-b">
-                  <th className="text-left py-4 font-semibold">PRODUCT</th>
-                  <th className="text-left py-4 font-semibold">PRICE</th>
-                  <th className="text-left py-4 font-semibold">QUANTITY</th>
-                  <th className="text-left py-4 font-semibold">DISCOUNT</th>
-                  <th className="text-left py-4 font-semibold">SUBTOTAL</th>
-                  <th className="text-left py-4 font-semibold">DELETE</th>
+                  <th className="text-left py-2 sm:py-4 font-semibold">
+                    PRODUCT
+                  </th>
+                  <th className="text-left py-2 sm:py-4 font-semibold">
+                    PRICE
+                  </th>
+                  <th className="text-left py-2 sm:py-4 font-semibold">QTY</th>
+                  <th className="text-left py-2 sm:py-4 font-semibold">DISC</th>
+                  <th className="text-left py-2 sm:py-4 font-semibold">
+                    SUBTOTAL
+                  </th>
+                  <th className="text-left py-2 sm:py-4 font-semibold"></th>
                 </tr>
               </thead>
               <tbody>
                 {products.map((product) => (
                   <tr key={product.id} className="border-b">
-                    <td className="py-4">{product.name}</td>
-                    <td className="py-4">Rs. {product.price}</td>
-                    <td className="py-4">{product.quantity}X</td>
-                    <td className="py-4">{product.discount}%</td>
-                    <td className="py-4">Rs. {product.subtotal}</td>
-                    <td className="py-4">
+                    <td className="py-2 sm:py-4">{product.name}</td>
+                    <td className="py-2 sm:py-4">Rs. {product.price}</td>
+                    <td className="py-2 sm:py-4">{product.quantity}X</td>
+                    <td className="py-2 sm:py-4">{product.discount}%</td>
+                    <td className="py-2 sm:py-4">Rs. {product.subtotal}</td>
+                    <td className="py-2 sm:py-4">
                       <button
                         onClick={() => handleDeleteProduct(product.id)}
                         className="text-red-500 hover:text-red-700"
                       >
-                        <RxCross2 size={20} />
+                        <RxCross2 size={16} className="sm:size-20" />
                       </button>
                     </td>
                   </tr>
@@ -559,23 +568,27 @@ const POS = ({ onGenerateInvoice }) => {
             </table>
           </div>
 
-          {/* Summary Section */}
-          <div className="mt-8 bg-gray-50 p-6 rounded-lg">
-            <div className="grid grid-cols-2 md:grid-cols-6 gap-6">
+          <div className="mt-6 sm:mt-8 bg-gray-50 p-4 sm:p-6 rounded-lg">
+            <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-6">
               <div>
-                <p className="text-gray-600 mb-1">Total Items</p>
-                <p className="text-2xl font-semibold">{totalItems}</p>
+                <p className="text-gray-600 mb-1 text-sm sm:text-base">
+                  Total Items
+                </p>
+                <p className="text-lg sm:text-2xl font-semibold">
+                  {totalItems}
+                </p>
               </div>
               <div>
-                <p className="text-gray-600 mb-1">Total Price:</p>
-                <p className="text-2xl font-semibold">
+                <p className="text-gray-600 mb-1 text-sm sm:text-base">
+                  Total Price
+                </p>
+                <p className="text-lg sm:text-2xl font-semibold">
                   Rs. {totalPrice.toFixed(1)}
                 </p>
               </div>
               <div>
                 <div className="flex flex-col items-center gap-2">
-                  <p className="text-gray-600">TAX:%</p>
-                  {/* FIX: Updated input field handling */}
+                  <p className="text-gray-600 text-sm sm:text-base">TAX:%</p>
                   <input
                     type="number"
                     value={
@@ -588,14 +601,15 @@ const POS = ({ onGenerateInvoice }) => {
                     id="tax-input"
                     onChange={handleTaxPercentageChange}
                     onFocus={(e) => e.target.value === "0" && e.target.select()}
-                    className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-300 rounded-md py-1 sm:py-2 px-2 sm:px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
                   />
                 </div>
               </div>
               <div>
                 <div className="flex flex-col gap-2">
-                  <p className="text-gray-600">Cash collected:</p>
-                  {/* FIX: Updated input field handling */}
+                  <p className="text-gray-600 text-sm sm:text-base">
+                    Cash collected
+                  </p>
                   <input
                     type="number"
                     value={
@@ -608,30 +622,29 @@ const POS = ({ onGenerateInvoice }) => {
                     id="cash-input"
                     onChange={handleCashCollectedChange}
                     onFocus={(e) => e.target.value === "0" && e.target.select()}
-                    className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-300 rounded-md py-1 sm:py-2 px-2 sm:px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
                   />
                 </div>
               </div>
-              <div className="flex flex-col items-center gap-2">
-                <p className="text-lg font-semibold">Grand Total</p>
-                <p className="text-2xl font-bold text-blue-600">
+              <div>
+                <p className="text-sm sm:text-lg font-semibold">Grand Total</p>
+                <p className="text-lg sm:text-2xl font-bold text-blue-600">
                   Rs. {grandTotal.toFixed(1)}
                 </p>
               </div>
-              <div className="flex flex-col items-center gap-2">
-                <p className="text-lg font-semibold">Due Amount</p>
-                <p className="text-2xl font-bold text-red-600">
+              <div>
+                <p className="text-sm sm:text-lg font-semibold">Due Amount</p>
+                <p className="text-lg sm:text-2xl font-bold text-red-600">
                   Rs. {dueAmount.toFixed(1)}
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Generate Invoice Button */}
           <button
             onClick={handleGenerateInvoice}
             disabled={!isFormValid}
-            className={`w-full mt-6 py-4 rounded-lg transition-colors ${
+            className={`w-full mt-4 sm:mt-6 py-3 sm:py-4 rounded-lg transition-colors text-sm sm:text-base ${
               isFormValid
                 ? "bg-blue-500 hover:bg-blue-600 text-white"
                 : "bg-gray-300 cursor-not-allowed text-gray-500"
