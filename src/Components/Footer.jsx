@@ -1,7 +1,41 @@
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../firebase";
 import ShoppingBag from "../assets/ShoppingBag.png";
 import Backimg13 from "../assets/backimg13.png";
+
 const Footer = () => {
+  const [contactInfo, setContactInfo] = useState({
+    description: "Shoppinessmart is a platform that turns your everyday online shopping into a force for good. By simply shopping through our website or app, you can support your favorite charities without spending a penny extra.",
+    phone: "+91 6368900045",
+    email: "email@gmail.com"
+  });
+
+  useEffect(() => {
+    const fetchContactInfo = async () => {
+      try {
+        const infoDocRef = doc(db, "contacts", "info");
+        const infoDocSnap = await getDoc(infoDocRef);
+
+        if (infoDocSnap.exists()) {
+          const data = infoDocSnap.data();
+          setContactInfo({
+            description: data.description || contactInfo.description,
+            phone: data.phone || contactInfo.phone,
+            email: data.email || contactInfo.email
+          });
+        } else {
+          console.log("No contact info document found!");
+        }
+      } catch (error) {
+        console.error("Error fetching contact info:", error);
+      }
+    };
+
+    fetchContactInfo();
+  }, []);
+
   return (
     <div>
       <div className=" mx-auto bg-[#049D8E] py-20 z-10  mt-5 overflow-hidden lg:justify-center items-center ">
@@ -14,18 +48,15 @@ const Footer = () => {
                 <img src={ShoppingBag} alt="" className="" />
               </a>
               <p className="mb-7 text-lg text-white">
-                Shoppinessmart is a platform that turns your everyday online
-                shopping into a force for good. By simply shopping through our
-                website or app, you can support your favorite charities without
-                spending a penny extra.
+                {contactInfo.description}
               </p>
               <p className="flex items-center text-lg  text-white">
-                <span className="mr-3 text-[#FFD705]">Call Us</span>
-                <span> +91 6368900045</span>
+                <span className="mr-3 text-[#FFD705]">Call Us:</span>
+                <span>+91 {contactInfo.phone}</span>
               </p>
               <p className="flex items-center text-lg mt-4  text-white">
-                <span className="mr-3 text-[#FFD705]">Email Us</span>
-                <span> email@gmail.com</span>
+                <span className="mr-3 text-[#FFD705]">Email Us:</span>
+                <span>{contactInfo.email}</span>
               </p>
             </div>
           </div>
@@ -121,7 +152,10 @@ const Footer = () => {
 
       <div className="bg-[#EDF6FB] mt-3 w-full md:px-10 lg:justify-between md:p-5 py-5 md:flex-row">
         <div className="flex justify-between ">
-          <p className="text-[#048376] text-sm">© 2024 UX/UI Team</p>
+          <p className="text-[#048376] text-sm">
+            © {new Date().getFullYear()} UX/UI Team
+          </p>
+
           <div className="text-[#048376] flex md:gap-6">
             <i className="bi bi-instagram"></i>
             <i className="bi bi-twitter ml-2"></i>

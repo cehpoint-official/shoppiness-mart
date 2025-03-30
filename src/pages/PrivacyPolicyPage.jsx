@@ -1,64 +1,96 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../firebase";
 import Loader from "../Components/Loader/Loader";
+
 const PrivacyPolicyPage = () => {
   const [loading, setLoading] = useState(true);
-  setInterval(() => {
-    setLoading(false);
-  }, [3000]);
-  const policies = [
-    {
-      title: "Privacy-policiy-1",
-      content:
-        "When you use our services, you’re trusting us with your information. We understand that this is a big responsibility and we work hard to protect your information and put you in control.The information we collect, and how that information is used, depends on how you use our services and how you manage your privacy controls.",
-    },
-    {
-      title: "Privacy-policiy-2",
-      content:
-        "We collect information to provide better services to all our users – from figuring out basic stuff such as which language you speak, to more complex things like which ads you’ll find most useful, the people who matter most to you online or which YouTube videos you might like. The information we collect, and how that information is used, depends on how you use our services and how you manage your privacy controls.",
-    },
-    {
-      title: "Privacy-policiy-3",
-      content:
-        "When you create a Google Account, you provide us with personal information that includes your name and a password. You can also choose to add a phone number or payment information to your account. Even if you aren’t signed in to a Google Account, you might choose to provide us with information — like an email address to communicate with Google or receive updates about our services.",
-    },
-  ];
+  const [policies, setPolicies] = useState([]);
+
+  // Fetch policies from Firebase
+  useEffect(() => {
+    const fetchPolicies = async () => {
+      try {
+        const policyCollection = collection(db, "privacyPolicies");
+        const policySnapshot = await getDocs(policyCollection);
+        const policyList = policySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        
+        // Sort policies by createdAt in ascending order (oldest first)
+        const sortedPolicies = policyList.sort((a, b) => {
+          return new Date(a.createdAt) - new Date(b.createdAt);
+        });
+        
+        setPolicies(sortedPolicies);
+      } catch (error) {
+        console.error("Error fetching policies:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPolicies();
+  }, []);
+
   return loading ? (
     <Loader />
   ) : (
-    <div className="mt-10">
-      <div>
-        <p className="text-center font-medium text-3xl my-10">Privacy Policy</p>
-      </div>
-      {/* policies list and disclaimer */}
-      <div className="flex justify-center gap-10 flex-wrap">
-        {/* list */}
-        <div style={{ boxShadow: "rgba(0, 0, 0, 0.16) 0px 1px 4px" }}>
-          <h1 className="px-14 py-2 font-semibold text-lg text-center">
-            Policies
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-16 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto"> {/* Increased from max-w-3xl to max-w-5xl */}
+        <div className="text-center mb-16"> {/* Increased from mb-12 to mb-16 */}
+          <h1 className="text-5xl font-extrabold text-gray-900 tracking-tight sm:text-6xl mb-6"> {/* Increased from text-4xl/text-5xl to text-5xl/text-6xl */}
+            Privacy Policy
           </h1>
-          {policies.map((item, index) => (
-            <div key={index}>
-              <a href={`#${item?.title}`}>
-                <p className="px-14 py-1 my-2  hover:bg-[#EDF6FB]">
-                  {item.title}
-                </p>
-              </a>
-            </div>
-          ))}
+          <p className="max-w-3xl mx-auto text-2xl text-gray-500"> {/* Increased from max-w-2xl/text-xl to max-w-3xl/text-2xl */}
+            Our commitment to protecting your personal information
+          </p>
         </div>
 
-        {/* disclaimer */}
-        <div
-          className="md:w-[70%] p-10"
-          style={{ boxShadow: "rgba(0, 0, 0, 0.16) 0px 1px 4px" }}
-        >
-          {policies.map((item, index) => (
-            <div id={`${item.title}`} key={index}>
-              <h1 className="text-2xl">{item.title}</h1>
-              <p className="my-4">{item.content}</p>
-            </div>
-          ))}
-        </div>
+        {policies.length === 0 ? (
+          <div className="text-center py-16 bg-white rounded-xl shadow-md"> {/* Increased from py-12 and shadow-sm to py-16 and shadow-md */}
+            <p className="text-gray-500 text-xl">No privacy policies found.</p> {/* Increased from text-lg to text-xl */}
+          </div>
+        ) : (
+          <div className="bg-white rounded-xl shadow-md overflow-hidden"> {/* Increased from rounded-lg and shadow-sm to rounded-xl and shadow-md */}
+            {policies.map((policy, index) => (
+              <div 
+                key={policy.id} 
+                id={policy.id}
+                className={`${index !== 0 ? 'border-t border-gray-100' : ''}`}
+              >
+                <div className="p-8 sm:p-12">
+                  <h2 className="text-3xl font-bold text-gray-900 mb-8 flex items-center">
+                    <span className="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-blue-100 text-blue-800 rounded-full mr-5 font-bold text-2xl">
+                      {index + 1}
+                    </span>
+                    {policy.title}
+                  </h2>
+                  <div 
+                    className="text-lg text-justify font-medium max-w-none text-gray-700"
+                    dangerouslySetInnerHTML={{ 
+                      __html: policy.content
+                        .replace(/\n\n/g, '</p><p>')
+                        .replace(/\n/g, '<br>')
+                        .replace(/^(.+)/, '<p>$1</p>')
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Footer with additional information */}
+        {/* <div className="mt-16 text-center">
+          <p className="text-base text-gray-500">
+            Last updated: {policies.length > 0 ? new Date(policies[policies.length - 1].updatedAt || policies[policies.length - 1].createdAt).toLocaleDateString() : "-"}
+          </p>
+          <p className="text-base text-gray-500 mt-3">
+            If you have any questions about our privacy policies, please contact us.
+          </p>
+        </div>*/}
       </div>
     </div>
   );

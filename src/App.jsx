@@ -105,6 +105,7 @@ const CauseForm = lazy(() => import("./pages/CauseForm/CauseForm"));
 const ContactUs = lazy(() => import("./pages/ContactUs"));
 const AboutUs = lazy(() => import("./pages/AboutUs"));
 const Blogs = lazy(() => import("./pages/Blogs"));
+const PrivacyPolicyPage = lazy(() => import("./pages/PrivacyPolicyPage"));
 const UserDashboard = lazy(() => import("./pages/UserDashboard/UserDashBoard"));
 const OnlineShop = lazy(() => import("./pages/OnlineShop"));
 const OfflineShop = lazy(() => import("./pages/OfflineShop"));
@@ -225,6 +226,7 @@ const router = createBrowserRouter([
           { path: "/contact", element: <ContactUs /> },
           { path: "/about", element: <AboutUs /> },
           { path: "/blogs", element: <Blogs /> },
+          { path: "/privacy-policy", element: <PrivacyPolicyPage/> },
           { path: "/register-business", element: <Business /> },
           { path: "/register-cause", element: <Cause /> },
           { path: "/support", element: <SupportACause /> },

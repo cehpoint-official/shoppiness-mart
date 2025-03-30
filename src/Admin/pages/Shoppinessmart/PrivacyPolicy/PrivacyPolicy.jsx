@@ -20,7 +20,13 @@ const PrivacyPolicy = () => {
         id: doc.id,
         ...doc.data()
       }));
-      setPolicies(policyList);
+      
+      // Sort policies by createdAt in ascending order (oldest first)
+      const sortedPolicies = policyList.sort((a, b) => {
+        return new Date(a.createdAt) - new Date(b.createdAt);
+      });
+      
+      setPolicies(sortedPolicies);
     } catch (error) {
       console.error("Error fetching policies:", error);
       toast.error("Failed to load policies");

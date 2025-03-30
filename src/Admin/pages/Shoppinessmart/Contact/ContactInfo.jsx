@@ -13,13 +13,14 @@ import {
 } from "firebase/firestore";
 import { db } from "../../../../../firebase";
 import ContactMessage from "./ContactMessage";
-import { toast } from "react-toastify"; // For notifications (optional)
+import  toast  from "react-hot-toast";
 
 const ContactInfo = () => {
   const [selectedContact, setSelectedContact] = useState(null);
   const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sortOrder, setSortOrder] = useState("newest");
+  const [infoDocId, setInfoDocId] = useState(null);
   
   // Contact info state
   const [contactInfo, setContactInfo] = useState({
@@ -32,30 +33,35 @@ const ContactInfo = () => {
   // Edit states
   const [editingField, setEditingField] = useState(null);
   const [editValue, setEditValue] = useState("");
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   // Setup initial database structure if needed
   useEffect(() => {
     const setupDatabase = async () => {
       try {
-        // Check if organizationInfo exists
-        const orgInfoSnapshot = await getDocs(collection(db, "organizationInfo"));
+        // Check if info document exists in contacts collection
+        const infoQuerySnapshot = await getDocs(collection(db, "contacts"));
+        let infoDoc = infoQuerySnapshot.docs.find(doc => doc.id === "info");
         
-        // If organizationInfo doesn't exist, create it
-        // if (orgInfoSnapshot.empty) {
-        //   await addDoc(collection(db, "organizationInfo"), {
-        //     email: "email@gmail.com",
-        //     phone: "9578288298",
-        //     location: "Lorem ipsum dolor sit amet consecteturvoluptrecusandae impedit Kolkata. Sahanagar Kolkata; 700026",
-        //     description: "Lorem ipsum dolor sit amet consecteturvoluptrecusandae impeditLorem ipsum dolor sit am",
-        //     createdAt: serverTimestamp(),
-        //     updatedAt: serverTimestamp()
-        //   });
-        //   console.log("Created organizationInfo collection");
-        // }
+        // If info document doesn't exist, create it
+        if (!infoDoc) {
+          await setDoc(doc(db, "contacts", "info"), {
+            email: "email@gmail.com",
+            phone: "9578288298",
+            location: "Lorem ipsum dolor sit amet consecteturvoluptrecusandae impedit Kolkata. Sahanagar Kolkata; 700026",
+            description: "Lorem ipsum dolor sit amet consecteturvoluptrecusandae impeditLorem ipsum dolor sit am",
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp()
+          });
+          setInfoDocId("info");
+          console.log("Created info document in contacts collection");
+        } else {
+          setInfoDocId("info");
+        }
         
         // Initialize contacts collection with sample data if it doesn't exist
         const contactsSnapshot = await getDocs(collection(db, "contacts"));
-        if (contactsSnapshot.empty) {
+        if (contactsSnapshot.docs.length <= 1) {  // Only the info document exists
           await addDoc(collection(db, "contacts"), {
             name: "Sauhardya Chakraborty",
             email: "sauhardya@gmail.com",
@@ -94,12 +100,14 @@ const ContactInfo = () => {
         
         // Set up real-time listener
         const unsubscribe = onSnapshot(q, (snapshot) => {
-          const contactsData = snapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data(),
-            // Handle timestamps that might be null or undefined
-            timestamp: doc.data().timestamp || { toDate: () => new Date() }
-          }));
+          const contactsData = snapshot.docs
+            .filter(doc => doc.id !== "info") // Exclude the info document
+            .map(doc => ({
+              id: doc.id,
+              ...doc.data(),
+              // Handle timestamps that might be null or undefined
+              timestamp: doc.data().timestamp || { toDate: () => new Date() }
+            }));
           setContacts(contactsData);
           setLoading(false);
         }, (error) => {
@@ -116,31 +124,45 @@ const ContactInfo = () => {
       }
     };
 
-    // Fetch organization info
-    const fetchOrgInfo = async () => {
+    // Fetch contact info from the "info" document
+    const fetchContactInfo = async () => {
       try {
-        const orgSnapshot = await getDocs(collection(db, "organizationInfo"));
-        if (!orgSnapshot.empty) {
-          const orgData = orgSnapshot.docs[0].data();
-          setContactInfo({
-            email: orgData.email || "",
-            phone: orgData.phone || "",
-            location: orgData.location || "",
-            description: orgData.description || ""
-          });
-        }
+        const infoDocRef = doc(db, "contacts", "info");
+        const unsubscribe = onSnapshot(infoDocRef, (docSnapshot) => {
+          if (docSnapshot.exists()) {
+            const infoData = docSnapshot.data();
+            setContactInfo({
+              email: infoData.email || "",
+              phone: infoData.phone || "",
+              location: infoData.location || "",
+              description: infoData.description || ""
+            });
+            setInfoDocId("info");
+          }
+        }, (error) => {
+          console.error("Error in info onSnapshot:", error);
+          toast.error("Failed to load contact information");
+        });
+        
+        return unsubscribe;
       } catch (error) {
-        console.error("Error fetching organization info:", error);
-        toast.error("Failed to load organization information");
+        console.error("Error fetching contact info:", error);
+        toast.error("Failed to load contact information");
       }
     };
 
     fetchContacts();
-    fetchOrgInfo();
+    fetchContactInfo();
   }, [sortOrder]);
 
-  // Handle updating organization info
-  const updateOrgInfo = async (field) => {
+  // Handle field change
+  const handleFieldChange = (field, value) => {
+    setEditValue(value);
+    setHasUnsavedChanges(true);
+  };
+
+  // Handle updating contact info field
+  const updateContactInfoField = async (field) => {
     try {
       setEditingField(null);
       
@@ -162,9 +184,8 @@ const ContactInfo = () => {
       });
       
       // Update in Firebase
-      const orgDocsSnapshot = await getDocs(collection(db, "organizationInfo"));
-      if (!orgDocsSnapshot.empty) {
-        const docRef = doc(db, "organizationInfo", orgDocsSnapshot.docs[0].id);
+      if (infoDocId) {
+        const docRef = doc(db, "contacts", infoDocId);
         await updateDoc(docRef, {
           [field]: editValue,
           updatedAt: serverTimestamp()
@@ -174,6 +195,34 @@ const ContactInfo = () => {
     } catch (error) {
       console.error(`Error updating ${field}:`, error);
       toast.error(`Failed to update ${field}`);
+    }
+  };
+
+  // Save all contact info at once
+  const saveAllContactInfo = async () => {
+    try {
+      if (infoDocId) {
+        const docRef = doc(db, "contacts", infoDocId);
+        await updateDoc(docRef, {
+          ...contactInfo,
+          updatedAt: serverTimestamp()
+        });
+        setHasUnsavedChanges(false);
+        toast.success("Contact information saved successfully");
+      } else {
+        // Create new info document if it doesn't exist
+        await setDoc(doc(db, "contacts", "info"), {
+          ...contactInfo,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        });
+        setInfoDocId("info");
+        setHasUnsavedChanges(false);
+        toast.success("Contact information created successfully");
+      }
+    } catch (error) {
+      console.error("Error saving contact information:", error);
+      toast.error("Failed to save contact information");
     }
   };
 
@@ -237,7 +286,9 @@ const ContactInfo = () => {
           <h1 className="text-2xl font-bold mb-6">Contact Info</h1>
           <div className="flex flex-col md:flex-row gap-6">
             <div className="p-6 bg-white rounded-lg shadow-md w-full md:w-1/2">
-              <h2 className="text-xl font-bold mb-4">Edit Contact Info</h2>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold">Edit Contact Info</h2>
+              </div>
               
               {/* Email Field */}
               <div className="mb-4">
@@ -248,11 +299,15 @@ const ContactInfo = () => {
                       type="email"
                       className="w-full px-3 py-2 border rounded-md"
                       value={editValue}
-                      onChange={(e) => setEditValue(e.target.value)}
+                      onChange={(e) => handleFieldChange("email", e.target.value)}
                     />
                     <button 
                       className="ml-2 bg-green-500 text-white px-3 py-1 rounded-md"
-                      onClick={() => updateOrgInfo("email")}
+                      onClick={() => {
+                        updateContactInfoField("email");
+                        setHasUnsavedChanges(true);
+                        setContactInfo({...contactInfo, email: editValue});
+                      }}
                     >
                       Save
                     </button>
@@ -287,11 +342,15 @@ const ContactInfo = () => {
                       type="text"
                       className="w-full px-3 py-2 border rounded-md"
                       value={editValue}
-                      onChange={(e) => setEditValue(e.target.value)}
+                      onChange={(e) => handleFieldChange("phone", e.target.value)}
                     />
                     <button 
                       className="ml-2 bg-green-500 text-white px-3 py-1 rounded-md"
-                      onClick={() => updateOrgInfo("phone")}
+                      onClick={() => {
+                        updateContactInfoField("phone");
+                        setHasUnsavedChanges(true);
+                        setContactInfo({...contactInfo, phone: editValue});
+                      }}
                     >
                       Save
                     </button>
@@ -325,13 +384,17 @@ const ContactInfo = () => {
                     <textarea
                       className="w-full px-3 py-2 border rounded-md"
                       value={editValue}
-                      onChange={(e) => setEditValue(e.target.value)}
+                      onChange={(e) => handleFieldChange("location", e.target.value)}
                       rows={3}
                     />
                     <div className="flex flex-col ml-2">
                       <button 
                         className="bg-green-500 text-white px-3 py-1 rounded-md mb-2"
-                        onClick={() => updateOrgInfo("location")}
+                        onClick={() => {
+                          updateContactInfoField("location");
+                          setHasUnsavedChanges(true);
+                          setContactInfo({...contactInfo, location: editValue});
+                        }}
                       >
                         Save
                       </button>
@@ -366,13 +429,17 @@ const ContactInfo = () => {
                     <textarea
                       className="w-full px-3 py-2 border rounded-md"
                       value={editValue}
-                      onChange={(e) => setEditValue(e.target.value)}
+                      onChange={(e) => handleFieldChange("description", e.target.value)}
                       rows={3}
                     />
                     <div className="flex flex-col ml-2">
                       <button 
                         className="bg-green-500 text-white px-3 py-1 rounded-md mb-2"
-                        onClick={() => updateOrgInfo("description")}
+                        onClick={() => {
+                          updateContactInfoField("description");
+                          setHasUnsavedChanges(true);
+                          setContactInfo({...contactInfo, description: editValue});
+                        }}
                       >
                         Save
                       </button>

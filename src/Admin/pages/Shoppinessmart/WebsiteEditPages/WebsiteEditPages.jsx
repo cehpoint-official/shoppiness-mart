@@ -5,7 +5,7 @@ import UploadVideo from "./UploadVideo";
 import UploadMembers from "./UploadMembers";
 import WriteStory from "./WriteStory";
 import { db } from "../../../../../firebase";
-import { collection, getDocs, doc, setDoc, deleteDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
 
 const WebsiteEditPages = () => {
@@ -29,28 +29,32 @@ const WebsiteEditPages = () => {
       try {
         setLoading(true);
         
-        // Create collections if they don't exist
-        const collections = ['banners', 'videos', 'members', 'content'];
-        const data = {};
+        // Fetch banners from content/banners document
+        const bannersDocRef = doc(db, 'content', 'banners');
+        const bannersDoc = await getDoc(bannersDocRef);
+        const bannersData = bannersDoc.exists() ? bannersDoc.data().items || [] : [];
         
-        for (const collectionName of collections) {
-          const collectionRef = collection(db, collectionName);
-          const snapshot = await getDocs(collectionRef);
-          
-          if (collectionName === 'content') {
-            // Handle special case for story content
-            const storyDoc = snapshot.docs.find(doc => doc.id === 'story');
-            data.story = storyDoc ? storyDoc.data().content : "";
-          } else {
-            // Handle media collections
-            data[collectionName] = snapshot.docs.map(doc => ({
-              id: doc.id,
-              ...doc.data()
-            }));
-          }
-        }
+        // Fetch videos from content/videos document
+        const videosDocRef = doc(db, 'content', 'videos');
+        const videosDoc = await getDoc(videosDocRef);
+        const videosData = videosDoc.exists() ? videosDoc.data().items || [] : [];
         
-        setPageData(data);
+        // Fetch story content from content/story document
+        const storyDocRef = doc(db, 'content', 'story');
+        const storyDoc = await getDoc(storyDocRef);
+        const storyContent = storyDoc.exists() ? storyDoc.data().content : "";
+        
+        // Fetch members from content/members document
+        const membersDocRef = doc(db, 'content', 'members');
+        const membersDoc = await getDoc(membersDocRef);
+        const membersData = membersDoc.exists() ? membersDoc.data().items || [] : [];
+        
+        setPageData({
+          banners: bannersData,
+          videos: videosData,
+          members: membersData,
+          story: storyContent
+        });
       } catch (error) {
         console.error("Error fetching website data:", error);
         toast.error("Failed to load website data");
@@ -77,52 +81,91 @@ const WebsiteEditPages = () => {
     setSelectedComponent(null);
   };
 
-  // Common function to update data that all components can use
-  const updatePageData = async (collectionName, data, id = null) => {
+  // Common function to update array-based content (banners, videos, members)
+  const updateArrayContent = async (contentType, data, id = null) => {
     try {
       const itemId = id || `${Date.now()}`;
-      const docRef = doc(db, collectionName, itemId);
-      await setDoc(docRef, data);
-
-      const updatedData = { id: itemId, ...data };
+      const contentDocRef = doc(db, 'content', contentType);
       
-      // Update local state to reflect changes
-      if (collectionName === 'content') {
-        setPageData(prev => ({
-          ...prev,
-          story: data.content
-        }));
+      // Get current items
+      const contentDoc = await getDoc(contentDocRef);
+      const currentItems = contentDoc.exists() ? contentDoc.data().items || [] : [];
+      
+      let updatedItems;
+      if (id) {
+        // Update existing item
+        updatedItems = currentItems.map(item => 
+          item.id === id ? { ...data, id } : item
+        );
       } else {
-        setPageData(prev => ({
-          ...prev,
-          [collectionName]: [...prev[collectionName].filter(item => item.id !== itemId), updatedData]
-        }));
+        // Add new item
+        updatedItems = [...currentItems, { ...data, id: itemId }];
       }
       
-      toast.success("Successfully updated content");
+      // Save back to Firestore
+      await setDoc(contentDocRef, { items: updatedItems });
+      
+      // Update local state
+      setPageData(prev => ({
+        ...prev,
+        [contentType]: updatedItems
+      }));
+      
+      toast.success(`Successfully updated ${contentType}`);
       return true;
     } catch (error) {
-      console.error(`Error updating ${collectionName}:`, error);
-      toast.error(`Failed to update content: ${error.message}`);
+      console.error(`Error updating ${contentType}:`, error);
+      toast.error(`Failed to update ${contentType}: ${error.message}`);
       return false;
     }
   };
 
-  const deleteItem = async (collectionName, id) => {
+  // Function to delete from array-based content
+  const deleteArrayItem = async (contentType, id) => {
     try {
-      await deleteDoc(doc(db, collectionName, id));
+      const contentDocRef = doc(db, 'content', contentType);
       
-      // Update local state to reflect deletion
+      // Get current items
+      const contentDoc = await getDoc(contentDocRef);
+      const currentItems = contentDoc.exists() ? contentDoc.data().items || [] : [];
+      
+      // Filter out the item to delete
+      const updatedItems = currentItems.filter(item => item.id !== id);
+      
+      // Save back to Firestore
+      await setDoc(contentDocRef, { items: updatedItems });
+      
+      // Update local state
       setPageData(prev => ({
         ...prev,
-        [collectionName]: prev[collectionName].filter(item => item.id !== id)
+        [contentType]: updatedItems
       }));
       
       toast.success("Item deleted successfully");
       return true;
     } catch (error) {
-      console.error(`Error deleting from ${collectionName}:`, error);
+      console.error(`Error deleting from ${contentType}:`, error);
       toast.error(`Failed to delete item: ${error.message}`);
+      return false;
+    }
+  };
+
+  // Function to update story content
+  const updateStory = async (content) => {
+    try {
+      const storyDocRef = doc(db, 'content', 'story');
+      await setDoc(storyDocRef, { content });
+      
+      setPageData(prev => ({
+        ...prev,
+        story: content
+      }));
+      
+      toast.success("Story updated successfully");
+      return true;
+    } catch (error) {
+      console.error("Error updating story:", error);
+      toast.error(`Failed to update story: ${error.message}`);
       return false;
     }
   };
@@ -142,25 +185,25 @@ const WebsiteEditPages = () => {
     if (selectedComponent.type === UploadBanner) {
       componentWithProps = <UploadBanner 
         banners={pageData.banners} 
-        updateBanner={(data, id) => updatePageData('banners', data, id)}
-        deleteBanner={(id) => deleteItem('banners', id)}
+        updateBanner={(data, id) => updateArrayContent('banners', data, id)}
+        deleteBanner={(id) => deleteArrayItem('banners', id)}
       />;
     } else if (selectedComponent.type === UploadVideo) {
       componentWithProps = <UploadVideo 
         videos={pageData.videos}
-        updateVideo={(data, id) => updatePageData('videos', data, id)}
-        deleteVideo={(id) => deleteItem('videos', id)}
+        updateVideo={(data, id) => updateArrayContent('videos', data, id)}
+        deleteVideo={(id) => deleteArrayItem('videos', id)}
       />;
     } else if (selectedComponent.type === UploadMembers) {
       componentWithProps = <UploadMembers 
         members={pageData.members}
-        updateMember={(data, id) => updatePageData('members', data, id)}
-        deleteMember={(id) => deleteItem('members', id)}
+        updateMember={(data, id) => updateArrayContent('members', data, id)}
+        deleteMember={(id) => deleteArrayItem('members', id)}
       />;
     } else if (selectedComponent.type === WriteStory) {
       componentWithProps = <WriteStory 
         story={pageData.story}
-        updateStory={(content) => updatePageData('content', { content }, 'story')}
+        updateStory={updateStory}
       />;
     }
 
