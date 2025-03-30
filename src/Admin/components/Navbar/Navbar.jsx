@@ -123,7 +123,7 @@ const Navbar = ({ userId }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           <div className="flex items-center space-x-4">
-            <span className="text-lg font-bold">Welcome Edmund 👋</span>
+            <span className="text-base lg:text-lg font-bold">Welcome Edmund 👋</span>
           </div>
           <div className="flex items-center space-x-4">
             {/* <div className="relative mr-4">
@@ -154,7 +154,7 @@ const Navbar = ({ userId }) => {
                 className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 focus:outline-none"
                 onClick={() => setIsNotificationOpen(!isNotificationOpen)}
               >
-                <FiBell className="w-6 h-6 text-gray-600" />
+                <FiBell className="w-5 lg:w-6 h-5 lg:h-6 text-gray-600" />
                 {unreadCount > 0 && (
                   <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">
                     {unreadCount}
@@ -225,7 +225,7 @@ const Navbar = ({ userId }) => {
             </div>
             <button
               onClick={handleLogout}
-              className="text-blue-600 font-medium hover:text-blue-800 transition-colors pr-4"
+              className="text-blue-600 text-base lg:text-lg font-medium hover:text-blue-800 transition-colors pr-4"
             >
               Logout
             </button>

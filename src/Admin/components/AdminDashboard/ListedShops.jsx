@@ -62,8 +62,6 @@ const ListedShops = ({ startDate, endDate }) => {
             }
           }
         });
-
-        console.log(shops);
         
         // Organize data by month (or based on activeTab)
         const organizedData = processShopData(shops, activeTab, parsedStartDate, parsedEndDate);
