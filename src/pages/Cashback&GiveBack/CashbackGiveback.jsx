@@ -124,18 +124,18 @@ const CashbackGiveback = () => {
           title="Collected Cash backs"
           amount={user?.collectedCashback || 0}
           pendingAmount={user?.pendingCashback || 0}
-          link="View Details"
+          // link="View Details"
         />
         <CashbackCard
           title="Withdraw"
           amount={user?.withdrawAmount || 0}
-          link="View Details"
+          // link="View Details"
         />
         <CashbackCard
           title="Give Back"
           amount={user?.givebackAmount || 0}
           pendingGivebackAmount={user?.pendingGivebackAmount || 0}
-          link="View Details"
+          // link="View Details"
         />
       </div>
 

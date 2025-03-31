@@ -41,9 +41,7 @@ const AdminTransactions = ({ startDate, endDate }) => {
     const unsubscribe = fetchTransactions();
     
     // Clean up subscription on unmount
-    return () => {
-      if (unsubscribe) unsubscribe();
-    };
+    return () => unsubscribe;
   }, [fetchTransactions]);
 
   // Parse date strings like "21 Jan 2025" to Date objects

@@ -45,9 +45,7 @@ const UserTransactions = () => {
     const unsubscribe = fetchUserTransactions();
     
     // Clean up subscription on unmount
-    return () => {
-      if (unsubscribe) unsubscribe();
-    };
+    return () => unsubscribe;
   }, [fetchUserTransactions]);
 
   // Calculate total earned cashback

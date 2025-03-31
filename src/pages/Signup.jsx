@@ -74,7 +74,7 @@ const Signup = () => {
       setUserData({ fname: "", lname: "", phone: "", password: "", email: "" });
 
       setTimeout(() => {
-        navigate(`/user-dashboard/${user.uid}`);
+        navigate(`/user-dashboard/${user.uid}/dashboard`);
       }, 1000);
     } catch (err) {
       toast.error(err.message);
@@ -103,7 +103,7 @@ const Signup = () => {
 
       // Delayed navigation
       setTimeout(() => {
-        navigate(`/user-dashboard/${res.user.uid}`);
+        navigate(`/user-dashboard/${res.user.uid}/dashboard`);
       }, 1000);
     } catch (error) {
       toast.error(error.message);

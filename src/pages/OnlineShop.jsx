@@ -128,7 +128,7 @@ const OnlineShop = () => {
       });
       
       // Clean up the listener when the component unmounts
-      return () => unsubscribe();
+      return () => unsubscribe;
     } catch (error) {
       console.error("Error fetching transactions:", error);
     }
@@ -139,9 +139,7 @@ const OnlineShop = () => {
     if (userId) {
       const unsubscribe = fetchTransactions();
       // Clean up subscription on unmount
-      return () => {
-        if (unsubscribe) unsubscribe();
-      };
+      return () => unsubscribe;
     }
   }, [userId, fetchTransactions]);
 
