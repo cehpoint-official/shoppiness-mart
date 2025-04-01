@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FaFacebook, FaInstagram, FaLinkedin } from "react-icons/fa6";
+import { FaFacebook, FaInstagram, FaTwitter } from "react-icons/fa6";
 import { RxCross1 } from "react-icons/rx";
 import { 
   collection, 
@@ -17,7 +17,7 @@ import { db } from '../../../../../firebase';
 const socialPlatforms = [
   { id: 'facebook', name: 'Facebook', icon: FaFacebook, color: 'text-blue-600' },
   { id: 'instagram', name: 'Instagram', icon: FaInstagram, color: 'text-pink-500' },
-  { id: 'linkedin', name: 'LinkedIn', icon: FaLinkedin, color: 'text-blue-700' },
+  { id: 'twitter', name: 'Twitter', icon: FaTwitter, color: 'text-blue-400' },
 ];
 
 const MainSocialmedia = () => {

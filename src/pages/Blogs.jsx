@@ -28,8 +28,7 @@ const Blogs = () => {
         const blogsQuery = query(
           collection(db, "blogs"),
           where("status", "==", "Published"),
-          orderBy("createdAt", "desc"),
-          limit(blogsPerPage)
+          orderBy("createdAt", "desc")
         );
         
         const blogsSnapshot = await getDocs(blogsQuery);
@@ -38,15 +37,11 @@ const Blogs = () => {
           ...doc.data()
         }));
         
-        setBlogs(blogsList);
-
-        // Get total number of published blogs for pagination
-        const countQuery = query(
-          collection(db, "blogs"),
-          where("status", "==", "Published")
-        );
-        const countSnapshot = await getDocs(countQuery);
-        setTotalBlogs(countSnapshot.docs.length);
+        // Calculate slice for current page
+        const startIndex = (currentPage - 1) * blogsPerPage;
+        const endIndex = startIndex + blogsPerPage;
+        setBlogs(blogsList.slice(startIndex, endIndex));
+        setTotalBlogs(blogsList.length);
         
         setLoading(false);
       } catch (error) {
@@ -56,7 +51,7 @@ const Blogs = () => {
     };
 
     fetchData();
-  }, []);
+  }, [currentPage]);
 
   // Handle clicks outside the modal to close it
   useEffect(() => {
@@ -89,31 +84,9 @@ const Blogs = () => {
   }, [expandedBlog]);
 
   // Handle pagination
-  const fetchBlogsByPage = async (page) => {
-    setLoading(true);
-    const startAt = (page - 1) * blogsPerPage;
-    
-    try {
-      const blogsQuery = query(
-        collection(db, "blogs"),
-        where("status", "==", "Published"),
-        orderBy("createdAt", "desc"),
-        limit(blogsPerPage)
-      );
-      
-      const blogsSnapshot = await getDocs(blogsQuery);
-      const blogsList = blogsSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      
-      setBlogs(blogsList);
-      setCurrentPage(page);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching blogs for page:", error);
-      setLoading(false);
-    }
+  const fetchBlogsByPage = (page) => {
+    setCurrentPage(page);
+    // The useEffect will handle the actual fetching since it depends on currentPage
   };
 
   // Close expanded blog and update local views count
@@ -163,7 +136,7 @@ const Blogs = () => {
       {/* Hero Section with Our Story */}
       <div className="bg-gradient-to-r from-teal-500 to-green-500 py-16">
         <div className="container mx-auto px-6 max-w-4xl">
-          <h1 className="text-4xl font-bold text-white text-center mb-8 font-slab">
+          <h1 className="text-4xl font-bold text-white text-center mb-8 font-serif">
             Our Story
           </h1>
           <div className="bg-white p-8 rounded-lg shadow-lg">
@@ -217,7 +190,7 @@ const Blogs = () => {
                         {getTruncatedContent(blog.content)}
                       </p>
                       <div className="flex justify-between items-center mt-auto">
-                        <span className="text-lg font-medium text-gray-500">
+                        <span className="text-sm text-gray-500">
                           {blog.views || 0} views
                         </span>
                         <button
@@ -295,32 +268,43 @@ const Blogs = () => {
         )}
       </div>
 
-      {/* Modal for expanded blog view - SMALLER SIZE */}
+      {/* Modal for expanded blog view */}
       {expandedBlog && (
-        <div className="fixed mt-40 inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-75 overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-75 overflow-y-auto">
           <div 
             ref={modalRef}
-            className="bg-white rounded-lg shadow-lg w-full max-w-2xl mx-auto overflow-hidden"
-            style={{ maxHeight: "90vh" }}
+            className="bg-white relative top-20 rounded-lg shadow-lg w-full max-w-2xl mx-auto overflow-hidden"
+            style={{ maxHeight: "70vh" }}
           >
             {blogs.filter(blog => blog.id === expandedBlog).map(blog => (
-              <div key={blog.id} className="flex flex-col">
-                <div className="relative h-72 overflow-hidden">
+              <div key={blog.id} className="flex flex-col overflow-y-auto">
+                <div className="relative h-64 overflow-hidden">
                   <img
                     src={blog.thumbnail || "https://via.placeholder.com/800x400"}
                     alt={blog.title}
                     className="w-full h-full object-cover"
                   />
+                  <div className="absolute top-4 right-4">
+                    <button
+                      onClick={closeExpandedBlog}
+                      className="bg-white bg-opacity-70 p-2 rounded-full hover:bg-opacity-100 transition-all"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                      </svg>
+                    </button>
+                  </div>
                 </div>
                 
-                <div className="px-6 py-3 overflow-y-auto" style={{ maxHeight: "calc(80vh - 12rem)" }}>
+                <div className="px-6 py-4" style={{ maxHeight: "calc(70vh - 16rem)" }}>
                   <div className="flex items-center mb-4">
-                    <div className="h-12 w-12 rounded-full bg-teal-500 flex items-center justify-center text-white font-bold text-sm">
-                      {blog.author?.[0] || "A"}
+                    <div className="h-12 w-12 rounded-full bg-teal-500 flex items-center justify-center text-white font-bold">
+                      {blog.author ? blog.author[0].toUpperCase() : "A"}
                     </div>
                     <div className="ml-3">
-                      <p className="font-semibold text-gray-800 text-xl">By {blog.author || "Unknown Author"}</p>
-                      <p className="text-xs text-gray-500">{(blog.views || 0) + 1} views</p>
+                      <p className="font-semibold text-gray-800">By {blog.author || "Unknown Author"}</p>
+                      <p className="text-sm text-gray-500">{(blog.views || 0) + 1} views</p>
                     </div>
                   </div>
                   
@@ -328,18 +312,9 @@ const Blogs = () => {
                     {blog.title || "Untitled Blog"}
                   </h1>
                   
-                  <div className="prose max-w-none text-gray-700 text-sm">
+                  <div className="prose max-w-none text-gray-700 pb-3">
                     {blog.content || "No content available."}
                   </div>
-                </div>
-                
-                <div className="border-t border-gray-200 p-4 flex justify-end">
-                  <button
-                    onClick={closeExpandedBlog}
-                    className="bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-700 transition-colors text-sm"
-                  >
-                    Close
-                  </button>
                 </div>
               </div>
             ))}

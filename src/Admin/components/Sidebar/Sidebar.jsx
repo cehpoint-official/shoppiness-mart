@@ -236,13 +236,13 @@ const Sidebar = ({ userId, sidebarOpen, setSidebarOpen }) => {
                   >
                     Earnings From Shops
                   </Link>
-                  <Link
+                  {/* <Link
                     to={`/admin/${userId}/shoppiness/services/add-categories`}
                     className="py-2 px-6 hover:bg-teal-600 transition-colors"
                     onClick={() => isMobile && setSidebarOpen(false)}
                   >
                     Add Categories
-                  </Link>
+                  </Link> */}
                   <Link
                     to={`/admin/${userId}/shoppiness/services/cashback-tracking`}
                     className="py-2 px-6 hover:bg-teal-600 transition-colors"
