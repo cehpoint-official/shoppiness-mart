@@ -7,7 +7,7 @@ import homepage from "../assets/homepage/homepage.png";
 import img18 from "../assets/homepage/img18.png";
 import Backimg9 from "../assets/homepage/backimg9.png";
 
-import Home1 from "../assets/Home/home1.png";
+// import Home1 from "../assets/Home/home1.png";
 import Logo1 from "../assets/Home/logo1.png";
 import supportACause from "../assets/homeheader.png";
 
@@ -15,13 +15,13 @@ import FAQ from "../Components/FAQ";
 import PeopleSaySection from "../Components/PeopleSaySection";
 import PopularCauses from "../Components/PopularCauses/PopularCauses";
 import RoundedCards from "../Components/RoundedCards/RoundedCards";
-import Carousel from "../Components/Carousel/Carousel";
+// import Carousel from "../Components/Carousel/Carousel";
 import Partners from "../Components/Partners";
 import Loader from "../Components/Loader/Loader";
 
 import { useState, useEffect } from "react";
 import { db } from "../../firebase";
-import { collection, addDoc, getDocs, query, where, orderBy, limit } from "firebase/firestore";
+import { collection, addDoc, getDoc, getDocs, query, where, orderBy, limit, doc } from "firebase/firestore";
 import { Link } from "react-router-dom";
 
 const Home = () => {
@@ -31,6 +31,8 @@ const Home = () => {
   const [roundedCardsData, setRoundedCardsData] = useState([]);
   const [blogsData, setBlogsData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [bannerImage, setBannerImage] = useState(null);
+  const [bannerLoading, setBannerLoading] = useState(true);
 
   const handleSubscribe = async (e) => {
     e.preventDefault();
@@ -83,7 +85,7 @@ const Home = () => {
           blogsQuery,
           where("status", "==", "Published"),
           orderBy("createdAt", "desc"),
-          limit(4)
+          limit(3)
         )
       );
 
@@ -97,11 +99,65 @@ const Home = () => {
       console.log("Error getting blog documents: ", error);
       setLoading(false);
     }
+
+    setBannerLoading(true);
+
+    // Fetch banner image from firebase
+    try {
+      // Reference to the banners document
+      const bannerRef = doc(db, "content", "banners");
+      const bannerDoc = await getDoc(bannerRef);
+
+      // Check if the document exists and has an 'items' array
+      if (bannerDoc.exists() && bannerDoc.data().items) {
+        const items = bannerDoc.data().items;
+
+        // Sort items by createdAt in descending order (latest first)
+        const sortedItems = items.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        // Get the top banner (first item after sorting)
+        const topBanner = sortedItems[0];
+
+        // Check if the banner has a valid URL
+        if (topBanner && topBanner.url) {
+          setBannerImage(topBanner.url);
+        }
+      }
+    } catch (error) {
+      console.log("Error getting banner image: ", error);
+      // If there's an error, we'll use the default image
+    } finally {
+      // Always finish loading state, regardless of success or failure
+      setBannerLoading(false);
+    }
   };
 
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Function to preload image
+  const preloadImage = (src) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve();
+      img.onerror = () => reject();
+      img.src = src;
+    });
+  };
+
+  // Effect to handle image preloading
+  useEffect(() => {
+    if (bannerImage) {
+      setBannerLoading(true);
+      preloadImage(bannerImage)
+        .then(() => setBannerLoading(false))
+        .catch(() => {
+          console.log("Error loading banner image");
+          setBannerLoading(false);
+        });
+    }
+  }, [bannerImage]);
 
   return (
     <div className=" overflow-hidden">
@@ -122,8 +178,20 @@ const Home = () => {
             </button>
           </Link>
         </div>
-        <div>
-          <img src={supportACause} alt="Cashback to giveback illustration" />
+        
+        <div className="max-w-md">
+          {bannerLoading ? (
+            // Skeleton loader while image is loading
+            <div className="animate-pulse bg-gray-200 rounded-lg w-full h-64 md:h-80"></div>
+          ) : (
+            // Display banner image with proper sizing constraints
+            <img
+              src={bannerImage || supportACause}
+              alt="Cashback to giveback illustration"
+              className="w-full h-auto object-contain max-h-80"
+              style={{ maxWidth: "400px" }}
+            />
+          )}
         </div>
       </div>
 

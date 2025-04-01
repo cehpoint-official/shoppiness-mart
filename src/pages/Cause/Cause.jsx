@@ -14,7 +14,7 @@ const Cause = () => {
       <div className="causeContainer">
         <ReuseableTop
           title="Get wholehearted support for all causes and NGOs"
-          paragraph="Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis,commodi tempora mollitia"
+          paragraph="ShoppinessMart helps NGOs and social causes raise funds effortlessly through online shopping contributions."
           name="Cause/NGO"
           img={causeImg}
         />
@@ -31,22 +31,19 @@ const Cause = () => {
               <div className="point">
                 <h5>1. Sign up your cause</h5>
                 <p>
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Nostrum, dolores.
+                  Register your NGO or cause on ShoppinessMart to start receiving support from shoppers worldwide.
                 </p>
               </div>
               <div className="point">
                 <h5>2. Get donations through online shopping</h5>
                 <p>
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Nostrum, dolores.
+                  Every time a customer makes a purchase through our platform, a portion of the sale is donated to your cause.
                 </p>
               </div>
               <div className="point">
                 <h5>3. You Can Raise more</h5>
                 <p>
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Nostrum, dolores.
+                  Spread the word and encourage more people to shop via ShoppinessMart to boost your donations.
                 </p>
               </div>
             </div>

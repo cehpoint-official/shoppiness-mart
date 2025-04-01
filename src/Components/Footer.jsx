@@ -158,11 +158,11 @@ const Footer = () => {
               <p className="mb-7 text-lg text-white">
                 {contactInfo.description}
               </p>
-              <p className="flex items-center text-lg  text-white">
+              <p className="flex items-center text-lg text-white">
                 <span className="mr-3 text-[#FFD705]">Call Us:</span>
-                <span>{contactInfo.phone}</span>
+                <span>+91 {contactInfo.phone}</span>
               </p>
-              <p className="flex items-center text-lg mt-4  text-white">
+              <p className="flex items-center text-lg mt-4 text-white">
                 <span className="mr-3 text-[#FFD705]">Email Us:</span>
                 <span>{contactInfo.email}</span>
               </p>
