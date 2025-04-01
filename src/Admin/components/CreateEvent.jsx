@@ -9,7 +9,7 @@ function CreateEvent({ onViewAllClick, editEvent = null }) {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState('');
   const fileInputRef = useRef(null);
-  
+
   const [eventData, setEventData] = useState(
     editEvent || {
       title: '',
@@ -40,7 +40,7 @@ function CreateEvent({ onViewAllClick, editEvent = null }) {
     }
 
     setEventData({ ...eventData, thumbnail: file });
-    
+
     // Create preview
     const reader = new FileReader();
     reader.onload = () => {
@@ -57,17 +57,17 @@ function CreateEvent({ onViewAllClick, editEvent = null }) {
   const handleDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const file = e.dataTransfer.files[0];
-      
+
       // Create a synthetic event object
       const syntheticEvent = {
         target: {
           files: [file]
         }
       };
-      
+
       handleFileChange(syntheticEvent);
     }
   };
@@ -97,35 +97,35 @@ function CreateEvent({ onViewAllClick, editEvent = null }) {
       setError('Thumbnail image is required');
       return false;
     }
-    
+
     // Validate end time is after start time
     if (eventData.startTime >= eventData.endTime) {
       setError('End time must be after start time');
       return false;
     }
-    
+
     return true;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    
+
     if (!validateForm()) return;
-    
+
     setIsSubmitting(true);
-    
+
     try {
       let thumbnailURL = eventData.thumbnailURL;
-      
+
       // Upload new image if it exists
       if (eventData.thumbnail && typeof eventData.thumbnail !== 'string') {
         const fileId = uuidv4();
         const fileName = `${fileId}_${eventData.thumbnail.name}`;
         const storageRef = ref(storage, `events/${fileName}`);
-        
+
         const uploadTask = uploadBytesResumable(storageRef, eventData.thumbnail);
-        
+
         // Set up progress tracking
         uploadTask.on(
           'state_changed',
@@ -141,24 +141,26 @@ function CreateEvent({ onViewAllClick, editEvent = null }) {
             setIsSubmitting(false);
           }
         );
-        
+
         // Wait for upload to complete
         await uploadTask;
         thumbnailURL = await getDownloadURL(uploadTask.snapshot.ref);
       }
-      
+
       // Format time for display
       const formattedStartTime = formatTime(eventData.startTime);
       const formattedEndTime = formatTime(eventData.endTime);
       const timeDisplay = `${formattedStartTime} - ${formattedEndTime}`;
-      
+
       // Format date for display (DD MMM format)
       const dateObj = new Date(eventData.date);
-      const formattedDate = dateObj.toLocaleDateString('en-US', {
+      const formattedDate = dateObj.toLocaleDateString('en-GB', {
         day: '2-digit',
-        month: 'short'
+        month: 'short',
+        year: 'numeric'
       });
-      
+
+
       // Prepare event data
       const eventDataToSave = {
         title: eventData.title,
@@ -172,14 +174,14 @@ function CreateEvent({ onViewAllClick, editEvent = null }) {
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       };
-      
+
       // Save to Firestore
       if (editEvent?.id) {
         // Update logic (to be implemented in EditEvent component)
       } else {
         await addDoc(collection(db, 'events'), eventDataToSave);
       }
-      
+
       // Reset form
       setEventData({
         title: '',
@@ -191,10 +193,10 @@ function CreateEvent({ onViewAllClick, editEvent = null }) {
         thumbnailURL: ''
       });
       setThumbnailPreview(null);
-      
+
       // Navigate to all events view
       onViewAllClick();
-      
+
     } catch (error) {
       console.error('Error creating event:', error);
       setError('Failed to create event. Please try again.');
@@ -203,7 +205,7 @@ function CreateEvent({ onViewAllClick, editEvent = null }) {
       setUploadProgress(0);
     }
   };
-  
+
   // Format time from 24h to 12h format with AM/PM
   const formatTime = (time24h) => {
     const [hours, minutes] = time24h.split(':');
@@ -297,7 +299,7 @@ function CreateEvent({ onViewAllClick, editEvent = null }) {
 
             <div>
               <label className="block text-gray-700 mb-2">Thumbnail</label>
-              <div 
+              <div
                 className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center"
                 onDragOver={handleDragOver}
                 onDrop={handleDrop}
@@ -305,9 +307,9 @@ function CreateEvent({ onViewAllClick, editEvent = null }) {
               >
                 {thumbnailPreview ? (
                   <div className="flex flex-col items-center">
-                    <img 
-                      src={thumbnailPreview} 
-                      alt="Thumbnail preview" 
+                    <img
+                      src={thumbnailPreview}
+                      alt="Thumbnail preview"
                       className="w-full h-48 object-cover mb-4 rounded-md"
                     />
                     <button
@@ -315,7 +317,7 @@ function CreateEvent({ onViewAllClick, editEvent = null }) {
                       onClick={(e) => {
                         e.stopPropagation();
                         setThumbnailPreview(null);
-                        setEventData({...eventData, thumbnail: null, thumbnailURL: ''});
+                        setEventData({ ...eventData, thumbnail: null, thumbnailURL: '' });
                       }}
                       className="text-red-500 hover:text-red-600"
                       disabled={isSubmitting}
@@ -343,12 +345,12 @@ function CreateEvent({ onViewAllClick, editEvent = null }) {
                   disabled={isSubmitting}
                 />
               </div>
-              
+
               {isSubmitting && uploadProgress > 0 && (
                 <div className="mt-4">
                   <div className="h-2 bg-gray-200 rounded-full">
-                    <div 
-                      className="h-2 bg-blue-500 rounded-full" 
+                    <div
+                      className="h-2 bg-blue-500 rounded-full"
                       style={{ width: `${uploadProgress}%` }}
                     ></div>
                   </div>
@@ -363,9 +365,8 @@ function CreateEvent({ onViewAllClick, editEvent = null }) {
           <div className="mt-8 text-right">
             <button
               type="submit"
-              className={`bg-orange-500 text-white px-6 py-2 rounded-md hover:bg-orange-600 ${
-                isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
+              className={`bg-orange-500 text-white px-6 py-2 rounded-md hover:bg-orange-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
               disabled={isSubmitting}
             >
               {isSubmitting ? 'Creating...' : 'Create a Event'}

@@ -1,4 +1,3 @@
-// ======================
 import img11 from "../assets/homepage/img11.png";
 import img12 from "../assets/homepage/img12.png";
 import img13 from "../assets/homepage/img13.png";
@@ -7,13 +6,11 @@ import homepage from "../assets/homepage/homepage.png";
 
 import img18 from "../assets/homepage/img18.png";
 import Backimg9 from "../assets/homepage/backimg9.png";
-// =========================
 
-import Home1 from "../assets/Home/home1.png"; //use in carasaul
-import Logo1 from "../assets/Home/logo1.png"; //use in ngo's
+import Home1 from "../assets/Home/home1.png";
+import Logo1 from "../assets/Home/logo1.png";
 import supportACause from "../assets/homeheader.png";
 
-// ========================
 import FAQ from "../Components/FAQ";
 import PeopleSaySection from "../Components/PeopleSaySection";
 import PopularCauses from "../Components/PopularCauses/PopularCauses";
@@ -21,14 +18,14 @@ import RoundedCards from "../Components/RoundedCards/RoundedCards";
 import Carousel from "../Components/Carousel/Carousel";
 import Partners from "../Components/Partners";
 import Loader from "../Components/Loader/Loader";
-// ==========================
+
 import { useState, useEffect } from "react";
-import { db } from "../../firebase"; // Adjust the import path as necessary
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import { db } from "../../firebase";
+import { collection, addDoc, getDocs, query, where, orderBy, limit } from "firebase/firestore";
 import { Link } from "react-router-dom";
-// ==============================
 
 const Home = () => {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [roundedCardsData, setRoundedCardsData] = useState([]);
@@ -42,15 +39,23 @@ const Home = () => {
       return;
     }
 
+    if (!name) {
+      setMessage("Please enter your name.");
+      return;
+    }
+
     try {
-      await addDoc(collection(db, "Newsletter"), {
+      await addDoc(collection(db, "newsletter"), {
+        name: name,
         email: email,
+        date: new Date(),
         timestamp: new Date(),
       });
       setMessage("Successfully subscribed!");
       setInterval(() => {
         setMessage("");
       }, 5000);
+      setName("");
       setEmail("");
     } catch (error) {
       console.error("Error adding document: ", error);
@@ -71,15 +76,26 @@ const Home = () => {
     }
 
     try {
-      const querySnapshot = await getDocs(collection(db, "BlogsHome"));
+      // Fetch published blogs sorted by createdAt (newest first)
+      const blogsQuery = collection(db, "blogs");
+      const querySnapshot = await getDocs(
+        query(
+          blogsQuery,
+          where("status", "==", "Published"),
+          orderBy("createdAt", "desc"),
+          limit(4)
+        )
+      );
+
       const data = [];
       querySnapshot.forEach((doc) => {
         data.push({ id: doc.id, ...doc.data() });
-        setBlogsData(data);
       });
+      setBlogsData(data);
       setLoading(false);
     } catch (error) {
-      console.log("Error getting documents: ", error);
+      console.log("Error getting blog documents: ", error);
+      setLoading(false);
     }
   };
 
@@ -151,7 +167,7 @@ const Home = () => {
               spending a penny extra. We&apos;ve partnered with hundreds of
               popular online stores, and for every purchase made through our
               platform, a percentage of the sale is donated to your chosen
-              charity. It’s that easy to make a difference.
+              charity. It's that easy to make a difference.
             </p>
           </div>
         </div>
@@ -293,76 +309,108 @@ const Home = () => {
               Recently Posted Blog
             </p>
             <p className="text-gray-600 text-sm md:text-lg text-center mx-auto mt-2">
-              Share stories of how Shoppinessmart donations have made a
-              difference in people&apos;s lives.
+              Share stories of how Shoppinessmart donations have made a difference in people's lives.
             </p>
           </div>
 
-          <div className="grid grid-cols-12 gap-4 mt-10">
-            <div className="lg:col-span-5 col-span-12">
-              <div>
-                <img src={blogsData[1].img} alt="" className="w-full" />
-                <p className="font-medium text-lg mt-4">{blogsData[1].title}</p>
-                <p className="text-gray-500 text-sm md:text-base">
-                  {blogsData[1].desc}{" "}
-                  <span className="text-[#049D8E] font-medium">
-                    Read More...
-                  </span>
-                </p>
-                <p className="text-gray-400 mt-4">
-                  By {blogsData[0].auther}, 10 Mar 2024
-                </p>
+          {blogsData.length > 0 ? (
+            <div className="grid grid-cols-12 gap-4 mt-10">
+              {/* Main featured blog */}
+              <div className="lg:col-span-5 col-span-12">
+                <div>
+                  <img
+                    src={blogsData[0]?.thumbnail}
+                    alt={blogsData[0]?.title}
+                    className="w-full h-auto rounded-lg object-cover aspect-video"
+                  />
+                  <p className="font-medium text-lg mt-4">{blogsData[0]?.title}</p>
+                  <p className="text-gray-500 text-sm md:text-base">
+                    {/* Reduced excerpt length for main blog */}
+                    {blogsData[0]?.content?.substring(0, 120)}...{" "}
+                    <Link to="/blogs">
+                      <span className="text-[#049D8E] font-medium">
+                        Read More...
+                      </span>
+                    </Link>
+                  </p>
+                  <p className="text-gray-400 mt-4">
+                    By {blogsData[0]?.author}, {new Date(blogsData[0]?.createdAt?.toDate()).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  </p>
+                </div>
               </div>
-            </div>
 
-            <div className="lg:col-span-7 col-span-12 mx-5">
-              <div className="lg:flex mb-4">
-                <img
-                  src={blogsData[0].img}
-                  alt=" "
-                  className="lg:w-1/3 w-full"
-                />
-                <div className="lg:ml-4 mt-4 lg:mt-0">
-                  <p className="font-medium text-lg">{blogsData[0].title}</p>
-                  <p className="text-gray-500 text-sm md:text-base">
-                    {blogsData[0].desc}
-                    <span className="text-[#049D8E] text-sm md:text-base font-medium">
-                      {" "}
-                      Read More...
-                    </span>
-                  </p>
-                  <p className="text-gray-400 mt-4">
-                    By {blogsData[1].auther}, 15 July 2024
-                  </p>
-                </div>
-              </div>
-              <div className="lg:flex">
-                <img
-                  src={blogsData[2].img}
-                  alt=""
-                  className="lg:w-1/3 w-full"
-                />
-                <div className="lg:ml-4 mt-4 lg:mt-0">
-                  <p className="font-medium text-lg">{blogsData[2].title}</p>
-                  <p className="text-gray-500 text-sm md:text-base">
-                    {blogsData[2].desc}{" "}
-                    <span className="text-[#049D8E] text-sm md:text-base font-medium">
-                      {" "}
-                      Read More...
-                    </span>
-                  </p>
-                  <p className="text-gray-400 mt-4">
-                    By {blogsData[2].auther}, 09 April 2024
-                  </p>
-                </div>
+              {/* Smaller blog entries */}
+              <div className="lg:col-span-7 col-span-12 mx-5">
+                {blogsData.length > 1 && (
+                  <div className="lg:flex mb-4">
+                    <img
+                      src={blogsData[1]?.thumbnail}
+                      alt={blogsData[1]?.title}
+                      className="lg:w-1/3 w-full h-auto rounded-lg object-cover aspect-video"
+                    />
+                    <div className="lg:ml-4 mt-4 lg:mt-0">
+                      <p className="font-medium text-lg">{blogsData[1]?.title}</p>
+                      <p className="text-gray-500 text-sm md:text-base">
+                        {/* Increased excerpt length for side blogs */}
+                        {blogsData[1]?.content?.substring(0, 120)}...{" "}
+                        <Link to="/blogs">
+                          <span className="text-[#049D8E] text-sm md:text-base font-medium">
+                            {" "}
+                            Read More...
+                          </span>
+                        </Link>
+                      </p>
+                      <p className="text-gray-400 mt-4">
+                        By {blogsData[1]?.author}, {new Date(blogsData[1]?.createdAt?.toDate()).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {blogsData.length > 2 && (
+                  <div className="lg:flex">
+                    <img
+                      src={blogsData[2]?.thumbnail}
+                      alt={blogsData[2]?.title}
+                      className="lg:w-1/3 w-full h-auto rounded-lg object-cover aspect-video"
+                    />
+                    <div className="lg:ml-4 mt-4 lg:mt-0">
+                      <p className="font-medium text-lg">{blogsData[2]?.title}</p>
+                      <p className="text-gray-500 text-sm md:text-base">
+                        {/* Increased excerpt length for side blogs */}
+                        {blogsData[2]?.content?.substring(0, 120)}...{" "}
+                        <Link to="/blogs">
+                          <span className="text-[#049D8E] text-sm md:text-base font-medium">
+                            {" "}
+                            Read More...
+                          </span>
+                        </Link>
+                      </p>
+                      <p className="text-gray-400 mt-4">
+                        By {blogsData[2]?.author}, {new Date(blogsData[2]?.createdAt?.toDate()).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
+          ) : (
+            <div className="text-center mt-10">
+              <p className="text-gray-500">No blog posts available at the moment.</p>
+            </div>
+          )}
+
+          <div className="text-center mt-8">
+            <Link to="/blogs">
+              <button className="bg-[#049D8E] text-white py-2 px-6 rounded-lg transition duration-300">
+                View All Blogs
+              </button>
+            </Link>
           </div>
         </div>
       )}
 
       {/* NewsLetter */}
-
       <div className="relative mt-44 py-20 flex flex-col justify-center items-center">
         <div className="absolute inset-0">
           <img
@@ -380,19 +428,27 @@ const Home = () => {
           </p>
           <div className="w-full max-w-lg mx-auto">
             <form
-              className="flex flex-col md:flex-row justify-center items-center mt-8 md:mt-16"
+              className="flex flex-col justify-center items-center mt-8 md:mt-16"
               onSubmit={handleSubscribe}
             >
               <input
+                type="text"
+                className="text-gray-900 bg-white border-2 p-3 rounded-xl w-full md:w-[400px] mb-4"
+                placeholder="Enter your Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+              <input
                 type="email"
-                className="text-gray-900 bg-white border-2 p-3 rounded-xl w-full md:w-[400px] mb-4 md:mb-0 md:mr-4"
+                className="text-gray-900 bg-white border-2 p-3 rounded-xl w-full md:w-[400px] mb-4"
                 placeholder="Enter your Email here"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
               <button
-                className="text-lg px-4 py-3 border-2 text-white bg-[#049D8E] rounded-xl"
+                className="text-lg px-4 py-3 border-2 text-white bg-[#049D8E] rounded-xl w-full md:w-auto"
                 type="submit"
               >
                 Subscribe
