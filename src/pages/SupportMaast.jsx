@@ -6,7 +6,7 @@ import page2 from "../assets/SupportMaast/page2.png";
 import page3 from "../assets/SupportMaast/page3.png";
 import { useState, useEffect } from "react";
 import DonationDialog from "../Components/DonationDialog";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 import { CalendarDays, Clock, MapPin } from "lucide-react";
 
@@ -15,6 +15,30 @@ const SupportMasst = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [bannerImage, setBannerImage] = useState(headerImg);
+
+  // Fetch banner image from Firebase
+  useEffect(() => {
+    const fetchBannerImage = async () => {
+      try {
+        const bannerDocRef = doc(db, "maast", "banners");
+        const bannerDocSnap = await getDoc(bannerDocRef);
+        
+        if (bannerDocSnap.exists()) {
+          const bannerData = bannerDocSnap.data();
+          // Check if the banners document contains items and if there's at least one image
+          if (bannerData.items && bannerData.items.length > 0 && bannerData.items[0].url) {
+            setBannerImage(bannerData.items[0].url);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching banner image:", error);
+        // If there's an error, we'll keep using the default headerImg
+      }
+    };
+
+    fetchBannerImage();
+  }, []);
 
   // Fetch events from Firebase
   useEffect(() => {
@@ -64,7 +88,7 @@ const SupportMasst = () => {
     <div className="overflow-hidden">
       {/* { 1st page } */}
       <div>
-        <img src={headerImg} alt="Loading..." className="w-full h-full" />
+        <img src={bannerImage} alt="Loading..." className="w-full h-full" />
       </div>
 
       {/* { what is maast } */}

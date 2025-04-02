@@ -116,7 +116,7 @@ const UserLoginForm = () => {
       if (userRole === "admin") {
         navigate(`/admin/${user.uid}/shoppiness/dashboard`);
       } else {
-        navigate(`/user-dashboard/${user.uid}`);
+        navigate(`/user-dashboard/${user.uid}/dashboard`);
       }
     } catch (error) {
       toast.error(error.message);

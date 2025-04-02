@@ -559,7 +559,7 @@ const POS = ({ onGenerateInvoice }) => {
                         onClick={() => handleDeleteProduct(product.id)}
                         className="text-red-500 hover:text-red-700"
                       >
-                        <RxCross2 size={16} className="sm:size-20" />
+                        <RxCross2 size={24} />
                       </button>
                     </td>
                   </tr>

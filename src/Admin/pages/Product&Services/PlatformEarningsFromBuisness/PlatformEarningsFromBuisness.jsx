@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { FaSpinner, FaEye, FaBell, FaSearch } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { db } from "../../../../../firebase";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -15,6 +15,7 @@ const PlatformEarningsFromBusiness = () => {
   const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 10;
   const navigate = useNavigate();
+  const { userId } = useParams();
 
   // Fetch active businesses
   useEffect(() => {
@@ -223,7 +224,7 @@ const PlatformEarningsFromBusiness = () => {
                       <button
                         onClick={() =>
                           navigate(
-                            `/admin/shoppiness/services/earnings/${business.id}`
+                            `/admin/${userId}/shoppiness/services/earnings/${business.id}`
                           )
                         }
                         className="bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded-md flex items-center transition-colors text-sm"

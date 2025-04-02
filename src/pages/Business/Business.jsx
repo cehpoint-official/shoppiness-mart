@@ -39,7 +39,8 @@ const Business = () => {
     <div className="business">
       <div className="businessContainer">
         <ReuseableTop
-          title="Grow you Online/Offline business with meaningful purpose"
+          name="Business/Services"
+          title="Grow your Online/Offline business with meaningful purpose"
           paragraph="Join ShoppinessMart and connect with customers who support businesses that give back to social causes."
           img={personImg}
         />

@@ -1,15 +1,17 @@
 import { useState, useEffect } from "react";
-import { MdDelete } from "react-icons/md";
+import { MdDelete, MdSave } from "react-icons/md";
 import { IoCloudUploadSharp } from "react-icons/io5";
-import { ref, uploadBytesResumable, getDownloadURL, deleteObject, listAll } from "firebase/storage";
+import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage";
 import { 
   collection, 
   addDoc, 
   getDocs, 
   deleteDoc, 
   doc, 
-  query, 
-  where 
+  query,
+  setDoc,
+  updateDoc,
+  getDoc
 } from "firebase/firestore";
 import { db, storage } from "../../../../../firebase";
 import { v4 as uuidv4 } from "uuid";
@@ -20,11 +22,37 @@ const EditPage = () => {
   const [uploadProgress, setUploadProgress] = useState({ banner: 0, video: 0 });
   const [isUploading, setIsUploading] = useState({ banner: false, video: false });
   const [error, setError] = useState("");
+  const [selectedFiles, setSelectedFiles] = useState({ banner: null, video: null });
 
   // Fetch existing files on component mount
   useEffect(() => {
     fetchFiles();
+    // Ensure maast collection exists with banners and videos documents
+    initMaastCollection();
   }, []);
+
+  const initMaastCollection = async () => {
+    try {
+      // Check if maast/banners document exists
+      const bannersDocRef = doc(db, "maast", "banners");
+      const bannersDoc = await getDoc(bannersDocRef);
+      
+      // Check if maast/videos document exists
+      const videosDocRef = doc(db, "maast", "videos");
+      const videosDoc = await getDoc(videosDocRef);
+      
+      // If not exist, create them with empty arrays
+      if (!bannersDoc.exists()) {
+        await setDoc(bannersDocRef, { items: [] });
+      }
+      
+      if (!videosDoc.exists()) {
+        await setDoc(videosDocRef, { items: [] });
+      }
+    } catch (error) {
+      console.error("Error initializing maast collection:", error);
+    }
+  };
 
   const fetchFiles = async () => {
     try {
@@ -152,6 +180,62 @@ const EditPage = () => {
     }
   };
 
+  const handleSelectFile = (id, type) => {
+    setSelectedFiles({ ...selectedFiles, [type]: id });
+  };
+
+  const handleSave = async (type) => {
+    const selectedId = selectedFiles[type];
+    if (!selectedId) {
+      setError(`Please select a ${type} to save`);
+      return;
+    }
+
+    try {
+      // Find the file to save
+      const fileArray = type === "banner" ? bannerFiles : videoFiles;
+      const fileToSave = fileArray.find(file => file.id === selectedId);
+      
+      if (!fileToSave) {
+        throw new Error("Selected file not found");
+      }
+
+      // Get the maast document reference
+      const maastDocRef = doc(db, "maast", `${type}s`);
+      
+      // Get current document
+      const maastDoc = await getDoc(maastDocRef);
+      
+      if (!maastDoc.exists()) {
+        // Create document if it doesn't exist
+        await setDoc(maastDocRef, { items: [fileToSave] });
+      } else {
+        // Update existing document
+        const currentItems = maastDoc.data().items || [];
+        
+        // Check if this item already exists in the array
+        const existingItemIndex = currentItems.findIndex(item => item.id === fileToSave.id);
+        
+        if (existingItemIndex >= 0) {
+          // Replace existing item
+          currentItems[existingItemIndex] = fileToSave;
+        } else {
+          // Add new item
+          currentItems.push(fileToSave);
+        }
+        
+        // Update the document
+        await updateDoc(maastDocRef, { items: currentItems });
+      }
+      
+      setError("");
+      alert(`${type.charAt(0).toUpperCase() + type.slice(1)} saved successfully to maast collection!`);
+    } catch (error) {
+      console.error("Save error:", error);
+      setError(`Failed to save ${type}. Please try again.`);
+    }
+  };
+
   const handleDelete = async (id, type) => {
     try {
       // Find the file to get its storage path
@@ -166,14 +250,34 @@ const EditPage = () => {
       const storageRef = ref(storage, fileToDelete.storagePath);
       await deleteObject(storageRef);
       
-      // Delete from Firestore
+      // Delete from Firestore's regular collection
       await deleteDoc(doc(db, `${type}s`, id));
+      
+      // Also remove from maast collection if it exists
+      try {
+        const maastDocRef = doc(db, "maast", `${type}s`);
+        const maastDoc = await getDoc(maastDocRef);
+        
+        if (maastDoc.exists()) {
+          const currentItems = maastDoc.data().items || [];
+          const updatedItems = currentItems.filter(item => item.id !== id);
+          await updateDoc(maastDocRef, { items: updatedItems });
+        }
+      } catch (e) {
+        console.log(`Error updating maast/${type}s document:`, e);
+      }
       
       // Update state
       if (type === "banner") {
         setBannerFiles(bannerFiles.filter(file => file.id !== id));
+        if (selectedFiles.banner === id) {
+          setSelectedFiles({ ...selectedFiles, banner: null });
+        }
       } else {
         setVideoFiles(videoFiles.filter(file => file.id !== id));
+        if (selectedFiles.video === id) {
+          setSelectedFiles({ ...selectedFiles, video: null });
+        }
       }
     } catch (error) {
       console.error("Delete error:", error);
@@ -271,12 +375,33 @@ const EditPage = () => {
           </div>
 
           <div className="bg-white rounded-lg p-4 shadow-sm">
+            <div className="flex justify-between mb-4">
+              <h3 className="font-medium text-gray-700">Available Banners</h3>
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => handleSave("banner")}
+                  className="flex items-center bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded"
+                  disabled={!selectedFiles.banner || isUploading.banner}
+                >
+                  <MdSave className="mr-1" />
+                  Save
+                </button>
+                <button
+                  onClick={() => selectedFiles.banner && handleDelete(selectedFiles.banner, "banner")}
+                  className="flex items-center bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+                  disabled={!selectedFiles.banner || isUploading.banner}
+                >
+                  <MdDelete className="mr-1" />
+                  Delete
+                </button>
+              </div>
+            </div>
             <table className="w-full">
               <thead>
                 <tr className="text-left text-gray-600">
                   <th className="py-2 font-medium">#</th>
                   <th className="py-2 font-medium">File name</th>
-                  <th className="py-2 font-medium">Action</th>
+                  <th className="py-2 font-medium">Select</th>
                 </tr>
               </thead>
               <tbody>
@@ -288,17 +413,18 @@ const EditPage = () => {
                   </tr>
                 ) : (
                   bannerFiles.map((file, index) => (
-                    <tr key={file.id} className="border-t border-gray-100">
+                    <tr key={file.id} className={`border-t border-gray-100 ${selectedFiles.banner === file.id ? 'bg-blue-50' : ''}`}>
                       <td className="py-2 text-gray-600">{index + 1}.</td>
                       <td className="py-2 text-gray-600">{file.originalName || file.name}</td>
                       <td className="py-2">
-                        <button
-                          onClick={() => handleDelete(file.id, "banner")}
-                          className="text-red-500 hover:text-red-600 p-1"
+                        <input
+                          type="radio"
+                          name="selectedBanner"
+                          checked={selectedFiles.banner === file.id}
+                          onChange={() => handleSelectFile(file.id, "banner")}
+                          className="form-radio text-blue-500"
                           disabled={isUploading.banner}
-                        >
-                          <MdDelete size={20} />
-                        </button>
+                        />
                       </td>
                     </tr>
                   ))
@@ -364,12 +490,33 @@ const EditPage = () => {
           </div>
 
           <div className="bg-white rounded-lg p-4 shadow-sm">
+            <div className="flex justify-between mb-4">
+              <h3 className="font-medium text-gray-700">Available Videos</h3>
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => handleSave("video")}
+                  className="flex items-center bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded"
+                  disabled={!selectedFiles.video || isUploading.video}
+                >
+                  <MdSave className="mr-1" />
+                  Save
+                </button>
+                <button
+                  onClick={() => selectedFiles.video && handleDelete(selectedFiles.video, "video")}
+                  className="flex items-center bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+                  disabled={!selectedFiles.video || isUploading.video}
+                >
+                  <MdDelete className="mr-1" />
+                  Delete
+                </button>
+              </div>
+            </div>
             <table className="w-full">
               <thead>
                 <tr className="text-left text-gray-600">
                   <th className="py-2 font-medium">#</th>
                   <th className="py-2 font-medium">File name</th>
-                  <th className="py-2 font-medium">Action</th>
+                  <th className="py-2 font-medium">Select</th>
                 </tr>
               </thead>
               <tbody>
@@ -381,17 +528,18 @@ const EditPage = () => {
                   </tr>
                 ) : (
                   videoFiles.map((file, index) => (
-                    <tr key={file.id} className="border-t border-gray-100">
+                    <tr key={file.id} className={`border-t border-gray-100 ${selectedFiles.video === file.id ? 'bg-blue-50' : ''}`}>
                       <td className="py-2 text-gray-600">{index + 1}.</td>
                       <td className="py-2 text-gray-600">{file.originalName || file.name}</td>
                       <td className="py-2">
-                        <button
-                          onClick={() => handleDelete(file.id, "video")}
-                          className="text-red-500 hover:text-red-600 p-1"
+                        <input
+                          type="radio"
+                          name="selectedVideo"
+                          checked={selectedFiles.video === file.id}
+                          onChange={() => handleSelectFile(file.id, "video")}
+                          className="form-radio text-blue-500"
                           disabled={isUploading.video}
-                        >
-                          <MdDelete size={20} />
-                        </button>
+                        />
                       </td>
                     </tr>
                   ))
