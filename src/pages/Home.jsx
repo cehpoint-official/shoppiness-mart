@@ -8,7 +8,6 @@ import img18 from "../assets/homepage/img18.png";
 import Backimg9 from "../assets/homepage/backimg9.png";
 
 // import Home1 from "../assets/Home/home1.png";
-import Logo1 from "../assets/Home/logo1.png";
 import supportACause from "../assets/homeheader.png";
 
 import FAQ from "../Components/FAQ";
@@ -22,7 +21,7 @@ import Loader from "../Components/Loader/Loader";
 import { useState, useEffect } from "react";
 import { db } from "../../firebase";
 import { collection, addDoc, getDoc, getDocs, query, where, orderBy, limit, doc } from "firebase/firestore";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Home = () => {
   const [name, setName] = useState("");
@@ -33,6 +32,9 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [bannerImage, setBannerImage] = useState(null);
   const [bannerLoading, setBannerLoading] = useState(true);
+  const [causeLogos, setCauseLogos] = useState([]);
+  const [causesLoading, setCausesLoading] = useState(true);
+  const navigate = useNavigate();
 
   const handleSubscribe = async (e) => {
     e.preventDefault();
@@ -129,6 +131,31 @@ const Home = () => {
     } finally {
       // Always finish loading state, regardless of success or failure
       setBannerLoading(false);
+    }
+
+    // Fetch active cause logos
+    setCausesLoading(true);
+    try {
+      const causesQuery = query(
+        collection(db, "causeDetails"),
+        where("status", "==", "Active"),
+        limit(6)
+      );
+      
+      const causesSnapshot = await getDocs(causesQuery);
+      const causesData = [];
+      
+      causesSnapshot.forEach((doc) => {
+        if (doc.data().logoUrl) {
+          causesData.push({ id: doc.id, ...doc.data() });
+        }
+      });
+      
+      setCauseLogos(causesData);
+    } catch (error) {
+      console.log("Error getting cause logos: ", error);
+    } finally {
+      setCausesLoading(false);
     }
   };
 
@@ -327,41 +354,51 @@ const Home = () => {
         </p>
 
         <div className="flex justify-center items-center flex-wrap gap-2 mt-4">
-          <div className="m-2">
-            <img src={Logo1} alt="Loading..." className="w-[100px]" />
-          </div>
-          <div className="m-2">
-            <img src={Logo1} alt="Loading..." className="w-[100px]" />
-          </div>
-          <div className="m-2">
-            <img src={Logo1} alt="Loading..." className="w-[100px]" />
-          </div>
-          <div className="m-2">
-            <img src={Logo1} alt="Loading..." className="w-[100px]" />
-          </div>
-          <div className="m-2">
-            <img src={Logo1} alt="Loading..." className="w-[100px]" />
-          </div>
-          <div>
-            <button className="bg-[#FFD705] text-blue-950 text-xl font-bold rounded-full w-[100px] h-[100px] px-2 flex items-center justify-center">
-              View All
-            </button>
-          </div>
+          {causesLoading ? (
+            // Show a loading indicator while fetching causes
+            <div className="flex justify-center w-full py-4">
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-teal-500"></div>
+            </div>
+          ) : causeLogos.length > 0 ? (
+            // Render cause logos
+            <>
+              {causeLogos.map((cause) => (
+                <div className="m-2" key={cause.id}>
+                  <img 
+                    src={cause.logoUrl} 
+                    alt={cause.name || "Cause logo"} 
+                    className="w-[100px] h-[100px] rounded-full object-cover"
+                  />
+                </div>
+              ))}
+              <div>
+                <button 
+                  className="bg-[#FFD705] text-blue-950 text-xl font-bold rounded-full w-[100px] h-[100px] px-2 flex items-center justify-center"
+                  onClick={() => {
+                    navigate('/support');
+                    window.scrollTo(0, 0);
+                  }}
+                >
+                  View All
+                </button>
+              </div>
+            </>
+          ) : (
+            // No causes found
+            <div className="text-center w-full py-4">
+              <p className="text-gray-500">No active causes available at the moment.</p>
+            </div>
+          )}
         </div>
 
-        <div className="md:mx-20 mx-10 mt-16">
-          <div className="flex justify-center items-center w-full">
-            <input
-              type="search"
-              className="py-2 px-10 w-full text-gray-900 bg-amber-50 border-2"
-              placeholder="Search name of the cause or NGO you want to support.."
-              required
-            />
-            <i className="bi bi-search text-2xl px-2 py-1 border-2"></i>
-          </div>
-        </div>
         <div className="mt-10 text-center pb-5">
-          <p className="bg-[#FFD705] rounded-lg w-full md:w-72 py-2 inline-block">
+          <p 
+            className="bg-[#FFD705] rounded-lg w-full md:w-72 py-2 inline-block cursor-pointer"
+            onClick={() => {
+              navigate('/business-form');
+              window.scrollTo(0, 0);
+            }}
+          >
             Create Your Own Fundraising Store
           </p>
         </div>

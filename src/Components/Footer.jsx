@@ -146,7 +146,7 @@ const Footer = () => {
 
   return (
     <div>
-      <div className=" mx-auto bg-[#049D8E] z-10 mt-5 overflow-hidden lg:justify-center items-center ">
+      <div className="mx-auto bg-[#049D8E] z-10 mt-5 overflow-hidden lg:justify-center items-center py-5">
         <div className=" w-44 hidden md:block lg:block"></div>
 
         <div className="mx-4 flex flex-wrap lg:justify-center items-center ">
@@ -169,7 +169,7 @@ const Footer = () => {
             </div>
           </div>
           <div className="w-full px-8 sm:w-1/2 lg:w-2/12">
-            <div className="mb-10 w-full mt-28">
+            <div className="mb-10 w-full mt-16">
               <h4 className="text-3xl font-semibold text-white mb-4">
                 Latest Posts
               </h4>

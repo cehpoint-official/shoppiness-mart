@@ -9,7 +9,7 @@ const CatagoryBasedShops = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [shops, setShops] = useState([]);
-  const { category,userId } = useParams();
+  const { category, userId } = useParams();
   const location = useLocation();
   const fetchData = useCallback(async () => {
     try {
@@ -17,7 +17,7 @@ const CatagoryBasedShops = () => {
       const data = [];
       querySnapshot.forEach((doc) => {
         const shopData = doc.data();
-        if (shopData.mode === "Offline" && shopData.cat === category) {
+        if (shopData.mode === "Offline" && shopData.cat === category && shopData.status === "Active") {
           data.push({ id: doc.id, ...shopData });
         }
       });
@@ -100,7 +100,7 @@ const CatagoryBasedShops = () => {
                   <p className="font-semibold text-xl">{item.businessName}</p>
                   <p className="my-2 text-lg text-gray-500">{item.location}</p>
                   <button className="bg-[#0059DE] text-white rounded-full px-2 py-1 text-sm">
-                    10% Cashback
+                    {item.rate}% Cashback
                   </button>
                 </div>
               </Link>

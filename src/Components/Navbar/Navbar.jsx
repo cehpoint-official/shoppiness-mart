@@ -1,5 +1,5 @@
 import ShoppingBag from "../../assets/ShoppingBag.png";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { AiOutlineClose } from "react-icons/ai"; // Importing cross icon
 import { useEffect, useState } from "react";
@@ -9,9 +9,12 @@ const Navbar = () => {
   const [active, setActive] = useState(false);
   const [showLoginDropdown, setShowLoginDropdown] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     setActive(false);
+    // Scroll to top when location changes
+    window.scrollTo(0, 0);
   }, [location]);
 
   const getLinkClass = (path) => {
@@ -22,10 +25,16 @@ const Navbar = () => {
     setShowLoginDropdown((prev) => !prev);
   };
 
+  // Custom navigation handler that ensures scroll to top
+  const handleNavigation = (path) => {
+    navigate(path);
+    window.scrollTo(0, 0);
+  };
+
   return (
     <div className="navbar">
       <div className="top">
-        <Link to="/">
+        <Link to="/" onClick={() => window.scrollTo(0, 0)}>
           <img src={ShoppingBag} className="h-11" alt="Loading..." />
         </Link>
         <div className="links">
@@ -42,18 +51,21 @@ const Navbar = () => {
               <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-50">
                 <Link
                   to="/login/cause"
+                  onClick={() => window.scrollTo(0, 0)}
                   className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                 >
                   Login as Cause/NGO
                 </Link>
                 <Link
                   to="/login/business"
+                  onClick={() => window.scrollTo(0, 0)}
                   className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                 >
                   Login as Business/Service
                 </Link>
                 <Link
                   to="/login/user"
+                  onClick={() => window.scrollTo(0, 0)}
                   className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                 >
                   Login as User
@@ -61,7 +73,7 @@ const Navbar = () => {
               </div>
             )}
           </div>
-          <Link to="/signup" className="register">
+          <Link to="/signup" onClick={() => window.scrollTo(0, 0)} className="register">
             <i className="bi bi-pencil-fill text-[#049D8E] text-lg"></i>
             Signup
           </Link>
@@ -75,46 +87,47 @@ const Navbar = () => {
         </div>
       </div>
       <div className="bottom">
-        <Link to="/" className={getLinkClass("/")}>
+        <Link to="/" onClick={() => window.scrollTo(0, 0)} className={getLinkClass("/")}>
           Home
         </Link>
-        <Link to="/offline-shop" className={getLinkClass("/offline-shop")}>
+        <Link to="/offline-shop" onClick={() => window.scrollTo(0, 0)} className={getLinkClass("/offline-shop")}>
           Offline Shop
         </Link>
-        <Link to="/online-shop" className={getLinkClass("/online-shop")}>
+        <Link to="/online-shop" onClick={() => window.scrollTo(0, 0)} className={getLinkClass("/online-shop")}>
           Online Shop
         </Link>
-        <Link to="/howitworks" className={getLinkClass("/howitworks")}>
+        <Link to="/howitworks" onClick={() => window.scrollTo(0, 0)} className={getLinkClass("/howitworks")}>
           How it works
         </Link>
-        <Link to="/support" className={getLinkClass("/support")}>
+        <Link to="/support" onClick={() => window.scrollTo(0, 0)} className={getLinkClass("/support")}>
           Support a Cause/NGO
         </Link>
-        <Link to="/register-cause" className={getLinkClass("/register-cause")}>
+        <Link to="/register-cause" onClick={() => window.scrollTo(0, 0)} className={getLinkClass("/register-cause")}>
           Register a Cause/NGO
         </Link>
         <Link
           to="/register-business"
+          onClick={() => window.scrollTo(0, 0)}
           className={getLinkClass("/register-business")}
         >
           Register a business/Service
         </Link>
-        <Link to="/supportmaast" className={getLinkClass("/supportmaast")}>
+        <Link to="/supportmaast" onClick={() => window.scrollTo(0, 0)} className={getLinkClass("/supportmaast")}>
           Support Maast
         </Link>
       </div>
 
       {active && (
         <div className="menu">
-          <Link to="/">Home</Link>
-          <Link to="/offline-shop">Offline Shop</Link>
-          <Link to="/online-shop">Online Shop</Link>
-          <Link to="/cashback-deals">Cashback/deals</Link>
-          <Link to="/howitworks">How it works</Link>
-          <Link to="/support">Support a Cause/NGO</Link>
-          <Link to="/register-cause">Register a Cause/NGO</Link>
-          <Link to="/register-business">Register a business/Service</Link>
-          <Link to="/supportmaast">Support Maast</Link>
+          <Link to="/" onClick={() => window.scrollTo(0, 0)}>Home</Link>
+          <Link to="/offline-shop" onClick={() => window.scrollTo(0, 0)}>Offline Shop</Link>
+          <Link to="/online-shop" onClick={() => window.scrollTo(0, 0)}>Online Shop</Link>
+          <Link to="/cashback-deals" onClick={() => window.scrollTo(0, 0)}>Cashback/deals</Link>
+          <Link to="/howitworks" onClick={() => window.scrollTo(0, 0)}>How it works</Link>
+          <Link to="/support" onClick={() => window.scrollTo(0, 0)}>Support a Cause/NGO</Link>
+          <Link to="/register-cause" onClick={() => window.scrollTo(0, 0)}>Register a Cause/NGO</Link>
+          <Link to="/register-business" onClick={() => window.scrollTo(0, 0)}>Register a business/Service</Link>
+          <Link to="/supportmaast" onClick={() => window.scrollTo(0, 0)}>Support Maast</Link>
           <div className="relative">
             <button onClick={toggleLoginDropdown} className="login w-full">
               <i className="bi bi-arrow-right-circle-fill text-white"></i>
@@ -124,18 +137,21 @@ const Navbar = () => {
               <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-50">
                 <Link
                   to="/login/cause"
+                  onClick={() => window.scrollTo(0, 0)}
                   className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                 >
                   Login as Cause/NGO
                 </Link>
                 <Link
                   to="/login/business"
+                  onClick={() => window.scrollTo(0, 0)}
                   className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                 >
                   Login as Business/Service
                 </Link>
                 <Link
                   to="/login/user"
+                  onClick={() => window.scrollTo(0, 0)}
                   className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                 >
                   Login as User
@@ -143,7 +159,7 @@ const Navbar = () => {
               </div>
             )}
           </div>
-          <Link to="/signup" className="register">
+          <Link to="/signup" onClick={() => window.scrollTo(0, 0)} className="register">
             <i className="bi bi-pencil-fill text-[#049D8E] text-lg"></i>
             Signup
           </Link>
