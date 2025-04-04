@@ -9,11 +9,152 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import SuccessPage from "../../Components/SuccessPage/SuccessPage";
 import toast from "react-hot-toast";
 import { FaSpinner } from "react-icons/fa";
+import { FaTimes } from "react-icons/fa";
 import axios from "axios";
+
+// Dialog Components
+const TermsDialog = ({ isOpen, onClose, onAgree }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="dialog-overlay">
+      <div className="dialog-container">
+        <div className="dialog-header">
+          <h2>Terms and Conditions</h2>
+          <button className="close-btn" onClick={onClose}>
+            <FaTimes />
+          </button>
+        </div>
+        <div className="dialog-content">
+          <h3>ShoppinessMart Business Registration Agreement</h3>
+          <p>Last Updated: April 4, 2025</p>
+          
+          <h4>1. INTRODUCTION</h4>
+          <p>This Business Registration Agreement ("Agreement") constitutes a legally binding contract between you, the Business Owner ("Seller," "you," or "your") and ShoppinessMart ("Company," "we," "us," or "our") governing your participation on our platform.</p>
+          
+          <h4>2. ELIGIBILITY</h4>
+          <p>By registering your business on our platform, you represent and warrant that:</p>
+          <ul>
+            <li>You are at least 18 years of age</li>
+            <li>You have the legal authority to bind the business to this Agreement</li>
+            <li>Your business complies with all applicable laws and regulations</li>
+            <li>All information provided during registration is accurate and complete</li>
+          </ul>
+          
+          <h4>3. REGISTRATION APPROVAL</h4>
+          <p>All business registrations are subject to approval by ShoppinessMart. We reserve the right to reject any registration at our sole discretion.</p>
+          
+          <h4>4. COMMISSION STRUCTURE</h4>
+          <p>In exchange for access to our platform and customer base, you agree to pay a commission on all sales generated through ShoppinessMart. Standard commission rates range from 5% to 15% depending on product/service category.</p>
+          
+          <h4>5. PAYMENT TERMS</h4>
+          <p>You agree to remit all commission payments within 3-5 business days after the customer's purchase and bill generation. Failure to make timely payments may result in suspension or termination of your account.</p>
+          
+          <h4>6. PLATFORM RULES</h4>
+          <p>You agree to:</p>
+          <ul>
+            <li>Maintain accurate inventory and pricing information</li>
+            <li>Respond to customer inquiries within 24 hours</li>
+            <li>Process and fulfill orders promptly</li>
+            <li>Comply with our return and refund policies</li>
+            <li>Maintain a customer satisfaction rating of at least 4.0 stars</li>
+          </ul>
+          
+          <h4>7. INTELLECTUAL PROPERTY</h4>
+          <p>You grant ShoppinessMart a non-exclusive license to use your business name, logo, and product information for marketing purposes. You retain all ownership rights to your intellectual property.</p>
+          
+          <h4>8. TERM AND TERMINATION</h4>
+          <p>This Agreement remains in effect until terminated. Either party may terminate this Agreement with 30 days' written notice. ShoppinessMart may terminate immediately if you breach any provision of this Agreement.</p>
+          
+          <h4>9. LIMITATION OF LIABILITY</h4>
+          <p>ShoppinessMart's liability is limited to direct damages not exceeding the total commissions paid in the three months preceding the claim.</p>
+          
+          <h4>10. MODIFICATIONS</h4>
+          <p>ShoppinessMart reserves the right to modify this Agreement at any time. Continued use of the platform constitutes acceptance of any modifications.</p>
+        </div>
+        <div className="dialog-footer">
+          <button className="cancel-btn" onClick={onClose}>Cancel</button>
+          <button className="agree-btn" onClick={onAgree}>I Agree</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const PreferredPartnerDialog = ({ isOpen, onClose, onAgree }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="dialog-overlay">
+      <div className="dialog-container">
+        <div className="dialog-header">
+          <h2>Preferred Partner Agreement</h2>
+          <button className="close-btn" onClick={onClose}>
+            <FaTimes />
+          </button>
+        </div>
+        <div className="dialog-content">
+          <h3>ShoppinessMart Preferred Partner Program</h3>
+          <p>Last Updated: April 4, 2025</p>
+          
+          <h4>1. PREFERRED PARTNER STATUS</h4>
+          <p>This Preferred Partner Agreement ("Agreement") enhances the standard Business Registration Agreement between you ("Preferred Partner") and ShoppinessMart ("Company").</p>
+          
+          <h4>2. ENHANCED BENEFITS</h4>
+          <p>As a Preferred Partner, you will receive:</p>
+          <ul>
+            <li>Priority placement in search results and category listings</li>
+            <li>Featured status in promotional campaigns</li>
+            <li>"Preferred Partner" badge on your business profile</li>
+            <li>Access to premium analytics dashboard</li>
+            <li>Dedicated account manager</li>
+            <li>Early access to new platform features</li>
+            <li>Invitation to exclusive networking events</li>
+          </ul>
+          
+          <h4>3. ADDITIONAL OBLIGATIONS</h4>
+          <p>In exchange for these benefits, you agree to:</p>
+          <ul>
+            <li>Maintain an average customer rating of at least 4.5 stars</li>
+            <li>Process and fulfill all orders within 24 hours</li>
+            <li>Respond to customer inquiries within 12 hours</li>
+            <li>Maintain a minimum monthly sales volume (category-dependent)</li>
+            <li>Participate in at least four promotional events annually</li>
+            <li>Provide exclusive offers to ShoppinessMart customers at least quarterly</li>
+          </ul>
+          
+          <h4>4. COMMISSION STRUCTURE</h4>
+          <p>Preferred Partners are subject to a premium commission structure, typically 2-5% higher than standard rates, reflecting the enhanced visibility and promotional benefits provided.</p>
+          
+          <h4>5. PAYMENT TERMS</h4>
+          <p>You agree to remit all commission payments within 3 business days after the customer's purchase and bill generation. Expedited payment is required to maintain the cash flow necessary to support premium promotional activities.</p>
+          
+          <h4>6. PERFORMANCE REVIEWS</h4>
+          <p>Your Preferred Partner status will be reviewed quarterly. Failure to meet the obligations outlined in this Agreement may result in reclassification to standard partner status.</p>
+          
+          <h4>7. TERM AND TERMINATION</h4>
+          <p>Either party may terminate this Preferred Partner Agreement with 14 days' written notice, reverting to the standard Business Registration Agreement. ShoppinessMart may terminate immediately if you breach any provision of this Agreement.</p>
+          
+          <h4>8. EXCLUSIVITY</h4>
+          <p>While not requiring absolute exclusivity, Preferred Partners agree to provide ShoppinessMart customers with pricing and offers at least as favorable as those offered on other platforms.</p>
+        </div>
+        <div className="dialog-footer">
+          <button className="cancel-btn" onClick={onClose}>Cancel</button>
+          <button className="agree-btn" onClick={onAgree}>I Agree</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const BusinessForm = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [success, setSuccess] = useState(false);
   const [completedSteps, setCompletedSteps] = useState([false, false, false]);
+  const [termsAgreed, setTermsAgreed] = useState(false);
+  const [showTermsDialog, setShowTermsDialog] = useState(false);
+  const [preferredPartner, setPreferredPartner] = useState(null);
+  const [showPreferredPartnerDialog, setShowPreferredPartnerDialog] = useState(false);
   const [formData, setFormData] = useState({
     // Business Details (Page 1)
     businessName: "",
@@ -35,18 +176,76 @@ const BusinessForm = () => {
     email: "",
     password: "",
     confirmPassword: "",
+    
+    // Agreement statuses
+    termsAgreed: false,
+    isPreferredPartner: false,
   });
 
   const [logoFile, setLogoFile] = useState(null);
   const [bannerFile, setBannerFile] = useState(null);
   const [uploadProgress, setUploadProgress] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
   const handleInputChange = (e, field) => {
     const { value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
+  };
+
+  const handleCheckboxChange = (e, field) => {
+    const { checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [field]: checked,
+    }));
+  };
+
+  const handleViewTerms = (e) => {
+    e.preventDefault();
+    setShowTermsDialog(true);
+  };
+
+  const handleAgreeTerms = () => {
+    setTermsAgreed(true);
+    setFormData(prev => ({
+      ...prev,
+      termsAgreed: true
+    }));
+    setShowTermsDialog(false);
+  };
+
+  const handleCloseTerms = () => {
+    setShowTermsDialog(false);
+  };
+
+  const handlePreferredPartnerChange = (e) => {
+    const isPreferred = e.target.value === "yes";
+    setPreferredPartner(e.target.value);
+    
+    if (isPreferred) {
+      setShowPreferredPartnerDialog(true);
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        isPreferredPartner: false
+      }));
+    }
+  };
+
+  const handleAgreePreferredPartner = () => {
+    setFormData(prev => ({
+      ...prev,
+      isPreferredPartner: true
+    }));
+    setShowPreferredPartnerDialog(false);
+  };
+
+  const handleClosePreferredPartner = () => {
+    setPreferredPartner("no");
+    setShowPreferredPartnerDialog(false);
   };
 
   const validateCurrentPage = () => {
@@ -57,14 +256,14 @@ const BusinessForm = () => {
           formData.owner &&
           formData.mode &&
           formData.contact &&
-          formData.businessEmail
+          formData.businessEmail 
         );
       case 2:
         return (
           formData.cat &&
           formData.location &&
           formData.pincode &&
-          formData.shortDesc
+          formData.shortDesc 
         );
       case 3:
         return (
@@ -73,7 +272,10 @@ const BusinessForm = () => {
           formData.mobileNumber &&
           formData.email &&
           formData.password &&
-          formData.confirmPassword
+          formData.confirmPassword &&
+          termsAgreed &&
+          preferredPartner !== null && 
+          (preferredPartner === "no" || (preferredPartner === "yes" && formData.isPreferredPartner))
         );
       default:
         return true;
@@ -89,6 +291,14 @@ const BusinessForm = () => {
         return updatedSteps;
       });
       setCurrentPage((prev) => prev + 1);
+    } else {
+      if (!termsAgreed) {
+        toast.error("You must agree to the Terms and Conditions to proceed.");
+      } else if (currentPage === 3 && preferredPartner === null) {
+        toast.error("Please select whether you want to be a Preferred Partner.");
+      } else {
+        toast.error("Please fill all required fields.");
+      }
     }
   };
 
@@ -116,7 +326,6 @@ const BusinessForm = () => {
           toast.error(
             "This email is already registered. Please use a different email address."
           );
-          // Keep the user on the same page
           setIsLoading(false);
           return;
         }
@@ -124,7 +333,7 @@ const BusinessForm = () => {
         await addData(); // Add data to Firebase
         // Add notification to adminNotifications collection
         await addDoc(collection(db, "adminNotifications"), {
-          message: `New Business/Services registration request from ${formData.firstName} ${formData.lastName} for "${formData.businessName}".`,
+          message: `New Business/Services registration request from ${formData.firstName} ${formData.lastName} for "${formData.businessName}".${formData.isPreferredPartner ? ' Requested Preferred Partner status.' : ''}`,
           createdAt: new Date().toISOString(),
           read: false,
         });
@@ -141,6 +350,7 @@ const BusinessForm = () => {
               <p>Dear ${formData.firstName} ${formData.lastName},</p>
               
               <p>We have received your Business/Services registration request for "${formData.businessName}". Our team will review your application and get back to you soon.</p>
+              ${formData.isPreferredPartner ? '<p><strong>We have also noted your interest in our Preferred Partner Program.</strong></p>' : ''}
               
               <p>Please note:</p>
               <ul>
@@ -165,6 +375,16 @@ const BusinessForm = () => {
         toast.error("Registration failed. Please try again.");
       } finally {
         setIsLoading(false);
+      }
+    } else {
+      if (!termsAgreed) {
+        toast.error("You must agree to the Terms and Conditions to proceed.");
+      } else if (preferredPartner === null) {
+        toast.error("Please select whether you want to be a Preferred Partner.");
+      } else if (preferredPartner === "yes" && !formData.isPreferredPartner) {
+        toast.error("You must agree to the Preferred Partner terms to proceed as a Preferred Partner.");
+      } else {
+        toast.error("Please fill all required fields.");
       }
     }
   };
@@ -272,10 +492,27 @@ const BusinessForm = () => {
       throw new Error(e.message);
     }
   };
+  
   function formatDate(date) {
     const options = { day: "numeric", month: "short", year: "numeric" };
     return date.toLocaleDateString("en-GB", options);
   }
+  
+  // Terms and conditions checkbox component
+  const TermsCheckbox = () => (
+    <div className="terms-checkbox">
+      <input
+        type="checkbox"
+        id="terms"
+        checked={termsAgreed}
+        onChange={(e) => setTermsAgreed(e.target.checked)}
+      />
+      <label htmlFor="terms">
+        I agree to the <button onClick={handleViewTerms} className="terms-link">Terms and Conditions</button>
+      </label>
+    </div>
+  );
+
   const pages = [
     {
       title: "Business Details",
@@ -415,8 +652,8 @@ const BusinessForm = () => {
             <div className="item">
               <h3>Add Logo</h3>
               <label htmlFor="file1">
-                <p>Drag And Drop</p>
-                or
+                <p>Drag & Drop</p>
+                <span>or</span>
                 <p className="chooseFile">Choose File</p>
               </label>
               <input
@@ -429,8 +666,8 @@ const BusinessForm = () => {
             <div className="item">
               <h3>Add Banner</h3>
               <label htmlFor="file2">
-                <p>Drag And Drop</p>
-                or
+                <p>Drag & Drop</p>
+                <span>or</span>
                 <p className="chooseFile">Choose File</p>
               </label>
               <input
@@ -484,6 +721,33 @@ const BusinessForm = () => {
                 onChange={(e) => handleInputChange(e, "mobileNumber")}
               />
             </div>
+            <div className="item">
+              <label>Do you want to join as a Most Preferred Partner?</label>
+              <div className="preferred-options">
+                <div className="preferred-option">
+                  <input
+                    type="radio"
+                    id="preferred-yes"
+                    name="preferred"
+                    value="yes"
+                    checked={preferredPartner === "yes"}
+                    onChange={handlePreferredPartnerChange}
+                  />
+                  <label htmlFor="preferred-yes">Yes</label>
+                </div>
+                <div className="preferred-option">
+                  <input
+                    type="radio"
+                    id="preferred-no"
+                    name="preferred"
+                    value="no"
+                    checked={preferredPartner === "no"}
+                    onChange={handlePreferredPartnerChange}
+                  />
+                  <label htmlFor="preferred-no">No</label>
+                </div>
+              </div>
+            </div>
           </div>
           <div className="right">
             <div className="item">
@@ -513,6 +777,7 @@ const BusinessForm = () => {
                 onChange={(e) => handleInputChange(e, "confirmPassword")}
               />
             </div>
+            <TermsCheckbox />
             <div className="btns">
               <button type="button" className="back" onClick={handleBackPage}>
                 Back
@@ -520,7 +785,7 @@ const BusinessForm = () => {
               <button
                 className="next flex justify-center items-center gap-3"
                 type="submit"
-                disabled={isLoading}
+                disabled={isLoading || !termsAgreed || preferredPartner === null || (preferredPartner === "yes" && !formData.isPreferredPartner)}
               >
                 {isLoading ? (
                   <>
@@ -573,6 +838,20 @@ const BusinessForm = () => {
           pages[currentPage - 1].content
         )}
       </div>
+
+      {/* Terms and Conditions Dialog */}
+      <TermsDialog 
+        isOpen={showTermsDialog} 
+        onClose={handleCloseTerms} 
+        onAgree={handleAgreeTerms} 
+      />
+
+      {/* Preferred Partner Dialog */}
+      <PreferredPartnerDialog 
+        isOpen={showPreferredPartnerDialog} 
+        onClose={handleClosePreferredPartner} 
+        onAgree={handleAgreePreferredPartner} 
+      />
     </div>
   );
 };

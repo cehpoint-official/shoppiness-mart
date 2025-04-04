@@ -304,6 +304,40 @@ const OfflineShopRequests = () => {
                     </td>
                   </tr>
                   <tr>
+                    <td className="py-3 text-sm text-gray-500">
+                      Terms Agreement
+                    </td>
+                    <td className="py-3 text-sm">
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          selectedShop.termsAgreed
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {selectedShop.termsAgreed ? "Agreed" : "Not Agreed"}
+                      </span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 text-sm text-gray-500">
+                      Preferred Partner Status
+                    </td>
+                    <td className="py-3 text-sm">
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          selectedShop.isPreferredPartner
+                            ? "bg-blue-100 text-blue-800"
+                            : "bg-gray-100 text-gray-800"
+                        }`}
+                      >
+                        {selectedShop.isPreferredPartner
+                          ? "Preferred Partner"
+                          : "Standard Partner"}
+                      </span>
+                    </td>
+                  </tr>
+                  <tr>
                     <td className="py-3 text-sm text-gray-500">LOGO</td>
                     <td className="py-3">
                       <img

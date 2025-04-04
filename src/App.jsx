@@ -12,6 +12,7 @@ import PlatformEarningsFromBusiness from "./Admin/pages/Product&Services/Platfor
 import AllPaymentVarificationRequest from "./Admin/pages/Product&Services/PlatformEarningsFromBuisness/AllPaymentVarificationRequest";
 import ViewPaymentDetails from "./Admin/pages/Product&Services/PlatformEarningsFromBuisness/ViewPaymentDetails";
 import CashbackTracking from "./Admin/pages/Product&Services/CashbackTracking/CashbackTracking";
+import AllPartners from "./pages/AllPartners";
 
 // import ProtectedRoute from "./Components/ProtectedRoute";
 
@@ -226,6 +227,7 @@ const router = createBrowserRouter([
           { path: "/about", element: <AboutUs /> },
           { path: "/blogs", element: <Blogs /> },
           { path: "/register-business", element: <Business /> },
+          { path: "/all-partners", element: <AllPartners /> },
           { path: "/register-cause", element: <Cause /> },
           { path: "/support", element: <SupportACause /> },
           { path: "/supportmaast", element: <SupportMaast /> },

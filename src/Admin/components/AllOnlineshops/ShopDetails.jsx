@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import { FaSpinner } from "react-icons/fa";
 import { FiEdit } from "react-icons/fi";
+
 function ShopDetails({ shop, onBack, onListedProducts, onStatusUpdate }) {
   const [showOptions, setShowOptions] = useState(false);
   const [markingActive, setMarkingActive] = useState(false);
@@ -14,8 +15,8 @@ function ShopDetails({ shop, onBack, onListedProducts, onStatusUpdate }) {
   const [editingRate, setEditingRate] = useState(null);
   const [tempRate, setTempRate] = useState("");
   const [isSavingRate, setIsSavingRate] = useState(false);
+
   const handleUpdateStatus = async (id, status) => {
-    // Set loading states based on the status being updated
     if (status === "Active") {
       setMarkingActive(true);
     } else if (status === "Inactive") {
@@ -23,7 +24,6 @@ function ShopDetails({ shop, onBack, onListedProducts, onStatusUpdate }) {
     }
 
     try {
-      // Update Firestore document
       const shopRef = doc(db, "businessDetails", id);
       await updateDoc(shopRef, {
         status,
@@ -45,7 +45,6 @@ function ShopDetails({ shop, onBack, onListedProducts, onStatusUpdate }) {
             : null,
       });
 
-      // Prepare email template based on the status
       const emailTemplate =
         status === "Active"
           ? `
@@ -96,7 +95,6 @@ function ShopDetails({ shop, onBack, onListedProducts, onStatusUpdate }) {
         </div>
       `;
 
-      // Send email notification
       await axios.post(`${import.meta.env.VITE_AWS_SERVER}/send-email`, {
         email: shop.email,
         title:
@@ -106,52 +104,45 @@ function ShopDetails({ shop, onBack, onListedProducts, onStatusUpdate }) {
         body: emailTemplate,
       });
 
-      // Show success toast and refresh data
       toast.success(`Status updated to ${status}`);
       onStatusUpdate();
     } catch (error) {
       console.error("Error updating document or sending email:", error);
       toast.error("Failed to update status");
     } finally {
-      // Reset loading states
       setMarkingActive(false);
       setMarkingInactive(false);
     }
   };
-  // Handle editing commission rate
+
   const handleEditRate = (shop) => {
     setEditingRate(shop.id);
     setTempRate(shop.rate || "");
   };
 
-  // Handle saving the updated commission rate
   const handleSaveRate = async () => {
     if (!tempRate || isNaN(tempRate)) {
       toast.error("Please enter a valid commission rate.");
       return;
     }
 
-    setIsSavingRate(true); // Start loading
-
+    setIsSavingRate(true);
     try {
       const shopRef = doc(db, "businessDetails", shop.id);
       await updateDoc(shopRef, { rate: tempRate });
-
-      // Update the local state to reflect the change immediately
       shop.rate = tempRate;
-      setEditingRate(null); // Exit editing mode
+      setEditingRate(null);
       toast.success("Commission rate updated successfully!");
     } catch (error) {
       console.error("Error updating commission rate:", error);
       toast.error("Failed to update commission rate");
     } finally {
-      setIsSavingRate(false); // Stop loading
+      setIsSavingRate(false);
     }
   };
 
   return (
     <div className="min-h-screen p-6">
-      {/* Header */}
       <div className="py-4 flex items-center justify-between">
         <button
           onClick={onBack}
@@ -167,7 +158,6 @@ function ShopDetails({ shop, onBack, onListedProducts, onStatusUpdate }) {
           >
             <IoEllipsisVertical className="w-6 h-6 text-gray-600" />
           </button>
-
           {showOptions && (
             <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border py-1">
               <button
@@ -203,7 +193,6 @@ function ShopDetails({ shop, onBack, onListedProducts, onStatusUpdate }) {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="p-6 bg-white rounded-lg shadow-md border">
         <div className="flex items-start gap-6 mb-8">
           <img
@@ -211,7 +200,6 @@ function ShopDetails({ shop, onBack, onListedProducts, onStatusUpdate }) {
             alt={shop.businessName}
             className="w-48 h-48 object-cover rounded-lg"
           />
-
           <div className="flex-grow">
             <div className="flex items-center gap-2 mb-1">
               <img
@@ -228,17 +216,14 @@ function ShopDetails({ shop, onBack, onListedProducts, onStatusUpdate }) {
               )}
             </div>
             <p className="text-gray-600 text-sm">{shop.cat}</p>
-
             <div className="mt-6">
               <h2 className="font-medium mb-2">Description</h2>
               <p className="text-gray-600">{shop.shortDesc}</p>
             </div>
-
             <div className="mt-4">
               <h2 className="font-medium mb-2">Location</h2>
               <p className="text-gray-600">{shop.location}</p>
             </div>
-
             <div className="mt-4 grid grid-cols-2 gap-4">
               <div>
                 <h2 className="font-medium mb-2">Phone Number</h2>
@@ -252,7 +237,6 @@ function ShopDetails({ shop, onBack, onListedProducts, onStatusUpdate }) {
           </div>
         </div>
 
-        {/* Shop Details Section */}
         <div className="border-t pt-6">
           <h2 className="text-lg font-semibold mb-4">SHOP DETAILS</h2>
           <div className="grid grid-cols-2 gap-6">
@@ -311,6 +295,32 @@ function ShopDetails({ shop, onBack, onListedProducts, onStatusUpdate }) {
             <div>
               <h3 className="text-sm text-gray-600 mb-1">Email</h3>
               <p className="font-medium">{shop.businessEmail}</p>
+            </div>
+            <div>
+              <h3 className="text-sm text-gray-600 mb-1">Terms Agreement</h3>
+              <span
+                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                  shop.termsAgreed
+                    ? "bg-green-100 text-green-800"
+                    : "bg-red-100 text-red-800"
+                }`}
+              >
+                {shop.termsAgreed ? "Agreed" : "Not Agreed"}
+              </span>
+            </div>
+            <div>
+              <h3 className="text-sm text-gray-600 mb-1">
+                Preferred Partner Status
+              </h3>
+              <span
+                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                  shop.isPreferredPartner
+                    ? "bg-blue-100 text-blue-800"
+                    : "bg-gray-100 text-gray-800"
+                }`}
+              >
+                {shop.isPreferredPartner ? "Preferred Partner" : "Standard Partner"}
+              </span>
             </div>
             <div>
               <h3 className="text-sm text-gray-600 mb-1">LOGO</h3>
