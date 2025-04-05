@@ -204,7 +204,7 @@ const OnlineShopRequests = () => {
           <BsArrowLeft className="w-4 h-4" />
           View request
         </button>
-
+  
         <div className="grid md:grid-cols-2 gap-8 bg-white p-6">
           <div>
             <img
@@ -213,7 +213,7 @@ const OnlineShopRequests = () => {
               className="w-full rounded-lg object-cover aspect-square"
             />
           </div>
-
+  
           <div>
             <div className="flex items-start gap-4 mb-6">
               <div>
@@ -223,18 +223,18 @@ const OnlineShopRequests = () => {
                 <p className="text-gray-500">{selectedShop.cat}</p>
               </div>
             </div>
-
+  
             <div className="space-y-6">
               <div>
                 <h2 className="font-medium mb-2">Description</h2>
                 <p className="text-gray-600">{selectedShop.shortDesc}</p>
               </div>
-
+  
               <div>
                 <h2 className="font-medium mb-2">Location</h2>
                 <p className="text-gray-600">{selectedShop.location}</p>
               </div>
-
+  
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <h2 className="font-medium mb-2">Phone Number</h2>
@@ -246,7 +246,7 @@ const OnlineShopRequests = () => {
                 </div>
               </div>
             </div>
-
+  
             <div className="mt-8">
               <h2 className="text-xl font-semibold mb-4">SHOP DETAILS</h2>
               <table className="w-full">
@@ -297,6 +297,40 @@ const OnlineShopRequests = () => {
                     </td>
                   </tr>
                   <tr>
+                    <td className="py-3 text-sm text-gray-500">
+                      Terms Agreement
+                    </td>
+                    <td className="py-3 text-sm">
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          selectedShop.termsAgreed
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {selectedShop.termsAgreed ? "Agreed" : "Not Agreed"}
+                      </span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 text-sm text-gray-500">
+                      Preferred Partner Status
+                    </td>
+                    <td className="py-3 text-sm">
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          selectedShop.isPreferredPartner
+                            ? "bg-blue-100 text-blue-800"
+                            : "bg-gray-100 text-gray-800"
+                        }`}
+                      >
+                        {selectedShop.isPreferredPartner
+                          ? "Preferred Partner"
+                          : "Standard Partner"}
+                      </span>
+                    </td>
+                  </tr>
+                  <tr>
                     <td className="py-3 text-sm text-gray-500">LOGO</td>
                     <td className="py-3">
                       <img
@@ -309,7 +343,7 @@ const OnlineShopRequests = () => {
                 </tbody>
               </table>
             </div>
-
+  
             <div className="flex gap-4 mt-8">
               {activeTab === "Pending" && (
                 <button

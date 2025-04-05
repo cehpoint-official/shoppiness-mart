@@ -29,6 +29,7 @@ const Home = () => {
   const [message, setMessage] = useState("");
   const [roundedCardsData, setRoundedCardsData] = useState([]);
   const [blogsData, setBlogsData] = useState([]);
+  const [shopsData, setShopsData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [bannerImage, setBannerImage] = useState(null);
   const [bannerLoading, setBannerLoading] = useState(true);
@@ -78,7 +79,16 @@ const Home = () => {
     } catch (error) {
       console.log("Error getting documents: ", error);
     }
-
+    try {
+      const querySnapshot = await getDocs(collection(db, "businessDetails"));
+      const data = [];
+      querySnapshot.forEach((doc) => {
+        data.push({ id: doc.id, ...doc.data() });
+        setShopsData(data);
+      });
+    } catch (error) {
+      console.log("Error getting documents: ", error);
+    }
     try {
       // Fetch published blogs sorted by createdAt (newest first)
       const blogsQuery = collection(db, "blogs");
@@ -228,6 +238,8 @@ const Home = () => {
         para={
           "Shoppinessmart aims to partner with businesses that align with our mission of giving back to the community. We seek partners who share our values of sustainability, ethical practices, and customer satisfaction."
         }
+        shopsData={shopsData}
+        isLoading={loading}
       />
       {/* what is the shopiness mart */}
       <div className=" md:pb-40 pb-10">
