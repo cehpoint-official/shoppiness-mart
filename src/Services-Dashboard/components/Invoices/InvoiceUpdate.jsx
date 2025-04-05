@@ -277,7 +277,8 @@ const InvoiceUpdate = ({ updatedData, back }) => {
 
         // Read user document if needed
         let userDoc;
-        if (updatedData.userId) {
+        // console.log(updatedData.userId); Not defined
+        if (updatedData.customerId) {
           const userRef = doc(db, "users", updatedData.customerId);
           userDoc = await transaction.get(userRef);
         }
