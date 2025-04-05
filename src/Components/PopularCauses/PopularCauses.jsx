@@ -43,7 +43,7 @@ const PopularCauses = () => {
         <h1 
           className="text-4xl md:text-5xl font-bold text-gray-800 mb-4"
           style={{ fontFamily: "'Roboto Slab', serif" }}
-        >Our Popular Causes</h1>
+        >Our Popular Causes/NGOs</h1>
         <p className="text-gray-600 text-xl max-w-2xl mx-auto">Addressing these challenges requires a multifaceted approach</p>
       </div>
       

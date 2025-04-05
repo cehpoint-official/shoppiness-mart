@@ -183,8 +183,9 @@ const SupportACause = () => {
 
       {/* Rest of the components */}
       <PopularCauses />
+
       {/* { 3rd page } */}
-      <div className="my-20">
+      {/* <div className="my-20">
         <div className="text-center">
           <h1 className="text-3xl font-medium mb-2 font-slab">
             Our Popular NGOs{" "}
@@ -357,7 +358,8 @@ const SupportACause = () => {
             <i className="bi bi-arrow-right"></i>{" "}
           </p>
         </div>
-      </div>
+      </div> */}
+      
       {/* { 4th page } */}
       <div className="bg-backgroundLightYellowColor p-10">
         <div className="text-center">
