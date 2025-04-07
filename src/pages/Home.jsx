@@ -5,15 +5,12 @@ import bgimg from "../assets/homepage/imagehome.png";
 import homepage from "../assets/homepage/homepage.png";
 import img18 from "../assets/homepage/img18.png";
 import Backimg9 from "../assets/homepage/backimg9.png";
-
-// import Home1 from "../assets/Home/home1.png";
 import supportACause from "../assets/homeheader.png";
 
 import FAQ from "../Components/FAQ";
 import PeopleSaySection from "../Components/PeopleSaySection";
 import PopularCauses from "../Components/PopularCauses/PopularCauses";
 import RoundedCards from "../Components/RoundedCards/RoundedCards";
-// import Carousel from "../Components/Carousel/Carousel";
 import Partners from "../Components/Partners";
 import Loader from "../Components/Loader/Loader";
 
@@ -32,185 +29,174 @@ import {
 } from "firebase/firestore";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Gift, ShoppingBag } from "lucide-react";
+
 const Home = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [formData, setFormData] = useState({ name: "", email: "" });
   const [message, setMessage] = useState("");
-  const [roundedCardsData, setRoundedCardsData] = useState([]);
-  const [blogsData, setBlogsData] = useState([]);
-  const [shopsData, setShopsData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [bannerImage, setBannerImage] = useState(null);
-  const [bannerLoading, setBannerLoading] = useState(true);
-  const [causeLogos, setCauseLogos] = useState([]);
-  const [causesLoading, setCausesLoading] = useState(true);
+  const [data, setData] = useState({
+    roundedCardsData: [],
+    blogsData: [],
+    shopsData: [],
+    causeLogos: [],
+    bannerImage: null,
+  });
+  const [loading, setLoading] = useState({
+    main: true,
+    banner: true,
+    causes: true,
+  });
   const navigate = useNavigate();
 
+  // Handle form input changes
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Handle newsletter subscription
   const handleSubscribe = async (e) => {
     e.preventDefault();
-    if (!email) {
-      setMessage("Please enter a valid email address.");
-      return;
-    }
+    const { name, email } = formData;
 
-    if (!name) {
-      setMessage("Please enter your name.");
-      return;
-    }
+    if (!email) return setMessage("Please enter a valid email address.");
+    if (!name) return setMessage("Please enter your name.");
 
     try {
       await addDoc(collection(db, "newsletter"), {
-        name: name,
-        email: email,
+        name,
+        email,
         date: new Date(),
         timestamp: new Date(),
       });
       setMessage("Successfully subscribed!");
-      setInterval(() => {
-        setMessage("");
-      }, 5000);
-      setName("");
-      setEmail("");
+      setTimeout(() => setMessage(""), 5000);
+      setFormData({ name: "", email: "" });
     } catch (error) {
       console.error("Error adding document: ", error);
       setMessage("Subscription failed. Please try again.");
     }
   };
 
-  const fetchData = async () => {
-    try {
-      const querySnapshot = await getDocs(collection(db, "WhyThisPlatform"));
-      const data = [];
-      querySnapshot.forEach((doc) => {
-        data.push({ id: doc.id, ...doc.data() });
-        setRoundedCardsData(data);
-      });
-    } catch (error) {
-      console.log("Error getting documents: ", error);
-    }
-    try {
-      const querySnapshot = await getDocs(collection(db, "businessDetails"));
-      const data = [];
-      querySnapshot.forEach((doc) => {
-        data.push({ id: doc.id, ...doc.data() });
-        setShopsData(data);
-      });
-    } catch (error) {
-      console.log("Error getting documents: ", error);
-    }
-    try {
-      // Fetch published blogs sorted by createdAt (newest first)
-      const blogsQuery = collection(db, "blogs");
-      const querySnapshot = await getDocs(
-        query(
-          blogsQuery,
-          where("status", "==", "Published"),
-          orderBy("createdAt", "desc"),
-          limit(3)
-        )
-      );
-
-      const data = [];
-      querySnapshot.forEach((doc) => {
-        data.push({ id: doc.id, ...doc.data() });
-      });
-      setBlogsData(data);
-      setLoading(false);
-    } catch (error) {
-      console.log("Error getting blog documents: ", error);
-      setLoading(false);
-    }
-
-    setBannerLoading(true);
-
-    // Fetch banner image from firebase
-    try {
-      // Reference to the banners document
-      const bannerRef = doc(db, "content", "banners");
-      const bannerDoc = await getDoc(bannerRef);
-
-      // Check if the document exists and has an 'items' array
-      if (bannerDoc.exists() && bannerDoc.data().items) {
-        const items = bannerDoc.data().items;
-
-        // Sort items by createdAt in descending order (latest first)
-        const sortedItems = items.sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-        );
-
-        // Get the top banner (first item after sorting)
-        const topBanner = sortedItems[0];
-
-        // Check if the banner has a valid URL
-        if (topBanner && topBanner.url) {
-          setBannerImage(topBanner.url);
-        }
-      }
-    } catch (error) {
-      console.log("Error getting banner image: ", error);
-      // If there's an error, we'll use the default image
-    } finally {
-      // Always finish loading state, regardless of success or failure
-      setBannerLoading(false);
-    }
-
-    // Fetch active cause logos
-    setCausesLoading(true);
-    try {
-      const causesQuery = query(
-        collection(db, "causeDetails"),
-        where("status", "==", "Active"),
-        limit(6)
-      );
-
-      const causesSnapshot = await getDocs(causesQuery);
-      const causesData = [];
-
-      causesSnapshot.forEach((doc) => {
-        if (doc.data().logoUrl) {
-          causesData.push({ id: doc.id, ...doc.data() });
-        }
-      });
-
-      setCauseLogos(causesData);
-    } catch (error) {
-      console.log("Error getting cause logos: ", error);
-    } finally {
-      setCausesLoading(false);
-    }
-  };
-
+  // Fetch data from Firebase
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Parallel fetch operations using Promise.all
+        const [
+          whyThisPlatformDocs,
+          businessDetailsDocs,
+          blogsDocs,
+          bannerDoc,
+          causesDocs,
+        ] = await Promise.all([
+          // WhyThisPlatform collection
+          getDocs(collection(db, "WhyThisPlatform")),
+
+          // businessDetails collection
+          getDocs(collection(db, "businessDetails")),
+
+          // Published blogs
+          getDocs(
+            query(
+              collection(db, "blogs"),
+              where("status", "==", "Published"),
+              orderBy("createdAt", "desc"),
+              limit(3)
+            )
+          ),
+
+          // Banner image
+          getDoc(doc(db, "content", "banners")),
+
+          // Active causes
+          getDocs(
+            query(
+              collection(db, "causeDetails"),
+              where("status", "==", "Active"),
+              limit(6)
+            )
+          ),
+        ]);
+
+        // Process fetched data
+        const roundedCardsData = whyThisPlatformDocs.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        const shopsData = businessDetailsDocs.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        const blogsData = blogsDocs.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        // Process banner image
+        let bannerImage = null;
+        if (bannerDoc.exists() && bannerDoc.data().items?.length > 0) {
+          const sortedItems = [...bannerDoc.data().items].sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          );
+          console.log("Sorted items:", sortedItems);
+
+          bannerImage = sortedItems[0]?.url || null;
+        }
+
+        // Process cause logos
+        const causeLogos = causesDocs.docs
+          .map((doc) => ({ id: doc.id, ...doc.data() }))
+          .filter((cause) => cause.logoUrl);
+
+        // Update state with all fetched data
+        setData({
+          roundedCardsData,
+          blogsData,
+          shopsData,
+          causeLogos,
+          bannerImage,
+        });
+        console.log("Fetched data:", bannerImage);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading((prev) => ({ ...prev, main: false, causes: false }));
+      }
+    };
+
     fetchData();
   }, []);
 
-  // Function to preload image
-  const preloadImage = (src) => {
-    return new Promise((resolve, reject) => {
+  // Handle banner image preloading
+  useEffect(() => {
+    if (data.bannerImage) {
+      setLoading((prev) => ({ ...prev, banner: true }));
+
       const img = new Image();
-      img.onload = () => resolve();
-      img.onerror = () => reject();
-      img.src = src;
+      img.onload = () => setLoading((prev) => ({ ...prev, banner: false }));
+      img.onerror = () => {
+        console.log("Error loading banner image");
+        setLoading((prev) => ({ ...prev, banner: false }));
+      };
+      img.src = data.bannerImage;
+    } else {
+      setLoading((prev) => ({ ...prev, banner: false }));
+    }
+  }, [data.bannerImage]);
+
+  // Format date function
+  const formatDate = (timestamp) => {
+    if (!timestamp) return "";
+    return new Date(timestamp.toDate()).toLocaleDateString("en-US", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
     });
   };
 
-  // Effect to handle image preloading
-  useEffect(() => {
-    if (bannerImage) {
-      setBannerLoading(true);
-      preloadImage(bannerImage)
-        .then(() => setBannerLoading(false))
-        .catch(() => {
-          console.log("Error loading banner image");
-          setBannerLoading(false);
-        });
-    }
-  }, [bannerImage]);
-
   return (
-    <div className=" overflow-hidden">
-      {/* carousel  */}
-      {/* <Carousel img1={Home1} img2={Home1} img3={Home1} /> */}
+    <div className="overflow-hidden">
+      {/* Hero section */}
       <div className="flex flex-col md:flex-row items-center justify-center w-full p-10">
         <div className="w-full md:w-1/2 space-y-8 md:pr-6">
           <div className="inline-flex items-center px-4 py-2 rounded-full bg-[#049D8E]/10 text-[#049D8E] font-medium text-sm">
@@ -248,32 +234,14 @@ const Home = () => {
               </span>
             </div>
           </div>
-
-          {/* <div className="flex items-center gap-6 pt-4">
-            <div className="flex -space-x-2">
-              {[1, 2, 3, 4].map((i) => (
-                <img
-                  key={i}
-                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8oghbsuzggpkknQSSU-Ch_xep_9v3m6EeBQ&s"
-                  alt={`Image ${i}`}
-                  className="w-8 h-8 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center text-xs font-bold text-gray-500"
-                />
-              ))}
-            </div>
-            <p className="text-sm text-gray-600">
-              <span className="font-semibold">500+</span> people already joined 
-            </p>
-          </div> */}
         </div>
 
         <div className="max-w-">
-          {bannerLoading ? (
-            // Skeleton loader while image is loading
+          {loading.banner ? (
             <div className="animate-pulse bg-gray-200 rounded-lg w-full h-64 md:h-80"></div>
           ) : (
-            // Display banner image with proper sizing constraints
             <img
-              src={supportACause}
+              src={data.bannerImage || supportACause}
               alt="Cashback to giveback illustration"
               className="w-full h-full object-contain"
               style={{ maxWidth: "600px" }}
@@ -282,17 +250,16 @@ const Home = () => {
         </div>
       </div>
 
-      {/* our partners */}
+      {/* Partners section */}
       <Partners
-        title={"Most preferred online and offline partners "}
-        para={
-          "Shoppinessmart aims to partner with businesses that align with our mission of giving back to the community. We seek partners who share our values of sustainability, ethical practices, and customer satisfaction."
-        }
-        shopsData={shopsData}
-        isLoading={loading}
+        title="Most preferred online and offline partners"
+        para="Shoppinessmart aims to partner with businesses that align with our mission of giving back to the community. We seek partners who share our values of sustainability, ethical practices, and customer satisfaction."
+        shopsData={data.shopsData}
+        isLoading={loading.main}
       />
-      {/* what is the shopiness mart */}
-      <div className=" md:pb-40 pb-10">
+
+      {/* What is Shopiness Mart section */}
+      <div className="md:pb-40 pb-10">
         <div className="grid grid-cols-12 mx-4 md:mx-10 px-4 md:px-10">
           <div className="col-span-12 md:col-span-6">
             <div className="flex flex-wrap justify-center md:justify-start">
@@ -314,10 +281,10 @@ const Home = () => {
           </div>
 
           <div className="col-span-12 md:col-span-6">
-            <h1 className="md:text-4xl text-3xl font-semibold mt-16 md:mt-12  font-slab ">
+            <h1 className="md:text-4xl text-3xl font-semibold mt-16 md:mt-12 font-slab">
               What is ShoppinessMart?
             </h1>
-            <p className="  text-gray-500 md:mt-7 mt-3  md:text-2xl text-sm">
+            <p className="text-gray-500 md:mt-7 mt-3 md:text-2xl text-sm">
               Shoppinessmart is a platform that turns your everyday online
               shopping into a force for good. By simply shopping through our
               website or app, you can support your favorite charities without
@@ -330,7 +297,7 @@ const Home = () => {
         </div>
       </div>
 
-      {/* {cashback deals for help other } */}
+      {/* Cashback deals section */}
       <div
         className="gap-20 flex justify-center items-center flex-wrap py-20 px-10 mb-10"
         style={{
@@ -339,8 +306,8 @@ const Home = () => {
           backgroundPosition: "center",
         }}
       >
-        <div className="md:w-[550px] md:mt-6  ">
-          <p className="text-xl mb-2 ">How it works</p>
+        <div className="md:w-[550px] md:mt-6">
+          <p className="text-xl mb-2">How it works</p>
           <h1 className="md:text-4xl text-3xl font-semibold font-slab mb-4">
             Cashback Deals for you to help others.
           </h1>
@@ -366,15 +333,19 @@ const Home = () => {
         </div>
       </div>
 
-      {/*why we use this platform */}
-      {loading ? <Loader /> : <RoundedCards data={roundedCardsData} />}
+      {/* Why use this platform */}
+      {loading.main ? (
+        <Loader />
+      ) : (
+        <RoundedCards data={data.roundedCardsData} />
+      )}
 
-      {/* how online or offline shop work  */}
+      {/* How shopping works section */}
       <div className="bg-[#EAEFF2] gap-20 flex justify-center items-center flex-wrap px-10 pb-16 mb-16">
         <div className="mt-6">
           <img src={img18} alt="Loading..." className="w-[500px]" />
         </div>
-        <div className="md:w-[400px] md:mt-6  ">
+        <div className="md:w-[400px] md:mt-6">
           <h1 className="md:text-4xl text-3xl font-semibold font-slab mb-4">
             How online and offline shopping works
           </h1>
@@ -389,7 +360,7 @@ const Home = () => {
                 Online Shopping
               </button>
             </Link>
-            <Link to={"offline-shop"}>
+            <Link to="offline-shop">
               <button className="bg-[#434343] text-white font-medium rounded-md text-sm md:text-base h-[40px] w-[150px] mt-4">
                 Offline Shopping
               </button>
@@ -398,11 +369,11 @@ const Home = () => {
         </div>
       </div>
 
-      {/* our popular causes */}
+      {/* Popular causes */}
       <PopularCauses />
 
-      {/* <!-- NGO's --> */}
-      <div className="m-20 mx-auto px-4 md:px-40 bg-amber-50 pt-10 pb-6 ">
+      {/* NGO's section */}
+      <div className="m-20 mx-auto px-4 md:px-40 bg-amber-50 pt-10 pb-6">
         <p className="font-bold md:text-4xl text-3xl font-slab text-center">
           Raise funds for your cause/NGOs/ charity
         </p>
@@ -416,15 +387,13 @@ const Home = () => {
         </p>
 
         <div className="flex justify-center items-center flex-wrap gap-2 mt-4">
-          {causesLoading ? (
-            // Show a loading indicator while fetching causes
+          {loading.causes ? (
             <div className="flex justify-center w-full py-4">
               <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-teal-500"></div>
             </div>
-          ) : causeLogos.length > 0 ? (
-            // Render cause logos
+          ) : data.causeLogos.length > 0 ? (
             <>
-              {causeLogos.map((cause) => (
+              {data.causeLogos.map((cause) => (
                 <div className="m-2" key={cause.id}>
                   <img
                     src={cause.logoUrl}
@@ -446,7 +415,6 @@ const Home = () => {
               </div>
             </>
           ) : (
-            // No causes found
             <div className="text-center w-full py-4">
               <p className="text-gray-500">
                 No active causes available at the moment.
@@ -468,8 +436,8 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Blogs */}
-      {loading ? (
+      {/* Blogs section */}
+      {loading.main ? (
         <Loader />
       ) : (
         <div className="mt-10 mx-auto px-6 md:px-40 pt-8 pb-6">
@@ -483,58 +451,51 @@ const Home = () => {
             </p>
           </div>
 
-          {blogsData.length > 0 ? (
+          {data.blogsData.length > 0 ? (
             <div className="grid grid-cols-12 gap-4 mt-10">
               {/* Main featured blog */}
               <div className="lg:col-span-5 col-span-12">
                 <div>
                   <img
-                    src={blogsData[0]?.thumbnail}
-                    alt={blogsData[0]?.title}
+                    src={data.blogsData[0]?.thumbnail}
+                    alt={data.blogsData[0]?.title}
                     className="w-full h-auto rounded-lg object-cover aspect-video"
                   />
                   <p className="font-medium text-lg mt-4">
-                    {blogsData[0]?.title}
+                    {data.blogsData[0]?.title}
                   </p>
                   <p className="text-gray-500 text-sm md:text-base">
-                    {/* Reduced excerpt length for main blog */}
-                    {blogsData[0]?.content?.substring(0, 120)}...{" "}
-                    <Link to="/blogs">
+                    {data.blogsData[0]?.content?.substring(0, 120)}...{" "}
+                    <Link to={`/blogs/${data.blogsData[0]?.id}`}>
                       <span className="text-[#049D8E] font-medium">
                         Read More...
                       </span>
                     </Link>
                   </p>
                   <p className="text-gray-400 mt-4">
-                    By {blogsData[0]?.author},{" "}
-                    {new Date(
-                      blogsData[0]?.createdAt?.toDate()
-                    ).toLocaleDateString("en-US", {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
-                    })}
+                    By {data.blogsData[0]?.author},{" "}
+                    {formatDate(data.blogsData[0]?.createdAt)}
                   </p>
                 </div>
               </div>
 
               {/* Smaller blog entries */}
               <div className="lg:col-span-7 col-span-12 mx-5">
-                {blogsData.length > 1 && (
-                  <div className="lg:flex mb-4">
+                {data.blogsData.slice(1, 3).map((blog, index) => (
+                  <div
+                    key={blog.id}
+                    className={`lg:flex ${index === 0 ? "mb-4" : ""}`}
+                  >
                     <img
-                      src={blogsData[1]?.thumbnail}
-                      alt={blogsData[1]?.title}
+                      src={blog?.thumbnail}
+                      alt={blog?.title}
                       className="lg:w-1/3 w-full h-auto rounded-lg object-cover aspect-video"
                     />
                     <div className="lg:ml-4 mt-4 lg:mt-0">
-                      <p className="font-medium text-lg">
-                        {blogsData[1]?.title}
-                      </p>
+                      <p className="font-medium text-lg">{blog?.title}</p>
                       <p className="text-gray-500 text-sm md:text-base">
-                        {/* Increased excerpt length for side blogs */}
-                        {blogsData[1]?.content?.substring(0, 120)}...{" "}
-                        <Link to="/blogs">
+                        {blog?.content?.substring(0, 120)}...{" "}
+                        <Link to={`/blogs/${blog.id}`}>
                           <span className="text-[#049D8E] text-sm md:text-base font-medium">
                             {" "}
                             Read More...
@@ -542,53 +503,11 @@ const Home = () => {
                         </Link>
                       </p>
                       <p className="text-gray-400 mt-4">
-                        By {blogsData[1]?.author},{" "}
-                        {new Date(
-                          blogsData[1]?.createdAt?.toDate()
-                        ).toLocaleDateString("en-US", {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                        })}
+                        By {blog?.author}, {formatDate(blog?.createdAt)}
                       </p>
                     </div>
                   </div>
-                )}
-
-                {blogsData.length > 2 && (
-                  <div className="lg:flex">
-                    <img
-                      src={blogsData[2]?.thumbnail}
-                      alt={blogsData[2]?.title}
-                      className="lg:w-1/3 w-full h-auto rounded-lg object-cover aspect-video"
-                    />
-                    <div className="lg:ml-4 mt-4 lg:mt-0">
-                      <p className="font-medium text-lg">
-                        {blogsData[2]?.title}
-                      </p>
-                      <p className="text-gray-500 text-sm md:text-base">
-                        {/* Increased excerpt length for side blogs */}
-                        {blogsData[2]?.content?.substring(0, 120)}...{" "}
-                        <Link to="/blogs">
-                          <span className="text-[#049D8E] text-sm md:text-base font-medium">
-                            {" "}
-                            Read More...
-                          </span>
-                        </Link>
-                      </p>
-                      <p className="text-gray-400 mt-4">
-                        By {blogsData[2]?.author},{" "}
-                        {new Date(
-                          blogsData[2]?.createdAt?.toDate()
-                        ).toLocaleDateString("en-US", {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                        })}
-                      </p>
-                    </div>
-                  </div>
-                )}
+                ))}
               </div>
             </div>
           ) : (
@@ -609,7 +528,7 @@ const Home = () => {
         </div>
       )}
 
-      {/* NewsLetter */}
+      {/* Newsletter section */}
       <div className="relative mt-44 py-20 flex flex-col justify-center items-center">
         <div className="absolute inset-0">
           <img
@@ -632,18 +551,20 @@ const Home = () => {
             >
               <input
                 type="text"
+                name="name"
                 className="text-gray-900 bg-white border-2 p-3 rounded-xl w-full md:w-[400px] mb-4"
                 placeholder="Enter your Name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={formData.name}
+                onChange={handleInputChange}
                 required
               />
               <input
                 type="email"
+                name="email"
                 className="text-gray-900 bg-white border-2 p-3 rounded-xl w-full md:w-[400px] mb-4"
                 placeholder="Enter your Email here"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={formData.email}
+                onChange={handleInputChange}
                 required
               />
               <button
@@ -658,10 +579,10 @@ const Home = () => {
         </div>
       </div>
 
-      {/* FAQ */}
+      {/* FAQ section */}
       <FAQ />
 
-      {/* Reviews  */}
+      {/* Reviews section */}
       <PeopleSaySection />
     </div>
   );

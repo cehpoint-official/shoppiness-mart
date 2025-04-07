@@ -17,7 +17,11 @@ const SupportACause = () => {
   const [ngos, setNgos] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [showAllCauses, setShowAllCauses] = useState(false);
+  const causesPerPage = 6;
 
+  // Fetch data from Firestore
   const fetchData = useCallback(async () => {
     try {
       const querySnapshot = await getDocs(collection(db, "causeDetails"));
@@ -54,6 +58,20 @@ const SupportACause = () => {
       setSearching(false);
     }, 1000);
   };
+  // Get current causes for pagination
+  const indexOfLastCause = currentPage * causesPerPage;
+  const indexOfFirstCause = indexOfLastCause - causesPerPage;
+  const currentCauses = ngos.slice(indexOfFirstCause, indexOfLastCause);
+  const totalPages = Math.ceil(ngos.length / causesPerPage);
+
+  // Toggle between paginated view and showing all causes
+  const handleViewToggle = () => {
+    setShowAllCauses(!showAllCauses);
+    setCurrentPage(1); // Reset to first page when toggling
+  };
+
+  // Change page
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <div className="overflow-hidden">
@@ -121,7 +139,7 @@ const SupportACause = () => {
                     <span>← Back to Search</span>
                   </button>
                 </div>
-                <div className="grid md:grid-cols-3 gap-6 px-10">
+                <div className="grid gap-6 ">
                   {searchResults && searchResults.length > 0 ? (
                     searchResults.map((ngo) => (
                       <div
@@ -145,7 +163,26 @@ const SupportACause = () => {
                             <MdLocationOn className="text-xl" />
                             <span>{ngo.location}</span>
                           </div>
-
+                          <Link
+                            to={`/support/${ngo.id}`}
+                            className="text-teal-500 hover:text-teal-700 font-medium flex items-center group"
+                          >
+                            Learn more & Support
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-5 w-5 ml-1 group-hover:translate-x-1 transition-transform duration-300"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M14 5l7 7m0 0l-7 7m7-7H3"
+                              />
+                            </svg>
+                          </Link>
                           <p className="text-gray-600 leading-relaxed">
                             {ngo.shortDesc}
                           </p>
@@ -180,9 +217,236 @@ const SupportACause = () => {
           </div>
         )}
       </div>
+      <div className="max-w-6xl mx-auto mt-16 mb-4 bg-teal-50 rounded-2xl p-8">
+        <h3 className="text-xl font-bold text-gray-800 mb-4">
+          How to Support a Cause
+        </h3>
+        <ol className="space-y-4 text-gray-700">
+          <li className="flex">
+            <span className="flex-shrink-0 w-8 h-8 rounded-full bg-teal-500 text-white flex items-center justify-center mr-3">
+              1
+            </span>
+            <div>
+              <h4 className="font-bold">Select a Cause</h4>
+              <p>
+                Browse through our list of causes and select one that resonates
+                with you.
+              </p>
+            </div>
+          </li>
+          <li className="flex">
+            <span className="flex-shrink-0 w-8 h-8 rounded-full bg-teal-500 text-white flex items-center justify-center mr-3">
+              2
+            </span>
+            <div>
+              <h4 className="font-bold">Find Partner Shops</h4>
+              <p>
+                On the cause's page, you'll find shops located near the NGO that
+                support this cause.
+              </p>
+            </div>
+          </li>
+          <li className="flex">
+            <span className="flex-shrink-0 w-8 h-8 rounded-full bg-teal-500 text-white flex items-center justify-center mr-3">
+              3
+            </span>
+            <div>
+              <h4 className="font-bold">Generate a Coupon</h4>
+              <p>
+                Generate a coupon for the shop where you'd like to make a
+                purchase.
+              </p>
+            </div>
+          </li>
+          <li className="flex">
+            <span className="flex-shrink-0 w-8 h-8 rounded-full bg-teal-500 text-white flex items-center justify-center mr-3">
+              4
+            </span>
+            <div>
+              <h4 className="font-bold">Shop and Support</h4>
+              <p>
+                Use your coupon when shopping. You'll receive cashback and the
+                NGO will receive a donation.
+              </p>
+            </div>
+          </li>
+        </ol>
+      </div>
+      {/* All Causes Section */}
+      {!searching && !searchResults && (
+        <div className="py-16 px-4 md:px-12">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold mb-4 font-serif text-gray-800">
+                All Causes and NGOs
+              </h2>
+              <p className="text-gray-600 max-w-2xl mx-auto">
+                Browse through our comprehensive list of verified causes and
+                NGOs that are making a positive impact in communities across the
+                country. Your support can make a difference.
+              </p>
+            </div>
+
+            {loading ? (
+              <div className="flex justify-center items-center py-10">
+                <Loader />
+              </div>
+            ) : ngos.length === 0 ? (
+              <div className="text-center py-10">
+                <p className="text-lg text-gray-600">
+                  No causes or NGOs available at the moment.
+                </p>
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mx-auto">
+                  {(showAllCauses ? ngos : currentCauses).map((cause) => (
+                    <div
+                      key={cause.id}
+                      className="bg-white rounded-3xl overflow-hidden shadow-md transition-all duration-300 hover:shadow-[0_15px_30px_rgba(4,126,114,0.2)] hover:-translate-y-1"
+                    >
+                      <div className="h-52 overflow-hidden">
+                        <img
+                          src={cause.bannerUrl}
+                          alt={cause.causeName}
+                          className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-500"
+                        />
+                      </div>
+                      <div className="p-6">
+                        <div className="flex items-center mb-3">
+                          <img
+                            src={cause.logoUrl}
+                            alt=""
+                            className="w-10 h-10 rounded-full object-cover mr-3 border border-gray-200"
+                          />
+                          <h3 className="text-xl font-semibold text-gray-800">
+                            {cause.causeName}
+                          </h3>
+                        </div>
+
+                        <div className="flex items-center text-teal-600 text-sm mb-3">
+                          <MdLocationOn className="text-xl" />
+                          <span>{cause.location}</span>
+                        </div>
+
+                        <p className="text-gray-600 mb-4 line-clamp-3">
+                          {cause.aboutCause}
+                        </p>
+
+                        <div className="flex justify-end">
+                          <Link
+                            to={`/support/${cause.id}`}
+                            className="text-teal-500 hover:text-teal-700 font-medium flex items-center group"
+                          >
+                            Learn more & Support
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-5 w-5 ml-1 group-hover:translate-x-1 transition-transform duration-300"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M14 5l7 7m0 0l-7 7m7-7H3"
+                              />
+                            </svg>
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Pagination */}
+                {!showAllCauses && totalPages > 1 && (
+                  <div className="flex justify-center mt-12">
+                    <nav
+                      className="inline-flex rounded-md shadow-sm -space-x-px"
+                      aria-label="Pagination"
+                    >
+                      <button
+                        onClick={() => paginate(Math.max(1, currentPage - 1))}
+                        disabled={currentPage === 1}
+                        className={`relative inline-flex items-center px-4 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${
+                          currentPage === 1
+                            ? "text-gray-400 cursor-not-allowed"
+                            : "text-gray-700 hover:bg-gray-50"
+                        }`}
+                      >
+                        Previous
+                      </button>
+
+                      {[...Array(totalPages)].map((_, index) => (
+                        <button
+                          key={index}
+                          onClick={() => paginate(index + 1)}
+                          className={`relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium ${
+                            currentPage === index + 1
+                              ? "z-10 bg-teal-50 border-teal-500 text-teal-600"
+                              : "text-gray-700 hover:bg-gray-50"
+                          }`}
+                        >
+                          {index + 1}
+                        </button>
+                      ))}
+
+                      <button
+                        onClick={() =>
+                          paginate(Math.min(totalPages, currentPage + 1))
+                        }
+                        disabled={currentPage === totalPages}
+                        className={`relative inline-flex items-center px-4 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${
+                          currentPage === totalPages
+                            ? "text-gray-400 cursor-not-allowed"
+                            : "text-gray-700 hover:bg-gray-50"
+                        }`}
+                      >
+                        Next
+                      </button>
+                    </nav>
+                  </div>
+                )}
+
+                {/* View toggle button */}
+                <div className="text-center mt-8">
+                  <button
+                    onClick={handleViewToggle}
+                    className="inline-flex items-center text-teal-500 hover:text-teal-700 font-medium transition-colors duration-200"
+                  >
+                    {showAllCauses ? (
+                      <>Show less</>
+                    ) : (
+                      <>
+                        See all{" "}
+                        <span className="font-bold mx-1">{ngos.length}+</span>{" "}
+                        Causes
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5 ml-1"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Rest of the components */}
-      <PopularCauses />
+      {/* <PopularCauses /> */}
 
       {/* { 3rd page } */}
       {/* <div className="my-20">
@@ -359,7 +623,7 @@ const SupportACause = () => {
           </p>
         </div>
       </div> */}
-      
+
       {/* { 4th page } */}
       <div className="bg-backgroundLightYellowColor p-10">
         <div className="text-center">

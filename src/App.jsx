@@ -14,6 +14,7 @@ import ViewPaymentDetails from "./Admin/pages/Product&Services/PlatformEarningsF
 import CashbackTracking from "./Admin/pages/Product&Services/CashbackTracking/CashbackTracking";
 import AllPartners from "./pages/AllPartners";
 import BlogDetails from "./pages/BlogDetails";
+import CauseDetails from "./pages/CauseDetails";
 
 // import ProtectedRoute from "./Components/ProtectedRoute";
 
@@ -234,6 +235,7 @@ const router = createBrowserRouter([
           { path: "/all-partners", element: <AllPartners /> },
           { path: "/register-cause", element: <Cause /> },
           { path: "/support", element: <SupportACause /> },
+          { path: "/support/:id", element: <CauseDetails /> },
           { path: "/supportmaast", element: <SupportMaast /> },
           { path: "/howitworks", element: <HowItWorks /> },
           { path: "/cashback-charity", element: <Cashback /> },
