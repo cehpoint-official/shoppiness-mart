@@ -3,7 +3,6 @@ import img12 from "../assets/homepage/img12.png";
 import img13 from "../assets/homepage/img13.png";
 import bgimg from "../assets/homepage/imagehome.png";
 import homepage from "../assets/homepage/homepage.png";
-
 import img18 from "../assets/homepage/img18.png";
 import Backimg9 from "../assets/homepage/backimg9.png";
 
@@ -20,9 +19,19 @@ import Loader from "../Components/Loader/Loader";
 
 import { useState, useEffect } from "react";
 import { db } from "../../firebase";
-import { collection, addDoc, getDoc, getDocs, query, where, orderBy, limit, doc } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  getDoc,
+  getDocs,
+  query,
+  where,
+  orderBy,
+  limit,
+  doc,
+} from "firebase/firestore";
 import { Link, useNavigate } from "react-router-dom";
-
+import { ArrowRight, Gift, ShoppingBag } from "lucide-react";
 const Home = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -125,7 +134,9 @@ const Home = () => {
         const items = bannerDoc.data().items;
 
         // Sort items by createdAt in descending order (latest first)
-        const sortedItems = items.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        const sortedItems = items.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
 
         // Get the top banner (first item after sorting)
         const topBanner = sortedItems[0];
@@ -151,16 +162,16 @@ const Home = () => {
         where("status", "==", "Active"),
         limit(6)
       );
-      
+
       const causesSnapshot = await getDocs(causesQuery);
       const causesData = [];
-      
+
       causesSnapshot.forEach((doc) => {
         if (doc.data().logoUrl) {
           causesData.push({ id: doc.id, ...doc.data() });
         }
       });
-      
+
       setCauseLogos(causesData);
     } catch (error) {
       console.log("Error getting cause logos: ", error);
@@ -200,33 +211,72 @@ const Home = () => {
     <div className=" overflow-hidden">
       {/* carousel  */}
       {/* <Carousel img1={Home1} img2={Home1} img3={Home1} /> */}
-      <div className="flex flex-wrap items-center justify-center w-full p-10">
-        <div className="rounded-lg px-6 max-w-xl justify-between ">
-          <h1 className="text-5xl font-bold text-blue-900 mb-4 font-slab">
-            Cashback to giveback
+      <div className="flex flex-col md:flex-row items-center justify-center w-full p-10">
+        <div className="w-full md:w-1/2 space-y-8 md:pr-6">
+          <div className="inline-flex items-center px-4 py-2 rounded-full bg-[#049D8E]/10 text-[#049D8E] font-medium text-sm">
+            <ShoppingBag className="w-4 h-4 mr-2" />
+            <span>Shop with purpose</span>
+          </div>
+
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
+            <span className="relative">
+              Cashback
+              <span className="absolute -bottom-2 left-0 w-full h-3 bg-[#049D8E]/20 -z-10 transform -rotate-1"></span>
+            </span>{" "}
+            to <span className="text-[#049D8E]">giveback</span>
           </h1>
-          <p className="text-gray-700 mb-6 text-xl">
-            Shop at Soppiness Mart, earn cashback to spread joy—use it for
-            yourself or donate to charity, sharing kindness exponentially.
+
+          <p className="text-gray-700 text-lg md:text-xl leading-relaxed">
+            Shop at Shoppiness Mart, earn cashback on purchases from our listed
+            shops, and use it to treat yourself or support listed NGOs and
+            charitable causes. Your donations help spread kindness and create
+            positive change, turning everyday shopping into meaningful actions!
           </p>
-          <Link to="/signup">
-            <button className="bg-[#049D8E] text-white py-2 px-4 rounded-lg transition duration-300">
-              Sign up and Get Started
-            </button>
-          </Link>
+
+          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+            <Link to="/signup" className="group">
+              <button className="bg-[#049D8E] hover:bg-[#038275] text-white py-2 px-6 rounded transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg flex items-center gap-2 font-medium">
+                Sign up and Get Started
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </button>
+            </Link>
+
+            <div className="flex items-center gap-2 text-gray-600">
+              <Gift className="w-5 h-5 text-[#049D8E]" />
+              <span className="text-sm">
+                Join today and start generating cashback
+              </span>
+            </div>
+          </div>
+
+          {/* <div className="flex items-center gap-6 pt-4">
+            <div className="flex -space-x-2">
+              {[1, 2, 3, 4].map((i) => (
+                <img
+                  key={i}
+                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8oghbsuzggpkknQSSU-Ch_xep_9v3m6EeBQ&s"
+                  alt={`Image ${i}`}
+                  className="w-8 h-8 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center text-xs font-bold text-gray-500"
+                />
+              ))}
+            </div>
+            <p className="text-sm text-gray-600">
+              <span className="font-semibold">500+</span> people already joined 
+            </p>
+          </div> */}
         </div>
-        
-        <div className="max-w-md">
+
+        <div className="max-w-">
           {bannerLoading ? (
             // Skeleton loader while image is loading
             <div className="animate-pulse bg-gray-200 rounded-lg w-full h-64 md:h-80"></div>
           ) : (
             // Display banner image with proper sizing constraints
             <img
-              src={bannerImage || supportACause}
+              src={supportACause}
               alt="Cashback to giveback illustration"
-              className="w-full h-auto object-contain max-h-80"
-              style={{ maxWidth: "400px" }}
+              className="w-full h-full object-contain"
+              style={{ maxWidth: "600px" }}
             />
           )}
         </div>
@@ -376,18 +426,18 @@ const Home = () => {
             <>
               {causeLogos.map((cause) => (
                 <div className="m-2" key={cause.id}>
-                  <img 
-                    src={cause.logoUrl} 
-                    alt={cause.name || "Cause logo"} 
+                  <img
+                    src={cause.logoUrl}
+                    alt={cause.name || "Cause logo"}
                     className="w-[100px] h-[100px] rounded-full object-cover"
                   />
                 </div>
               ))}
               <div>
-                <button 
+                <button
                   className="bg-[#FFD705] text-blue-950 text-xl font-bold rounded-full w-[100px] h-[100px] px-2 flex items-center justify-center"
                   onClick={() => {
-                    navigate('/support');
+                    navigate("/support");
                     window.scrollTo(0, 0);
                   }}
                 >
@@ -398,16 +448,18 @@ const Home = () => {
           ) : (
             // No causes found
             <div className="text-center w-full py-4">
-              <p className="text-gray-500">No active causes available at the moment.</p>
+              <p className="text-gray-500">
+                No active causes available at the moment.
+              </p>
             </div>
           )}
         </div>
 
         <div className="mt-10 text-center pb-5">
-          <p 
+          <p
             className="bg-[#FFD705] rounded-lg w-full md:w-72 py-2 inline-block cursor-pointer"
             onClick={() => {
-              navigate('/business-form');
+              navigate("/cause-form");
               window.scrollTo(0, 0);
             }}
           >
@@ -426,7 +478,8 @@ const Home = () => {
               Recently Posted Blog
             </p>
             <p className="text-gray-600 text-sm md:text-lg text-center mx-auto mt-2">
-              Share stories of how Shoppinessmart donations have made a difference in people's lives.
+              Share stories of how Shoppinessmart donations have made a
+              difference in people's lives.
             </p>
           </div>
 
@@ -440,7 +493,9 @@ const Home = () => {
                     alt={blogsData[0]?.title}
                     className="w-full h-auto rounded-lg object-cover aspect-video"
                   />
-                  <p className="font-medium text-lg mt-4">{blogsData[0]?.title}</p>
+                  <p className="font-medium text-lg mt-4">
+                    {blogsData[0]?.title}
+                  </p>
                   <p className="text-gray-500 text-sm md:text-base">
                     {/* Reduced excerpt length for main blog */}
                     {blogsData[0]?.content?.substring(0, 120)}...{" "}
@@ -451,7 +506,14 @@ const Home = () => {
                     </Link>
                   </p>
                   <p className="text-gray-400 mt-4">
-                    By {blogsData[0]?.author}, {new Date(blogsData[0]?.createdAt?.toDate()).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    By {blogsData[0]?.author},{" "}
+                    {new Date(
+                      blogsData[0]?.createdAt?.toDate()
+                    ).toLocaleDateString("en-US", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    })}
                   </p>
                 </div>
               </div>
@@ -466,7 +528,9 @@ const Home = () => {
                       className="lg:w-1/3 w-full h-auto rounded-lg object-cover aspect-video"
                     />
                     <div className="lg:ml-4 mt-4 lg:mt-0">
-                      <p className="font-medium text-lg">{blogsData[1]?.title}</p>
+                      <p className="font-medium text-lg">
+                        {blogsData[1]?.title}
+                      </p>
                       <p className="text-gray-500 text-sm md:text-base">
                         {/* Increased excerpt length for side blogs */}
                         {blogsData[1]?.content?.substring(0, 120)}...{" "}
@@ -478,7 +542,14 @@ const Home = () => {
                         </Link>
                       </p>
                       <p className="text-gray-400 mt-4">
-                        By {blogsData[1]?.author}, {new Date(blogsData[1]?.createdAt?.toDate()).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        By {blogsData[1]?.author},{" "}
+                        {new Date(
+                          blogsData[1]?.createdAt?.toDate()
+                        ).toLocaleDateString("en-US", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })}
                       </p>
                     </div>
                   </div>
@@ -492,7 +563,9 @@ const Home = () => {
                       className="lg:w-1/3 w-full h-auto rounded-lg object-cover aspect-video"
                     />
                     <div className="lg:ml-4 mt-4 lg:mt-0">
-                      <p className="font-medium text-lg">{blogsData[2]?.title}</p>
+                      <p className="font-medium text-lg">
+                        {blogsData[2]?.title}
+                      </p>
                       <p className="text-gray-500 text-sm md:text-base">
                         {/* Increased excerpt length for side blogs */}
                         {blogsData[2]?.content?.substring(0, 120)}...{" "}
@@ -504,7 +577,14 @@ const Home = () => {
                         </Link>
                       </p>
                       <p className="text-gray-400 mt-4">
-                        By {blogsData[2]?.author}, {new Date(blogsData[2]?.createdAt?.toDate()).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        By {blogsData[2]?.author},{" "}
+                        {new Date(
+                          blogsData[2]?.createdAt?.toDate()
+                        ).toLocaleDateString("en-US", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })}
                       </p>
                     </div>
                   </div>
@@ -513,7 +593,9 @@ const Home = () => {
             </div>
           ) : (
             <div className="text-center mt-10">
-              <p className="text-gray-500">No blog posts available at the moment.</p>
+              <p className="text-gray-500">
+                No blog posts available at the moment.
+              </p>
             </div>
           )}
 

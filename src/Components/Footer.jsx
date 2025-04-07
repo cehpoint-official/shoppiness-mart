@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { doc, getDoc, collection, getDocs, query, orderBy, limit } from "firebase/firestore";
-import { db } from "../../firebase";
+
 import ShoppingBag from "../assets/ShoppingBag.png";
 import Backimg13 from "../assets/backimg13.png";
+import { db } from "../../firebase";
 
 const Footer = () => {
   const [contactInfo, setContactInfo] = useState({

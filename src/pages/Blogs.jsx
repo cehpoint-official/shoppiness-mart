@@ -1,18 +1,32 @@
 import { Link } from "react-router-dom";
-import { useState, useEffect, useRef } from "react";
-import { collection, doc, getDocs, getDoc, updateDoc, query, where, increment, orderBy, limit } from "firebase/firestore";
+import { useState, useEffect } from "react";
+import {
+  collection,
+  doc,
+  getDocs,
+  getDoc,
+  query,
+  where,
+  orderBy,
+} from "firebase/firestore";
 import { db } from "../../firebase";
 import Loader from "../Components/Loader/Loader";
+import {
+  BookOpen,
+  Clock,
+  Eye,
+  ArrowRight,
+  Calendar,
+} from "lucide-react";
+
 
 const Blogs = () => {
   const [loading, setLoading] = useState(true);
   const [story, setStory] = useState("");
   const [blogs, setBlogs] = useState([]);
-  const [expandedBlog, setExpandedBlog] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const blogsPerPage = 6;
   const [totalBlogs, setTotalBlogs] = useState(0);
-  const modalRef = useRef(null);
 
   // Fetch story and blogs data from Firebase
   useEffect(() => {
@@ -30,19 +44,19 @@ const Blogs = () => {
           where("status", "==", "Published"),
           orderBy("createdAt", "desc")
         );
-        
+
         const blogsSnapshot = await getDocs(blogsQuery);
-        const blogsList = blogsSnapshot.docs.map(doc => ({
+        const blogsList = blogsSnapshot.docs.map((doc) => ({
           id: doc.id,
-          ...doc.data()
+          ...doc.data(),
         }));
-        
+
         // Calculate slice for current page
         const startIndex = (currentPage - 1) * blogsPerPage;
         const endIndex = startIndex + blogsPerPage;
         setBlogs(blogsList.slice(startIndex, endIndex));
         setTotalBlogs(blogsList.length);
-        
+
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -53,70 +67,10 @@ const Blogs = () => {
     fetchData();
   }, [currentPage]);
 
-  // Handle clicks outside the modal to close it
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (modalRef.current && !modalRef.current.contains(event.target)) {
-        closeExpandedBlog();
-      }
-    };
-
-    // Add escape key listener to close modal
-    const handleEscKey = (event) => {
-      if (event.key === "Escape") {
-        closeExpandedBlog();
-      }
-    };
-
-    if (expandedBlog) {
-      document.addEventListener("mousedown", handleClickOutside);
-      document.addEventListener("keydown", handleEscKey);
-      // Prevent body scroll when modal is open
-      document.body.style.overflow = "hidden";
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleEscKey);
-      // Restore body scroll when component unmounts or modal closes
-      document.body.style.overflow = "auto";
-    };
-  }, [expandedBlog]);
-
   // Handle pagination
   const fetchBlogsByPage = (page) => {
     setCurrentPage(page);
-    // The useEffect will handle the actual fetching since it depends on currentPage
-  };
-
-  // Close expanded blog and update local views count
-  const closeExpandedBlog = () => {
-    if (expandedBlog) {
-      setBlogs(prev => prev.map(blog => {
-        if (blog.id === expandedBlog) {
-          // Update views in the local state (increment by 1)
-          return { ...blog, views: (blog.views || 0) + 1 };
-        }
-        return blog;
-      }));
-      setExpandedBlog(null);
-    }
-  };
-
-  // Handle read more click
-  const handleReadMore = async (blogId) => {
-    // Update views count in Firebase
-    try {
-      const blogRef = doc(db, "blogs", blogId);
-      await updateDoc(blogRef, {
-        views: increment(1)
-      });
-      
-      // Set expanded view
-      setExpandedBlog(blogId);
-    } catch (error) {
-      console.error("Error updating views:", error);
-    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   // Get shortened content for thumbnails
@@ -133,22 +87,63 @@ const Blogs = () => {
     <Loader />
   ) : (
     <div className="bg-gray-50 min-h-screen">
-      {/* Hero Section with Our Story */}
-      <div className="bg-gradient-to-r from-teal-500 to-green-500 py-16">
-        <div className="container mx-auto px-6 max-w-4xl">
-          <h1 className="text-4xl font-bold text-white text-center mb-8 font-serif">
-            Our Story
-          </h1>
-          <div className="bg-white p-8 rounded-lg shadow-lg">
-            <p className="text-gray-700 leading-relaxed mb-6">
-              {story || "Our story content is loading..."}
-            </p>
-            <div className="flex items-center justify-center">
-              <Link to="/signup">
-                <button className="bg-[#047E72] text-white px-8 py-3 rounded-lg hover:bg-teal-700 transition-colors font-medium text-lg shadow-md">
-                  Sign Up for Free
-                </button>
+      {/* Enhanced Hero Section with Our Story */}
+      <div className="relative overflow-hidden bg-[#047E72]">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#047E72]/95 to-[#047E72]/80 z-10"></div>
+        <div className="absolute inset-0">
+          <svg
+            className="absolute bottom-0 left-0 right-0 text-white"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 1440 320"
+          >
+            <path
+              fill="currentColor"
+              fillOpacity="1"
+              d="M0,288L48,272C96,256,192,224,288,197.3C384,171,480,149,576,165.3C672,181,768,235,864,250.7C960,267,1056,245,1152,224C1248,203,1344,181,1392,170.7L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
+            ></path>
+          </svg>
+        </div>
+
+        <div className="container relative z-20 mx-auto px-6 py-24 max-w-6xl">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6">
+              <div className="inline-flex items-center px-3 py-1 rounded-full bg-white/20 text-white text-sm font-medium">
+                <BookOpen className="h-4 w-4 mr-2" /> Our Journey
+              </div>
+              <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight">
+                Our Story <span className="block">of Impact</span>
+              </h1>
+              <div className="h-1 w-20 bg-white rounded"></div>
+              <p className="text-white/90 text-lg leading-relaxed">
+                Join us in creating a world where every purchase contributes to
+                a greater cause and shopping becomes an act of kindness.
+              </p>
+              <Link
+                to="/signup"
+                className="inline-flex items-center gap-2 bg-white text-[#047E72] hover:bg-gray-100 px-8 py-3 rounded-lg font-medium text-lg shadow-lg transition-all duration-300 hover:shadow-xl"
+              >
+                Join Our Movement
+                <ArrowRight className="h-5 w-5" />
               </Link>
+            </div>
+
+            <div className="bg-white p-8 rounded-xl shadow-2xl transition-all duration-300 hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)]">
+              <h3 className="text-[#047E72] font-semibold text-lg mb-4">
+                Our Mission
+              </h3>
+              <p className="text-gray-700 leading-relaxed mb-6">
+                {story || "Our story content is loading..."}
+              </p>
+              <div className="flex items-center text-sm text-gray-500">
+                <div className="flex items-center mr-4">
+                  <Calendar className="h-4 w-4 mr-1 text-[#047E72]" />
+                  <span>Est. 2023</span>
+                </div>
+                <div className="flex items-center">
+                  <Eye className="h-4 w-4 mr-1 text-[#047E72]" />
+                  <span>1,000+ Causes Supported</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -156,72 +151,96 @@ const Blogs = () => {
 
       {/* Blogs Section */}
       <div className="container mx-auto py-16 px-6">
-        <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">
-          Latest Articles
-        </h2>
-        
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-800">
+            Latest Articles
+          </h2>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Explore our collection of thought-provoking articles on how shopping
+            with purpose can transform lives and communities.
+          </p>
+        </div>
+
         {blogs.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-xl text-gray-600">No published blogs available at the moment.</p>
+            <p className="text-xl text-gray-600">
+              No published blogs available at the moment.
+            </p>
           </div>
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {blogs.map((blog) => (
-                <div key={blog.id} className="relative">
-                  <div className="bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl h-full flex flex-col transform hover:-translate-y-1">
-                    <div className="relative h-64">
-                      <img
-                        src={blog.thumbnail || "https://via.placeholder.com/800x600"}
-                        alt={blog.title}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
-                        <p className="text-white font-medium">
-                          By {blog.author || "Unknown Author"}
+                <div key={blog.id} className="group">
+                  <Link to={`/blogs/${blog.id}`} className="block h-full">
+                    <div className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl h-full flex flex-col transform group-hover:-translate-y-1">
+                      <div className="relative h-56 overflow-hidden">
+                        <img
+                          src={
+                            blog.thumbnail ||
+                            "https://via.placeholder.com/800x600"
+                          }
+                          alt={blog.title}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                        <div className="absolute top-4 left-4">
+                          <span className="bg-[#047E72]/90 text-white text-xs px-3 py-1 rounded-full">
+                            Article
+                          </span>
+                        </div>
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+                          <div className="flex items-center text-white">
+                            <Clock className="h-4 w-4 mr-1" />
+                            <p className="text-sm">{blog.date || "No date"}</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="p-6 flex-grow flex flex-col">
+                        <h3 className="text-xl font-bold text-gray-800 mb-3 group-hover:text-[#047E72] transition-colors">
+                          {blog.title || "Untitled Blog"}
+                        </h3>
+                        <p className="text-gray-600 mb-4 flex-grow">
+                          {getTruncatedContent(blog.content)}
                         </p>
+                        <div className="flex justify-between items-center mt-auto pt-4 border-t border-gray-100">
+                          <div className="flex items-center">
+                            <div className="h-8 w-8 rounded-full bg-[#047E72] flex items-center justify-center text-white font-medium text-sm">
+                              {blog.author ? blog.author[0].toUpperCase() : "A"}
+                            </div>
+                            <span className="ml-2 text-sm text-gray-700">
+                              {blog.author || "Unknown"}
+                            </span>
+                          </div>
+                          <span className="flex items-center text-sm text-gray-500">
+                            <Eye className="h-4 w-4 mr-1" />
+                            {blog.views || 0}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                    <div className="p-6 flex-grow">
-                      <h3 className="text-xl font-bold text-gray-800 mb-3">
-                        {blog.title || "Untitled Blog"}
-                      </h3>
-                      <p className="text-gray-600 mb-4">
-                        {getTruncatedContent(blog.content)}
-                      </p>
-                      <div className="flex justify-between items-center mt-auto">
-                        <span className="text-sm text-gray-500">
-                          {blog.views || 0} views
-                        </span>
-                        <button
-                          onClick={() => handleReadMore(blog.id)}
-                          className="bg-teal-600 text-white px-5 py-2 rounded-lg hover:bg-teal-700 transition-colors"
-                        >
-                          Read More
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                  </Link>
                 </div>
               ))}
             </div>
-            
+
             {/* Pagination */}
             {totalPages > 1 && (
               <div className="flex justify-center mt-12">
                 <div className="flex items-center space-x-2 flex-wrap">
                   <button
-                    onClick={() => fetchBlogsByPage(Math.max(1, currentPage - 1))}
+                    onClick={() =>
+                      fetchBlogsByPage(Math.max(1, currentPage - 1))
+                    }
                     disabled={currentPage === 1}
                     className={`px-4 py-2 rounded-md ${
-                      currentPage === 1 
-                        ? "bg-gray-200 text-gray-500" 
+                      currentPage === 1
+                        ? "bg-gray-200 text-gray-500"
                         : "bg-teal-600 text-white hover:bg-teal-700"
                     }`}
                   >
                     Previous
                   </button>
-                  
+
                   {[...Array(Math.min(5, totalPages)).keys()].map((page) => {
                     // Show 5 pages at most, centered around current page
                     let pageToShow;
@@ -234,7 +253,7 @@ const Blogs = () => {
                     } else {
                       pageToShow = currentPage - 2 + page;
                     }
-                    
+
                     return (
                       <button
                         key={pageToShow}
@@ -249,9 +268,11 @@ const Blogs = () => {
                       </button>
                     );
                   })}
-                  
+
                   <button
-                    onClick={() => fetchBlogsByPage(Math.min(totalPages, currentPage + 1))}
+                    onClick={() =>
+                      fetchBlogsByPage(Math.min(totalPages, currentPage + 1))
+                    }
                     disabled={currentPage === totalPages}
                     className={`px-4 py-2 rounded-md ${
                       currentPage === totalPages
@@ -267,60 +288,6 @@ const Blogs = () => {
           </>
         )}
       </div>
-
-      {/* Modal for expanded blog view */}
-      {expandedBlog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-75 overflow-y-auto">
-          <div 
-            ref={modalRef}
-            className="bg-white relative top-20 rounded-lg shadow-lg w-full max-w-2xl mx-auto overflow-hidden"
-            style={{ maxHeight: "70vh" }}
-          >
-            {blogs.filter(blog => blog.id === expandedBlog).map(blog => (
-              <div key={blog.id} className="flex flex-col overflow-y-auto">
-                <div className="relative h-64 overflow-hidden">
-                  <img
-                    src={blog.thumbnail || "https://via.placeholder.com/800x400"}
-                    alt={blog.title}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute top-4 right-4">
-                    <button
-                      onClick={closeExpandedBlog}
-                      className="bg-white bg-opacity-70 p-2 rounded-full hover:bg-opacity-100 transition-all"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-                
-                <div className="px-6 py-4" style={{ maxHeight: "calc(70vh - 16rem)" }}>
-                  <div className="flex items-center mb-4">
-                    <div className="h-12 w-12 rounded-full bg-teal-500 flex items-center justify-center text-white font-bold">
-                      {blog.author ? blog.author[0].toUpperCase() : "A"}
-                    </div>
-                    <div className="ml-3">
-                      <p className="font-semibold text-gray-800">By {blog.author || "Unknown Author"}</p>
-                      <p className="text-sm text-gray-500">{(blog.views || 0) + 1} views</p>
-                    </div>
-                  </div>
-                  
-                  <h1 className="text-2xl font-bold text-gray-800 mb-4">
-                    {blog.title || "Untitled Blog"}
-                  </h1>
-                  
-                  <div className="prose max-w-none text-gray-700 pb-3">
-                    {blog.content || "No content available."}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 };
