@@ -2,12 +2,10 @@ import { Link } from "react-router-dom";
 import "./HowItworks.scss";
 // ================================
 import store from "../../assets/homepage/store.png";
-import video from "../../assets/homepage/homepage.png";
 import Onlinewishes from "../../assets/homepage/Onlinewishes.png";
 import card1 from "../../assets/homepage/howitworksCard1.png";
 import card2 from "../../assets/homepage/howitworksCard2.png";
 import card3 from "../../assets/homepage/howitworksCard3.png";
-
 import signup from "../../assets/RegisterBusiness/signup.png";
 import money from "../../assets/RegisterBusiness/money.png";
 import bag from "../../assets/RegisterBusiness/bag.jpg";
@@ -15,8 +13,66 @@ import bag from "../../assets/RegisterBusiness/bag.jpg";
 import { RiSearchFill } from "react-icons/ri";
 import RoundedCards from "../../Components/RoundedCards/RoundedCards";
 import FAQ from "../../Components/FAQ";
+import { getDoc, doc } from "firebase/firestore";
+import { db } from "../../../firebase";
+import { useState, useEffect, useRef } from "react";
+
+// In-memory cache for video data
+let videoCache = null;
 
 const HowItWorks = () => {
+  const [homeVideo, setHomeVideo] = useState({
+    url: null,
+    type: null,
+    thumbnail: null,
+  });
+  const [loading, setLoading] = useState(true);
+  const videoRef = useRef(null);
+
+  // Fetch video data
+  const fetchVideoData = async () => {
+    try {
+      let videoData = videoCache;
+      if (!videoData) {
+        const videoDoc = await getDoc(doc(db, "content", "howitworksVideos"));
+        videoData = {
+          url: null,
+          type: null,
+          thumbnail: null,
+        };
+        if (videoDoc.exists() && videoDoc.data().items?.length > 0) {
+          const sortedItems = [...videoDoc.data().items].sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          );
+          videoData.url = sortedItems[0]?.url || null;
+          videoData.type = sortedItems[0]?.type || null;
+          videoData.thumbnail = sortedItems[0]?.thumbnail || null;
+          videoCache = videoData; // Cache the result
+        }
+      }
+
+      setHomeVideo(videoData);
+
+      // Preload video if URL exists
+      if (videoData.url) {
+        const preloadLink = document.createElement("link");
+        preloadLink.rel = "preload";
+        preloadLink.as = "video";
+        preloadLink.href = videoData.url;
+        document.head.appendChild(preloadLink);
+      }
+    } catch (error) {
+      console.error("Error fetching video:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchVideoData();
+  }, []);
+
+
   return (
     <div className="howitworks">
       <div className="howitworksContainer">
@@ -31,7 +87,7 @@ const HowItWorks = () => {
               stores and shop for your favorite products at no extra cost. For
               every purchase you make through SHOPPINESSMART, a percentage of
               the sale is automatically donated to your chosen charity. This
-              way, you can enjoy your shopping while knowing you&apos;re contributing
+              way, you can enjoy your shopping while knowing you're contributing
               to meaningful causes and making a positive impact on the world. By
               seamlessly integrating charity into your everyday shopping
               experience, SHOPPINESSMART helps you support the causes you care
@@ -50,7 +106,30 @@ const HowItWorks = () => {
           <h1>How you can start raising</h1>
           <div className="container">
             <div className="left">
-              <img src={video} alt="loading" />
+              {loading ? (
+                <div className="w-full h-[225px] md:h-[281px] bg-gray-200 rounded-lg flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-teal-500"></div>
+                </div>
+              ) : homeVideo?.url ? (
+                <div className="w-full h-[225px] md:h-[400px] bg-black rounded-lg overflow-hidden relative">
+                  <video
+                    ref={videoRef}
+                    autoPlay
+                    controls
+                    playsInline
+                    className="w-full h-full object-cover"
+                    poster={homeVideo.thumbnail || ""}
+                    preload="auto"
+                  >
+                    <source src={homeVideo.url} type={homeVideo.type} />
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+              ) : (
+                <div className="w-full h-[225px] md:h-[281px] bg-gray-200 rounded-lg flex items-center justify-center">
+                  <p className="text-gray-500">No video available</p>
+                </div>
+              )}
             </div>
             <div className="right">
               <div className="points">
@@ -70,7 +149,7 @@ const HowItWorks = () => {
                   </div>
                   <p>
                     <span>Make a Difference: </span>Enjoy your shopping while
-                    knowing you&apos;re contributing to meaningful causes and
+                    knowing you're contributing to meaningful causes and
                     making a positive impact on the world.
                   </p>
                 </div>
@@ -84,7 +163,6 @@ const HowItWorks = () => {
                     at no extra cost.
                   </p>
                 </div>
-
                 <div className="point">
                   <div className="img">
                     <img src={money} alt="loading" />
@@ -95,7 +173,6 @@ const HowItWorks = () => {
                     donated to your chosen charity.
                   </p>
                 </div>
-
                 <Link to="/signup" className="signup">
                   SIGN UP FOR FREE
                 </Link>
@@ -153,7 +230,6 @@ const HowItWorks = () => {
           ]}
         />
         <FAQ />
-        {/* <PeopleSaySection /> */}
       </div>
     </div>
   );

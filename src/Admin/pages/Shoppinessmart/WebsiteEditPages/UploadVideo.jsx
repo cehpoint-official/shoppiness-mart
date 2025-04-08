@@ -1,49 +1,51 @@
-import { useState, useRef } from 'react';
-import { 
-  AiOutlineCloudUpload, 
-  AiOutlineLoading3Quarters, 
-  AiOutlinePlayCircle,
-  AiOutlineSave,
-  AiOutlineDelete 
-} from 'react-icons/ai';
-import { storage, db } from '../../../../../firebase';
-import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
-import { doc, updateDoc, getDoc, setDoc } from 'firebase/firestore';
-import  toast  from 'react-hot-toast';
+import { useState, useRef } from "react";
+import {
+  AiOutlineCloudUpload,
+  AiOutlineLoading3Quarters,
+  AiOutlineDelete,
+} from "react-icons/ai";
+import { FaSpinner } from "react-icons/fa";
+import { storage, db } from "../../../../../firebase";
+import {
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+  deleteObject,
+} from "firebase/storage";
+import { doc, setDoc, getDoc } from "firebase/firestore";
+import toast from "react-hot-toast";
 
-const UploadVideo = ({ videos = [], updateVideo, deleteVideo }) => {
+const UploadVideo = ({ videos = [], deleteVideo, section, refreshData }) => {
   const [uploading, setUploading] = useState(false);
-  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [progress, setProgress] = useState(0);
   const [selectedVideo, setSelectedVideo] = useState(null);
-  const [pendingVideos, setPendingVideos] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [videoToDelete, setVideoToDelete] = useState(null);
   const fileInputRef = useRef(null);
 
   const validateFile = (file) => {
-    // Validate file type
-    const validTypes = ['video/mp4', 'video/avi', 'video/quicktime', 'video/x-msvideo'];
+    const validTypes = [
+      "video/mp4",
+      "video/avi",
+      "video/quicktime",
+      "video/x-msvideo",
+    ];
     if (!validTypes.includes(file.type)) {
-      toast.error('Please upload a valid video file (MP4, AVI, or MOV)');
+      toast.error("Please upload a valid video file (MP4, AVI, or MOV)");
       return false;
     }
-
-    // Validate file size (150MB)
-    const maxSize = 150 * 1024 * 1024; // 150MB in bytes
+    const maxSize = 20 * 1024 * 1024;
     if (file.size > maxSize) {
-      toast.error('File size exceeds 150MB limit');
+      toast.error("File size exceeds 20MB limit");
       return false;
     }
-
     return true;
   };
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
-    if (!file) return;
-
-    if (!validateFile(file)) {
+    if (!file || !validateFile(file)) {
       e.target.value = null;
       return;
     }
@@ -52,49 +54,68 @@ const UploadVideo = ({ videos = [], updateVideo, deleteVideo }) => {
       setUploading(true);
       setProgress(0);
 
-      // Create a storage reference
-      const storageRef = ref(storage, `videos/${Date.now()}_${file.name}`);
+      const timestamp = Date.now();
+      const storageFilePath = `${section
+        .toLowerCase()
+        .replace(/\s/g, "")}/videos/${timestamp}_${file.name}`;
 
-      // Upload file with progress monitoring
+      const storageRef = ref(storage, storageFilePath);
       const uploadTask = uploadBytesResumable(storageRef, file);
 
-      uploadTask.on('state_changed',
-        (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          setProgress(Math.round(progress));
-        },
+      uploadTask.on(
+        "state_changed",
+        (snapshot) =>
+          setProgress(
+            Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100)
+          ),
         (error) => {
           toast.error(`Upload failed: ${error.message}`);
           setUploading(false);
         },
         async () => {
-          // Upload completed successfully
-          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          try {
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
 
-          // Create video object
-          const newVideo = {
-            id: `temp_${Date.now()}`,
-            name: file.name,
-            url: downloadURL,
-            path: uploadTask.snapshot.ref.fullPath,
-            createdAt: new Date().toISOString(),
-            type: file.type,
-            pendingSave: true
-          };
+            const videoId = `${section
+              .toLowerCase()
+              .replace(/\s/g, "")}_video_${timestamp}`;
+            const newVideo = {
+              id: videoId,
+              name: file.name,
+              url: downloadURL,
+              path: uploadTask.snapshot.ref.fullPath,
+              createdAt: new Date().toISOString(),
+              type: file.type,
+              section,
+            };
 
-          // Add to pending videos
-          setPendingVideos(prev => [...prev, newVideo]);
-          
-          if (fileInputRef.current) fileInputRef.current.value = null;
-          setUploading(false);
-          
-          // Automatically select the newly uploaded video
-          setSelectedVideo(newVideo);
+            const collectionName = `${section
+              .toLowerCase()
+              .replace(/\s/g, "")}Videos`;
+            const videosDocRef = doc(db, "content", collectionName);
+            const docSnap = await getDoc(videosDocRef);
+
+            const currentItems = docSnap.exists()
+              ? docSnap.data().items || []
+              : [];
+            const updatedItems = [...currentItems, newVideo];
+
+            await setDoc(videosDocRef, { items: updatedItems });
+
+            toast.success(`Video uploaded successfully to ${collectionName}`);
+            refreshData(); // Refresh data after upload
+          } catch (error) {
+            console.error("Error saving video metadata:", error);
+            toast.error(`Failed to save video metadata: ${error.message}`);
+          } finally {
+            setUploading(false);
+            if (fileInputRef.current) fileInputRef.current.value = null;
+          }
         }
       );
     } catch (error) {
       console.error("Error uploading video:", error);
-      toast.error(`Upload error: ${error.message}`);
+      toast.error("Upload failed");
       setUploading(false);
     }
   };
@@ -110,89 +131,8 @@ const UploadVideo = ({ videos = [], updateVideo, deleteVideo }) => {
     }
   };
 
-  const handleCancel = (videoId, e) => {
-    if (e) e.stopPropagation(); // Prevent row selection when canceling
-    setPendingVideos(prev => prev.filter(video => video.id !== videoId));
-    
-    // If the canceled video was selected, deselect it
-    if (selectedVideo && selectedVideo.id === videoId) {
-      setSelectedVideo(null);
-    }
-  };
-
-  const handleSave = async (e) => {
-    if (e) e.stopPropagation(); // Prevent event bubbling
-    
-    if (!selectedVideo) {
-      toast.error("Please select a video to save");
-      return;
-    }
-
-    try {
-      setSaving(true);
-      
-      // Reference to the videos document in the content collection
-      const videosDocRef = doc(db, "content", "videos");
-      
-      // Create the video object to save (omit pendingSave property)
-      const { pendingSave, ...videoData } = selectedVideo;
-      const videoToSave = {
-        ...videoData,
-        id: selectedVideo.pendingSave ? `video_${Date.now()}` : selectedVideo.id // Generate a real ID if it's a temp one
-      };
-      
-      // Check if the document exists
-      const docSnap = await getDoc(videosDocRef);
-      
-      if (docSnap.exists()) {
-        // Get current videos array
-        const currentData = docSnap.data();
-        const updatedVideos = currentData.videos ? [...currentData.videos, videoToSave] : [videoToSave];
-        
-        // Update the document with the new array
-        await updateDoc(videosDocRef, {
-          videos: updatedVideos
-        });
-      } else {
-        // Create the document with an initial videos array
-        await setDoc(videosDocRef, {
-          videos: [videoToSave]
-        });
-      }
-      
-      toast.success('Video saved successfully to content/videos');
-      
-      // Remove from pending after successful save
-      if (selectedVideo.pendingSave) {
-        setPendingVideos(prev => prev.filter(video => video.id !== selectedVideo.id));
-      }
-      
-      // Update locally if needed
-      if (updateVideo && typeof updateVideo === 'function') {
-        await updateVideo(videoToSave);
-      }
-      
-      setSelectedVideo(null);
-    } catch (error) {
-      console.error("Error saving video:", error);
-      toast.error(`Save error: ${error.message}`);
-    } finally {
-      setSaving(false);
-    }
-  };
-
   const openDeleteModal = (video, e) => {
-    if (e) e.stopPropagation(); // Prevent event bubbling
-    
-    if (!video) {
-      video = selectedVideo;
-    }
-    
-    if (!video) {
-      toast.error("Please select a video to delete");
-      return;
-    }
-    
+    e.stopPropagation();
     setVideoToDelete(video);
     setShowDeleteModal(true);
   };
@@ -200,56 +140,25 @@ const UploadVideo = ({ videos = [], updateVideo, deleteVideo }) => {
   const closeDeleteModal = () => {
     setShowDeleteModal(false);
     setVideoToDelete(null);
+    setDeleting(false);
   };
 
   const confirmDelete = async () => {
     if (!videoToDelete) return;
-    
-    try {
-      // First try to delete from storage
-      try {
-        const storageRef = ref(storage, videoToDelete.path);
-        await deleteObject(storageRef);
-      } catch (storageError) {
-        console.warn("Storage delete error:", storageError);
-        // Continue with Firestore deletion even if storage deletion fails
-      }
 
-      // If it's a pending video, just remove it from the pending list
-      if (videoToDelete.pendingSave) {
-        setPendingVideos(prev => prev.filter(video => video.id !== videoToDelete.id));
-        toast.success("Video deleted successfully");
-      } else {
-        // Reference to the videos document in the content collection
-        const videosDocRef = doc(db, "content", "videos");
-        
-        // Get current videos
-        const docSnap = await getDoc(videosDocRef);
-        
-        if (docSnap.exists()) {
-          const currentVideos = docSnap.data().videos || [];
-          // Filter out the video to delete
-          const updatedVideos = currentVideos.filter(video => video.id !== videoToDelete.id);
-          
-          // Update the document with the filtered array
-          await updateDoc(videosDocRef, {
-            videos: updatedVideos
-          });
-          
-          // Call the deleteVideo function if available (for local state update)
-          if (deleteVideo && typeof deleteVideo === 'function') {
-            await deleteVideo(videoToDelete.id);
-          }
-          
-          toast.success("Video deleted successfully from content/videos");
-        }
-      }
-      
-      // If the deleted video was selected, deselect it
-      if (selectedVideo && selectedVideo.id === videoToDelete.id) {
-        setSelectedVideo(null);
-      }
-      
+    try {
+      setDeleting(true);
+
+      // Delete from storage
+      const storageRef = ref(storage, videoToDelete.path);
+      await deleteObject(storageRef);
+
+      // Delete from Firestore
+      await deleteVideo(videoToDelete.id);
+      refreshData(); // Refresh data after deletion
+
+      if (selectedVideo?.id === videoToDelete.id) setSelectedVideo(null);
+      toast.success("Video deleted successfully");
       closeDeleteModal();
     } catch (error) {
       console.error("Error deleting video:", error);
@@ -261,13 +170,11 @@ const UploadVideo = ({ videos = [], updateVideo, deleteVideo }) => {
   const handleSelectVideo = (video) => {
     setSelectedVideo(video.id === selectedVideo?.id ? null : video);
   };
-
-  // Combine saved videos and pending videos for display
-  const allVideos = [...videos, ...pendingVideos];
+console.log("videos", videos);
 
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-semibold">How it works / Upload Video</h2>
+      <h2 className="text-xl font-semibold">{section} / Upload Video</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div
           className="border bg-white shadow-md rounded-lg p-8 text-center"
@@ -309,8 +216,9 @@ const UploadVideo = ({ videos = [], updateVideo, deleteVideo }) => {
               </>
             )}
             <p className="text-sm text-gray-500">
-              Please upload Video (AVI, MP4, or MOV) with dimensions<br />
-              851 x 315 pixels and a maximum file size of 150 MB.
+              Please upload Video (AVI, MP4, or MOV) with dimensions
+              <br />
+              851 x 315 pixels and a maximum file size of 20 MB.
             </p>
           </div>
         </div>
@@ -318,10 +226,12 @@ const UploadVideo = ({ videos = [], updateVideo, deleteVideo }) => {
         <div className="border bg-white shadow-md rounded-lg p-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="font-medium">Uploaded Videos</h3>
-            <span className="text-sm text-gray-500">{allVideos.length} videos</span>
+            <span className="text-sm text-gray-500">
+              {videos.length} videos
+            </span>
           </div>
 
-          {allVideos.length === 0 ? (
+          {videos.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               No videos uploaded yet
             </div>
@@ -332,48 +242,28 @@ const UploadVideo = ({ videos = [], updateVideo, deleteVideo }) => {
                   <tr className="text-left">
                     <th className="pb-4">#</th>
                     <th className="pb-4">File name</th>
-                    <th className="pb-4">Preview</th>
-                    <th className="pb-4">Status</th>
                     <th className="pb-4">Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {allVideos.map((video, index) => (
-                    <tr 
-                      key={video.id} 
-                      className={`border-t ${selectedVideo?.id === video.id ? 'bg-blue-50' : ''}`}
+                  {videos.map((video, index) => (
+                    <tr
+                      key={video.id}
+                      className={`border-t ${
+                        selectedVideo?.id === video.id ? "bg-blue-50" : ""
+                      }`}
                       onClick={() => handleSelectVideo(video)}
-                      style={{ cursor: 'pointer' }}
+                      style={{ cursor: "pointer" }}
                     >
                       <td className="py-3">{index + 1}.</td>
                       <td className="py-3 text-gray-600">{video.name}</td>
                       <td className="py-3">
-                        <a
-                          href={video.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-500 hover:text-blue-700"
-                          onClick={(e) => e.stopPropagation()}
+                        <button
+                          className="text-red-500 hover:text-red-700"
+                          onClick={(e) => openDeleteModal(video, e)}
                         >
-                          <AiOutlinePlayCircle className="text-2xl" />
-                        </a>
-                      </td>
-                      <td className="py-3">
-                        {video.pendingSave ? (
-                          <span className="text-yellow-500">Pending</span>
-                        ) : (
-                          <span className="text-green-500">Saved</span>
-                        )}
-                      </td>
-                      <td className="py-3">
-                        {video.pendingSave && (
-                          <button
-                            className="text-red-500 hover:text-red-600"
-                            onClick={(e) => handleCancel(video.id, e)}
-                          >
-                            Cancel
-                          </button>
-                        )}
+                          <AiOutlineDelete className="text-xl" />
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -383,47 +273,20 @@ const UploadVideo = ({ videos = [], updateVideo, deleteVideo }) => {
           )}
         </div>
       </div>
-      
-      {/* Save and Delete buttons with icons */}
-      <div className="flex justify-end space-x-4 mt-4">
-        <button
-          className={`px-4 py-2 rounded flex items-center ${
-            selectedVideo && !saving ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-          }`}
-          onClick={handleSave}
-          disabled={!selectedVideo || saving}
-        >
-          {saving ? (
-            <>
-              <AiOutlineLoading3Quarters className="mr-2 animate-spin" /> Saving...
-            </>
-          ) : (
-            <>
-              <AiOutlineSave className="mr-2" /> Save
-            </>
-          )}
-        </button>
-        <button
-          className={`px-4 py-2 rounded flex items-center ${
-            selectedVideo ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-          }`}
-          onClick={(e) => openDeleteModal(null, e)}
-          disabled={!selectedVideo}
-        >
-          <AiOutlineDelete className="mr-2" /> Delete
-        </button>
-      </div>
-      
-      {/* Delete Confirmation Modal */}
+
       {showDeleteModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+            <div
+              className="fixed inset-0 transition-opacity"
+              aria-hidden="true"
+            >
               <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
             </div>
-            
-            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            
+            <span
+              className="hidden sm:inline-block sm:align-middle sm:h-screen"
+              aria-hidden="true"
+            ></span>
             <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
               <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div className="sm:flex sm:items-start">
@@ -431,10 +294,13 @@ const UploadVideo = ({ videos = [], updateVideo, deleteVideo }) => {
                     <AiOutlineDelete className="h-6 w-6 text-red-600" />
                   </div>
                   <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                    <h3 className="text-lg leading-6 font-medium text-gray-900">Delete Video</h3>
+                    <h3 className="text-lg leading-6 font-medium text-gray-900">
+                      Delete Video
+                    </h3>
                     <div className="mt-2">
                       <p className="text-sm text-gray-500">
-                        Are you sure you want to delete "{videoToDelete?.name}"? This action cannot be undone.
+                        Are you sure you want to delete "{videoToDelete?.name}"
+                        from {section}? This action cannot be undone.
                       </p>
                     </div>
                   </div>
@@ -445,13 +311,21 @@ const UploadVideo = ({ videos = [], updateVideo, deleteVideo }) => {
                   type="button"
                   className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
                   onClick={confirmDelete}
+                  disabled={deleting}
                 >
-                  Delete
+                  {deleting ? (
+                    <>
+                      <FaSpinner className="mr-2 animate-spin" /> Deleting...
+                    </>
+                  ) : (
+                    "Delete"
+                  )}
                 </button>
                 <button
                   type="button"
                   className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                   onClick={closeDeleteModal}
+                  disabled={deleting}
                 >
                   Cancel
                 </button>

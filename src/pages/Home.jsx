@@ -2,11 +2,9 @@ import img11 from "../assets/homepage/img11.png";
 import img12 from "../assets/homepage/img12.png";
 import img13 from "../assets/homepage/img13.png";
 import bgimg from "../assets/homepage/imagehome.png";
-import homepage from "../assets/homepage/homepage.png";
 import img18 from "../assets/homepage/img18.png";
 import Backimg9 from "../assets/homepage/backimg9.png";
 import supportACause from "../assets/homeheader.png";
-
 import FAQ from "../Components/FAQ";
 import PeopleSaySection from "../Components/PeopleSaySection";
 import PopularCauses from "../Components/PopularCauses/PopularCauses";
@@ -14,7 +12,7 @@ import RoundedCards from "../Components/RoundedCards/RoundedCards";
 import Partners from "../Components/Partners";
 import Loader from "../Components/Loader/Loader";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { db } from "../../firebase";
 import {
   collection,
@@ -39,12 +37,15 @@ const Home = () => {
     shopsData: [],
     causeLogos: [],
     bannerImage: null,
+    homeVideo: null,
   });
   const [loading, setLoading] = useState({
     main: true,
     banner: true,
     causes: true,
+    video: true,
   });
+  const videoRef = useRef(null);
   const navigate = useNavigate();
 
   // Handle form input changes
@@ -77,11 +78,46 @@ const Home = () => {
     }
   };
 
-  // Fetch data from Firebase
+  // Fetch data from Firebase with priority loading for video
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Parallel fetch operations using Promise.all
+        // First fetch the home video with high priority
+        const homeVideosDoc = await getDoc(doc(db, "content", "homeVideos"));
+
+        // Process home video data immediately
+        let homeVideo = {
+          url: null,
+          type: null,
+          thumbnail: null,
+        };
+
+        if (homeVideosDoc.exists() && homeVideosDoc.data().items?.length > 0) {
+          const sortedItems = [...homeVideosDoc.data().items].sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          );
+
+          homeVideo.url = sortedItems[0]?.url || null;
+          homeVideo.type = sortedItems[0]?.type || null;
+          homeVideo.thumbnail = sortedItems[0]?.thumbnail || null;
+
+          // Update video state immediately
+          setData((prev) => ({ ...prev, homeVideo }));
+          setLoading((prev) => ({ ...prev, video: false }));
+
+          // Start preloading the video
+          if (homeVideo.url) {
+            const videoPreload = document.createElement("link");
+            videoPreload.rel = "preload";
+            videoPreload.as = "video";
+            videoPreload.href = homeVideo.url;
+            document.head.appendChild(videoPreload);
+          }
+        } else {
+          setLoading((prev) => ({ ...prev, video: false }));
+        }
+
+        // Then fetch the rest of the data in parallel
         const [
           whyThisPlatformDocs,
           businessDetailsDocs,
@@ -89,13 +125,9 @@ const Home = () => {
           bannerDoc,
           causesDocs,
         ] = await Promise.all([
-          // WhyThisPlatform collection
+          // Other fetch operations remain the same
           getDocs(collection(db, "WhyThisPlatform")),
-
-          // businessDetails collection
           getDocs(collection(db, "businessDetails")),
-
-          // Published blogs
           getDocs(
             query(
               collection(db, "blogs"),
@@ -104,11 +136,7 @@ const Home = () => {
               limit(3)
             )
           ),
-
-          // Banner image
           getDoc(doc(db, "content", "banners")),
-
-          // Active causes
           getDocs(
             query(
               collection(db, "causeDetails"),
@@ -138,8 +166,6 @@ const Home = () => {
           const sortedItems = [...bannerDoc.data().items].sort(
             (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
           );
-          console.log("Sorted items:", sortedItems);
-
           bannerImage = sortedItems[0]?.url || null;
         }
 
@@ -149,14 +175,14 @@ const Home = () => {
           .filter((cause) => cause.logoUrl);
 
         // Update state with all fetched data
-        setData({
+        setData((prev) => ({
+          ...prev,
           roundedCardsData,
           blogsData,
           shopsData,
           causeLogos,
           bannerImage,
-        });
-        console.log("Fetched data:", bannerImage);
+        }));
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -184,7 +210,38 @@ const Home = () => {
     }
   }, [data.bannerImage]);
 
+  // Handle video element autoplay and metadata loading
+  useEffect(() => {
+    if (videoRef.current && data.homeVideo?.url) {
+      const videoElement = videoRef.current;
+
+      // Function to handle video loaded
+      const handleVideoLoaded = () => {
+        if (videoElement.readyState >= 3) {
+          // HAVE_FUTURE_DATA or HAVE_ENOUGH_DATA
+          setLoading((prev) => ({ ...prev, video: false }));
+          // Start playing when loaded
+          videoElement.play().catch((err) => {
+            console.warn("Autoplay failed:", err);
+            // Some browsers require user interaction before autoplay
+          });
+        }
+      };
+
+      // Set up event listeners
+      videoElement.addEventListener("loadeddata", handleVideoLoaded);
+      videoElement.addEventListener("canplay", handleVideoLoaded);
+
+      // Clean up event listeners
+      return () => {
+        videoElement.removeEventListener("loadeddata", handleVideoLoaded);
+        videoElement.removeEventListener("canplay", handleVideoLoaded);
+      };
+    }
+  }, [data.homeVideo?.url]);
+
   // Format date function
+
   const formatDate = (timestamp) => {
     if (!timestamp) return "";
     return new Date(timestamp.toDate()).toLocaleDateString("en-US", {
@@ -297,7 +354,7 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Cashback deals section */}
+      {/* Cashback deals section with improved video handling */}
       <div
         className="gap-20 flex justify-center items-center flex-wrap py-20 px-10 mb-10"
         style={{
@@ -328,8 +385,32 @@ const Home = () => {
             </Link>
           </div>
         </div>
+
         <div className="mt-6">
-          <img src={homepage} alt="Loading..." className="w-[400px]" />
+          {loading.video ? (
+            <div className="w-[400px] h-[225px] md:w-[500px] md:h-[281px] bg-gray-200 rounded-lg flex items-center justify-center">
+              <Loader />
+            </div>
+          ) : data.homeVideo?.url ? (
+            <div className="w-[400px] h-[225px] md:w-[500px] md:h-[281px] bg-black rounded-lg overflow-hidden">
+              <video
+                ref={videoRef}
+                autoPlay
+                controls
+                playsInline
+                className="w-full h-full object-cover"
+                poster={data.homeVideo.thumbnail || ""}
+                preload="auto"
+              >
+                <source src={data.homeVideo.url} type={data.homeVideo.type} />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          ) : (
+            <div className="w-[400px] h-[225px] md:w-[500px] md:h-[281px] bg-gray-200 rounded-lg flex items-center justify-center">
+              <p className="text-gray-500">No video available</p>
+            </div>
+          )}
         </div>
       </div>
 

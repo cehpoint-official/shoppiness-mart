@@ -1,3 +1,4 @@
+// WebsiteEditPages.jsx
 import { useState, useEffect } from "react";
 import { AiOutlinePlus, AiOutlineMinus } from "react-icons/ai";
 import UploadBanner from "./UploadBanner";
@@ -13,58 +14,65 @@ const WebsiteEditPages = () => {
     home: false,
     howItWorks: false,
     aboutUs: false,
+    registerBusiness: false,
   });
   const [selectedComponent, setSelectedComponent] = useState(null);
   const [pageData, setPageData] = useState({
     banners: [],
-    videos: [],
+    homeVideos: [],
+    howItWorksVideos: [],
+    registerBusinessVideos: [],
     members: [],
-    story: ""
+    story: "",
   });
   const [loading, setLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0); // Add refresh key
+
+  const fetchWebsiteData = async () => {
+    try {
+      setLoading(true);
+
+      const fetchContent = async (docName) => {
+        const docRef = doc(db, "content", docName);
+        const docSnap = await getDoc(docRef);
+        return docSnap.exists() ? docSnap.data().items || [] : [];
+      };
+
+      const [
+        banners,
+        homeVideos,
+        howItWorksVideos,
+        registerBusinessVideos,
+        members,
+        storyDoc,
+      ] = await Promise.all([
+        fetchContent("banners"),
+        fetchContent("homeVideos"),
+        fetchContent("howitworksVideos"),
+        fetchContent("registerbusinessVideos"),
+        fetchContent("members"),
+        getDoc(doc(db, "content", "story")),
+      ]);
+
+      setPageData({
+        banners,
+        homeVideos,
+        howItWorksVideos,
+        registerBusinessVideos,
+        members,
+        story: storyDoc.exists() ? storyDoc.data().content : "",
+      });
+    } catch (error) {
+      console.error("Error fetching website data:", error);
+      toast.error("Failed to load website data");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    // Initial fetch of all website data
-    const fetchWebsiteData = async () => {
-      try {
-        setLoading(true);
-        
-        // Fetch banners from content/banners document
-        const bannersDocRef = doc(db, 'content', 'banners');
-        const bannersDoc = await getDoc(bannersDocRef);
-        const bannersData = bannersDoc.exists() ? bannersDoc.data().items || [] : [];
-        
-        // Fetch videos from content/videos document
-        const videosDocRef = doc(db, 'content', 'videos');
-        const videosDoc = await getDoc(videosDocRef);
-        const videosData = videosDoc.exists() ? videosDoc.data().items || [] : [];
-        
-        // Fetch story content from content/story document
-        const storyDocRef = doc(db, 'content', 'story');
-        const storyDoc = await getDoc(storyDocRef);
-        const storyContent = storyDoc.exists() ? storyDoc.data().content : "";
-        
-        // Fetch members from content/members document
-        const membersDocRef = doc(db, 'content', 'members');
-        const membersDoc = await getDoc(membersDocRef);
-        const membersData = membersDoc.exists() ? membersDoc.data().items || [] : [];
-        
-        setPageData({
-          banners: bannersData,
-          videos: videosData,
-          members: membersData,
-          story: storyContent
-        });
-      } catch (error) {
-        console.error("Error fetching website data:", error);
-        toast.error("Failed to load website data");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchWebsiteData();
-  }, []);
+  }, [refreshKey]); // Add refreshKey as dependency
 
   const toggleSection = (section) => {
     setOpenSections((prev) => ({
@@ -79,93 +87,63 @@ const WebsiteEditPages = () => {
 
   const handleBack = () => {
     setSelectedComponent(null);
+    setRefreshKey((prev) => prev + 1); // Refresh data when going back
   };
 
-  // Common function to update array-based content (banners, videos, members)
-  const updateArrayContent = async (contentType, data, id = null) => {
+  const updateArrayContent = async (contentType, data) => {
     try {
-      const itemId = id || `${Date.now()}`;
-      const contentDocRef = doc(db, 'content', contentType);
-      
-      // Get current items
+      const itemId = `${Date.now()}`;
+      const contentDocRef = doc(db, "content", contentType);
       const contentDoc = await getDoc(contentDocRef);
-      const currentItems = contentDoc.exists() ? contentDoc.data().items || [] : [];
-      
-      let updatedItems;
-      if (id) {
-        // Update existing item
-        updatedItems = currentItems.map(item => 
-          item.id === id ? { ...data, id } : item
-        );
-      } else {
-        // Add new item
-        updatedItems = [...currentItems, { ...data, id: itemId }];
-      }
-      
-      // Save back to Firestore
+      const currentItems = contentDoc.exists()
+        ? contentDoc.data().items || []
+        : [];
+
+      const updatedItems = [...currentItems, { ...data, id: itemId }];
+
       await setDoc(contentDocRef, { items: updatedItems });
-      
-      // Update local state
-      setPageData(prev => ({
-        ...prev,
-        [contentType]: updatedItems
-      }));
-      
-      toast.success(`Successfully updated ${contentType}`);
+
+      setRefreshKey((prev) => prev + 1); // Refresh data after update
+      toast.success(`Successfully added to ${contentType}`);
       return true;
     } catch (error) {
       console.error(`Error updating ${contentType}:`, error);
-      toast.error(`Failed to update ${contentType}: ${error.message}`);
+      toast.error(`Failed to update ${contentType}`);
       return false;
     }
   };
 
-  // Function to delete from array-based content
   const deleteArrayItem = async (contentType, id) => {
     try {
-      const contentDocRef = doc(db, 'content', contentType);
-      
-      // Get current items
+      const contentDocRef = doc(db, "content", contentType);
       const contentDoc = await getDoc(contentDocRef);
-      const currentItems = contentDoc.exists() ? contentDoc.data().items || [] : [];
-      
-      // Filter out the item to delete
-      const updatedItems = currentItems.filter(item => item.id !== id);
-      
-      // Save back to Firestore
+      const currentItems = contentDoc.exists()
+        ? contentDoc.data().items || []
+        : [];
+      const updatedItems = currentItems.filter((item) => item.id !== id);
+
       await setDoc(contentDocRef, { items: updatedItems });
-      
-      // Update local state
-      setPageData(prev => ({
-        ...prev,
-        [contentType]: updatedItems
-      }));
-      
+
+      setRefreshKey((prev) => prev + 1); // Refresh data after deletion
       toast.success("Item deleted successfully");
       return true;
     } catch (error) {
       console.error(`Error deleting from ${contentType}:`, error);
-      toast.error(`Failed to delete item: ${error.message}`);
+      toast.error("Failed to delete item");
       return false;
     }
   };
 
-  // Function to update story content
   const updateStory = async (content) => {
     try {
-      const storyDocRef = doc(db, 'content', 'story');
+      const storyDocRef = doc(db, "content", "story");
       await setDoc(storyDocRef, { content });
-      
-      setPageData(prev => ({
-        ...prev,
-        story: content
-      }));
-      
+      setRefreshKey((prev) => prev + 1); // Refresh data after update
       toast.success("Story updated successfully");
       return true;
     } catch (error) {
       console.error("Error updating story:", error);
-      toast.error(`Failed to update story: ${error.message}`);
+      toast.error("Failed to update story");
       return false;
     }
   };
@@ -177,35 +155,52 @@ const WebsiteEditPages = () => {
       </div>
     );
   }
+  // console.log(pageData);
 
   if (selectedComponent) {
-    // Pass the appropriate data and update functions to each component
-    let componentWithProps;
-    
-    if (selectedComponent.type === UploadBanner) {
-      componentWithProps = <UploadBanner 
-        banners={pageData.banners} 
-        updateBanner={(data, id) => updateArrayContent('banners', data, id)}
-        deleteBanner={(id) => deleteArrayItem('banners', id)}
-      />;
-    } else if (selectedComponent.type === UploadVideo) {
-      componentWithProps = <UploadVideo 
-        videos={pageData.videos}
-        updateVideo={(data, id) => updateArrayContent('videos', data, id)}
-        deleteVideo={(id) => deleteArrayItem('videos', id)}
-      />;
-    } else if (selectedComponent.type === UploadMembers) {
-      componentWithProps = <UploadMembers 
-        members={pageData.members}
-        updateMember={(data, id) => updateArrayContent('members', data, id)}
-        deleteMember={(id) => deleteArrayItem('members', id)}
-      />;
-    } else if (selectedComponent.type === WriteStory) {
-      componentWithProps = <WriteStory 
-        story={pageData.story}
-        updateStory={updateStory}
-      />;
-    }
+    const componentMap = {
+      UploadBanner: (
+        <UploadBanner
+          banners={pageData.banners}
+          updateBanner={(data) => updateArrayContent("banners", data)}
+          deleteBanner={(id) => deleteArrayItem("banners", id)}
+        />
+      ),
+      UploadVideoHome: (
+        <UploadVideo
+          videos={pageData.homeVideos}
+          deleteVideo={(id) => deleteArrayItem("homeVideos", id)}
+          section="Home"
+          refreshData={() => setRefreshKey((prev) => prev + 1)}
+        />
+      ),
+      UploadVideoHowItWorks: (
+        <UploadVideo
+          videos={pageData.howItWorksVideos}
+          deleteVideo={(id) => deleteArrayItem("howitworksVideos", id)}
+          section="How It Works"
+          refreshData={() => setRefreshKey((prev) => prev + 1)}
+        />
+      ),
+      UploadVideoRegisterBusiness: (
+        <UploadVideo
+          videos={pageData.registerBusinessVideos}
+          deleteVideo={(id) => deleteArrayItem("registerbusinessVideos", id)}
+          section="Register Business"
+          refreshData={() => setRefreshKey((prev) => prev + 1)}
+        />
+      ),
+      UploadMembers: (
+        <UploadMembers
+          members={pageData.members}
+          updateMember={(data) => updateArrayContent("members", data)}
+          deleteMember={(id) => deleteArrayItem("members", id)}
+        />
+      ),
+      WriteStory: (
+        <WriteStory story={pageData.story} updateStory={updateStory} />
+      ),
+    };
 
     return (
       <div className="p-6">
@@ -215,7 +210,7 @@ const WebsiteEditPages = () => {
         >
           ← Back
         </button>
-        {componentWithProps}
+        {componentMap[selectedComponent.type]}
       </div>
     );
   }
@@ -231,20 +226,29 @@ const WebsiteEditPages = () => {
             onClick={() => toggleSection("home")}
           >
             <h2 className="text-lg font-medium">Home</h2>
-            <div className="flex items-center">
-              <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded mr-2">
+            <div className="flex items-center space-x-2">
+              <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
                 {pageData.banners.length} banners
+              </span>
+              <span className="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">
+                {pageData.homeVideos.length} videos
               </span>
               {openSections.home ? <AiOutlineMinus /> : <AiOutlinePlus />}
             </div>
           </div>
           {openSections.home && (
-            <div className="p-4 border-t">
+            <div className="p-4 border-t space-y-2">
               <div
                 className="cursor-pointer text-blue-600 hover:text-blue-800 flex items-center"
-                onClick={() => handleItemClick(<UploadBanner />)}
+                onClick={() => handleItemClick({ type: "UploadBanner" })}
               >
                 <AiOutlinePlus className="mr-2" /> Upload Banner image
+              </div>
+              <div
+                className="cursor-pointer text-blue-600 hover:text-blue-800 flex items-center"
+                onClick={() => handleItemClick({ type: "UploadVideoHome" })}
+              >
+                <AiOutlinePlus className="mr-2" /> Upload Home Video
               </div>
             </div>
           )}
@@ -259,7 +263,7 @@ const WebsiteEditPages = () => {
             <h2 className="text-lg font-medium">How it works</h2>
             <div className="flex items-center">
               <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded mr-2">
-                {pageData.videos.length} videos
+                {pageData.howItWorksVideos.length} videos
               </span>
               {openSections.howItWorks ? <AiOutlineMinus /> : <AiOutlinePlus />}
             </div>
@@ -268,7 +272,9 @@ const WebsiteEditPages = () => {
             <div className="p-4 border-t">
               <div
                 className="cursor-pointer text-blue-600 hover:text-blue-800 flex items-center"
-                onClick={() => handleItemClick(<UploadVideo />)}
+                onClick={() =>
+                  handleItemClick({ type: "UploadVideoHowItWorks" })
+                }
               >
                 <AiOutlinePlus className="mr-2" /> How it works video
               </div>
@@ -294,15 +300,48 @@ const WebsiteEditPages = () => {
             <div className="p-4 border-t space-y-2">
               <div
                 className="cursor-pointer text-blue-600 hover:text-blue-800 flex items-center"
-                onClick={() => handleItemClick(<WriteStory />)}
+                onClick={() => handleItemClick({ type: "WriteStory" })}
               >
-                <AiOutlinePlus className="mr-2" /> Write the story of this platform
+                <AiOutlinePlus className="mr-2" /> Write the story of this
+                platform
               </div>
               <div
                 className="cursor-pointer text-blue-600 hover:text-blue-800 flex items-center"
-                onClick={() => handleItemClick(<UploadMembers />)}
+                onClick={() => handleItemClick({ type: "UploadMembers" })}
               >
                 <AiOutlinePlus className="mr-2" /> Upload members image
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Register Business/Service Section */}
+        <div className="border rounded-lg overflow-hidden">
+          <div
+            className="flex justify-between items-center p-4 cursor-pointer"
+            onClick={() => toggleSection("registerBusiness")}
+          >
+            <h2 className="text-lg font-medium">Register Business/Service</h2>
+            <div className="flex items-center">
+              <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded mr-2">
+                {pageData.registerBusinessVideos.length} videos
+              </span>
+              {openSections.registerBusiness ? (
+                <AiOutlineMinus />
+              ) : (
+                <AiOutlinePlus />
+              )}
+            </div>
+          </div>
+          {openSections.registerBusiness && (
+            <div className="p-4 border-t">
+              <div
+                className="cursor-pointer text-blue-600 hover:text-blue-800 flex items-center"
+                onClick={() =>
+                  handleItemClick({ type: "UploadVideoRegisterBusiness" })
+                }
+              >
+                <AiOutlinePlus className="mr-2" /> Register Business Video
               </div>
             </div>
           )}
