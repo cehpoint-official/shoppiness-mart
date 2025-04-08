@@ -1,7 +1,7 @@
 import "./UserDashBoard.scss";
 import { collection, doc, getDoc, getDocs, setDoc } from "firebase/firestore";
 import { db } from "../../../firebase.js";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Link, useParams } from "react-router-dom";
 import UserDashboardNav from "../../Components/UserDashboardNav/UserDashboardNav.jsx";
 import Footer from "../../Components/Footer.jsx";
@@ -29,7 +29,8 @@ import EditProfileDialog from "./EditProfileDialog.jsx";
 import UserTransactions from "./UserTransactions.jsx";
 import { useDispatch } from "react-redux";
 import { userExist, userNotExist } from "../../redux/reducer/userReducer.js";
-
+// In-memory cache for video data
+let videoCache = null;
 const UserDashBoard = () => {
   const dispatch = useDispatch();
   const [userData, setUserData] = useState({});
@@ -40,6 +41,56 @@ const UserDashBoard = () => {
   const [cashbackRequest, setCashbackRequest] = useState([]);
   const [isFetchingCoupons, setIsFetchingCoupons] = useState(true);
   const [activeTab, setActiveTab] = useState("dashboard"); // Adding state for tab navigation
+  const [homeVideo, setHomeVideo] = useState({
+    url: null,
+    type: null,
+    thumbnail: null,
+  });
+  const [videoloading, setVideoLoading] = useState(true);
+  const videoRef = useRef(null);
+
+  // Fetch video data
+  const fetchVideoData = async () => {
+    try {
+      let videoData = videoCache;
+      if (!videoData) {
+        const videoDoc = await getDoc(doc(db, "content", "howitworksVideos"));
+        videoData = {
+          url: null,
+          type: null,
+          thumbnail: null,
+        };
+        if (videoDoc.exists() && videoDoc.data().items?.length > 0) {
+          const sortedItems = [...videoDoc.data().items].sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          );
+          videoData.url = sortedItems[0]?.url || null;
+          videoData.type = sortedItems[0]?.type || null;
+          videoData.thumbnail = sortedItems[0]?.thumbnail || null;
+          videoCache = videoData; // Cache the result
+        }
+      }
+
+      setHomeVideo(videoData);
+
+      // Preload video if URL exists
+      if (videoData.url) {
+        const preloadLink = document.createElement("link");
+        preloadLink.rel = "preload";
+        preloadLink.as = "video";
+        preloadLink.href = videoData.url;
+        document.head.appendChild(preloadLink);
+      }
+    } catch (error) {
+      console.error("Error fetching video:", error);
+    } finally {
+      setVideoLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchVideoData();
+  }, []);
 
   // Skeleton Components
   const SkeletonWidget = () => (
@@ -93,9 +144,9 @@ const UserDashBoard = () => {
         merge: true,
       });
       console.log(updatedData);
-      
+
       dispatch(userExist(updatedData));
-       setUserData(updatedData);
+      setUserData(updatedData);
       setIsDialogOpen(false);
     } catch (error) {
       console.error("Error updating user data:", error);
@@ -144,7 +195,7 @@ const UserDashBoard = () => {
   // Main dashboard content
   const renderDashboardContent = () => (
     <>
-      <div className="widgets">
+      <div className="widgets grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {loading ? (
           <>
             <SkeletonWidget />
@@ -156,7 +207,7 @@ const UserDashBoard = () => {
           <>
             <Widget
               title="Collected Cash backs"
-              heading={userData.collectedCashback || "0"}
+              heading={(userData.collectedCashback || 0).toFixed(1)}
               icon={money}
             />
             <Widget
@@ -240,7 +291,7 @@ const UserDashBoard = () => {
           <h2>
             How do you get happiness with <span>Shoppiness Mart</span>
           </h2>
-          <div className="featuresSecLowerSection">
+          <div className="featuresSecLowerSection flex gap-4 items-center justify-center flex-wrap">
             <div className="featuresSecItem">
               <img src={feature} alt="err" />
               <p>Visit favorite stores listed in Shopping Mart</p>
@@ -266,7 +317,7 @@ const UserDashBoard = () => {
           </div>
         </div>
 
-        <div className="popularOfflineShops">
+        {/* <div className="popularOfflineShops">
           <h2>
             Popular <span>Offline</span> Shops close to you
           </h2>
@@ -321,18 +372,37 @@ const UserDashBoard = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
 
       <div className="moneyRaisingSec">
         <h1>Start raising from Online Stores</h1>
         <div className="container">
           <div className="left">
-            <img
-              src={video}
-              alt="loading"
-              className="w-full h-auto object-cover rounded-lg"
-            />
+            {videoloading ? (
+              <div className="w-full h-[225px] md:h-[281px] bg-gray-200 rounded-lg flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-teal-500"></div>
+              </div>
+            ) : homeVideo?.url ? (
+              <div className="w-full h-[225px] md:h-[400px] bg-black rounded-lg overflow-hidden relative">
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  controls
+                  playsInline
+                  className="w-full h-full object-cover"
+                  poster={homeVideo.thumbnail || ""}
+                  preload="auto"
+                >
+                  <source src={homeVideo.url} type={homeVideo.type} />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+            ) : (
+              <div className="w-full h-[225px] md:h-[281px] bg-gray-200 rounded-lg flex items-center justify-center">
+                <p className="text-gray-500">No video available</p>
+              </div>
+            )}
           </div>
           <div className="right">
             <div className="points">
@@ -451,15 +521,15 @@ const UserDashBoard = () => {
               </div>
             </div>
           </div>
-          
+
           {/* New navigation tabs */}
           <div className="dashboard-tabs mt-6 mb-4 border-b">
             <div className="flex space-x-4">
               <button
                 onClick={() => setActiveTab("dashboard")}
                 className={`py-2 px-4 font-medium transition-colors duration-200 ${
-                  activeTab === "dashboard" 
-                    ? "text-blue-600 border-b-2 border-blue-600" 
+                  activeTab === "dashboard"
+                    ? "text-blue-600 border-b-2 border-blue-600"
                     : "text-gray-500 hover:text-blue-500"
                 }`}
               >
@@ -468,8 +538,8 @@ const UserDashBoard = () => {
               <button
                 onClick={() => setActiveTab("transactions")}
                 className={`py-2 px-4 font-medium transition-colors duration-200 ${
-                  activeTab === "transactions" 
-                    ? "text-blue-600 border-b-2 border-blue-600" 
+                  activeTab === "transactions"
+                    ? "text-blue-600 border-b-2 border-blue-600"
                     : "text-gray-500 hover:text-blue-500"
                 }`}
               >

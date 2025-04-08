@@ -15,9 +15,8 @@ import CashbackTracking from "./Admin/pages/Product&Services/CashbackTracking/Ca
 import AllPartners from "./pages/AllPartners";
 import BlogDetails from "./pages/BlogDetails";
 import CauseDetails from "./pages/CauseDetails";
-
-// import ProtectedRoute from "./Components/ProtectedRoute";
-
+import { useSelector } from "react-redux";
+import ProtectedRoute from "./Components/ProtectedRoute";
 const BusinessDetails = lazy(() => import("./pages/BusinessDetails"));
 const ProductDetails = lazy(() => import("./pages/ProductDetails"));
 const AdminDashboard = lazy(() =>
@@ -186,34 +185,61 @@ const Layout = () => (
 );
 
 // Protected Route Wrappers
-// const UserProtectedRoute = ({ children }) => {
-//   const { user } = useSelector((state) => state.userReducer);
+const UserProtectedRoute = ({ children }) => {
+  const { user } = useSelector((state) => state.userReducer || {});
+  console.log(
+    "UserProtectedRoute State:",
+    useSelector((state) => state)
+  ); // Debug log
+  return (
+    <ProtectedRoute isAuthenticated={!!user} redirect="/login/user">
+      {children}
+    </ProtectedRoute>
+  );
+};
 
-//   return (
-//     <ProtectedRoute isAuthenticated={!!user} redirect="/login/user">
-//       {children}
-//     </ProtectedRoute>
-//   );
-// };
+const NgoProtectedRoute = ({ children }) => {
+  const { user } = useSelector((state) => state.ngoUserReducer || {});
+  console.log(
+    "NgoProtectedRoute State:",
+    useSelector((state) => state)
+  ); // Debug log
+  return (
+    <ProtectedRoute isAuthenticated={!!user} redirect="/login/cause">
+      {children}
+    </ProtectedRoute>
+  );
+};
 
-// const NgoProtectedRoute = ({ children }) => {
-//   const { user } = useSelector((state) => state.ngoUserReducer);
-//   return (
-//     <ProtectedRoute isAuthenticated={!!user} redirect="/login/cause">
-//       {children}
-//     </ProtectedRoute>
-//   );
-// };
+const BusinessProtectedRoute = ({ children }) => {
+  const { user } = useSelector((state) => state.businessUserReducer || {});
+  console.log(
+    "BusinessProtectedRoute State:",
+    useSelector((state) => state)
+  ); // Debug log
+  return (
+    <ProtectedRoute isAuthenticated={!!user} redirect="/login/business">
+      {children}
+    </ProtectedRoute>
+  );
+};
 
-// const BusinessProtectedRoute = ({ children }) => {
-//   const { user } = useSelector((state) => state.businessUserReducer);
-//   return (
-//     <ProtectedRoute isAuthenticated={!!user} redirect="/login/business">
-//       {children}
-//     </ProtectedRoute>
-//   );
-// };
-
+const AdminProtectedRoute = ({ children }) => {
+  const { user } = useSelector((state) => state.userReducer || {});
+  console.log(
+    "AdminProtectedRoute State:",
+    useSelector((state) => state)
+  ); // Debug log
+  return (
+    <ProtectedRoute
+      isAuthenticated={!!user}
+      adminOnly={true}
+      redirect="/login/user"
+    >
+      {children}
+    </ProtectedRoute>
+  );
+};
 // Router configuration
 const router = createBrowserRouter([
   {
@@ -229,8 +255,8 @@ const router = createBrowserRouter([
           { path: "/contact", element: <ContactUs /> },
           { path: "/about", element: <AboutUs /> },
           { path: "/blogs", element: <Blogs /> },
-          { path: "/blogs/:blogId", element: <BlogDetails />} ,
-          { path: "/privacy-policy", element: <PrivacyPolicyPage/> },
+          { path: "/blogs/:blogId", element: <BlogDetails /> },
+          { path: "/privacy-policy", element: <PrivacyPolicyPage /> },
           { path: "/register-business", element: <Business /> },
           { path: "/all-partners", element: <AllPartners /> },
           { path: "/register-cause", element: <Cause /> },
@@ -268,17 +294,19 @@ const router = createBrowserRouter([
       {
         path: "/user-dashboard/:userId/dashboard",
         element: (
-          // <UserProtectedRoute>
-          <UserDashboard />
-          //   </UserProtectedRoute>
+          <Suspense fallback={<Loader />}>
+            <UserProtectedRoute>
+              <UserDashboard />
+            </UserProtectedRoute>
+          </Suspense>
         ),
       },
       {
         path: "/user-dashboard/:userId",
         element: (
-          //    <UserProtectedRoute>
-          <NewLayout />
-          //     </UserProtectedRoute>
+          <UserProtectedRoute>
+            <NewLayout />
+          </UserProtectedRoute>
         ),
         children: [
           {
@@ -331,9 +359,11 @@ const router = createBrowserRouter([
       {
         path: "/ngo-dashboard/:id",
         element: (
-          // <NgoProtectedRoute>
-          <NgoDashboardOutlet />
-          //  </NgoProtectedRoute>
+          <Suspense fallback={<Loader />}>
+            <NgoProtectedRoute>
+              <NgoDashboardOutlet />
+            </NgoProtectedRoute>
+          </Suspense>
         ),
         children: [
           { path: "dashboard", element: <NgoDashboard /> },
@@ -348,7 +378,13 @@ const router = createBrowserRouter([
       // Admin routes
       {
         path: "/admin/:userId/shoppiness/",
-        element: (<AdminDashboardOutlet />),
+        element: (
+          <Suspense fallback={<Loader />}>
+            <AdminProtectedRoute>
+              <AdminDashboardOutlet />
+            </AdminProtectedRoute>
+          </Suspense>
+        ),
         children: [
           { path: "dashboard", element: <AdminDashboard /> },
           { path: "edit-pages", element: <WebsiteEditPages /> },
@@ -363,30 +399,36 @@ const router = createBrowserRouter([
             children: [
               { path: "edit", element: <EditPage /> },
               { path: "donations", element: <AllDonations /> },
-              { path: "events", element: <Events /> }
-            ]
+              { path: "events", element: <Events /> },
+            ],
           },
           {
             path: "ngo",
             children: [
               { path: "ngo-requests", element: <NgoRequest /> },
               { path: "all-ngo", element: <AllNgos /> },
-              { path: "giveback-request", element: <GiveBackRecord /> }
-            ]
+              { path: "giveback-request", element: <GiveBackRecord /> },
+            ],
           },
           {
             path: "services",
             children: [
               { path: "cashback-tracking", element: <CashbackTracking /> },
-              { path: "offlineshop-requests", element: <OfflineShopRequests /> },
+              {
+                path: "offlineshop-requests",
+                element: <OfflineShopRequests />,
+              },
               { path: "onlineshop-requests", element: <OnlineShopRequests /> },
               { path: "all-offlineshops", element: <AllOfflineShops /> },
               { path: "all-onlineshops", element: <AllOnlineShops /> },
               { path: "add-categories", element: <AddCategories /> },
               { path: "earnings", element: <PlatformEarningsFromBusiness /> },
-              { path: "earnings/:id", element: <AllPaymentVarificationRequest /> },
-              { path: "earnings/:id/:id", element: <ViewPaymentDetails /> }
-            ]
+              {
+                path: "earnings/:id",
+                element: <AllPaymentVarificationRequest />,
+              },
+              { path: "earnings/:id/:id", element: <ViewPaymentDetails /> },
+            ],
           },
           {
             path: "users",
@@ -396,18 +438,20 @@ const router = createBrowserRouter([
               { path: "cashback-requests", element: <CashbackRequests /> },
               { path: "cashback-status", element: <CashbackStatus /> },
               { path: "givebacks", element: <Givebacks /> },
-              { path: "dispute-requests", element: <DisputeRequest /> }
-            ]
-          }
+              { path: "dispute-requests", element: <DisputeRequest /> },
+            ],
+          },
         ],
       },
       // Protected Services Dashboard Routes
       {
         path: "/services-dashboard/:id",
         element: (
-          //  <BusinessProtectedRoute>
-          <DashboardOutlet />
-          //     </BusinessProtectedRoute>
+          <Suspense fallback={<Loader />}>
+            <BusinessProtectedRoute>
+              <DashboardOutlet />
+            </BusinessProtectedRoute>
+          </Suspense>
         ),
         children: [
           { path: "dashboard", element: <Dashboard /> },

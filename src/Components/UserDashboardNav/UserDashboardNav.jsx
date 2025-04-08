@@ -15,6 +15,7 @@ import {
   doc,
 } from "firebase/firestore";
 import { db } from "../../../firebase";
+import { persistor } from "../../redux/store";
 
 const UserDashboardNav = ({ profilePic, userId }) => {
   const navigate = useNavigate();
@@ -123,13 +124,26 @@ const UserDashboardNav = ({ profilePic, userId }) => {
   const toggleNotificationPopup = () => {
     setShowNotificationPopup((prev) => !prev);
   };
+  const handleLogout = async () => {
+    try {
+      // Step 1: Clear the Redux state
+      dispatch(userNotExist());
 
+      // Step 2: Purge the persisted state from sessionStorage
+      await persistor.purge();
+
+      // Step 3: Navigate to login page
+      navigate("/login/user");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
   return (
     <div className="w-full">
       {/* Upper Nav */}
-      <div className="flex justify-between items-center px-[100px] py-0">
+      <div className="flex justify-between items-center px-4 sm:px-[100px] py-0">
         <Link to="/">
-          <img src={logo} alt="err" className="w-[210px] h-[80px]" />
+          <img src={logo} alt="err" className="w-[150px] h-[50px] sm:w-[210px] sm:h-[80px]" />
         </Link>
         <div className="hidden lg:flex items-center border border-gray-500 h-[45px] px-[50px] rounded-lg">
           <div className="flex items-center gap-2">
@@ -162,13 +176,7 @@ const UserDashboardNav = ({ profilePic, userId }) => {
               </span>
             )}
           </div>
-          <button
-            onClick={() => {
-              dispatch(userNotExist());
-              navigate("/login/user");
-            }}
-            className="text-blue-600 font-medium"
-          >
+          <button onClick={handleLogout} className="text-blue-600 font-medium">
             Logout
           </button>
         </div>
@@ -219,7 +227,7 @@ const UserDashboardNav = ({ profilePic, userId }) => {
       )}
 
       {/* Lower Nav */}
-      <div className="bg-[#047e72] h-[100px] px-[100px] flex items-center gap-[50px] lg:justify-between">
+      <div className="bg-[#047e72] h-[70px] sm:h-[100px] px-4 sm:px-[100px]  flex items-center gap-[50px] lg:justify-between">
         <div className="hidden lg:flex items-center justify-between w-[85%]">
           <Link
             to={`/user-dashboard/${userId}/dashboard`}

@@ -18,20 +18,20 @@ const ManageAddress = ({ userData }) => {
     }));
   };
 
-  const getCurrentLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          // In a real app, you would use these coordinates to fetch the address details
-          console.log("Latitude:", position.coords.latitude);
-          console.log("Longitude:", position.coords.longitude);
-        },
-        (error) => {
-          console.error("Error getting location:", error);
-        }
-      );
-    }
-  };
+  // const getCurrentLocation = () => {
+  //   if (navigator.geolocation) {
+  //     navigator.geolocation.getCurrentPosition(
+  //       (position) => {
+  //         // In a real app, you would use these coordinates to fetch the address details
+  //         console.log("Latitude:", position.coords.latitude);
+  //         console.log("Longitude:", position.coords.longitude);
+  //       },
+  //       (error) => {
+  //         console.error("Error getting location:", error);
+  //       }
+  //     );
+  //   }
+  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -57,18 +57,18 @@ const ManageAddress = ({ userData }) => {
       <div className="max-w-8xl mx-auto">
         <div className="flex gap-3 items-center mb-6">
           <h2 className="text-lg font-medium">Manage Address</h2>
-          <button className="text-blue-600 font-medium hover:text-blue-700">
+          {/* <button className="text-blue-600 font-medium hover:text-blue-700">
             Edit
-          </button>
+          </button> */}
         </div>
 
-        <button
+        {/* <button
           onClick={getCurrentLocation}
           className="flex items-center justify-center gap-2 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 mb-6"
         >
           <BsPlusCircle size={20} />
           Use My Current Location
-        </button>
+        </button> */}
 
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-2 gap-4">

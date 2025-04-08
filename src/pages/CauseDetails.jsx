@@ -13,19 +13,109 @@ import {
 import { db } from "../../firebase";
 import Loader from "../Components/Loader/Loader";
 
+// Google Maps API Key - Replace with your actual API key
+const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+const MAX_DISTANCE_KM = 20; // Maximum distance in kilometers to be considered "nearby"
+const SHOPS_PER_PAGE = 6; // Number of shops to display per page
+
 const CauseDetails = () => {
   const { id } = useParams();
   const [cause, setCause] = useState(null);
+  const [allShops, setAllShops] = useState([]);
   const [nearbyShops, setNearbyShops] = useState([]);
-  const [loading, setLoading] = useState(true); // Set initial loading to true
+  const [loading, setLoading] = useState(true);
+  const [pageLoading, setPageLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const navigate = useNavigate();
   const location = useLocation();
 
   // Determine if we're in the user dashboard
   const isUserDashboard = location.pathname.includes("/user-dashboard");
-
   // Get userId from URL if we're in user dashboard
   const userId = isUserDashboard ? location.pathname.split("/")[2] : null;
+
+  // Function to calculate distance between two coordinates using Haversine formula
+  const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371; // Radius of the Earth in km
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLon = ((lon2 - lon1) * Math.PI) / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos((lat1 * Math.PI) / 180) *
+        Math.cos((lat2 * Math.PI) / 180) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c; // Distance in km
+    return distance;
+  };
+
+  // Function to get geocode from address
+  const getGeocode = async (address) => {
+    try {
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
+          address
+        )}&key=${GOOGLE_MAPS_API_KEY}`
+      );
+      const data = await response.json();
+
+      if (data.status === "OK" && data.results.length > 0) {
+        const { lat, lng } = data.results[0].geometry.location;
+        return { lat, lng };
+      }
+      return null;
+    } catch (error) {
+      console.error("Error getting geocode:", error);
+      return null;
+    }
+  };
+
+  // Function to filter shops by distance
+  const filterShopsByDistance = async (causeLocation, shops) => {
+    try {
+      // Get coordinates for the cause location
+      const causeCoords = await getGeocode(causeLocation);
+      //console.log("Cause Coordinates:", causeCoords);
+
+      if (!causeCoords) return [];
+
+      // Process shops in batches to avoid rate limiting
+      const processedShops = [];
+      for (const shop of shops) {
+        // Get coordinates for the shop location
+        const shopCoords = await getGeocode(shop.location);
+        if (shopCoords) {
+          // Calculate distance between cause and shop
+          const distance = calculateDistance(
+            causeCoords.lat,
+            causeCoords.lng,
+            shopCoords.lat,
+            shopCoords.lng
+          );
+
+          // Add distance property to shop object
+          const shopWithDistance = {
+            ...shop,
+            distance,
+            distanceText: `${distance.toFixed(1)} km away`,
+          };
+
+          // Consider it nearby if within MAX_DISTANCE_KM
+          if (distance <= MAX_DISTANCE_KM) {
+            processedShops.push(shopWithDistance);
+          }
+        }
+      }
+
+      // Sort by distance (closest first)
+      return processedShops.sort((a, b) => a.distance - b.distance);
+    } catch (error) {
+      console.error("Error filtering shops by distance:", error);
+      return [];
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -55,16 +145,14 @@ const CauseDetails = () => {
           shops.push({ id: doc.id, ...doc.data() });
         });
 
-        // Find nearby shops based on location (simplified example)
-        // In a real app, you might use geolocation or more complex filtering
-        const nearby = shops.filter(
-          (shop) =>
-            shop.location &&
-            causeData.location &&
-            shop.location.includes(causeData.location.split(",")[0])
-        );
+        setAllShops(shops);
 
-        setNearbyShops(nearby);
+        // Filter shops by distance using Google Maps API
+        if (causeData.location) {
+          const nearby = await filterShopsByDistance(causeData.location, shops);
+          setNearbyShops(nearby);
+          setTotalPages(Math.ceil(nearby.length / SHOPS_PER_PAGE));
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -74,6 +162,29 @@ const CauseDetails = () => {
 
     fetchData();
   }, [id, navigate]);
+
+  // Get current page of shops
+  const getCurrentPageShops = () => {
+    const startIndex = (currentPage - 1) * SHOPS_PER_PAGE;
+    const endIndex = startIndex + SHOPS_PER_PAGE;
+    return nearbyShops.slice(startIndex, endIndex);
+  };
+
+  // Handle page change
+  const handlePageChange = (pageNumber) => {
+    setPageLoading(true);
+    setCurrentPage(pageNumber);
+
+    // Simulate page loading for better UX
+    setTimeout(() => {
+      setPageLoading(false);
+    }, 300);
+
+    // Scroll to shops section
+    document
+      .getElementById("shops-section")
+      .scrollIntoView({ behavior: "smooth" });
+  };
 
   // Generate the appropriate shop link based on shop mode and user login status
   const getShopLink = (shop) => {
@@ -217,76 +328,137 @@ const CauseDetails = () => {
         </div>
 
         {/* Nearby shops section */}
-        <div className="mt-12">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">
-            Partner Shops Supporting This Cause
-          </h2>
-
-          {nearbyShops.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {nearbyShops.map((shop) => (
-                <div
-                  key={shop.id}
-                  className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg"
-                >
-                  <div className="h-48 overflow-hidden">
-                    <img
-                      src={shop.bannerUrl}
-                      alt={shop.businessName}
-                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                    />
-                  </div>
-                  <div className="p-6">
-                    <div className="flex items-center mb-4">
-                      <img
-                        src={shop.logoUrl}
-                        alt={shop.businessName}
-                        className="w-12 h-12 rounded-full object-cover mr-3 border border-gray-200"
-                      />
-                      <div>
-                        <h3 className="font-bold text-gray-800 text-lg">
-                          {shop.businessName}
-                        </h3>
-                        <p className="text-sm text-teal-500">
-                          {shop.mode} • {shop.cat}
-                        </p>
-                      </div>
-                    </div>
-
-                    <p className="text-gray-600 mb-4">{shop.shortDesc}</p>
-
-                    <div className="flex items-center justify-between">
-                      <div className="bg-teal-50 text-teal-700 px-3 py-1 rounded-full text-sm font-medium">
-                        {shop.rate}% Cashback Rate
-                      </div>
-
-                      <Link
-                        to={getShopLink(shop)}
-                        className="text-teal-500 font-medium hover:text-teal-700 flex items-center"
-                      >
-                        View Details
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-4 w-4 ml-1"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              ))}
+        <div id="shops-section" className="mt-12">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-800">
+              Nearby Partner Shops ({nearbyShops.length})
+            </h2>
+            <div className="text-gray-600">
+              Showing partners within {MAX_DISTANCE_KM} km
             </div>
+          </div>
+
+          {pageLoading ? (
+            <div className="flex justify-center items-center py-20">
+              <Loader />
+            </div>
+          ) : nearbyShops.length > 0 ? (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {getCurrentPageShops().map((shop) => (
+                  <div
+                    key={shop.id}
+                    className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg"
+                  >
+                    <div className="h-48 overflow-hidden">
+                      <img
+                        src={shop.bannerUrl}
+                        alt={shop.businessName}
+                        className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                      />
+                    </div>
+                    <div className="p-6">
+                      <div className="flex items-center mb-4">
+                        <img
+                          src={shop.logoUrl}
+                          alt={shop.businessName}
+                          className="w-12 h-12 rounded-full object-cover mr-3 border border-gray-200"
+                        />
+                        <div>
+                          <h3 className="font-bold text-gray-800 text-lg">
+                            {shop.businessName}
+                          </h3>
+                          <p className="text-sm text-teal-500">
+                            {shop.mode} • {shop.cat}
+                          </p>
+                        </div>
+                      </div>
+
+                      <p className="text-gray-600 mb-2">{shop.shortDesc}</p>
+
+                      {/* <div className="text-sm text-gray-500 mb-4 flex items-center">
+                        <MdLocationOn className="mr-1" />
+                        <span>{shop.distanceText}</span>
+                      </div> */}
+
+                      <div className="flex items-center justify-between">
+                        <div className="bg-teal-50 text-teal-700 px-3 py-1 rounded-full text-sm font-medium">
+                          {shop.rate}% Cashback Rate
+                        </div>
+
+                        <Link
+                          to={getShopLink(shop)}
+                          className="text-teal-500 font-medium hover:text-teal-700 flex items-center"
+                        >
+                          View Details
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4 ml-1"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex justify-center mt-10">
+                  <nav className="flex items-center space-x-2">
+                    <button
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      className={`px-3 py-1 rounded ${
+                        currentPage === 1
+                          ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                      }`}
+                    >
+                      Previous
+                    </button>
+
+                    {[...Array(totalPages)].map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handlePageChange(index + 1)}
+                        className={`w-8 h-8 flex items-center justify-center rounded ${
+                          currentPage === index + 1
+                            ? "bg-teal-500 text-white"
+                            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                        }`}
+                      >
+                        {index + 1}
+                      </button>
+                    ))}
+
+                    <button
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                      className={`px-3 py-1 rounded ${
+                        currentPage === totalPages
+                          ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                      }`}
+                    >
+                      Next
+                    </button>
+                  </nav>
+                </div>
+              )}
+            </>
           ) : (
             <div className="bg-white rounded-lg p-8 text-center">
               <p className="text-gray-600">
-                No partner shops found supporting this cause yet.
+                No partner shops found near {cause.causeName}.
               </p>
             </div>
           )}

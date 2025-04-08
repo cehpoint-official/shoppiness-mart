@@ -1,10 +1,17 @@
 import { useState, useEffect, useCallback } from "react";
 import { FiBell } from "react-icons/fi";
-import { collection, getDocs, updateDoc, doc, getDoc } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  updateDoc,
+  doc,
+  getDoc,
+} from "firebase/firestore";
 import { db } from "../../../../firebase";
 import { useDispatch } from "react-redux";
 import { userNotExist } from "../../../redux/reducer/userReducer";
 import { useNavigate } from "react-router-dom";
+import { persistor } from "../../../redux/store";
 
 const Navbar = ({ userId }) => {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
@@ -107,13 +114,13 @@ const Navbar = ({ userId }) => {
   };
 
   // Handle logout functionality
-  const handleLogout = () => {
+  const handleLogout = async () => {
     // Clear user from Redux
     dispatch(userNotExist());
-    
+
     // Clear localStorage
     localStorage.removeItem("userRole");
-    
+    await persistor.purge();
     // Navigate to login page
     navigate("/login/user");
   };
@@ -123,7 +130,9 @@ const Navbar = ({ userId }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           <div className="flex items-center space-x-4">
-            <span className="text-base lg:text-lg font-bold">Welcome Edmund 👋</span>
+            <span className="text-base lg:text-lg font-bold">
+              Welcome Edmund 👋
+            </span>
           </div>
           <div className="flex items-center space-x-4">
             {/* <div className="relative mr-4">

@@ -24,3 +24,4 @@ export const businessUserReducer = createSlice({
 });
 
 export const { businessUserExist, businessUserNotExist, setLoading } = businessUserReducer.actions;
+export default businessUserReducer.reducer;

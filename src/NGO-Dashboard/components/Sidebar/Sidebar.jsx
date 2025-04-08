@@ -15,6 +15,7 @@ import iconShop from "../../assets/icon-shop.png";
 import iconLogout from "../../assets/icon-logout.png";
 import { Link, useParams, useLocation, useNavigate } from "react-router-dom";
 import { ngoUserNotExist } from "../../../redux/reducer/ngoUserReducer";
+import { persistor } from "../../../redux/store";
 
 const Sidebar = () => {
   const { id } = useParams();
@@ -41,6 +42,18 @@ const Sidebar = () => {
   const LogoutDialog = () => {
     if (!showLogoutDialog) return null;
 
+    const handleLogout = async () => {
+      try {
+        // Step 1: Clear the Redux state
+        dispatch(ngoUserNotExist());
+        // Step 2: Purge the persisted state from sessionStorage
+        await persistor.purge();
+        // Step 3: Navigate to login page
+        navigate("/login/cause");
+      } catch (error) {
+        console.error("Logout failed:", error);
+      }
+    };
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-white rounded-lg p-6 w-80 shadow-lg">
@@ -59,10 +72,7 @@ const Sidebar = () => {
                 Cancel
               </button>
               <button
-                onClick={() => {
-                  dispatch(ngoUserNotExist());
-                  navigate("/login/cause");
-                }}
+                onClick={handleLogout}
                 className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
               >
                 Log out
