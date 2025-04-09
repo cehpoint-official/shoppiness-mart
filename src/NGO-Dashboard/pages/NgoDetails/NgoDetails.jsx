@@ -47,7 +47,7 @@ const NgoDetails = () => {
                       ? "after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-[#5E5E5E] text-black font-medium"
                       : "text-[#5E5E5E] hover:text-black"
                   }
-                  md:border-b-2 border-gray-200 md:border-b-0
+                  border-gray-200 md:border-b-0
                   touch-manipulation
                 `}
               >
