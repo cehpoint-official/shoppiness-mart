@@ -17,7 +17,7 @@ import BlogDetails from "./pages/BlogDetails";
 import CauseDetails from "./pages/CauseDetails";
 import { useSelector } from "react-redux";
 import ProtectedRoute from "./Components/ProtectedRoute";
-const BusinessDetails = lazy(() => import("./pages/BusinessDetails"));
+import BusinessDetails from "./pages/BusinessDetails"; // Direct import
 const ProductDetails = lazy(() => import("./pages/ProductDetails"));
 const AdminDashboard = lazy(() =>
   import("./Admin/pages/AdminDashboard/AdminDashboard")

@@ -17,7 +17,6 @@ function DashboardOutlet() {
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
 
-
   // Fetch business details from Firestore
   const fetchBusinessDetails = async () => {
     try {
@@ -26,7 +25,7 @@ function DashboardOutlet() {
 
       if (docSnap.exists()) {
         const data = docSnap.data();
-        dispatch(businessUserExist(data));
+        dispatch(businessUserExist({ ...data, id: id }));
       } else {
         console.error("No such document!");
         dispatch(businessUserNotExist());

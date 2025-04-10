@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import { MdLocationOn } from "react-icons/md";
-
 import {
   collection,
   doc,
@@ -12,14 +11,17 @@ import {
 } from "firebase/firestore";
 import { db } from "../../firebase";
 import Loader from "../Components/Loader/Loader";
+import { useSelector } from "react-redux";
 
 // Google Maps API Key - Replace with your actual API key
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+
 const MAX_DISTANCE_KM = 20; // Maximum distance in kilometers to be considered "nearby"
 const SHOPS_PER_PAGE = 6; // Number of shops to display per page
 
 const CauseDetails = () => {
   const { id } = useParams();
+  const { user } = useSelector((state) => state.userReducer);
   const [cause, setCause] = useState(null);
   const [allShops, setAllShops] = useState([]);
   const [nearbyShops, setNearbyShops] = useState([]);
@@ -32,8 +34,12 @@ const CauseDetails = () => {
 
   // Determine if we're in the user dashboard
   const isUserDashboard = location.pathname.includes("/user-dashboard");
-  // Get userId from URL if we're in user dashboard
-  const userId = isUserDashboard ? location.pathname.split("/")[2] : null;
+
+  // Get userId either from Redux state or URL pathname
+  const userId =
+    user?.id || (isUserDashboard ? location.pathname.split("/")[2] : null);
+
+  console.log("User ID:", userId);
 
   // Function to calculate distance between two coordinates using Haversine formula
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
@@ -77,7 +83,6 @@ const CauseDetails = () => {
     try {
       // Get coordinates for the cause location
       const causeCoords = await getGeocode(causeLocation);
-      //console.log("Cause Coordinates:", causeCoords);
 
       if (!causeCoords) return [];
 
@@ -188,13 +193,27 @@ const CauseDetails = () => {
 
   // Generate the appropriate shop link based on shop mode and user login status
   const getShopLink = (shop) => {
+    // Create the state object with cause data to pass along with navigation
+    const stateData = {
+      causeName: cause.causeName,
+      causeId: id,
+      bankAccounts: cause.paymentDetails || [],
+      // Include any other relevant cause data you want to pass
+    };
+
     if (shop.mode === "Online") {
-      return isUserDashboard
-        ? `/user-dashboard/${userId}/online-shop/${shop.id}`
+      return userId
+        ? {
+            pathname: `/user-dashboard/${userId}/online-shop/${shop.id}`,
+            state: stateData, // Pass state with the navigation
+          }
         : `/online-shop/${shop.id}`;
     } else {
-      return isUserDashboard
-        ? `/user-dashboard/${userId}/offline-shop/${shop.cat}/${shop.id}`
+      return userId
+        ? {
+            pathname: `/user-dashboard/${userId}/offline-shop/${shop.cat}/${shop.id}`,
+            state: stateData, // Pass state with the navigation
+          }
         : `/offline-shop/${shop.cat}/${shop.id}`;
     }
   };
@@ -376,14 +395,9 @@ const CauseDetails = () => {
 
                       <p className="text-gray-600 mb-2">{shop.shortDesc}</p>
 
-                      {/* <div className="text-sm text-gray-500 mb-4 flex items-center">
-                        <MdLocationOn className="mr-1" />
-                        <span>{shop.distanceText}</span>
-                      </div> */}
-
                       <div className="flex items-center justify-between">
                         <div className="bg-teal-50 text-teal-700 px-3 py-1 rounded-full text-sm font-medium">
-                          {shop.rate}% Cashback Rate
+                          {shop.rate / 2}% Cashback Rate
                         </div>
 
                         <Link

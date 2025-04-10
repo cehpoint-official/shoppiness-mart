@@ -162,7 +162,7 @@ const UserDashBoard = () => {
         if (docSnap.exists()) {
           const data = docSnap.data();
           setUserData(data);
-          dispatch(userExist(data));
+          dispatch(userExist({ ...data, id: userId }));
         } else {
           alert("No such document!");
           dispatch(userNotExist());
@@ -411,9 +411,9 @@ const UserDashBoard = () => {
                   <img src={signup} alt="loading" />
                 </div>
                 <p>
-                  <span>Sign up: </span>Lorem ipsum dolor sit amet consectetur
-                  adipisicing elit. Blanditiis,commodi tempora mollitia
-                  voluptatem recusandae impedit
+                  <span>Sign up: </span>Join our platform for free by signing up
+                  on our website or app and select the charities you wish to
+                  support.
                 </p>
               </div>
               <div className="point">
@@ -421,9 +421,9 @@ const UserDashBoard = () => {
                   <RiSearchFill fontSize={"40px"} />
                 </div>
                 <p>
-                  <span>Browse: </span>Lorem ipsum dolor sit amet consectetur
-                  adipisicing elit. Blanditiis,commodi tempora mollitia
-                  voluptatem recusandae impedit
+                  <span>Make a Difference: </span>Enjoy your shopping while
+                  knowing you're contributing to meaningful causes and making a
+                  positive impact on the world.
                 </p>
               </div>
               <div className="point">
@@ -431,9 +431,9 @@ const UserDashBoard = () => {
                   <img src={bag} alt="loading" />
                 </div>
                 <p>
-                  <span>Shop: </span>Lorem ipsum dolor sit amet consectetur
-                  adipisicing elit. Blanditiis,commodi tempora mollitia
-                  voluptatem recusandae impedit
+                  <span>Shop: </span>Browse through our extensive list of
+                  partnered online stores and shop for your favorite products at
+                  no extra cost.
                 </p>
               </div>
               <div className="point">
@@ -441,9 +441,9 @@ const UserDashBoard = () => {
                   <img src={money2} alt="loading" />
                 </div>
                 <p>
-                  <span>Raise: </span>Lorem ipsum dolor sit amet consectetur
-                  adipisicing elit. Blanditiis,commodi tempora mollitia
-                  voluptatem recusandae impedit
+                  <span>Donate: </span>For every purchase you make through
+                  SHOPPINESSMART, a percentage of the sale is automatically
+                  donated to your chosen charity.
                 </p>
               </div>
 
