@@ -19,7 +19,7 @@ const persistConfig = {
   storage,
   transforms: [
     encryptTransform({
-      secretKey: import.meta.env.VITE_APP_PERSIST_KEY || "your-secret-key-here",
+      secretKey: import.meta.env.VITE_APP_PERSIST_KEY || "secret-key-here-shoppiness-mart",
       onError: (error) => {
         console.error("Encryption Error:", error);
       },
@@ -36,7 +36,15 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        ignoredActions: ["persist/PERSIST", "persist/REHYDRATE"],
+        // Add PURGE to the list of ignored actions
+        ignoredActions: [
+          "persist/PERSIST",
+          "persist/REHYDRATE",
+          "persist/PURGE",
+          "persist/FLUSH",
+          "persist/PAUSE",
+          "persist/REGISTER",
+        ],
       },
     }),
 });

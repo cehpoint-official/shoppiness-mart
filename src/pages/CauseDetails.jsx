@@ -191,33 +191,6 @@ const CauseDetails = () => {
       .scrollIntoView({ behavior: "smooth" });
   };
 
-  // Generate the appropriate shop link based on shop mode and user login status
-  const getShopLink = (shop) => {
-    // Create the state object with cause data to pass along with navigation
-    const stateData = {
-      causeName: cause.causeName,
-      causeId: id,
-      bankAccounts: cause.paymentDetails || [],
-      // Include any other relevant cause data you want to pass
-    };
-
-    if (shop.mode === "Online") {
-      return userId
-        ? {
-            pathname: `/user-dashboard/${userId}/online-shop/${shop.id}`,
-            state: stateData, // Pass state with the navigation
-          }
-        : `/online-shop/${shop.id}`;
-    } else {
-      return userId
-        ? {
-            pathname: `/user-dashboard/${userId}/offline-shop/${shop.cat}/${shop.id}`,
-            state: stateData, // Pass state with the navigation
-          }
-        : `/offline-shop/${shop.cat}/${shop.id}`;
-    }
-  };
-
   // Handle loading state
   if (loading) {
     return (
@@ -399,9 +372,21 @@ const CauseDetails = () => {
                         <div className="bg-teal-50 text-teal-700 px-3 py-1 rounded-full text-sm font-medium">
                           {shop.rate / 2}% Cashback Rate
                         </div>
-
                         <Link
-                          to={getShopLink(shop)}
+                          to={
+                            shop.mode === "Online"
+                              ? userId
+                                ? `/user-dashboard/${userId}/online-shop/${shop.id}`
+                                : `/online-shop/${shop.id}`
+                              : userId
+                              ? `/user-dashboard/${userId}/offline-shop/${shop.cat}/${shop.id}`
+                              : `/offline-shop/${shop.cat}/${shop.id}`
+                          }
+                          state={{
+                            causeName: cause.causeName,
+                            causeId: id,
+                            bankAccounts: cause.paymentDetails || {},
+                          }}
                           className="text-teal-500 font-medium hover:text-teal-700 flex items-center"
                         >
                           View Details

@@ -115,7 +115,7 @@ const Partners = ({ title, para, shopsData, isLoading }) => {
 
   return (
     <div className="bg-white">
-      <div className="mt-10 mx-auto px-4 md:px-40 bg-[#EEFAF9] py-12 mb-12 rounded-xl shadow-sm">
+      <div className="mt-10 mx-auto px-4 md:px-10 bg-[#EEFAF9] py-12 mb-12 rounded-xl shadow-sm">
         <div className="max-w-4xl mx-auto">
           <div className="relative mb-12">
             <h1 className="font-bold md:text-4xl text-2xl text-center font-slab">

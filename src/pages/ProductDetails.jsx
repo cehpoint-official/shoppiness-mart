@@ -1,7 +1,7 @@
 import { doc, getDoc, addDoc, collection } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { db } from "../../firebase";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import {
   AiOutlineLoading3Quarters,
@@ -12,6 +12,7 @@ import { useSelector } from "react-redux";
 
 const ProductDetails = () => {
   const { productId, businessId, userId } = useParams();
+  const location = useLocation();
   const [business, setBusiness] = useState(null);
   const [productsDetails, setProductsDetails] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -22,6 +23,8 @@ const ProductDetails = () => {
   const [generatedCouponCode, setGeneratedCouponCode] = useState("");
   const { user } = useSelector((state) => state.userReducer);
 
+  const causeData = location.state || {};
+  //console.log("Cause Data:", causeData);
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -77,7 +80,7 @@ const ProductDetails = () => {
     setSavingCoupon(true);
 
     try {
-      await addDoc(collection(db, "coupons"), {
+      const couponData = {
         ...formData,
         businessId,
         userId,
@@ -96,7 +99,18 @@ const ProductDetails = () => {
         userProfilePic: user.profilePic || "",
         productDiscount: productsDetails.discount,
         status: "Pending",
-      });
+      };
+      // Add cause data if it exists
+      if (Object.keys(causeData).length > 0) {
+        couponData.causeData = {
+          causeName: causeData.causeName || "",
+          causeId: causeData.causeId || "",
+          bankAccounts: causeData.bankAccounts || null,
+        };
+      }
+
+      // Save to coupons collection
+      await addDoc(collection(db, "coupons"), couponData);
       // Add notification to business notifications
       await addDoc(collection(db, "businessNotifications"), {
         businessId: businessId,

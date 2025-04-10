@@ -12,7 +12,10 @@ import iconCustomers from "../../assets/icon-customers.png";
 import iconPOS from "../../assets/icon-pos.png";
 import iconInvoices from "../../assets/icon-invoice.png";
 import iconLogout from "../../assets/icon-logout.png";
-import { businessUserExist } from "../../../redux/reducer/businessUserReducer";
+import {
+  businessUserExist,
+  businessUserNotExist,
+} from "../../../redux/reducer/businessUserReducer";
 import { persistor } from "../../../redux/store";
 import toast from "react-hot-toast";
 
@@ -39,12 +42,14 @@ const Sidebar = () => {
 
     const handleLogout = async () => {
       try {
-        // Step 1: Clear the Redux state
-        dispatch(businessUserExist());
+        // Step 1: Clear the Redux state by dispatching the proper action
+        dispatch(businessUserNotExist());
+
         // Step 2: Purge the persisted state from sessionStorage
-        await persistor.purge();
-        // Step 3: Navigate to login page
-        navigate("/login/business");
+        await persistor.purge().then(() => {
+          // Step 3: Navigate to login page after purge completes
+          navigate("/login/business");
+        });
       } catch (error) {
         console.error("Logout failed:", error);
       }
