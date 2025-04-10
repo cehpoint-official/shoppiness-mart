@@ -153,12 +153,20 @@ const POS = ({ onGenerateInvoice }) => {
       invoiceId: `IN-${Math.floor(Math.random() * 100000)}`,
       couponCode: matchedCoupon?.code || "",
       userCashback: matchedCoupon?.userCashback || 0,
+      userProfilePic: matchedCoupon?.userProfilePic || "",
       platformEarnings: matchedCoupon?.platformEarnings || 0,
       customerId: matchedCoupon?.userId || "",
       couponId: matchedCoupon?.id || "",
       businessId: id,
     };
-
+    // Add cause data if it exists
+    if (Object.keys(matchedCoupon?.causeData).length > 0) {
+      invoiceData.causeData = {
+        causeName: matchedCoupon?.causeData.causeName || "",
+        causeId: matchedCoupon?.causeData.causeId || "",
+        bankAccounts: matchedCoupon?.causeData.bankAccounts || null,
+      };
+    }
     onGenerateInvoice(invoiceData);
   };
 

@@ -20,6 +20,7 @@ const Invoice = ({ data, onBack }) => {
   const { user } = useSelector((state) => state.businessUserReducer);
   const [isLoading, setIsLoading] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  console.log("invoice data", data);
 
   const generatePdf = async (elementId) => {
     try {
@@ -158,16 +159,17 @@ const Invoice = ({ data, onBack }) => {
     if (!grandTotal || grandTotal <= 0) {
       return { platformCashback: 0, userCashback: 0, remainingCashback: 0 };
     }
-  
+
     try {
       // For online shop, ensure exactly 50/50 split
       // Total commission percentage is the sum of both percentages
-      const totalCommissionPercentage = userCashbackPercentage + platformEarningsPercentage;
-      
+      const totalCommissionPercentage =
+        userCashbackPercentage + platformEarningsPercentage;
+
       // Enforce 50/50 split for online shops
       const adjustedUserPercentage = totalCommissionPercentage / 2;
       const adjustedPlatformPercentage = totalCommissionPercentage / 2;
-      
+
       // Calculate the total cashback amounts based on the grand total
       const totalUserCashback = Number(
         ((adjustedUserPercentage / 100) * grandTotal).toFixed(2)
@@ -175,12 +177,12 @@ const Invoice = ({ data, onBack }) => {
       const platformCashback = Number(
         ((adjustedPlatformPercentage / 100) * grandTotal).toFixed(2)
       );
-      
+
       // Calculate how much of the invoice has been paid
       const paymentPercentage = (cashCollected / grandTotal) * 100;
-      
+
       let userCashback, remainingCashback;
-      
+
       // Distribute user cashback based on payment status
       if (paymentPercentage <= 0) {
         // Nothing paid, no cashback for user
@@ -199,7 +201,7 @@ const Invoice = ({ data, onBack }) => {
           (totalUserCashback - userCashback).toFixed(2)
         );
       }
-  
+
       return { platformCashback, userCashback, remainingCashback };
     } catch (error) {
       console.error("Error calculating cashback:", error);
@@ -554,6 +556,7 @@ const Invoice = ({ data, onBack }) => {
         customerName: data.customerName || "",
         customerEmail: data.email || "",
         amountEarned: platformCashback || 0,
+        userProfilePic: data?.userProfilePic || "",
         paymentStatus: hasCoupon ? "Pending" : "Not Applicable",
         dueDate: hasCoupon
           ? new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString(
@@ -566,6 +569,15 @@ const Invoice = ({ data, onBack }) => {
             )
           : "",
       };
+
+      // Add cause data if it exists
+      if (Object.keys(data?.causeData).length > 0) {
+        platformEarningsData.causeData = {
+          causeName: data?.causeData.causeName || "",
+          causeId: data?.causeData.causeId || "",
+          bankAccounts: data?.causeData.bankAccounts || null,
+        };
+      }
       await addDoc(collection(db, "platformEarnings"), platformEarningsData);
 
       // Send emails
