@@ -14,28 +14,68 @@ const SupporterRow = ({ name, email, image }) => (
   </div>
 );
 
-const Supporters = ({ onBack, givebacks }) => {
-  const uniqueSupporters = new Set();
-  const newSupporters = givebacks
-    .filter((item) => item.status === "Completed")
-    .sort(
-      (a, b) =>
-        new Date(b.paidAt || b.requestedAt) -
-        new Date(a.paidAt || a.requestedAt)
-    )
-    .filter((item) => {
-      if (!uniqueSupporters.has(item.userId)) {
-        uniqueSupporters.add(item.userId);
-        return true;
-      }
-      return false;
-    })
-    .slice(0, 4) // Limit to 4 unique supporters
-    .map((item) => ({
-      name: item.userName,
-      email: item.userEmail,
-      image: item.userPic,
-    }));
+const Supporters = ({ onBack, givebacks,donationTransactions }) => {
+ // Use a combined set of emails for deduplication
+ const allSupporterEmails = new Set();
+  
+ // Add all giveback emails regardless of status
+ givebacks.forEach(item => {
+   if (item.userEmail) {
+     allSupporterEmails.add(item.userEmail.toLowerCase());
+   }
+ });
+
+ // Add all donation transaction emails regardless of status
+ donationTransactions.forEach(transaction => {
+   if (transaction.customerEmail) {
+     allSupporterEmails.add(transaction.customerEmail.toLowerCase());
+   }
+ });
+
+ const totalSupporters = allSupporterEmails.size;
+
+ // New supporters (combined from both sources and unique by email)
+ const uniqueSupporters = new Map(); // Using Map to track by email
+
+ // Process all givebacks for supporters
+ givebacks.forEach(item => {
+   if (!item.userEmail) return;
+   
+   const email = item.userEmail.toLowerCase();
+   const date = new Date(item.paidAt || item.requestedAt);
+   
+   if (!uniqueSupporters.has(email) || date > uniqueSupporters.get(email).date) {
+     uniqueSupporters.set(email, {
+       email: item.userEmail,
+       name: item.userName,
+       image: item.userPic,
+       date: date,
+       source: "giveback"
+     });
+   }
+ });
+
+ // Process all donation transactions for supporters
+ donationTransactions.forEach(item => {
+   if (!item.customerEmail) return;
+   
+   const email = item.customerEmail.toLowerCase();
+   const date = new Date(item.paymentDate);
+   
+   if (!uniqueSupporters.has(email) || date > uniqueSupporters.get(email).date) {
+     uniqueSupporters.set(email, {
+       email: item.customerEmail,
+       name: item.customerName,
+       image: item.userProfilePic,
+       date: date,
+       source: "donation"
+     });
+   }
+ });
+
+ // Convert to array, sort by date, and take top 4
+ const newSupporters = Array.from(uniqueSupporters.values())
+   .sort((a, b) => b.date - a.date)
 
   return (
     <div className="p-4 sm:p-6 md:p-10">
