@@ -145,7 +145,7 @@ const UserDashboardNav = ({ profilePic, userId }) => {
         <Link to="/">
           <img src={logo} alt="err" className="w-[150px] h-[50px] sm:w-[210px] sm:h-[80px]" />
         </Link>
-        <div className="hidden lg:flex items-center border border-gray-500 h-[45px] px-[50px] rounded-lg">
+        {/* <div className="hidden lg:flex items-center border border-gray-500 h-[45px] px-[50px] rounded-lg">
           <div className="flex items-center gap-2">
             <CiLocationOn className="text-2xl" />
             <input
@@ -163,7 +163,7 @@ const UserDashboardNav = ({ profilePic, userId }) => {
               className="outline-none w-[270px]"
             />
           </div>
-        </div>
+        </div> */}
         <div className="flex items-center gap-5">
           <div className="relative">
             <IoNotifications

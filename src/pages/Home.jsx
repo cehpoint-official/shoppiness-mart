@@ -105,13 +105,18 @@ const Home = () => {
           setData((prev) => ({ ...prev, homeVideo }));
           setLoading((prev) => ({ ...prev, video: false }));
 
-          // Start preloading the video
+          // Correct way to preload video - don't use link preload for video
           if (homeVideo.url) {
-            const videoPreload = document.createElement("link");
-            videoPreload.rel = "preload";
-            videoPreload.as = "video";
-            videoPreload.href = homeVideo.url;
-            document.head.appendChild(videoPreload);
+            const videoElement = document.createElement("video");
+            videoElement.style.display = "none";
+            videoElement.preload = "auto";
+            videoElement.src = homeVideo.url;
+            document.body.appendChild(videoElement);
+
+            // Remove the element after a reasonable time for preloading
+            setTimeout(() => {
+              document.body.removeChild(videoElement);
+            }, 5000);
           }
         } else {
           setLoading((prev) => ({ ...prev, video: false }));
@@ -220,11 +225,6 @@ const Home = () => {
         if (videoElement.readyState >= 3) {
           // HAVE_FUTURE_DATA or HAVE_ENOUGH_DATA
           setLoading((prev) => ({ ...prev, video: false }));
-          // Start playing when loaded
-          videoElement.play().catch((err) => {
-            console.warn("Autoplay failed:", err);
-            // Some browsers require user interaction before autoplay
-          });
         }
       };
 
@@ -232,16 +232,34 @@ const Home = () => {
       videoElement.addEventListener("loadeddata", handleVideoLoaded);
       videoElement.addEventListener("canplay", handleVideoLoaded);
 
+      // Handle user interaction to enable autoplay
+      const enableAutoplay = () => {
+        if (videoElement && videoElement.paused) {
+          videoElement.muted = true; // Mute the video to allow autoplay
+          videoElement.play().catch((err) => {
+            console.warn("Autoplay still failed:", err);
+          });
+        }
+      };
+
+      // Add one-time event listeners for user interaction
+      const interactionEvents = ["click", "touchstart", "keydown", "scroll"];
+      interactionEvents.forEach((event) => {
+        document.addEventListener(event, enableAutoplay, { once: true });
+      });
+
       // Clean up event listeners
       return () => {
         videoElement.removeEventListener("loadeddata", handleVideoLoaded);
         videoElement.removeEventListener("canplay", handleVideoLoaded);
+        interactionEvents.forEach((event) => {
+          document.removeEventListener(event, enableAutoplay);
+        });
       };
     }
   }, [data.homeVideo?.url]);
 
   // Format date function
-
   const formatDate = (timestamp) => {
     if (!timestamp) return "";
     return new Date(timestamp.toDate()).toLocaleDateString("en-US", {
@@ -395,12 +413,13 @@ const Home = () => {
             <div className="w-[400px] h-[225px] md:w-[500px] md:h-[281px] bg-black rounded-lg overflow-hidden">
               <video
                 ref={videoRef}
-                autoPlay
-                controls
-                playsInline
+                muted // Important: muted videos can autoplay without user interaction
+                playsInline // Important for mobile browsers
+                loop // Optional: loop the video
                 className="w-full h-full object-cover"
                 poster={data.homeVideo.thumbnail || ""}
                 preload="auto"
+                controls // Show controls so user can unmute
               >
                 <source src={data.homeVideo.url} type={data.homeVideo.type} />
                 Your browser does not support the video tag.

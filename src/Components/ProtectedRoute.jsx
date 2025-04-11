@@ -7,8 +7,9 @@ const ProtectedRoute = ({
   adminOnly = false,
   redirect = "/",
 }) => {
-  const { user } = useSelector((state) =>
-    adminOnly ? state.userReducer : state.userReducer
+  // Only select the specific user data needed, not the entire state
+  const user = useSelector((state) =>
+    adminOnly ? state.userReducer.user : state.userReducer.user
   );
   const isAdmin = user?.role === "admin";
 

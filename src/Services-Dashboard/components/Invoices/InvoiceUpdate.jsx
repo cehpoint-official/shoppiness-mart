@@ -163,16 +163,17 @@ const InvoiceUpdate = ({ updatedData, back }) => {
     if (!grandTotal || grandTotal <= 0) {
       return { platformCashback: 0, userCashback: 0, remainingCashback: 0 };
     }
-  
+
     try {
       // For online shop, ensure exactly 50/50 split
       // Total commission percentage is the sum of both percentages
-      const totalCommissionPercentage = userCashbackPercentage + platformEarningsPercentage;
-      
+      const totalCommissionPercentage =
+        userCashbackPercentage + platformEarningsPercentage;
+
       // Enforce 50/50 split for online shops
       const adjustedUserPercentage = totalCommissionPercentage / 2;
       const adjustedPlatformPercentage = totalCommissionPercentage / 2;
-      
+
       // Calculate the total cashback amounts based on the grand total
       const totalUserCashback = Number(
         ((adjustedUserPercentage / 100) * grandTotal).toFixed(2)
@@ -180,12 +181,12 @@ const InvoiceUpdate = ({ updatedData, back }) => {
       const platformCashback = Number(
         ((adjustedPlatformPercentage / 100) * grandTotal).toFixed(2)
       );
-      
+
       // Calculate how much of the invoice has been paid
       const paymentPercentage = (cashCollected / grandTotal) * 100;
-      
+
       let userCashback, remainingCashback;
-      
+
       // Distribute user cashback based on payment status
       if (paymentPercentage <= 0) {
         // Nothing paid, no cashback for user
@@ -204,7 +205,7 @@ const InvoiceUpdate = ({ updatedData, back }) => {
           (totalUserCashback - userCashback).toFixed(2)
         );
       }
-  
+
       return { platformCashback, userCashback, remainingCashback };
     } catch (error) {
       console.error("Error calculating cashback:", error);
@@ -214,60 +215,44 @@ const InvoiceUpdate = ({ updatedData, back }) => {
 
   const handleSave = async () => {
     setIsLoading(true);
+
     try {
-      // Define hasCoupon before the transaction
-      const hasCoupon = Boolean(
-        updatedData.couponCode && updatedData.customerId && updatedData.couponId
-      );
-      // Validate required data
+      // Validate required fields
       if (!updatedData.invoiceNum || !updatedData.grandTotal) {
         throw new Error("Missing required invoice data");
       }
+
+      // Pre-check for coupon validation
+      const hasCoupon = Boolean(
+        updatedData.couponCode && updatedData.customerId && updatedData.couponId
+      );
 
       // Generate and upload new PDF
       const pdfBlob = await generatePdfBlob();
       const pdfUrl = await uploadPdf(pdfBlob);
 
-      // Base update data for invoice
+      // Prepare base invoice data
       const baseUpdateData = {
         ...updatedData,
-        pdfUrl: pdfUrl,
-        updatedAt: new Date().toLocaleDateString("en-GB", {
-          day: "numeric",
-          month: "short",
-          year: "numeric",
-        }),
+        pdfUrl,
+        updatedAt: formatDate(new Date()),
       };
 
-      // Initialize variables outside transaction
+      // Initialize transaction variables
       let updatedInvoice = { ...baseUpdateData };
       let platformCashback = 0;
       let userCashback = 0;
       let remainingCashback = 0;
 
+      // Run database transaction
       await runTransaction(db, async (transaction) => {
-        const hasCoupon = Boolean(
-          updatedData.couponCode &&
-            updatedData.customerId &&
-            updatedData.couponId
-        );
+        // Step 1: Collect all required documents
+        const { disputeSnapshot, couponDoc, userDoc, businessDoc } =
+          await fetchRequiredDocuments(transaction, updatedData, hasCoupon);
 
-        // STEP 1: Perform ALL reads first
-        // Read dispute documents
-        const disputeQuery = query(
-          collection(db, "cashbackDisputeRequests"),
-          where("shopId", "==", updatedData.businessId),
-          where("couponCode", "==", updatedData.couponCode)
-        );
-        const disputeSnapshot = await getDocs(disputeQuery);
-
-        // Read coupon document if needed
-        let couponDoc;
+        // Validate coupon if present
         if (hasCoupon) {
-          const couponRef = doc(db, "coupons", updatedData.couponId);
-          couponDoc = await transaction.get(couponRef);
-
-          if (!couponDoc.exists()) {
+          if (!couponDoc?.exists()) {
             throw new Error("Coupon no longer exists");
           }
           if (couponDoc.data().status !== "Pending") {
@@ -275,46 +260,8 @@ const InvoiceUpdate = ({ updatedData, back }) => {
           }
         }
 
-        // Read user document if needed
-        let userDoc;
-        // console.log(updatedData.userId); Not defined
-        if (updatedData.customerId) {
-          const userRef = doc(db, "users", updatedData.customerId);
-          userDoc = await transaction.get(userRef);
-        }
-
-        // Read business document if needed
-        let businessDoc;
-        if (updatedData.businessId) {
-          const businessRef = doc(
-            db,
-            "businessDetails",
-            updatedData.businessId
-          );
-          businessDoc = await transaction.get(businessRef);
-        }
-
-        // STEP 2: Perform ALL writes after completing reads
-        // Update dispute status if exists
-        if (!disputeSnapshot.empty) {
-          const disputeDoc = disputeSnapshot.docs[0];
-          transaction.update(
-            doc(db, "cashbackDisputeRequests", disputeDoc.id),
-            {
-              status: "Resolved",
-              invoiceUrl: pdfUrl,
-              resolvedAt: new Date().toLocaleDateString("en-GB", {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              }),
-            }
-          );
-        }
-
-        // Handle coupon-related updates
+        // Step 2: Calculate cashback if coupon exists
         if (hasCoupon) {
-          // Calculate cashback
           const cashbackResults = calculateCashbackAndEarnings(
             updatedData.grandTotal,
             updatedData.paidAmount,
@@ -326,8 +273,9 @@ const InvoiceUpdate = ({ updatedData, back }) => {
           userCashback = cashbackResults.userCashback;
           remainingCashback = cashbackResults.remainingCashback;
 
-          // Add coupon-specific data to invoice
-          const couponData = {
+          // Enhance invoice with coupon data
+          updatedInvoice = {
+            ...updatedInvoice,
             claimedCouponCode: updatedData.couponCode,
             claimedCouponCodeUserName: updatedData.customerName,
             discount: updatedData.userCashback,
@@ -336,169 +284,51 @@ const InvoiceUpdate = ({ updatedData, back }) => {
             platformCashback,
             remainingCashback,
             customerId: updatedData.customerId || "",
-            claimedDate: new Date().toLocaleDateString("en-GB", {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-            }),
+            claimedDate: formatDate(new Date()),
           };
-
-          // Update complete invoice data with coupon info
-          updatedInvoice = { ...updatedInvoice, ...couponData };
         }
 
-        // WRITE: Update user's cashback if needed
-        if (hasCoupon && userDoc && userDoc.exists() && userCashback > 0) {
-          const currentCashback = userDoc.data().collectedCashback || 0;
-          const userRef = doc(db, "users", updatedData.customerId);
-          transaction.update(userRef, {
-            collectedCashback: currentCashback + userCashback,
-          });
-        }
-
-        // WRITE: Update coupon status if needed
-        if (hasCoupon && couponDoc && couponDoc.exists()) {
-          const couponRef = doc(db, "coupons", updatedData.couponId);
-          transaction.update(couponRef, {
-            status: "Claimed",
-            claimedAt: new Date().toLocaleDateString("en-GB", {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-            }),
-          });
-        }
-
-        // WRITE: Update business details if needed
-        if (businessDoc && businessDoc.exists() && platformCashback > 0) {
-          const businessRef = doc(
-            db,
-            "businessDetails",
-            updatedData.businessId
-          );
-          const currentTotalDue =
-            businessDoc.data().totalPlatformEarningsDue || 0;
-          transaction.update(businessRef, {
-            totalPlatformEarningsDue: currentTotalDue + platformCashback,
-          });
-        }
+        // Step 3: Perform all write operations
+        await performTransactionWrites({
+          transaction,
+          disputeSnapshot,
+          hasCoupon,
+          userDoc,
+          couponDoc,
+          businessDoc,
+          updatedData,
+          userCashback,
+          platformCashback,
+          pdfUrl,
+        });
       });
+      // Step 5: Handle cause donations if applicable and get the donation ID
+      let donationId = null;
+      if (Object.keys(updatedData?.causeData || {}).length > 0) {
+        donationId = await handleCauseDonation(updatedData, platformCashback);
+      }
+      // Step 4: Save documents (outside transaction)
+      await Promise.all([
+        saveInvoiceDetails(updatedInvoice),
+        saveUserTransaction(
+          updatedData,
+          userCashback,
+          remainingCashback,
+          hasCoupon
+        ),
+        savePlatformEarnings(
+          updatedData,
+          platformCashback,
+          hasCoupon,
+          donationId
+        ), // Pass donationId here
+      ]);
 
-      // Save invoice data
-      await addDoc(collection(db, "invoiceDetails"), updatedInvoice);
-
-      // Save user transaction details
-      const userTransactionData = {
-        customerId: updatedData.customerId || "",
-        invoiceId: updatedData.invoiceNum,
-        couponCode: updatedData.couponCode || "",
-        products: updatedData.products || [],
-        claimedDate: new Date().toLocaleDateString("en-GB", {
-          day: "numeric",
-          month: "short",
-          year: "numeric",
-        }),
-        customerName: updatedData.customerName || "",
-        customerEmail: updatedData.email || "",
-        discount: updatedData.userCashback || 0,
-        userCashbackAmount: userCashback || 0,
-        userRemainingCashbackAmount: remainingCashback || 0,
-        status: hasCoupon ? "Claimed" : "No Coupon",
-      };
-      await addDoc(collection(db, "userTransactions"), userTransactionData);
-
-      // Save platform earnings details
-      const platformEarningsData = {
-        customerId: updatedData.customerId || "",
-        businessId: updatedData.businessId,
-        invoiceId: updatedData.invoiceNum,
-        customerName: updatedData.customerName || "",
-        customerEmail: updatedData.email || "",
-        amountEarned: platformCashback || 0,
-        paymentStatus: hasCoupon ? "Pending" : "Not Applicable",
-        dueDate: hasCoupon
-          ? new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString(
-              "en-GB",
-              {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              }
-            )
-          : "",
-      };
-      await addDoc(collection(db, "platformEarnings"), platformEarningsData);
-
-      // Send notification to admin
-      const adminEmailTemplate = `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <div style="background-color: #f8f8f8; padding: 20px; border-radius: 8px;">
-            <h2 style="color: #333; margin-bottom: 20px;">Invoice Updated</h2>
-            <p style="color: #666;">Dear Admin,</p>
-            <p style="color: #666;">A new invoice has been updated.</p>
-            <div style="background-color: #fff; padding: 15px; border-radius: 5px; margin: 15px 0;">
-              <p style="margin: 5px 0;"><strong>Invoice Number:</strong> ${
-                updatedData.invoiceNum
-              }</p>
-              <p style="margin: 5px 0;"><strong>Customer Name:</strong> ${
-                updatedData.customerName
-              }</p>
-              <p style="margin: 5px 0;"><strong>Amount:</strong> ${
-                updatedData.totalAmount
-              }</p>
-              <p style="margin: 5px 0;"><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
-            </div>
-            <p style="color: #666;">Please review the details.</p>
-            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
-              <p style="color: #666; margin: 0;">Best regards,</p>
-              <p style="color: #666; margin: 5px 0;">The ShoppinessMart Team</p>
-            </div>
-          </div>
-        </div>
-      `;
-
-      await axios.post(`${import.meta.env.VITE_AWS_SERVER}/send-email`, {
-        email: "admin@shoppinessmart.com", // Replace with actual admin email
-        title: "ShoppinessMart - Invoice Updated",
-        body: adminEmailTemplate,
-      });
-
-      // Send email to user about dispute resolution and cashback
-      const userEmailTemplate = `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <div style="background-color: #f8f8f8; padding: 20px; border-radius: 8px;">
-            <h2 style="color: #333; margin-bottom: 20px;">Dispute Resolved and Cashback Credited</h2>
-            <p style="color: #666;">Dear ${updatedData.customerName},</p>
-            <p style="color: #666;">Your dispute request for invoice number <strong>${
-              updatedData.invoiceNum
-            }</strong> has been resolved successfully.</p>
-            <p style="color: #666;">A cashback of <strong>Rs. ${userCashback.toLocaleString()}</strong> has been credited to your account.</p>
-            <div style="background-color: #fff; padding: 15px; border-radius: 5px; margin: 15px 0;">
-              <p style="margin: 5px 0;"><strong>Invoice Number:</strong> ${
-                updatedData.invoiceNum
-              }</p>
-              <p style="margin: 5px 0;"><strong>Cashback Amount:</strong> Rs. ${userCashback.toLocaleString()}</p>
-              <p style="margin: 5px 0;"><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
-            </div>
-            <p style="color: #666;">You can download the updated invoice by clicking the button below:</p>
-            <div style="text-align: center; margin-top: 20px;">
-              <a href="${pdfUrl}" style="background-color: #179A56; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
-                Download Invoice
-              </a>
-            </div>
-            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
-              <p style="color: #666; margin: 0;">Best regards,</p>
-              <p style="color: #666; margin: 5px 0;">The ShoppinessMart Team</p>
-            </div>
-          </div>
-        </div>
-      `;
-
-      await axios.post(`${import.meta.env.VITE_AWS_SERVER}/send-email`, {
-        email: updatedData.customerEmail, 
-        title: "ShoppinessMart - Dispute Resolved and Cashback Credited",
-        body: userEmailTemplate,
-      });
+      // Step 6: Send notifications
+      await Promise.all([
+        sendAdminNotification(updatedData),
+        sendUserNotification(updatedData, userCashback, pdfUrl),
+      ]);
 
       toast.success("Invoice Updated, Coupon claimed, and Admin notified!");
       setLocalDueAmount(0);
@@ -509,6 +339,260 @@ const InvoiceUpdate = ({ updatedData, back }) => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Helper functions
+  const formatDate = (date) => {
+    return date.toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  const fetchRequiredDocuments = async (
+    transaction,
+    updatedData,
+    hasCoupon
+  ) => {
+    // Fetch dispute documents
+    const disputeQuery = query(
+      collection(db, "cashbackDisputeRequests"),
+      where("shopId", "==", updatedData.businessId),
+      where("couponCode", "==", updatedData.couponCode)
+    );
+    const disputeSnapshot = await getDocs(disputeQuery);
+
+    // Fetch coupon document if needed
+    let couponDoc;
+    if (hasCoupon) {
+      const couponRef = doc(db, "coupons", updatedData.couponId);
+      couponDoc = await transaction.get(couponRef);
+    }
+
+    // Fetch user document if needed
+    let userDoc;
+    if (updatedData.customerId) {
+      const userRef = doc(db, "users", updatedData.customerId);
+      userDoc = await transaction.get(userRef);
+    }
+
+    // Fetch business document if needed
+    let businessDoc;
+    if (updatedData.businessId) {
+      const businessRef = doc(db, "businessDetails", updatedData.businessId);
+      businessDoc = await transaction.get(businessRef);
+    }
+
+    return { disputeSnapshot, couponDoc, userDoc, businessDoc };
+  };
+
+  const performTransactionWrites = async ({
+    transaction,
+    disputeSnapshot,
+    hasCoupon,
+    userDoc,
+    couponDoc,
+    businessDoc,
+    updatedData,
+    userCashback,
+    platformCashback,
+    pdfUrl,
+  }) => {
+    // Update dispute status if exists
+    if (!disputeSnapshot.empty) {
+      const disputeDoc = disputeSnapshot.docs[0];
+      transaction.update(doc(db, "cashbackDisputeRequests", disputeDoc.id), {
+        status: "Resolved",
+        invoiceUrl: pdfUrl,
+        resolvedAt: formatDate(new Date()),
+      });
+    }
+
+    // Update user's cashback if applicable
+    if (hasCoupon && userDoc?.exists() && userCashback > 0) {
+      const currentCashback = userDoc.data().collectedCashback || 0;
+      transaction.update(doc(db, "users", updatedData.customerId), {
+        collectedCashback: currentCashback + userCashback,
+      });
+    }
+
+    // Update coupon status if applicable
+    if (hasCoupon && couponDoc?.exists()) {
+      transaction.update(doc(db, "coupons", updatedData.couponId), {
+        status: "Claimed",
+        claimedAt: formatDate(new Date()),
+      });
+    }
+
+    // Update business earnings if applicable
+    if (businessDoc?.exists() && platformCashback > 0) {
+      const currentTotalDue = businessDoc.data().totalPlatformEarningsDue || 0;
+      transaction.update(doc(db, "businessDetails", updatedData.businessId), {
+        totalPlatformEarningsDue: currentTotalDue + platformCashback,
+      });
+    }
+  };
+
+  const saveInvoiceDetails = async (invoiceData) => {
+    return addDoc(collection(db, "invoiceDetails"), invoiceData);
+  };
+
+  const saveUserTransaction = async (
+    updatedData,
+    userCashback,
+    remainingCashback,
+    hasCoupon
+  ) => {
+    const userTransactionData = {
+      customerId: updatedData.customerId || "",
+      invoiceId: updatedData.invoiceNum,
+      couponCode: updatedData.couponCode || "",
+      products: updatedData.products || [],
+      claimedDate: formatDate(new Date()),
+      customerName: updatedData.customerName || "",
+      customerEmail: updatedData.email || "",
+      discount: updatedData.userCashback || 0,
+      userCashbackAmount: userCashback || 0,
+      userRemainingCashbackAmount: remainingCashback || 0,
+      status: hasCoupon ? "Claimed" : "No Coupon",
+    };
+    return addDoc(collection(db, "userTransactions"), userTransactionData);
+  };
+
+  const savePlatformEarnings = async (
+    updatedData,
+    platformCashback,
+    hasCoupon,
+    donationId = null
+  ) => {
+    const platformEarningsData = {
+      customerId: updatedData.customerId || "",
+      businessId: updatedData.businessId,
+      invoiceId: updatedData.invoiceNum,
+      customerName: updatedData.customerName || "",
+      customerEmail: updatedData.email || "",
+      amountEarned: platformCashback || 0,
+      paymentStatus: hasCoupon ? "Pending" : "Not Applicable",
+      dueDate: hasCoupon
+        ? formatDate(new Date(Date.now() + 3 * 24 * 60 * 60 * 1000))
+        : "",
+    };
+
+    // Add cause data if it exists
+    if (Object.keys(updatedData?.causeData || {}).length > 0) {
+      platformEarningsData.causeData = {
+        causeName: updatedData?.causeData.causeName || "",
+        causeId: updatedData?.causeData.causeId || "",
+        paymentDetails: updatedData?.causeData.paymentDetails || null,
+        donationTransactionId: donationId, // Add the donation transaction ID here
+      };
+    }
+
+    return addDoc(collection(db, "platformEarnings"), platformEarningsData);
+  };
+
+  const handleCauseDonation = async (updatedData, platformCashback) => {
+    try {
+      // Add donation transaction and get the reference
+      const donationRef = await addDoc(collection(db, "donationTransactions"), {
+        causeId: updatedData?.causeData.causeId || "",
+        causeName: updatedData?.causeData.causeName || "",
+        customerName: updatedData.customerName || "",
+        customerEmail: updatedData.email || "",
+        amount: platformCashback || 0,
+        userProfilePic: updatedData?.userProfilePic || "",
+        paymentStatus: "Pending",
+        paymentDate: formatDate(new Date()),
+      });
+
+      // Add NGO notification
+      await addDoc(collection(db, "ngoNotifications"), {
+        message: `${updatedData.customerName} with email id ${updatedData.email} has purchased a product to donate to your NGO/Cause. For more details, please check your dashboard.`,
+        ngoId: updatedData?.causeData.causeId || "",
+        read: false,
+        createdAt: new Date().toISOString(),
+      });
+
+      // Return the donation transaction document ID
+      return donationRef.id;
+    } catch (error) {
+      console.error("Error handling cause donation:", error);
+      throw error;
+    }
+  };
+
+  const sendAdminNotification = async (updatedData) => {
+    const adminEmailTemplate = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background-color: #f8f8f8; padding: 20px; border-radius: 8px;">
+          <h2 style="color: #333; margin-bottom: 20px;">Invoice Updated</h2>
+          <p style="color: #666;">Dear Admin,</p>
+          <p style="color: #666;">A new invoice has been updated.</p>
+          <div style="background-color: #fff; padding: 15px; border-radius: 5px; margin: 15px 0;">
+            <p style="margin: 5px 0;"><strong>Invoice Number:</strong> ${
+              updatedData.invoiceNum
+            }</p>
+            <p style="margin: 5px 0;"><strong>Customer Name:</strong> ${
+              updatedData.customerName
+            }</p>
+            <p style="margin: 5px 0;"><strong>Amount:</strong> ${
+              updatedData.totalAmount
+            }</p>
+            <p style="margin: 5px 0;"><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+          </div>
+          <p style="color: #666;">Please review the details.</p>
+          <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+            <p style="color: #666; margin: 0;">Best regards,</p>
+            <p style="color: #666; margin: 5px 0;">The ShoppinessMart Team</p>
+          </div>
+        </div>
+      </div>
+    `;
+
+    return axios.post(`${import.meta.env.VITE_AWS_SERVER}/send-email`, {
+      email: "admin@shoppinessmart.com",
+      title: "ShoppinessMart - Invoice Updated",
+      body: adminEmailTemplate,
+    });
+  };
+
+  const sendUserNotification = async (updatedData, userCashback, pdfUrl) => {
+    const userEmailTemplate = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background-color: #f8f8f8; padding: 20px; border-radius: 8px;">
+          <h2 style="color: #333; margin-bottom: 20px;">Dispute Resolved and Cashback Credited</h2>
+          <p style="color: #666;">Dear ${updatedData.customerName},</p>
+          <p style="color: #666;">Your dispute request for invoice number <strong>${
+            updatedData.invoiceNum
+          }</strong> has been resolved successfully.</p>
+          <p style="color: #666;">A cashback of <strong>Rs. ${userCashback.toLocaleString()}</strong> has been credited to your account.</p>
+          <div style="background-color: #fff; padding: 15px; border-radius: 5px; margin: 15px 0;">
+            <p style="margin: 5px 0;"><strong>Invoice Number:</strong> ${
+              updatedData.invoiceNum
+            }</p>
+            <p style="margin: 5px 0;"><strong>Cashback Amount:</strong> Rs. ${userCashback.toLocaleString()}</p>
+            <p style="margin: 5px 0;"><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+          </div>
+          <p style="color: #666;">You can download the updated invoice by clicking the button below:</p>
+          <div style="text-align: center; margin-top: 20px;">
+            <a href="${pdfUrl}" style="background-color: #179A56; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+              Download Invoice
+            </a>
+          </div>
+          <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+            <p style="color: #666; margin: 0;">Best regards,</p>
+            <p style="color: #666; margin: 5px 0;">The ShoppinessMart Team</p>
+          </div>
+        </div>
+      </div>
+    `;
+
+    return axios.post(`${import.meta.env.VITE_AWS_SERVER}/send-email`, {
+      email: updatedData.customerEmail,
+      title: "ShoppinessMart - Dispute Resolved and Cashback Credited",
+      body: userEmailTemplate,
+    });
   };
 
   // Handle downloading the PDF

@@ -47,9 +47,10 @@ const Sidebar = () => {
         // Step 1: Clear the Redux state
         dispatch(ngoUserNotExist());
         // Step 2: Purge the persisted state from sessionStorage
-        await persistor.purge();
-        // Step 3: Navigate to login page
-        navigate("/login/cause");
+        await persistor.purge().then(() => {
+          // Step 3: Navigate to login page after purge completes
+          navigate("/login/cause");
+        });
       } catch (error) {
         console.error("Logout failed:", error);
       }

@@ -63,7 +63,7 @@ const Footer = () => {
             twitter: socialData.twitter || null
           });
         } else {
-          console.log("No social media links found!");
+         // console.log("No social media links found!");
         }
       } catch (error) {
         console.error("Error fetching social media links:", error);

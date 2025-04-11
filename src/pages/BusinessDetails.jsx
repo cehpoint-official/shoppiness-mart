@@ -36,15 +36,19 @@ const BusinessDetails = () => {
 
   // Get state data
   const causeData = location.state || {};
+//console.log(causeData);
 
-  useEffect(() => {
-    console.log("Location object in BusinessDetails:", location);
-    console.log("Raw state received:", location.state);
-    console.log("Processed causeData:", causeData);
-    console.log("Cause Name:", causeData.causeName);
-    console.log("Cause ID:", causeData.causeId);
-    console.log("Bank Accounts:", causeData.bankAccounts);
-  }, [location]);
+  // useEffect(() => {
+  //   // More detailed logging to diagnose state issues
+  //   console.log("========== STATE DEBUGGING ==========");
+  //   console.log("Location:", location);
+  //   console.log("Location state type:", typeof location.state);
+  //   console.log("Raw location.state:", location.state);
+  //   console.log("Processed causeData:", causeData);
+  //   console.log("User ID from params:", userId);
+  //   console.log("Business ID from params:", businessId);
+  //   console.log("====================================");
+  // }, [location, causeData, userId, businessId]);
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -160,7 +164,7 @@ const BusinessDetails = () => {
         couponData.causeData = {
           causeName: causeData.causeName || "",
           causeId: causeData.causeId || "",
-          bankAccounts: causeData.bankAccounts || null,
+          paymentDetails: causeData.paymentDetails || null,
         };
       }
 
@@ -507,29 +511,27 @@ const ShopLink = ({ userId, category, businessId, productId, children }) => {
     );
   };
 
-  const getPath = () => {
-    const isInDashboard = location.pathname.includes("/user-dashboard");
-    const isOffline = isOfflineShop();
+  const isInDashboard = location.pathname.includes("/user-dashboard");
+  const isOffline = isOfflineShop();
 
-    if (isOffline) {
-      return {
-        pathname: isInDashboard
-          ? `/user-dashboard/${userId}/offline-shop/${category}/${businessId}/${productId}`
-          : `/offline-shop/${category}/${businessId}/${productId}`,
-        state: causeData, // Pass the state along
-      };
-    } else {
-      return {
-        pathname: isInDashboard
-          ? `/user-dashboard/${userId}/online-shop/${businessId}/${productId}`
-          : `/online-shop/${businessId}/${productId}`,
-        state: causeData, // Pass the state along
-      };
-    }
-  };
+  // Determine the path without state
+  const pathTo = isOffline
+    ? isInDashboard
+      ? `/user-dashboard/${userId}/offline-shop/${category}/${businessId}/${productId}`
+      : `/offline-shop/${category}/${businessId}/${productId}`
+    : isInDashboard
+    ? `/user-dashboard/${userId}/online-shop/${businessId}/${productId}`
+    : `/online-shop/${businessId}/${productId}`;
+
+  // Log state data for debugging
+  //console.log("ShopLink passing state:", causeData);
 
   return (
-    <Link to={getPath()} className="overflow-hidden">
+    <Link
+      to={pathTo}
+      state={causeData} 
+      className="overflow-hidden"
+    >
       {children}
     </Link>
   );

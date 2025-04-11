@@ -186,11 +186,9 @@ const Layout = () => (
 
 // Protected Route Wrappers
 const UserProtectedRoute = ({ children }) => {
-  const { user } = useSelector((state) => state.userReducer || {});
-  console.log(
-    "UserProtectedRoute State:",
-    useSelector((state) => state)
-  ); // Debug log
+  const { user } = useSelector((state) => state.userReducer);
+  // Remove or update the debug log to avoid selecting the entire state
+//  console.log("UserProtectedRoute State: user exists:", !!user);
   return (
     <ProtectedRoute isAuthenticated={!!user} redirect="/login/user">
       {children}
@@ -199,11 +197,9 @@ const UserProtectedRoute = ({ children }) => {
 };
 
 const NgoProtectedRoute = ({ children }) => {
-  const { user } = useSelector((state) => state.ngoUserReducer || {});
-  console.log(
-    "NgoProtectedRoute State:",
-    useSelector((state) => state)
-  ); // Debug log
+  const { user } = useSelector((state) => state.ngoUserReducer);
+  // Remove or update the debug log to avoid selecting the entire state
+  // console.log("NgoProtectedRoute State: user exists:", !!user);
   return (
     <ProtectedRoute isAuthenticated={!!user} redirect="/login/cause">
       {children}
@@ -212,11 +208,9 @@ const NgoProtectedRoute = ({ children }) => {
 };
 
 const BusinessProtectedRoute = ({ children }) => {
-  const { user } = useSelector((state) => state.businessUserReducer || {});
-  console.log(
-    "BusinessProtectedRoute State:",
-    useSelector((state) => state)
-  ); // Debug log
+  const { user } = useSelector((state) => state.businessUserReducer);
+  // Remove or update the debug log to avoid selecting the entire state
+  // console.log("BusinessProtectedRoute State: user exists:", !!user);
   return (
     <ProtectedRoute isAuthenticated={!!user} redirect="/login/business">
       {children}
@@ -225,11 +219,9 @@ const BusinessProtectedRoute = ({ children }) => {
 };
 
 const AdminProtectedRoute = ({ children }) => {
-  const { user } = useSelector((state) => state.userReducer || {});
-  console.log(
-    "AdminProtectedRoute State:",
-    useSelector((state) => state)
-  ); // Debug log
+  const { user } = useSelector((state) => state.userReducer);
+  // Remove or update the debug log to avoid selecting the entire state
+  // console.log("AdminProtectedRoute State: user exists:", !!user);
   return (
     <ProtectedRoute
       isAuthenticated={!!user}
@@ -240,6 +232,7 @@ const AdminProtectedRoute = ({ children }) => {
     </ProtectedRoute>
   );
 };
+
 // Router configuration
 const router = createBrowserRouter([
   {
