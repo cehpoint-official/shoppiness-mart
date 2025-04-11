@@ -211,6 +211,10 @@ const AllMoneySendToPlatform = () => {
         earningId: earning.id,
         invoiceId: earning.invoiceId,
         amount: earning.amountEarned,
+        customerName: earning.customerName || "",
+        customerEmail: earning.customerEmail || "",
+        customerId: earning.customerId || "",
+        customerProfilePic: earning.userProfilePic || "",
         receiptUrl: receiptUrl,
         fileType: paymentReceipt.type.includes("image") ? "image" : "pdf",
         requestDate: new Date().toLocaleDateString("en-GB", {
@@ -220,8 +224,16 @@ const AllMoneySendToPlatform = () => {
         }),
         status: "Checking",
       };
-
+      // Add cause data if it exists
+      if (Object.keys(earning?.causeData).length > 0) {
+        paymentRequest.causeData = {
+          causeName: earning?.causeData.causeName || "",
+          causeId: earning?.causeData.causeId || "",
+          paymentDetails: earning?.causeData.paymentDetails || null,
+        };
+      }
       await addDoc(collection(db, "paymentByBusiness"), paymentRequest);
+     
 
       // 3. Update the earning status to "Checking"
       const earningRef = doc(db, "platformEarnings", earning.id);
@@ -449,6 +461,8 @@ const AllMoneySendToPlatform = () => {
 
   // If in detail view, render the details component
   if (viewDetails && selectedEarning) {
+    //   console.log("Selected Earning:", selectedEarning);
+
     return (
       <div className="bg-white rounded-lg shadow-md p-6 m-10">
         <div className="flex items-center mb-6">

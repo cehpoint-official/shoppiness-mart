@@ -39,7 +39,7 @@ const CauseDetails = () => {
   const userId =
     user?.id || (isUserDashboard ? location.pathname.split("/")[2] : null);
 
-  console.log("User ID:", userId);
+ // console.log("User ID:", userId);
 
   // Function to calculate distance between two coordinates using Haversine formula
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
@@ -385,7 +385,7 @@ const CauseDetails = () => {
                           state={{
                             causeName: cause.causeName,
                             causeId: id,
-                            bankAccounts: cause.paymentDetails || {},
+                            paymentDetails: cause.paymentDetails || {},
                           }}
                           className="text-teal-500 font-medium hover:text-teal-700 flex items-center"
                         >

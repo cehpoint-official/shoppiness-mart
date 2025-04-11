@@ -156,6 +156,13 @@ const UpdatePos = ({ invoiceDetails, onBack, onUpdate }) => {
       grandTotal,
       dueAmount,
     };
+    if (Object.keys(matchedCoupon?.causeData).length > 0) {
+      invoiceData.causeData = {
+        causeName: matchedCoupon?.causeData.causeName || "",
+        causeId: matchedCoupon?.causeData.causeId || "",
+        paymentDetails: matchedCoupon?.causeData.paymentDetails || null,
+      };
+    }
     setGenerateInvoice(invoiceData);
   }, [
     customerInfo,

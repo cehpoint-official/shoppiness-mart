@@ -36,6 +36,7 @@ const BusinessDetails = () => {
 
   // Get state data
   const causeData = location.state || {};
+//console.log(causeData);
 
   // useEffect(() => {
   //   // More detailed logging to diagnose state issues
@@ -163,7 +164,7 @@ const BusinessDetails = () => {
         couponData.causeData = {
           causeName: causeData.causeName || "",
           causeId: causeData.causeId || "",
-          bankAccounts: causeData.bankAccounts || null,
+          paymentDetails: causeData.paymentDetails || null,
         };
       }
 
@@ -528,7 +529,7 @@ const ShopLink = ({ userId, category, businessId, productId, children }) => {
   return (
     <Link
       to={pathTo}
-      state={causeData} // Correctly pass state in React Router v6
+      state={causeData} 
       className="overflow-hidden"
     >
       {children}

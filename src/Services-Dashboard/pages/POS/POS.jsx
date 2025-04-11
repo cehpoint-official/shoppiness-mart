@@ -164,7 +164,7 @@ const POS = ({ onGenerateInvoice }) => {
       invoiceData.causeData = {
         causeName: matchedCoupon?.causeData.causeName || "",
         causeId: matchedCoupon?.causeData.causeId || "",
-        bankAccounts: matchedCoupon?.causeData.bankAccounts || null,
+        paymentDetails: matchedCoupon?.causeData.paymentDetails || null,
       };
     }
     onGenerateInvoice(invoiceData);

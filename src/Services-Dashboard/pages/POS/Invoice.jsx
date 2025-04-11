@@ -220,73 +220,65 @@ const Invoice = ({ data, onBack }) => {
     const customerEmail = invoiceData.customerEmail || invoiceData.email || "";
 
     // Ensure we have a valid userCashback amount
-    let userCashback = 0;
-    if (typeof invoiceData.userCashback === "number") {
-      userCashback = invoiceData.userCashback;
-    } else if (typeof invoiceData.userCashbackAmount === "number") {
-      userCashback = invoiceData.userCashbackAmount;
-    } else if (invoiceData.userCashback) {
-      // Handle string conversion if needed
-      userCashback = parseFloat(invoiceData.userCashback);
-    }
-
-    // Ensure userCashback is a valid number
-    userCashback = isNaN(userCashback) ? 0 : userCashback;
+    let userCashback = extractNumericValue(invoiceData, [
+      "userCashback",
+      "userCashbackAmount",
+    ]);
 
     const emailTemplate = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <div style="background-color: #f8f8f8; padding: 20px; border-radius: 8px;">
-          <h2 style="color: #333; margin-bottom: 20px;">Invoice Generated and Cashback Details</h2>
-          <p style="color: #666;">Dear ${customerName},</p>
-          <p style="color: #666;">Your invoice number <strong>${invoiceNum}</strong> has been generated successfully.</p>
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background-color: #f8f8f8; padding: 20px; border-radius: 8px;">
+        <h2 style="color: #333; margin-bottom: 20px;">Invoice Generated and Cashback Details</h2>
+        <p style="color: #666;">Dear ${customerName},</p>
+        <p style="color: #666;">Your invoice number <strong>${invoiceNum}</strong> has been generated successfully.</p>
+        ${
+          userCashback > 0
+            ? `
+          <p style="color: #666;">You are eligible for a cashback of <strong>Rs. ${userCashback.toFixed(
+            2
+          )}</strong>.</p>
+          ${
+            dueAmount > 0
+              ? `
+            <p style="color: #666;">However, due to an outstanding due amount of <strong>Rs. ${dueAmount.toFixed(
+              2
+            )}</strong>, your cashback will be credited once the due is cleared.</p>
+          `
+              : `
+            <p style="color: #666;">The cashback has been credited to your account.</p>
+          `
+          }
+        `
+            : `
+          <p style="color: #666;">No cashback is applicable for this invoice.</p>
+        `
+        }
+        <div style="background-color: #fff; padding: 15px; border-radius: 5px; margin: 15px 0;">
+          <p style="margin: 5px 0;"><strong>Invoice Number:</strong> ${invoiceNum}</p>
           ${
             userCashback > 0
               ? `
-            <p style="color: #666;">You are eligible for a cashback of <strong>Rs. ${userCashback.toFixed(
+            <p style="margin: 5px 0;"><strong>Cashback Amount:</strong> Rs. ${userCashback.toFixed(
               2
-            )}</strong>.</p>
-            ${
-              dueAmount > 0
-                ? `
-              <p style="color: #666;">However, due to an outstanding due amount of <strong>Rs. ${dueAmount.toFixed(
-                2
-              )}</strong>, your cashback will be credited once the due is cleared.</p>
-            `
-                : `
-              <p style="color: #666;">The cashback has been credited to your account.</p>
-            `
-            }
+            )}</p>
           `
-              : `
-            <p style="color: #666;">No cashback is applicable for this invoice.</p>
-          `
+              : ""
           }
-          <div style="background-color: #fff; padding: 15px; border-radius: 5px; margin: 15px 0;">
-            <p style="margin: 5px 0;"><strong>Invoice Number:</strong> ${invoiceNum}</p>
-            ${
-              userCashback > 0
-                ? `
-              <p style="margin: 5px 0;"><strong>Cashback Amount:</strong> Rs. ${userCashback.toFixed(
-                2
-              )}</p>
-            `
-                : ""
-            }
-            <p style="margin: 5px 0;"><strong>Date:</strong> ${billingDate}</p>
-          </div>
-          <p style="color: #666;">You can download the invoice by clicking the button below:</p>
-          <div style="text-align: center; margin-top: 20px;">
-            <a href="${pdfUrl}" style="background-color: #179A56; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
-              Download Invoice
-            </a>
-          </div>
-          <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
-            <p style="color: #666; margin: 0;">Best regards,</p>
-            <p style="color: #666; margin: 5px 0;">The ShoppinessMart Team</p>
-          </div>
+          <p style="margin: 5px 0;"><strong>Date:</strong> ${billingDate}</p>
+        </div>
+        <p style="color: #666;">You can download the invoice by clicking the button below:</p>
+        <div style="text-align: center; margin-top: 20px;">
+          <a href="${pdfUrl}" style="background-color: #179A56; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+            Download Invoice
+          </a>
+        </div>
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+          <p style="color: #666; margin: 0;">Best regards,</p>
+          <p style="color: #666; margin: 5px 0;">The ShoppinessMart Team</p>
         </div>
       </div>
-    `;
+    </div>
+  `;
 
     try {
       await axios.post(`${import.meta.env.VITE_AWS_SERVER}/send-email`, {
@@ -307,50 +299,41 @@ const Invoice = ({ data, onBack }) => {
       invoiceData.billingDate || new Date().toLocaleDateString("en-GB");
 
     // Ensure we have a valid platformCashback amount
-    let platformCashback = 0;
-    if (typeof invoiceData.platformCashback === "number") {
-      platformCashback = invoiceData.platformCashback;
-    } else if (typeof invoiceData.amountEarned === "number") {
-      platformCashback = invoiceData.amountEarned;
-    } else if (typeof invoiceData.platformEarnings === "number") {
-      platformCashback = invoiceData.platformEarnings;
-    } else if (invoiceData.platformCashback) {
-      // Handle string conversion if needed
-      platformCashback = parseFloat(invoiceData.platformCashback);
-    }
-
-    // Ensure platformCashback is a valid number
-    platformCashback = isNaN(platformCashback) ? 0 : platformCashback;
+    let platformCashback = extractNumericValue(invoiceData, [
+      "platformCashback",
+      "amountEarned",
+      "platformEarnings",
+    ]);
 
     const emailTemplate = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <div style="background-color: #f8f8f8; padding: 20px; border-radius: 8px;">
-          <h2 style="color: #333; margin-bottom: 20px;">Platform Earnings Reminder</h2>
-          <p style="color: #666;">Dear Business Owner,</p>
-          <p style="color: #666;">For invoice number <strong>${invoiceNum}</strong>, the platform's share is <strong>Rs. ${platformCashback.toFixed(
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background-color: #f8f8f8; padding: 20px; border-radius: 8px;">
+        <h2 style="color: #333; margin-bottom: 20px;">Platform Earnings Reminder</h2>
+        <p style="color: #666;">Dear Business Owner,</p>
+        <p style="color: #666;">For invoice number <strong>${invoiceNum}</strong>, the platform's share is <strong>Rs. ${platformCashback.toFixed(
       2
     )}</strong>.</p>
-          <p style="color: #666;">Please ensure the payment is made within the next 2-3 days.</p>
-          <div style="background-color: #fff; padding: 15px; border-radius: 5px; margin: 15px 0;">
-            <p style="margin: 5px 0;"><strong>Invoice Number:</strong> ${invoiceNum}</p>
-            <p style="margin: 5px 0;"><strong>Platform Earnings:</strong> Rs. ${platformCashback.toFixed(
-              2
-            )}</p>
-            <p style="margin: 5px 0;"><strong>Date:</strong> ${billingDate}</p>
-          </div>
-          <p style="color: #666;">You can download the invoice by clicking the button below:</p>
-          <div style="text-align: center; margin-top: 20px;">
-            <a href="${pdfUrl}" style="background-color: #179A56; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
-              Download Invoice
-            </a>
-          </div>
-          <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
-            <p style="color: #666; margin: 0;">Best regards,</p>
-            <p style="color: #666; margin: 5px 0;">The ShoppinessMart Team</p>
-          </div>
+        <p style="color: #666;">Please ensure the payment is made within the next 2-3 days.</p>
+        <div style="background-color: #fff; padding: 15px; border-radius: 5px; margin: 15px 0;">
+          <p style="margin: 5px 0;"><strong>Invoice Number:</strong> ${invoiceNum}</p>
+          <p style="margin: 5px 0;"><strong>Platform Earnings:</strong> Rs. ${platformCashback.toFixed(
+            2
+          )}</p>
+          <p style="margin: 5px 0;"><strong>Date:</strong> ${billingDate}</p>
+        </div>
+        <p style="color: #666;">You can download the invoice by clicking the button below:</p>
+        <div style="text-align: center; margin-top: 20px;">
+          <a href="${pdfUrl}" style="background-color: #179A56; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+            Download Invoice
+          </a>
+        </div>
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+          <p style="color: #666; margin: 0;">Best regards,</p>
+          <p style="color: #666; margin: 5px 0;">The ShoppinessMart Team</p>
         </div>
       </div>
-    `;
+    </div>
+  `;
 
     try {
       await axios.post(`${import.meta.env.VITE_AWS_SERVER}/send-email`, {
@@ -364,16 +347,102 @@ const Invoice = ({ data, onBack }) => {
     }
   };
 
+  // Helper function to extract numeric values from various properties
+  const extractNumericValue = (data, propertyNames) => {
+    for (const prop of propertyNames) {
+      if (typeof data[prop] === "number") {
+        return data[prop];
+      } else if (data[prop]) {
+        const parsed = parseFloat(data[prop]);
+        if (!isNaN(parsed)) {
+          return parsed;
+        }
+      }
+    }
+    return 0;
+  };
+
+  // Helper function to format date consistently
+  const formatDate = (date) => {
+    return date.toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  // Helper function to create base invoice data
+  const createBaseInvoiceData = (data, pdfUrl) => {
+    return {
+      billerName: data.billerName || "",
+      dueDate: data.dueDate || "",
+      subTotal: data.totalPrice || 0,
+      customerEmail: data.email || "",
+      customerPhoneNumber: data.phoneNumber || "",
+      taxRate: data.totalPrice
+        ? ((data.taxAmount / data.totalPrice) * 100).toFixed(1)
+        : "0",
+      products: data.products || [],
+      customerName: data.customerName || "",
+      pdfUrl,
+      totalAmount: data.grandTotal || 0,
+      paidAmount: data.cashCollected || 0,
+      dueAmount: data.dueAmount || 0,
+      invoiceNum: data.invoiceId,
+      businessId: data.businessId,
+      billingDate: data.billingDate || formatDate(new Date()),
+    };
+  };
+
+  // Helper function to check if coupon exists
+  const hasCouponData = (data) => {
+    return Boolean(data.couponCode && data.customerId && data.couponId);
+  };
+
+  // Helper function to handle cause donation records
+  const handleCauseDonation = async (data, platformCashback) => {
+    if (!data?.causeData || Object.keys(data.causeData).length === 0) {
+      return null;
+    }
+
+    try {
+      // Execute the first operation and capture its result
+      const donationRef = await addDoc(collection(db, "donationTransactions"), {
+        causeId: data.causeData.causeId || "",
+        causeName: data.causeData.causeName || "",
+        customerName: data.customerName || "",
+        customerEmail: data.email || "",
+        amount: platformCashback || 0,
+        userProfilePic: data.userProfilePic || "",
+        paymentStatus: "Pending",
+        paymentDate: formatDate(new Date()),
+      });
+
+      // Execute the notification operation separately
+      await addDoc(collection(db, "ngoNotifications"), {
+        message: `${data.customerName} with email id ${data.email} has purchased a product to donate to your NGO/Cause. For more details, please check your dashboard.`,
+        ngoId: data.causeData.causeId || "",
+        read: false,
+        createdAt: new Date().toISOString(),
+      });
+
+      // Return the donation transaction document ID
+      return donationRef.id;
+    } catch (error) {
+      console.error("Error handling cause donation:", error);
+      throw error;
+    }
+  };
+
+  // Main function to save invoice
   const handleSave = async () => {
     setIsLoading(true);
     let pdfUrl = null;
     let storageRef = null;
 
     try {
-      // Define hasCoupon before the transaction
-      const hasCoupon = Boolean(
-        data.couponCode && data.customerId && data.couponId
-      );
+      // Check if data has coupon
+      const hasCoupon = hasCouponData(data);
 
       // Validate required data
       if (!data.invoiceId || !data.grandTotal) {
@@ -385,34 +454,10 @@ const Invoice = ({ data, onBack }) => {
       storageRef = ref(storage, `invoices/${data.invoiceId}.pdf`);
       pdfUrl = await uploadPdf(pdfBlob);
 
-      // Base invoice data
-      const baseInvoiceData = {
-        billerName: data.billerName || "",
-        dueDate: data.dueDate || "",
-        subTotal: data.totalPrice || 0,
-        customerEmail: data.email || "",
-        customerPhoneNumber: data.phoneNumber || "",
-        taxRate: data.totalPrice
-          ? ((data.taxAmount / data.totalPrice) * 100).toFixed(1)
-          : "0",
-        products: data.products || [],
-        customerName: data.customerName || "",
-        pdfUrl,
-        totalAmount: data.grandTotal || 0,
-        paidAmount: data.cashCollected || 0,
-        dueAmount: data.dueAmount || 0,
-        invoiceNum: data.invoiceId,
-        businessId: data.businessId,
-        billingDate:
-          data.billingDate ||
-          new Date().toLocaleDateString("en-GB", {
-            day: "numeric",
-            month: "short",
-            year: "numeric",
-          }),
-      };
+      // Create base invoice data
+      const baseInvoiceData = createBaseInvoiceData(data, pdfUrl);
 
-      // Initialize variables outside transaction
+      // Initialize transaction variables
       let completeInvoiceData = { ...baseInvoiceData };
       let platformCashback = 0;
       let userCashback = 0;
@@ -420,42 +465,22 @@ const Invoice = ({ data, onBack }) => {
 
       // Use a transaction to ensure all-or-nothing saving
       await runTransaction(db, async (transaction) => {
-        const hasCoupon = Boolean(
-          data.couponCode && data.customerId && data.couponId
-        );
+        // Collect all required documents first
+        const { couponDoc, userDoc, businessDoc } =
+          await fetchRequiredDocuments(transaction, data, hasCoupon);
 
-        // IMPORTANT: Perform ALL reads first
-        let couponDoc = null;
-        let userDoc = null;
-
+        // Validate coupon if exists
         if (hasCoupon) {
-          // READ: Verify coupon exists and is valid
-          const couponRef = doc(db, "coupons", data.couponId);
-          couponDoc = await transaction.get(couponRef);
-
-          if (!couponDoc.exists()) {
+          if (!couponDoc?.exists()) {
             throw new Error("Coupon no longer exists");
           }
-
           if (couponDoc.data().status !== "Pending") {
             throw new Error("Coupon is no longer valid");
           }
-
-          // READ: Get user data for cashback update
-          const userRef = doc(db, "users", data.customerId);
-          userDoc = await transaction.get(userRef);
         }
 
-        // READ: Get business details if needed
-        let businessDoc = null;
-        if (data.businessId) {
-          const businessRef = doc(db, "businessDetails", data.businessId);
-          businessDoc = await transaction.get(businessRef);
-        }
-
-        // Now perform calculations
+        // Calculate cashback if coupon exists
         if (hasCoupon) {
-          // Calculate cashback
           const cashbackResults = calculateCashbackAndEarnings(
             data.grandTotal,
             data.cashCollected,
@@ -477,114 +502,68 @@ const Invoice = ({ data, onBack }) => {
             platformCashback,
             remainingCashback,
             customerId: data.customerId || "",
-            claimedDate: new Date().toLocaleDateString("en-GB", {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-            }),
+            claimedDate: formatDate(new Date()),
           };
 
           // Update complete invoice data with coupon info
           completeInvoiceData = { ...baseInvoiceData, ...couponData };
         }
 
-        // NOW perform all writes after all reads
-
-        // WRITE: Update user's cashback if needed
-        if (hasCoupon && userDoc && userDoc.exists() && userCashback > 0) {
-          const currentCashback = userDoc.data().collectedCashback || 0;
-          const userRef = doc(db, "users", data.customerId);
-          transaction.update(userRef, {
-            collectedCashback: currentCashback + userCashback,
-          });
-        }
-
-        // WRITE: Update coupon status if needed
-        if (hasCoupon && couponDoc && couponDoc.exists()) {
-          const couponRef = doc(db, "coupons", data.couponId);
-          transaction.update(couponRef, {
-            status: "Claimed",
-            claimedAt: new Date().toLocaleDateString("en-GB", {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-            }),
-          });
-        }
-
-        // WRITE: Update business details if needed
-        if (businessDoc && businessDoc.exists() && platformCashback > 0) {
-          const businessRef = doc(db, "businessDetails", data.businessId);
-          const currentTotalDue =
-            businessDoc.data().totalPlatformEarningsDue || 0;
-          transaction.update(businessRef, {
-            totalPlatformEarningsDue: currentTotalDue + platformCashback,
-          });
-        }
+        // Perform all write operations inside transaction
+        await performTransactionWrites({
+          transaction,
+          userDoc,
+          couponDoc,
+          businessDoc,
+          data,
+          userCashback,
+          platformCashback,
+          hasCoupon,
+        });
       });
+      let donationId = null;
+      if (Object.keys(data?.causeData || {}).length > 0) {
+        donationId = await handleCauseDonation(data, platformCashback);
+      }
 
-      // After transaction completes successfully, perform non-transactional operations
+      // Create platform earnings data with donation ID
+      const platformEarningsData = createPlatformEarningsData(
+        data,
+        platformCashback,
+        hasCoupon,
+        donationId
+      );
+      // After transaction completes, perform non-transactional operations
+      await Promise.all([
+        // Save invoice details
+        addDoc(collection(db, "invoiceDetails"), completeInvoiceData),
 
-      // Save invoice data
-      await addDoc(collection(db, "invoiceDetails"), completeInvoiceData);
-
-      // Save user transaction details
-      const userTransactionData = {
-        customerId: data.customerId || "",
-        invoiceId: data.invoiceId,
-        couponCode: data.couponCode || "",
-        products: data.products || [],
-        claimedDate: new Date().toLocaleDateString("en-GB", {
-          day: "numeric",
-          month: "short",
-          year: "numeric",
+        // Save user transaction
+        addDoc(collection(db, "userTransactions"), {
+          customerId: data.customerId || "",
+          invoiceId: data.invoiceId,
+          couponCode: data.couponCode || "",
+          products: data.products || [],
+          claimedDate: formatDate(new Date()),
+          customerName: data.customerName || "",
+          customerEmail: data.email || "",
+          discount: data.userCashback || 0,
+          userCashbackAmount: userCashback || 0,
+          userRemainingCashbackAmount: remainingCashback || 0,
+          status: hasCoupon ? "Claimed" : "No Coupon",
         }),
-        customerName: data.customerName || "",
-        customerEmail: data.email || "",
-        discount: data.userCashback || 0,
-        userCashbackAmount: userCashback || 0,
-        userRemainingCashbackAmount: remainingCashback || 0,
-        status: hasCoupon ? "Claimed" : "No Coupon",
-      };
-      await addDoc(collection(db, "userTransactions"), userTransactionData);
 
-      // Save platform earnings details
-      const platformEarningsData = {
-        customerId: data.customerId || "",
-        businessId: data.businessId,
-        invoiceId: data.invoiceId,
-        customerName: data.customerName || "",
-        customerEmail: data.email || "",
-        amountEarned: platformCashback || 0,
-        userProfilePic: data?.userProfilePic || "",
-        paymentStatus: hasCoupon ? "Pending" : "Not Applicable",
-        dueDate: hasCoupon
-          ? new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString(
-              "en-GB",
-              {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              }
-            )
-          : "",
-      };
+        // Save platform earnings with the donation ID
+        addDoc(collection(db, "platformEarnings"), platformEarningsData),
+      ]);
 
-      // Add cause data if it exists
-      if (Object.keys(data?.causeData).length > 0) {
-        platformEarningsData.causeData = {
-          causeName: data?.causeData.causeName || "",
-          causeId: data?.causeData.causeId || "",
-          bankAccounts: data?.causeData.bankAccounts || null,
-        };
-      }
-      await addDoc(collection(db, "platformEarnings"), platformEarningsData);
-
-      // Send emails
-      await sendEmailToUser(completeInvoiceData, pdfUrl);
-      if ((platformCashback || 0) > 0) {
-        await sendEmailToBusinessOwner(completeInvoiceData, pdfUrl);
-      }
+      // Send emails in parallel
+      await Promise.all([
+        sendEmailToUser(completeInvoiceData, pdfUrl),
+        ...(platformCashback > 0
+          ? [sendEmailToBusinessOwner(completeInvoiceData, pdfUrl)]
+          : []),
+      ]);
 
       toast.success("Invoice saved successfully!");
       onBack();
@@ -604,6 +583,118 @@ const Invoice = ({ data, onBack }) => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Helper function to fetch all required documents
+  const fetchRequiredDocuments = async (transaction, data, hasCoupon) => {
+    const docs = {
+      couponDoc: null,
+      userDoc: null,
+      businessDoc: null,
+    };
+
+    // Setup promise array for parallel document fetching
+    const fetchPromises = [];
+
+    // Fetch coupon document if needed
+    if (hasCoupon) {
+      const couponRef = doc(db, "coupons", data.couponId);
+      fetchPromises.push(
+        transaction.get(couponRef).then((doc) => {
+          docs.couponDoc = doc;
+        })
+      );
+
+      // Fetch user document if needed
+      const userRef = doc(db, "users", data.customerId);
+      fetchPromises.push(
+        transaction.get(userRef).then((doc) => {
+          docs.userDoc = doc;
+        })
+      );
+    }
+
+    // Fetch business document if needed
+    if (data.businessId) {
+      const businessRef = doc(db, "businessDetails", data.businessId);
+      fetchPromises.push(
+        transaction.get(businessRef).then((doc) => {
+          docs.businessDoc = doc;
+        })
+      );
+    }
+
+    // Wait for all document fetches to complete
+    await Promise.all(fetchPromises);
+    return docs;
+  };
+
+  // Helper function to perform all writes within transaction
+  const performTransactionWrites = async ({
+    transaction,
+    userDoc,
+    couponDoc,
+    businessDoc,
+    data,
+    userCashback,
+    platformCashback,
+    hasCoupon,
+  }) => {
+    // Update user's cashback if needed
+    if (hasCoupon && userDoc?.exists() && userCashback > 0) {
+      const currentCashback = userDoc.data().collectedCashback || 0;
+      const userRef = doc(db, "users", data.customerId);
+      transaction.update(userRef, {
+        collectedCashback: currentCashback + userCashback,
+      });
+    }
+
+    // Update coupon status if needed
+    if (hasCoupon && couponDoc?.exists()) {
+      const couponRef = doc(db, "coupons", data.couponId);
+      transaction.update(couponRef, {
+        status: "Claimed",
+        claimedAt: formatDate(new Date()),
+      });
+    }
+
+    // Update business details if needed
+    if (businessDoc?.exists() && platformCashback > 0) {
+      const businessRef = doc(db, "businessDetails", data.businessId);
+      const currentTotalDue = businessDoc.data().totalPlatformEarningsDue || 0;
+      transaction.update(businessRef, {
+        totalPlatformEarningsDue: currentTotalDue + platformCashback,
+      });
+    }
+  };
+
+  // Helper function to create platform earnings data
+  const createPlatformEarningsData = (data, platformCashback, hasCoupon, donationId = null) => {
+    const platformEarningsData = {
+      customerId: data.customerId || "",
+      businessId: data.businessId,
+      invoiceId: data.invoiceId,
+      customerName: data.customerName || "",
+      customerEmail: data.email || "",
+      amountEarned: platformCashback || 0,
+      userProfilePic: data?.userProfilePic || "",
+      paymentStatus: hasCoupon ? "Pending" : "Not Applicable",
+      dueDate: hasCoupon
+        ? formatDate(new Date(Date.now() + 3 * 24 * 60 * 60 * 1000))
+        : "",
+    };
+  
+    // Add cause data if it exists
+    if (Object.keys(data?.causeData || {}).length > 0) {
+      platformEarningsData.causeData = {
+        causeName: data?.causeData.causeName || "",
+        causeId: data?.causeData.causeId || "",
+        paymentDetails: data?.causeData.paymentDetails || null,
+        donationTransactionId: donationId, // Add the donation transaction ID here
+      };
+    }
+    
+    return platformEarningsData;
   };
   const handleDownloadPDF = async () => {
     setIsDownloading(true);

@@ -105,7 +105,7 @@ const ProductDetails = () => {
         couponData.causeData = {
           causeName: causeData.causeName || "",
           causeId: causeData.causeId || "",
-          bankAccounts: causeData.bankAccounts || null,
+          paymentDetails: causeData.paymentDetails || null,
         };
       }
 
