@@ -94,6 +94,7 @@ const DisputeRequest = lazy(() =>
 const Home = lazy(() => import("./pages/Home"));
 const Signup = lazy(() => import("./pages/Signup"));
 const Login = lazy(() => import("./pages/Login"));
+const ForgotPassword = lazy(() => import("./pages/ForgetPassoword"));
 const Business = lazy(() => import("./pages/Business/Business"));
 const SupportACause = lazy(() => import("./pages/SupportACause"));
 const SupportMaast = lazy(() => import("./pages/SupportMaast"));
@@ -244,6 +245,7 @@ const router = createBrowserRouter([
         children: [
           { path: "/", element: <Home /> },
           { path: "/login/:userType", element: <Login /> },
+          { path: "/forgot-password/:userType", element: <ForgotPassword /> },
           { path: "/signup", element: <Signup /> },
           { path: "/contact", element: <ContactUs /> },
           { path: "/about", element: <AboutUs /> },

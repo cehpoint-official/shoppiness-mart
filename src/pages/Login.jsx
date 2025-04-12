@@ -13,11 +13,11 @@ const Login = () => {
   const renderLoginForm = () => {
     switch (userType) {
       case "user":
-        return <UserLoginForm />;
+        return <UserLoginForm userType={userType} />;
       case "business":
-        return <BusinessLoginForm />;
+        return <BusinessLoginForm userType={userType} />;
       case "cause":
-        return <CauseLoginForm />;
+        return <CauseLoginForm userType={userType} />;
       default:
         return <p>Invalid user type</p>;
     }

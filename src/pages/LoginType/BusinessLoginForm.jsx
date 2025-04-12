@@ -16,7 +16,7 @@ import {
 import { useDispatch } from "react-redux";
 import { businessUserExist } from "../../redux/reducer/businessUserReducer";
 
-const BusinessLoginForm = () => {
+const BusinessLoginForm = ({userType}) => {
   const [userData, setUserData] = useState({
     email: "",
     password: "",
@@ -159,7 +159,7 @@ const BusinessLoginForm = () => {
             className="w-full p-2 border border-gray-200 bg-slate-100 rounded"
           />
         </div>
-        <a href="#" className="text-blue-700 text-center">
+        <a href={`/forgot-password/${userType}`} className="text-blue-700 text-center">
           Forgot password?
         </a>
 

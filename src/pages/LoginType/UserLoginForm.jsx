@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { userExist } from "../../redux/reducer/userReducer";
 
-const UserLoginForm = () => {
+const UserLoginForm = ({userType}) => {
   const [userData, setUserData] = useState({
     email: "",
     password: "",
@@ -163,7 +163,7 @@ const UserLoginForm = () => {
             className="w-full p-2 border border-gray-200 bg-slate-100 rounded"
           />
         </div>
-        <a href="#" className="text-blue-700 text-center">
+        <a href={`/forgot-password/${userType}`} className="text-blue-700 text-center">
           Forgot password?
         </a>
         <button

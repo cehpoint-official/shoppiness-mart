@@ -16,7 +16,7 @@ import {
 } from "firebase/firestore";
 import { ngoUserExist } from "../../redux/reducer/ngoUserReducer";
 
-const CauseLoginForm = () => {
+const CauseLoginForm = ({userType}) => {
   const dispatch = useDispatch();
   const [userData, setUserData] = useState({
     email: "",
@@ -154,7 +154,7 @@ const CauseLoginForm = () => {
             className="w-full p-2 border border-gray-200 bg-slate-100 rounded"
           />
         </div>
-        <a href="#" className="text-blue-700 text-center">
+        <a href={`/forgot-password/${userType}`} className="text-blue-700 text-center">
           Forgot password?
         </a>
 
