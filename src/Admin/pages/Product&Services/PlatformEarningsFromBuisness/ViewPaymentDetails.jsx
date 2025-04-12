@@ -16,7 +16,7 @@ const ViewPaymentDetails = () => {
   const [loading, setLoading] = useState(true);
   const [verifying, setVerifying] = useState(false);
   const [donationPercentage, setDonationPercentage] = useState(10); // Default percentage
-  const [donationAmount, setDonationAmount] = useState(0);
+  const [donationAmount, setDonationAmount] = useState(1); // Changed initial value to 1 to avoid button being disabled
   const [sendingDonation, setSendingDonation] = useState(false);
   const [donationSent, setDonationSent] = useState(false); // New state to track if donation was sent
   const [sentDonationDetails, setSentDonationDetails] = useState(null); // Store sent donation details
@@ -32,13 +32,22 @@ const ViewPaymentDetails = () => {
         if (requestDoc.exists()) {
           const requestData = { id: requestDoc.id, ...requestDoc.data() };
           setRequest(requestData);
+          //   console.log(requestData, "requestData");
+
+          // Set initial donation amount when request is loaded
+          if (requestData.amount) {
+            const initialAmount =
+              (requestData.amount * donationPercentage) / 100;
+            setDonationAmount(initialAmount);
+          }
 
           // Check if donation transaction exists and is completed
-          if (requestData.donationTransactionId) {
+
+          if (requestData.causeData.donationTransactionId) {
             const donationRef = doc(
               db,
               "donationTransactions",
-              requestData.donationTransactionId
+              requestData.causeData.donationTransactionId
             );
             const donationDoc = await getDoc(donationRef);
             if (
@@ -62,13 +71,14 @@ const ViewPaymentDetails = () => {
     };
 
     fetchRequest();
-  }, [id]);
+  }, [id, donationPercentage]);
+ // console.log(request, "request");
 
   // Calculate donation amount based on percentage
   useEffect(() => {
     if (request && request.amount) {
       const calculatedAmount = (request.amount * donationPercentage) / 100;
-      setDonationAmount(calculatedAmount);
+      setDonationAmount(calculatedAmount > 0 ? calculatedAmount : 1); // Ensure donation amount is always at least 1
     }
   }, [donationPercentage, request]);
 
@@ -138,8 +148,7 @@ const ViewPaymentDetails = () => {
 
   // Handle sending donation to NGO/cause
   const handleSendDonation = async () => {
-    if (!request || !request.causeData || !request.donationTransactionId)
-      return;
+    if (!request || !request.causeData) return;
 
     setSendingDonation(true);
     try {
@@ -170,11 +179,11 @@ const ViewPaymentDetails = () => {
           request.causeData.paymentDetails.cardDetails[0].cardNumber;
       }
 
-      // Update donation transaction
+      // Update existing donation transaction
       const donationRef = doc(
         db,
         "donationTransactions",
-        request.donationTransactionId
+        request.causeData.donationTransactionId
       );
       await updateDoc(donationRef, {
         paymentStatus: "Completed",
@@ -500,11 +509,9 @@ const ViewPaymentDetails = () => {
               <div className="mt-8 flex justify-center">
                 <button
                   onClick={handleSendDonation}
-                  disabled={sendingDonation || donationAmount <= 0}
+                  disabled={sendingDonation} // Removed the donationAmount <= 0 condition
                   className={`flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-medium transition-all ${
-                    sendingDonation || donationAmount <= 0
-                      ? "opacity-50 cursor-not-allowed"
-                      : ""
+                    sendingDonation ? "opacity-50 cursor-not-allowed" : ""
                   }`}
                 >
                   {sendingDonation ? (

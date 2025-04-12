@@ -39,7 +39,7 @@ const CauseDetails = () => {
   const userId =
     user?.id || (isUserDashboard ? location.pathname.split("/")[2] : null);
 
- // console.log("User ID:", userId);
+  // console.log("User ID:", userId);
 
   // Function to calculate distance between two coordinates using Haversine formula
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
@@ -280,10 +280,10 @@ const CauseDetails = () => {
                 How to Support
               </h2>
               <p className="text-gray-600 mb-6">
-                You can support {cause.causeName} by shopping at partner
-                businesses. When you make a purchase using a generated coupon,
-                you'll receive cashback and {cause.causeName} will receive a
-                donation - at no extra cost to you!
+                You can support {cause.causeName} by shopping at any business —
+                whether online or offline. When you make a purchase using a
+                generated coupon, you'll receive cashback, and {cause.causeName}{" "}
+                will receive a donation — all at no extra cost to you!
               </p>
 
               <div className="bg-teal-50 border border-teal-200 rounded-lg p-6 mb-8">
@@ -292,28 +292,58 @@ const CauseDetails = () => {
                 </h3>
                 <ol className="list-decimal pl-5 space-y-3 text-gray-700">
                   <li>
-                    <span className="font-medium">Select a partner shop</span> -
-                    Choose from the businesses listed below that support this
-                    cause
+                    <span className="font-medium">Shop at any store</span> —
+                    Whether online or offline, choose any shop you prefer.
                   </li>
                   <li>
-                    <span className="font-medium">Generate a coupon</span> -
-                    Create a special coupon for your purchase
+                    <span className="font-medium">Generate a coupon</span> —
+                    Create a special coupon before making your purchase from the
+                    selected shops page.
                   </li>
                   <li>
                     <span className="font-medium">
-                      Shop and use your coupon
+                      Shop and apply your coupon
                     </span>{" "}
-                    - Make a purchase and apply your coupon
+                    — Complete your purchase and use the generated coupon at
+                    checkout.
                   </li>
                   <li>
                     <span className="font-medium">
                       Receive cashback and support the cause
                     </span>{" "}
-                    - For example, on a ₹100 purchase with a 10% cashback rate,
-                    you might receive ₹5 cashback while ₹5 goes to the cause
+                    — For example, on a ₹100 purchase with a 10% cashback offer,
+                    ₹5 will be donated to {cause.causeName} (after platform
+                    fees) and ₹5 will be credited to you as cashback. You can
+                    either keep your cashback or choose to donate it to any NGO
+                    or cause you care about.
                   </li>
                 </ol>
+              </div>
+
+              {/* Shop Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6">
+                <Link
+                  to={"/online-shop"}
+                  state={{
+                    causeName: cause.causeName,
+                    causeId: id,
+                    paymentDetails: cause.paymentDetails || {},
+                  }}
+                  className="bg-teal-600 hover:bg-teal-700 text-white font-medium py-3 px-6 rounded-lg text-center transition-colors duration-200 shadow-md"
+                >
+                  Online Shops
+                </Link>
+                <Link
+                  to="/offline-shop"
+                  state={{
+                    causeName: cause.causeName,
+                    causeId: id,
+                    paymentDetails: cause.paymentDetails || {},
+                  }}
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg text-center transition-colors duration-200 shadow-md"
+                >
+                  Offline Shops
+                </Link>
               </div>
             </div>
           </div>
