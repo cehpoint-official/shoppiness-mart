@@ -1,6 +1,11 @@
 import { useState, useEffect } from "react";
 import { addDoc, collection, doc, getDoc, updateDoc } from "firebase/firestore";
-import { FaArrowLeft, FaSpinner, FaCheckCircle, FaDonate } from "react-icons/fa";
+import {
+  FaArrowLeft,
+  FaSpinner,
+  FaCheckCircle,
+  FaDonate,
+} from "react-icons/fa";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -13,6 +18,8 @@ const ViewPaymentDetails = () => {
   const [donationPercentage, setDonationPercentage] = useState(10); // Default percentage
   const [donationAmount, setDonationAmount] = useState(0);
   const [sendingDonation, setSendingDonation] = useState(false);
+  const [donationSent, setDonationSent] = useState(false); // New state to track if donation was sent
+  const [sentDonationDetails, setSentDonationDetails] = useState(null); // Store sent donation details
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -23,7 +30,29 @@ const ViewPaymentDetails = () => {
         const requestRef = doc(db, "paymentByBusiness", id);
         const requestDoc = await getDoc(requestRef);
         if (requestDoc.exists()) {
-          setRequest({ id: requestDoc.id, ...requestDoc.data() });
+          const requestData = { id: requestDoc.id, ...requestDoc.data() };
+          setRequest(requestData);
+
+          // Check if donation transaction exists and is completed
+          if (requestData.donationTransactionId) {
+            const donationRef = doc(
+              db,
+              "donationTransactions",
+              requestData.donationTransactionId
+            );
+            const donationDoc = await getDoc(donationRef);
+            if (
+              donationDoc.exists() &&
+              donationDoc.data().paymentStatus === "Completed"
+            ) {
+              setDonationSent(true);
+              setSentDonationDetails({
+                percentage: donationDoc.data().donationPercentage,
+                amount: donationDoc.data().donationAmount,
+                date: donationDoc.data().moneySentDate,
+              });
+            }
+          }
         }
       } catch (error) {
         console.error("Error fetching request details:", error);
@@ -109,27 +138,44 @@ const ViewPaymentDetails = () => {
 
   // Handle sending donation to NGO/cause
   const handleSendDonation = async () => {
-    if (!request || !request.causeData || !request.donationTransactionId) return;
+    if (!request || !request.causeData || !request.donationTransactionId)
+      return;
 
     setSendingDonation(true);
     try {
       // Determine payment method type
       let paymentMethodType = "";
       let paymentMethodDetails = "";
-      
-      if (request.causeData.paymentDetails.upiDetails && request.causeData.paymentDetails.upiDetails.length > 0) {
+
+      if (
+        request.causeData.paymentDetails.upiDetails &&
+        request.causeData.paymentDetails.upiDetails.length > 0
+      ) {
         paymentMethodType = "UPI";
-        paymentMethodDetails = request.causeData.paymentDetails.upiDetails[0].upiId;
-      } else if (request.causeData.paymentDetails.bankAccounts && request.causeData.paymentDetails.bankAccounts.length > 0) {
+        paymentMethodDetails =
+          request.causeData.paymentDetails.upiDetails[0].upiId;
+      } else if (
+        request.causeData.paymentDetails.bankAccounts &&
+        request.causeData.paymentDetails.bankAccounts.length > 0
+      ) {
         paymentMethodType = "Bank Transfer";
-        paymentMethodDetails = request.causeData.paymentDetails.bankAccounts[0].accountNumber;
-      } else if (request.causeData.paymentDetails.cardDetails && request.causeData.paymentDetails.cardDetails.length > 0) {
+        paymentMethodDetails =
+          request.causeData.paymentDetails.bankAccounts[0].accountNumber;
+      } else if (
+        request.causeData.paymentDetails.cardDetails &&
+        request.causeData.paymentDetails.cardDetails.length > 0
+      ) {
         paymentMethodType = "Card Payment";
-        paymentMethodDetails = request.causeData.paymentDetails.cardDetails[0].cardNumber;
+        paymentMethodDetails =
+          request.causeData.paymentDetails.cardDetails[0].cardNumber;
       }
 
       // Update donation transaction
-      const donationRef = doc(db, "donationTransactions", request.donationTransactionId);
+      const donationRef = doc(
+        db,
+        "donationTransactions",
+        request.donationTransactionId
+      );
       await updateDoc(donationRef, {
         paymentStatus: "Completed",
         paymentMethod: paymentMethodType,
@@ -145,11 +191,35 @@ const ViewPaymentDetails = () => {
 
       // Add notification for the NGO
       await addDoc(collection(db, "ngoNotifications"), {
-        message: `${request.customerName} (${request.customerEmail}) purchased a product on ${request.requestDate} to donate to your cause/NGO. After applying a ${100-donationPercentage}% platform fee, the remaining amount of ₹${donationAmount.toFixed(2)} has been sent to your payment option.`,
+        message: `${request.customerName} (${
+          request.customerEmail
+        }) purchased a product on ${
+          request.requestDate
+        } to donate to your cause/NGO. After applying a ${
+          100 - donationPercentage
+        }% platform fee, the remaining amount of ₹${donationAmount.toFixed(
+          2
+        )} has been sent to your payment option.`,
         ngoId: request.causeData.causeId,
         read: false,
         createdAt: new Date().toISOString(),
       });
+
+      // Store sent donation details
+      const currentDate = new Date().toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      });
+
+      setSentDonationDetails({
+        percentage: donationPercentage,
+        amount: donationAmount,
+        date: currentDate,
+      });
+
+      // Set donation as sent
+      setDonationSent(true);
 
       toast.success("Donation sent successfully!");
     } catch (error) {
@@ -279,17 +349,24 @@ const ViewPaymentDetails = () => {
       {request.causeData && (
         <div className="mt-10 bg-blue-50 p-6 rounded-lg shadow-sm">
           <h3 className="text-xl font-semibold text-blue-800 mb-4 flex items-center">
-            <FaDonate className="mr-2" /> Send Money to Selected NGO/Cause
+            <FaDonate className="mr-2" />{" "}
+            {donationSent
+              ? "Money Sent to Selected NGO/Cause"
+              : "Send Money to Selected NGO/Cause"}
           </h3>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
             {/* Cause Information */}
             <div>
-              <h4 className="font-medium text-blue-700 mb-3">Cause Information</h4>
+              <h4 className="font-medium text-blue-700 mb-3">
+                Cause Information
+              </h4>
               <div className="space-y-4">
                 <p>
                   <strong className="text-gray-600">Cause Name:</strong>{" "}
-                  <span className="text-gray-800">{request.causeData.causeName}</span>
+                  <span className="text-gray-800">
+                    {request.causeData.causeName}
+                  </span>
                 </p>
                 <p>
                   <strong className="text-gray-600">Customer Name:</strong>{" "}
@@ -307,87 +384,142 @@ const ViewPaymentDetails = () => {
                 </p>
               </div>
             </div>
-            
+
             {/* Payment Details */}
             <div>
-              <h4 className="font-medium text-blue-700 mb-3">Payment Details</h4>
+              <h4 className="font-medium text-blue-700 mb-3">
+                Payment Details
+              </h4>
               <div className="space-y-4">
-                {request.causeData.paymentDetails.upiDetails && 
-                 request.causeData.paymentDetails.upiDetails.length > 0 && (
-                  <p>
-                    <strong className="text-gray-600">UPI ID:</strong>{" "}
-                    <span className="text-gray-800">
-                      {request.causeData.paymentDetails.upiDetails[0].upiId}
-                    </span>
-                  </p>
-                )}
-                
-                {request.causeData.paymentDetails.bankAccounts && 
-                 request.causeData.paymentDetails.bankAccounts.length > 0 && (
-                  <div>
+                {request.causeData.paymentDetails.upiDetails &&
+                  request.causeData.paymentDetails.upiDetails.length > 0 && (
                     <p>
-                      <strong className="text-gray-600">Bank Account:</strong>{" "}
+                      <strong className="text-gray-600">UPI ID:</strong>{" "}
                       <span className="text-gray-800">
-                        {request.causeData.paymentDetails.bankAccounts[0].accountNumber}
+                        {request.causeData.paymentDetails.upiDetails[0].upiId}
                       </span>
                     </p>
-                  </div>
-                )}
-                
-                {request.causeData.paymentDetails.cardDetails && 
-                 request.causeData.paymentDetails.cardDetails.length > 0 && (
-                  <p>
-                    <strong className="text-gray-600">Card Details:</strong>{" "}
-                    <span className="text-gray-800">
-                      {request.causeData.paymentDetails.cardDetails[0].cardNumber}
-                    </span>
-                  </p>
-                )}
+                  )}
+
+                {request.causeData.paymentDetails.bankAccounts &&
+                  request.causeData.paymentDetails.bankAccounts.length > 0 && (
+                    <div>
+                      <p>
+                        <strong className="text-gray-600">Bank Account:</strong>{" "}
+                        <span className="text-gray-800">
+                          {
+                            request.causeData.paymentDetails.bankAccounts[0]
+                              .accountNumber
+                          }
+                        </span>
+                      </p>
+                    </div>
+                  )}
+
+                {request.causeData.paymentDetails.cardDetails &&
+                  request.causeData.paymentDetails.cardDetails.length > 0 && (
+                    <p>
+                      <strong className="text-gray-600">Card Details:</strong>{" "}
+                      <span className="text-gray-800">
+                        {
+                          request.causeData.paymentDetails.cardDetails[0]
+                            .cardNumber
+                        }
+                      </span>
+                    </p>
+                  )}
               </div>
             </div>
           </div>
-          
-          {/* Donation calculation */}
-          <div className="mt-6">
-            <label htmlFor="donationPercentage" className="block text-gray-700 font-medium mb-2">
-              Donation Percentage (%)
-            </label>
-            <div className="flex items-center space-x-4">
-              <input
-                type="number"
-                id="donationPercentage"
-                value={donationPercentage}
-                onChange={(e) => setDonationPercentage(Math.max(0, Math.min(100, Number(e.target.value))))}
-                className="border border-gray-300 rounded-md px-3 py-2 w-24 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                min="0"
-                max="100"
-              />
-              <span className="text-gray-700">
-                = ₹{donationAmount.toFixed(2)} of ₹{request.amount?.toLocaleString()}
-              </span>
+
+          {/* Show either the donation form or the completed donation details */}
+          {donationSent ? (
+            <div className="mt-6 bg-green-50 p-4 rounded-lg border border-green-200">
+              <h4 className="font-medium text-green-700 mb-3">
+                Donation Completed
+              </h4>
+              <div className="space-y-4">
+                <p>
+                  <strong className="text-gray-600">
+                    Donation Percentage:
+                  </strong>{" "}
+                  <span className="text-gray-800">
+                    {sentDonationDetails.percentage}%
+                  </span>
+                </p>
+                <p>
+                  <strong className="text-gray-600">Donation Amount:</strong>{" "}
+                  <span className="text-green-600 font-bold">
+                    ₹{sentDonationDetails.amount.toFixed(2)}
+                  </span>
+                </p>
+                <p>
+                  <strong className="text-gray-600">Sent Date:</strong>{" "}
+                  <span className="text-gray-800">
+                    {sentDonationDetails.date}
+                  </span>
+                </p>
+                <div className="flex items-center text-green-700">
+                  <FaCheckCircle className="mr-2" />
+                  <span>Money has been successfully sent to the cause/NGO</span>
+                </div>
+              </div>
             </div>
-          </div>
-          
-          {/* Send donation button */}
-          <div className="mt-8 flex justify-center">
-            <button
-              onClick={handleSendDonation}
-              disabled={sendingDonation || donationAmount <= 0}
-              className={`flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-medium transition-all ${
-                sendingDonation || donationAmount <= 0 ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-            >
-              {sendingDonation ? (
-                <>
-                  <FaSpinner className="animate-spin mr-2" /> Processing...
-                </>
-              ) : (
-                <>
-                  <FaDonate className="mr-2" /> Successfully Send Money
-                </>
-              )}
-            </button>
-          </div>
+          ) : (
+            <>
+              {/* Donation calculation */}
+              <div className="mt-6">
+                <label
+                  htmlFor="donationPercentage"
+                  className="block text-gray-700 font-medium mb-2"
+                >
+                  Donation Percentage (%)
+                </label>
+                <div className="flex items-center space-x-4">
+                  <input
+                    type="number"
+                    id="donationPercentage"
+                    value={donationPercentage}
+                    onChange={(e) =>
+                      setDonationPercentage(
+                        Math.max(0, Math.min(100, Number(e.target.value)))
+                      )
+                    }
+                    className="border border-gray-300 rounded-md px-3 py-2 w-24 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    min="0"
+                    max="100"
+                  />
+                  <span className="text-gray-700">
+                    = ₹{donationAmount.toFixed(2)} of ₹
+                    {request.amount?.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+
+              {/* Send donation button */}
+              <div className="mt-8 flex justify-center">
+                <button
+                  onClick={handleSendDonation}
+                  disabled={sendingDonation || donationAmount <= 0}
+                  className={`flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-medium transition-all ${
+                    sendingDonation || donationAmount <= 0
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
+                  }`}
+                >
+                  {sendingDonation ? (
+                    <>
+                      <FaSpinner className="animate-spin mr-2" /> Processing...
+                    </>
+                  ) : (
+                    <>
+                      <FaDonate className="mr-2" /> Successfully Send Money
+                    </>
+                  )}
+                </button>
+              </div>
+            </>
+          )}
         </div>
       )}
     </div>
