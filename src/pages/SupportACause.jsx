@@ -239,10 +239,10 @@ const SupportACause = () => {
               2
             </span>
             <div>
-              <h4 className="font-bold">Find Partner Shops</h4>
+              <h4 className="font-bold">Shop Anywhere You Like</h4>
               <p>
-                On the cause's page, you'll find shops located near the NGO that
-                support this cause.
+                You can support any cause by shopping at any store —
+                whether online or offline.
               </p>
             </div>
           </li>
@@ -263,15 +263,28 @@ const SupportACause = () => {
               4
             </span>
             <div>
-              <h4 className="font-bold">Shop and Support</h4>
+              <h4 className="font-bold">Shop and Earn Cashback</h4>
               <p>
-                Use your coupon when shopping. You'll receive cashback and the
-                NGO will receive a donation.
+                Use your coupon while shopping. You'll receive cashback for your
+                purchase and help support the cause.
+              </p>
+            </div>
+          </li>
+          <li className="flex">
+            <span className="flex-shrink-0 w-8 h-8 rounded-full bg-teal-500 text-white flex items-center justify-center mr-3">
+              5
+            </span>
+            <div>
+              <h4 className="font-bold">Donate Your Cashback</h4>
+              <p>
+                Once you receive cashback, you can choose to donate all or part
+                of it to any NGO you care about.
               </p>
             </div>
           </li>
         </ol>
       </div>
+
       {/* All Causes Section */}
       {!searching && !searchResults && (
         <div className="py-16 px-4 md:px-12">

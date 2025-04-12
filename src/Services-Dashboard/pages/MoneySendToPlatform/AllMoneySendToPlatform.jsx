@@ -170,6 +170,7 @@ const AllMoneySendToPlatform = () => {
       setLoading(false);
     }
   };
+  //console.log("Platform Earnings:", platformEarnings);
 
   // Handle file selection
   const handleFileChange = (e) => {
@@ -230,10 +231,10 @@ const AllMoneySendToPlatform = () => {
           causeName: earning?.causeData.causeName || "",
           causeId: earning?.causeData.causeId || "",
           paymentDetails: earning?.causeData.paymentDetails || null,
+          donationTransactionId : earning?.causeData.donationTransactionId || null,
         };
       }
       await addDoc(collection(db, "paymentByBusiness"), paymentRequest);
-     
 
       // 3. Update the earning status to "Checking"
       const earningRef = doc(db, "platformEarnings", earning.id);
@@ -461,7 +462,7 @@ const AllMoneySendToPlatform = () => {
 
   // If in detail view, render the details component
   if (viewDetails && selectedEarning) {
-    //   console.log("Selected Earning:", selectedEarning);
+    // console.log("Selected Earning:", selectedEarning);
 
     return (
       <div className="bg-white rounded-lg shadow-md p-6 m-10">
