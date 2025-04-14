@@ -146,7 +146,7 @@ const OnlineShop = () => {
   // Modify the store link rendering to include tracking
   const renderStoreLink = (item) => {
     // Construct the tracking URL
-    const trackingUrl = `https://inr.deals/track?id=inrdeals&src=merchant-detail-backend&url=${encodeURIComponent(item.url)}&subid=${userId}`;
+    const trackingUrl = `https://inr.deals/track?id=${import.meta.env.VITE_INRDEALS_USERNAME}&src=shoppinessmart&url=${item.url}&subid=${userId}`;
     
     return (
       <div
@@ -158,7 +158,7 @@ const OnlineShop = () => {
         key={item.id}
       >
         <a 
-          href={item?.url} // Use the tracking URL
+          href={trackingUrl} // Use the tracking URL
           target="_blank" 
           rel="noopener noreferrer"
           onClick={() => trackPurchase(item)}
