@@ -2,12 +2,65 @@ import React, { useState, useEffect, useCallback } from "react";
 import { collection, query, onSnapshot, orderBy, doc, getDoc } from "firebase/firestore";
 import { db } from "../../../../firebase";
 import Loader from "../../../Components/Loader/Loader";
+import DatePicker from 'react-datepicker';
+import "react-datepicker/dist/react-datepicker.css";
+import { BsCalendar4 } from "react-icons/bs";
 
-const AdminTransactions = ({ startDate, endDate }) => {
+const AdminTransactions = () => {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all"); // "all", "pending", "verified", "rejected"
   const [userNames, setUserNames] = useState({});
+  
+  // Date picker states
+  const [startDate, setStartDate] = useState(new Date(new Date().setMonth(new Date().getMonth() - 4))); // Default to 4 months ago
+  const [endDate, setEndDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
+  // Format date for display in "1 Jan 2024" format
+  const formatDateForDisplay = (date) => {
+    const day = date.getDate();
+    const month = date.toLocaleString('en-US', { month: 'short' });
+    const year = date.getFullYear();
+    return `${day} ${month} ${year}`;
+  };
+
+  // Format date range for display
+  const formatDateRange = () => {
+    return `${formatDateForDisplay(startDate)} - ${formatDateForDisplay(endDate)}`;
+  };
+
+  // Handle date selection - enforce 4 month maximum
+  const handleStartDateChange = (date) => {
+    // Calculate the maximum allowed start date (4 months before end date)
+    const maxStartDate = new Date(endDate);
+    maxStartDate.setMonth(maxStartDate.getMonth() - 4);
+    
+    // If selected date is earlier than max allowed start date, set it to max allowed
+    if (date < maxStartDate) {
+      setStartDate(maxStartDate);
+    } else {
+      setStartDate(date);
+    }
+  };
+
+  const handleEndDateChange = (date) => {
+    // Calculate the minimum allowed end date (4 months after start date)
+    const minEndDate = new Date(startDate);
+    minEndDate.setMonth(minEndDate.getMonth() + 4);
+    
+    // If selected date is later than min allowed end date, set it to min allowed
+    if (date > minEndDate) {
+      setEndDate(minEndDate);
+    } else {
+      setEndDate(date);
+    }
+  };
+
+  // Apply date range and close date picker
+  const handleDateRangeApply = () => {
+    setShowDatePicker(false);
+  };
 
   const fetchTransactions = useCallback(async () => {
     setLoading(true);
@@ -87,21 +140,6 @@ const AdminTransactions = ({ startDate, endDate }) => {
     };
   }, [fetchTransactions]);
 
-  // Parse date strings like "21 Jan 2025" to Date objects
-  const parseInputDate = (dateString) => {
-    if (!dateString) return null;
-    const parts = dateString.split(' ');
-    const day = parseInt(parts[0]);
-    const month = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
-      .indexOf(parts[1].toLowerCase());
-    const year = parseInt(parts[2]);
-
-    if (month === -1) return null;
-
-    // Create date at beginning of day
-    return new Date(year, month, day, 0, 0, 0);
-  };
-
   // Function to truncate user ID and add tooltip
   const formatUserId = (userId) => {
     if (!userId) return "N/A";
@@ -114,27 +152,23 @@ const AdminTransactions = ({ startDate, endDate }) => {
     if (filter !== "all" && transaction.status !== filter) return false;
 
     // Then filter by date range
-    const start = parseInputDate(startDate);
-    const end = parseInputDate(endDate);
-
-    // If dates are invalid or not provided, don't filter by date
-    if (!start && !end) return true;
-
-    // Get the transaction date
+    // Get the transaction date - prioritize saleDate, fall back to clickDate
     let transactionDate = null;
     if (transaction.saleDate && transaction.saleDate.seconds) {
       transactionDate = new Date(transaction.saleDate.seconds * 1000);
+    } else if (transaction.clickDate && transaction.clickDate.seconds) {
+      transactionDate = new Date(transaction.clickDate.seconds * 1000);
     }
 
     // If transaction has no valid date, exclude it
     if (!transactionDate) return false;
 
     // Check if transaction date is within range
-    if (start && transactionDate < start) return false;
+    if (startDate && transactionDate < startDate) return false;
 
     // For end date, set it to end of day for inclusive comparison
-    if (end) {
-      const endOfDay = new Date(end);
+    if (endDate) {
+      const endOfDay = new Date(endDate);
       endOfDay.setHours(23, 59, 59, 999);
       if (transactionDate > endOfDay) return false;
     }
@@ -147,34 +181,9 @@ const AdminTransactions = ({ startDate, endDate }) => {
     setLoading(true);
 
     try {
-      // Convert the startDate and endDate props to the required format (YYYY-MM-DD)
-      let apiStartDate, apiEndDate;
-
-      // Use the provided dates if available, otherwise use default of 4 months ago to today
-      if (startDate) {
-        const parsedDate = parseInputDate(startDate);
-        if (parsedDate) {
-          apiStartDate = parsedDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
-        }
-      }
-
-      if (endDate) {
-        const parsedDate = parseInputDate(endDate);
-        if (parsedDate) {
-          apiEndDate = parsedDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
-        }
-      }
-
-      // Fallback to default dates if parsing failed or dates weren't provided
-      if (!apiStartDate) {
-        const fourMonthsAgo = new Date();
-        fourMonthsAgo.setMonth(fourMonthsAgo.getMonth() - 4);
-        apiStartDate = fourMonthsAgo.toISOString().split('T')[0];
-      }
-
-      if (!apiEndDate) {
-        apiEndDate = new Date().toISOString().split('T')[0];
-      }
+      // Format dates for API in YYYY-MM-DD format
+      const apiStartDate = startDate.toISOString().split('T')[0];
+      const apiEndDate = endDate.toISOString().split('T')[0];
 
       // You would need to store this token securely, possibly in environment variables
       const token = import.meta.env.VITE_INRDEALS_API_TOKEN;
@@ -189,7 +198,7 @@ const AdminTransactions = ({ startDate, endDate }) => {
       const data = await response.json();
 
       if (data.success) {
-        console.log("Transactions refreshed successfully");
+        console.log("Transactions refreshed successfully", data);
       } else {
         console.error("Failed to refresh transactions:", data.message);
       }
@@ -205,6 +214,66 @@ const AdminTransactions = ({ startDate, endDate }) => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Transaction Management</h1>
         <div className="flex gap-4">
+          {/* Date picker section */}
+          <div className="relative">
+            <button 
+              className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm border"
+              onClick={() => setShowDatePicker(!showDatePicker)}
+            >
+              <BsCalendar4 className="text-blue-600" />
+              <span>{formatDateRange()}</span>
+            </button>
+            
+            {showDatePicker && (
+              <div className="absolute right-0 mt-2 bg-white p-4 rounded-lg shadow-lg z-10">
+                <div className="flex flex-col space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                    <DatePicker
+                      selected={startDate}
+                      onChange={handleStartDateChange}
+                      selectsStart
+                      startDate={startDate}
+                      endDate={endDate}
+                      className="w-full p-2 border rounded"
+                      dateFormat="d MMM yyyy"
+                      maxDate={new Date(endDate.getTime() - (86400000 * 30))} // At least 30 days before end date
+                    />
+                    <div className="text-xs text-gray-500 mt-1">Maximum range: 4 months</div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                    <DatePicker
+                      selected={endDate}
+                      onChange={handleEndDateChange}
+                      selectsEnd
+                      startDate={startDate}
+                      endDate={endDate}
+                      minDate={startDate}
+                      maxDate={new Date(startDate.getTime() + (86400000 * 120))} // Max 120 days (4 months) after start date
+                      className="w-full p-2 border rounded"
+                      dateFormat="d MMM yyyy"
+                    />
+                  </div>
+                  <div className="flex justify-end space-x-2">
+                    <button 
+                      className="px-3 py-1 bg-gray-200 rounded text-sm"
+                      onClick={() => setShowDatePicker(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button 
+                      className="px-3 py-1 bg-blue-600 text-white rounded text-sm"
+                      onClick={handleDateRangeApply}
+                    >
+                      Apply
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
           <select
             className="border rounded p-2"
             value={filter}
@@ -279,13 +348,22 @@ const AdminTransactions = ({ startDate, endDate }) => {
                       {transaction.status}
                     </td>
                     <td className="py-2 px-4 border text-sm">
-                      {transaction.saleDate ? new Date(transaction.saleDate.seconds * 1000).toLocaleString(undefined, {
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      }) : 'N/A'}
+                      {transaction.saleDate ? 
+                        new Date(transaction.saleDate.seconds * 1000).toLocaleString(undefined, {
+                          year: 'numeric',
+                          month: '2-digit',
+                          day: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        }) : 
+                        transaction.clickDate ? 
+                          new Date(transaction.clickDate.seconds * 1000).toLocaleString(undefined, {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          }) : 'N/A'}
                     </td>
                     <td className="py-2 px-4 border text-sm">
                       {transaction.lastUpdated ? new Date(transaction.lastUpdated.seconds * 1000).toLocaleString(undefined, {

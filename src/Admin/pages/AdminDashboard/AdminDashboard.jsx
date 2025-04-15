@@ -326,8 +326,8 @@ const AdminDashboard = () => {
         {/* Transactions Section - Pass date range */}
         <div className="mb-6">
           <AdminTransactions 
-            startDate={formatDateForQuery(startDate)} 
-            endDate={formatDateForQuery(endDate)} 
+            // startDate={formatDateForQuery(startDate)} 
+            // endDate={formatDateForQuery(endDate)} 
           />
         </div>
 
