@@ -18,6 +18,7 @@ const Navbar = ({ userId }) => {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [profilePic, setProfilePic] = useState("");
+  const [name, setName] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -31,6 +32,7 @@ const Navbar = ({ userId }) => {
 
         if (userSnap.exists()) {
           setProfilePic(userSnap.data().profilePic);
+          setName(userSnap.data().fname.split(" ")[0]);
         } else {
           console.log("No such document!");
         }
@@ -131,7 +133,7 @@ const Navbar = ({ userId }) => {
         <div className="flex justify-between h-16 items-center">
           <div className="flex items-center space-x-4">
             <span className="text-base lg:text-lg font-bold">
-              Welcome Edmund 👋
+              Welcome {name} 👋
             </span>
           </div>
           <div className="flex items-center space-x-4">

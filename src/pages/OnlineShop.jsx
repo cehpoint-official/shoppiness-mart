@@ -4,7 +4,7 @@ import onlineShopHeader from "../assets/onlineShopHeader.png";
 import Loader from "../Components/Loader/Loader";
 import { FiSearch } from "react-icons/fi";
 import { Link, useParams } from "react-router-dom";
-import { collection, getDocs, addDoc, query, where, onSnapshot } from "firebase/firestore";
+import { collection, getDocs, addDoc, query, where, onSnapshot, serverTimestamp } from "firebase/firestore";
 import { db } from "../../firebase";
 
 const OnlineShop = () => {
@@ -92,7 +92,7 @@ const OnlineShop = () => {
   };
 
   // Function to track a click/purchase
-  const trackPurchase = async (storeData) => {
+  const trackPurchase = async (storeData, clickId) => {
     try {
       // Create a record in Firebase for tracking
       await addDoc(collection(db, "transactions"), {
@@ -103,10 +103,12 @@ const OnlineShop = () => {
         status: "pending", // Initial status is pending
         saleAmount: 0, // Will be updated by callback or reports API
         commission: 0, // Will be updated later
-        trackingId: Math.random().toString(36).substring(2, 15), // Generate a unique ID
-        subId: userId, // The same as userId for now
+        // trackingId: Math.random().toString(36).substring(2, 15), // Generate a unique ID
+        clickId: clickId, // Store the unique clickId
+        subId: userId, // Keep this for backward compatibility
+        lastUpdated: serverTimestamp(),
       });
-      
+
       console.log("Purchase tracking initiated");
     } catch (error) {
       console.error("Error tracking purchase:", error);
@@ -117,7 +119,7 @@ const OnlineShop = () => {
   const fetchTransactions = useCallback(async () => {
     try {
       const q = query(collection(db, "transactions"), where("userId", "==", userId));
-      
+
       // Set up a real-time listener for transactions
       const unsubscribe = onSnapshot(q, (querySnapshot) => {
         const transactionsData = [];
@@ -126,14 +128,14 @@ const OnlineShop = () => {
         });
         setTransactions(transactionsData);
       });
-      
+
       // Clean up the listener when the component unmounts
       return () => unsubscribe;
     } catch (error) {
       console.error("Error fetching transactions:", error);
     }
   }, [userId]);
-  
+
   // Call fetchTransactions on component mount
   useEffect(() => {
     if (userId) {
@@ -145,9 +147,12 @@ const OnlineShop = () => {
 
   // Modify the store link rendering to include tracking
   const renderStoreLink = (item) => {
+    // Generate a unique click ID
+    const clickId = `${userId}_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+
     // Construct the tracking URL
-    const trackingUrl = `https://inr.deals/track?id=${import.meta.env.VITE_INRDEALS_USERNAME}&src=shoppinessmart&url=${item.url}&subid=${userId}`;
-    
+    const trackingUrl = `https://inr.deals/track?id=${import.meta.env.VITE_INRDEALS_USERNAME}&src=shoppinessmart&url=${item.url}&subid=${clickId}`;
+
     return (
       <div
         className="p-5 w-full md:w-[200px]"
@@ -157,11 +162,11 @@ const OnlineShop = () => {
         }}
         key={item.id}
       >
-        <a 
+        <a
           href={trackingUrl} // Use the tracking URL
-          target="_blank" 
+          target="_blank"
           rel="noopener noreferrer"
-          onClick={() => trackPurchase(item)}
+          onClick={() => trackPurchase(item, clickId)}
         >
           <div>
             <img
