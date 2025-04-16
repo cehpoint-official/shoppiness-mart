@@ -159,7 +159,7 @@ const OfflineShop = () => {
       },
       {
         image: giftImage,
-        text: "Readme your coupon",
+        text: "Reedem your coupon",
       },
       {
         image: cashBack,

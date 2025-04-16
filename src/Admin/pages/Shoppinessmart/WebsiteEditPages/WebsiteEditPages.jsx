@@ -1,4 +1,3 @@
-// WebsiteEditPages.jsx
 import { useState, useEffect } from "react";
 import { AiOutlinePlus, AiOutlineMinus } from "react-icons/ai";
 import UploadBanner from "./UploadBanner";
@@ -15,15 +14,19 @@ const WebsiteEditPages = () => {
     howItWorks: false,
     aboutUs: false,
     registerBusiness: false,
+    onlineShops: false,
+    supportMaast: false,
   });
   const [selectedComponent, setSelectedComponent] = useState(null);
   const [pageData, setPageData] = useState({
-    banners: [],
+    homeBanners: [],
     homeVideos: [],
     howItWorksVideos: [],
     registerBusinessVideos: [],
     members: [],
     story: "",
+    onlineShopsBanners: [],
+    supportMaastBanners: [],
   });
   const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0); // Add refresh key
@@ -39,28 +42,34 @@ const WebsiteEditPages = () => {
       };
 
       const [
-        banners,
+        homeBanners,
         homeVideos,
         howItWorksVideos,
         registerBusinessVideos,
         members,
         storyDoc,
+        onlineShopsBanners,
+        supportMaastBanners,
       ] = await Promise.all([
-        fetchContent("banners"),
+        fetchContent("homeBanners"),
         fetchContent("homeVideos"),
         fetchContent("howitworksVideos"),
         fetchContent("registerbusinessVideos"),
         fetchContent("members"),
         getDoc(doc(db, "content", "story")),
+        fetchContent("onlineshopsBanners"),
+        fetchContent("supportmaastBanners"),
       ]);
 
       setPageData({
-        banners,
+        homeBanners,
         homeVideos,
         howItWorksVideos,
         registerBusinessVideos,
         members,
         story: storyDoc.exists() ? storyDoc.data().content : "",
+        onlineShopsBanners,
+        supportMaastBanners,
       });
     } catch (error) {
       console.error("Error fetching website data:", error);
@@ -155,17 +164,35 @@ const WebsiteEditPages = () => {
       </div>
     );
   }
-  // console.log(pageData);
 
   if (selectedComponent) {
     const componentMap = {
-      UploadBanner: (
+      // Reusable Banner components for different sections
+      UploadHomeBanner: (
         <UploadBanner
-          banners={pageData.banners}
-          updateBanner={(data) => updateArrayContent("banners", data)}
-          deleteBanner={(id) => deleteArrayItem("banners", id)}
+          banners={pageData.homeBanners}
+          deleteBanner={(id) => deleteArrayItem("homeBanners", id)}
+          refreshData={() => setRefreshKey((prev) => prev + 1)}
+          section="Home"
         />
       ),
+      UploadOnlineShopsBanner: (
+        <UploadBanner
+          banners={pageData.onlineShopsBanners}
+          deleteBanner={(id) => deleteArrayItem("onlineShopsBanners", id)}
+          refreshData={() => setRefreshKey((prev) => prev + 1)}
+          section="Online Shops"
+        />
+      ),
+      UploadSupportMaastBanner: (
+        <UploadBanner
+          banners={pageData.supportMaastBanners}
+          deleteBanner={(id) => deleteArrayItem("supportMaastBanners", id)}
+          refreshData={() => setRefreshKey((prev) => prev + 1)}
+          section="Support Maast"
+        />
+      ),
+      // Video components
       UploadVideoHome: (
         <UploadVideo
           videos={pageData.homeVideos}
@@ -228,7 +255,7 @@ const WebsiteEditPages = () => {
             <h2 className="text-lg font-medium">Home</h2>
             <div className="flex items-center space-x-2">
               <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                {pageData.banners.length} banners
+                {pageData.homeBanners.length} banners  
               </span>
               <span className="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">
                 {pageData.homeVideos.length} videos
@@ -240,7 +267,7 @@ const WebsiteEditPages = () => {
             <div className="p-4 border-t space-y-2">
               <div
                 className="cursor-pointer text-blue-600 hover:text-blue-800 flex items-center"
-                onClick={() => handleItemClick({ type: "UploadBanner" })}
+                onClick={() => handleItemClick({ type: "UploadHomeBanner" })}
               >
                 <AiOutlinePlus className="mr-2" /> Upload Banner image
               </div>
@@ -342,6 +369,58 @@ const WebsiteEditPages = () => {
                 }
               >
                 <AiOutlinePlus className="mr-2" /> Register Business Video
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Online Shops Section */}
+        <div className="border rounded-lg overflow-hidden">
+          <div
+            className="flex justify-between items-center p-4 cursor-pointer"
+            onClick={() => toggleSection("onlineShops")}
+          >
+            <h2 className="text-lg font-medium">Online Shops</h2>
+            <div className="flex items-center space-x-2">
+              <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                {pageData.onlineShopsBanners.length} banners
+              </span>
+              {openSections.onlineShops ? <AiOutlineMinus /> : <AiOutlinePlus />}
+            </div>
+          </div>
+          {openSections.onlineShops && (
+            <div className="p-4 border-t space-y-2">
+              <div
+                className="cursor-pointer text-blue-600 hover:text-blue-800 flex items-center"
+                onClick={() => handleItemClick({ type: "UploadOnlineShopsBanner" })}
+              >
+                <AiOutlinePlus className="mr-2" /> Upload Online Shops Banner
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Support Maast Section */}
+        <div className="border rounded-lg overflow-hidden">
+          <div
+            className="flex justify-between items-center p-4 cursor-pointer"
+            onClick={() => toggleSection("supportMaast")}
+          >
+            <h2 className="text-lg font-medium">Support Maast</h2>
+            <div className="flex items-center space-x-2">
+              <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                {pageData.supportMaastBanners.length} banners
+              </span>
+              {openSections.supportMaast ? <AiOutlineMinus /> : <AiOutlinePlus />}
+            </div>
+          </div>
+          {openSections.supportMaast && (
+            <div className="p-4 border-t space-y-2">
+              <div
+                className="cursor-pointer text-blue-600 hover:text-blue-800 flex items-center"
+                onClick={() => handleItemClick({ type: "UploadSupportMaastBanner" })}
+              >
+                <AiOutlinePlus className="mr-2" /> Upload Support Maast Banner
               </div>
             </div>
           )}

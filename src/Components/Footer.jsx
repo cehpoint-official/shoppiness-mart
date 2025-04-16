@@ -12,7 +12,7 @@ const Footer = () => {
     phone: "+91 6368900045",
     email: "email@gmail.com"
   });
-  
+
   const [socialLinks, setSocialLinks] = useState({
     facebook: null,
     instagram: null,
@@ -46,24 +46,24 @@ const Footer = () => {
       try {
         const socialMediaCollection = collection(db, "socialMedia");
         const socialMediaSnapshot = await getDocs(socialMediaCollection);
-        
+
         if (!socialMediaSnapshot.empty) {
           const socialData = {};
-          
+
           socialMediaSnapshot.forEach((doc) => {
             const data = doc.data();
             if (data.platform && data.url) {
               socialData[data.platform.toLowerCase()] = data.url;
             }
           });
-          
+
           setSocialLinks({
             facebook: socialData.facebook || null,
             instagram: socialData.instagram || null,
             twitter: socialData.twitter || null
           });
         } else {
-         // console.log("No social media links found!");
+          // console.log("No social media links found!");
         }
       } catch (error) {
         console.error("Error fetching social media links:", error);
@@ -78,12 +78,12 @@ const Footer = () => {
           orderBy("createdAt", "desc"),
           limit(3)
         );
-        
+
         const blogsSnapshot = await getDocs(blogsQuery);
-        
+
         if (!blogsSnapshot.empty) {
           const blogs = [];
-          
+
           blogsSnapshot.forEach((doc) => {
             const data = doc.data();
             blogs.push({
@@ -92,7 +92,7 @@ const Footer = () => {
               date: data.date || "No date"
             });
           });
-          
+
           setLatestBlogs(blogs);
         } else {
           console.log("No blogs found!");
@@ -110,7 +110,7 @@ const Footer = () => {
   // Social media icon renderer
   const renderSocialIcon = (platform, iconClass) => {
     const url = socialLinks[platform];
-    
+
     if (url) {
       return (
         <a href={url} target="_blank" rel="noopener noreferrer">
@@ -125,18 +125,18 @@ const Footer = () => {
   // Format date function (optional, you can use this if you want to format the date)
   const formatDate = (dateString) => {
     if (!dateString) return "No date";
-    
+
     try {
       // If dateString is a timestamp object
       if (dateString.toDate) {
         const date = dateString.toDate();
-        return date.toLocaleDateString('en-US', { 
+        return date.toLocaleDateString('en-US', {
           day: 'numeric',
           month: 'short',
           year: 'numeric'
         });
       }
-      
+
       // If dateString is already a string
       return dateString;
     } catch (error) {
@@ -254,19 +254,20 @@ const Footer = () => {
 
       {/* 14th page */}
 
-      <div className="bg-[#EDF6FB] mt-3 w-full md:px-10 lg:justify-between md:p-5 py-5 md:flex-row">
-        <div className="flex justify-between">
-          <p className="text-[#048376] text-base">
+      <div className="bg-[#EDF6FB] mt-3 w-full py-5 px-4 md:px-10">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+          <p className="text-[#048376] text-base text-center sm:text-left">
             © {new Date().getFullYear()} UX/UI Team
           </p>
 
-          <div className="text-[#048376] flex md:gap-6">
+          <div className="text-[#048376] flex gap-4 order-3 sm:order-2">
             {renderSocialIcon('instagram', 'bi bi-instagram')}
-            {renderSocialIcon('twitter', 'bi bi-twitter ml-2')}
-            {renderSocialIcon('facebook', 'bi bi-facebook ml-2')}
+            {renderSocialIcon('twitter', 'bi bi-twitter')}
+            {renderSocialIcon('facebook', 'bi bi-facebook')}
           </div>
-          <div className="">
-            <p className="text-[#048376] text-base">All Rights Reserved</p>
+
+          <div className="order-2 sm:order-3">
+            <p className="text-[#048376] text-base text-center sm:text-right">All Rights Reserved</p>
           </div>
         </div>
       </div>

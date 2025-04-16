@@ -5,7 +5,7 @@ import "./Support.scss"
 const Support = ({num}) => {
   return (
     <div className="secSix">
-      <h1>Over {num} charities and good causes are need your support</h1>
+      <h1>Over {num} charities and good causes need your support</h1>
       <div className="imgCon">
         <img src={charitiesImg} alt="charitiesImg" />
       </div>

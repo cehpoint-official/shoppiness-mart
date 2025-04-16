@@ -290,9 +290,12 @@ const SupportACause = () => {
         <div className="py-16 px-4 md:px-12">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4 font-serif text-gray-800">
+              <h1 
+                className="text-4xl md:text-5xl font-bold text-gray-800 mb-4" 
+                style={{ fontFamily: "'Roboto Slab', serif" }}
+              >
                 All Causes and NGOs
-              </h2>
+              </h1>
               <p className="text-gray-600 max-w-2xl mx-auto">
                 Browse through our comprehensive list of verified causes and
                 NGOs that are making a positive impact in communities across the

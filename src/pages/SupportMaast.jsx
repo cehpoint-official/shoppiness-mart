@@ -1,7 +1,7 @@
 import FAQ from "../Components/FAQ";
 import OurEfforts from "../Components/OurEfforts";
 import PopularCauses from "../Components/PopularCauses/PopularCauses";
-import headerImg from "../assets/SupportMaast/header.png";
+// import headerImg from "../assets/SupportMaast/header.png";
 import page2 from "../assets/SupportMaast/page2.png";
 import page3 from "../assets/SupportMaast/page3.png";
 import { useState, useEffect } from "react";
@@ -15,25 +15,21 @@ const SupportMasst = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [bannerImage, setBannerImage] = useState(headerImg);
+  const [bannerImage, setBannerImage] = useState(null);
 
-  // Fetch banner image from Firebase
   useEffect(() => {
     const fetchBannerImage = async () => {
       try {
-        const bannerDocRef = doc(db, "maast", "banners");
-        const bannerDocSnap = await getDoc(bannerDocRef);
+        const docRef = doc(db, "content", "supportmaastBanners");
+        const docSnap = await getDoc(docRef);
         
-        if (bannerDocSnap.exists()) {
-          const bannerData = bannerDocSnap.data();
-          // Check if the banners document contains items and if there's at least one image
-          if (bannerData.items && bannerData.items.length > 0 && bannerData.items[0].url) {
-            setBannerImage(bannerData.items[0].url);
-          }
+        if (docSnap.exists() && docSnap.data().items && docSnap.data().items.length > 0) {
+          setBannerImage(docSnap.data().items[0].url);
+        } else {
+          console.error("No banner images found or document doesn't exist");
         }
       } catch (error) {
         console.error("Error fetching banner image:", error);
-        // If there's an error, we'll keep using the default headerImg
       }
     };
 
@@ -88,7 +84,7 @@ const SupportMasst = () => {
     <div className="overflow-hidden">
       {/* { 1st page } */}
       <div>
-        <img src={bannerImage} alt="Loading..." className="w-full h-full" />
+        <img src={bannerImage} alt="Loading..." className="w-full h-auto"/>
       </div>
 
       {/* { what is maast } */}

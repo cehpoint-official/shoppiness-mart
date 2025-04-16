@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
-import shopcard from "../assets/Shop/shopcard.png";
-import onlineShopHeader from "../assets/onlineShopHeader.png";
+// import shopcard from "../assets/Shop/shopcard.png";
+// import onlineShopHeader from "../assets/onlineShopHeader.png";
 import Loader from "../Components/Loader/Loader";
 import { FiSearch } from "react-icons/fi";
 import { Link, useParams } from "react-router-dom";
-import { collection, getDocs, addDoc, query, where, onSnapshot, serverTimestamp } from "firebase/firestore";
+import { collection, getDocs, addDoc, query, where, onSnapshot, serverTimestamp, doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 
 const OnlineShop = () => {
@@ -16,12 +16,29 @@ const OnlineShop = () => {
   const [serviceSearchTerm, setServiceSearchTerm] = useState("");
   const { userId } = useParams();
   const [transactions, setTransactions] = useState([]);
+  const [bannerImage, setBannerImage] = useState(null);
+
+  useEffect(() => {
+    const fetchBannerImage = async () => {
+      try {
+        const docRef = doc(db, "content", "onlineshopsBanners");
+        const docSnap = await getDoc(docRef);
+        
+        if (docSnap.exists() && docSnap.data().items && docSnap.data().items.length > 0) {
+          setBannerImage(docSnap.data().items[0].url);
+        } else {
+          console.error("No banner images found or document doesn't exist");
+        }
+      } catch (error) {
+        console.error("Error fetching banner image:", error);
+      }
+    };
+
+    fetchBannerImage();
+  }, []);
 
   useEffect(() => {
     const fetchStores = async () => {
-      // console.log("API URL:", `${import.meta.env.VITE_AWS_SERVER}/inrdeals/stores`);  
-      // ✅ Log the API URL
-
       try {
         const response = await fetch(
           `${import.meta.env.VITE_AWS_SERVER}/inrdeals/stores`
@@ -192,7 +209,7 @@ const OnlineShop = () => {
     <div className="overflow-hidde px-4">
       <div>
         <img
-          src={onlineShopHeader}
+          src={bannerImage}
           alt="Loading..."
           className="w-full h-auto px-0"
         />
