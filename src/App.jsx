@@ -133,6 +133,9 @@ const Dashboard = lazy(() =>
 const ShopInfo = lazy(() =>
   import("./Services-Dashboard/pages/ShopInfo/ShopInfo")
 );
+const BusinessCashbackDeals = lazy(() =>
+  import("./Services-Dashboard/pages/BusinessCashbackDeals/BusinessCashbackDeals")
+);
 const NgoDetails = lazy(() =>
   import("./NGO-Dashboard/pages/NgoDetails/NgoDetails")
 );
@@ -454,6 +457,7 @@ const router = createBrowserRouter([
           { path: "customers", element: <Customers /> },
           { path: "money-send", element: <AllMoneySendToPlatform /> },
           { path: "coupons", element: <GeneratedCoupons /> },
+          { path: "cashback", element: <BusinessCashbackDeals /> },
           { path: "shopinfo", element: <ShopInfo /> },
           { path: "pos", element: <MainPos /> },
           { path: "invoices", element: <Invoice /> },

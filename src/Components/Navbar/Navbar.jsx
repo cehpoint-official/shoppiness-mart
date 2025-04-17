@@ -152,6 +152,13 @@ const Navbar = () => {
           Online Shop
         </Link>
         <Link
+          to="/cashback-deals"
+          onClick={() => window.scrollTo(0, 0)}
+          className={getLinkClass("/cashback-deals")}
+        >
+          Cashback Deals
+        </Link>
+        <Link
           to="/howitworks"
           onClick={() => window.scrollTo(0, 0)}
           className={getLinkClass("/howitworks")}

@@ -3,6 +3,7 @@
   background-color: #048c7e;
   color: white;
   height: 100vh;
+  padding-bottom: 20px;
 
   .logo {
     font-size: 1.5rem;
@@ -20,7 +21,7 @@
     padding: 15px;
 
     li {
-      margin-bottom: 20px;
+      margin-bottom: 15px;
       cursor: pointer;
       display: flex;
       align-items: center;

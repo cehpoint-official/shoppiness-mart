@@ -4,6 +4,9 @@ import { useNavigate, useParams, Link, useLocation } from "react-router-dom";
 import { IoLogOutOutline, IoClose } from "react-icons/io5";
 import { HiMenuAlt2 } from "react-icons/hi";
 import { RiCoupon2Line } from "react-icons/ri";
+import { FaCashRegister } from "react-icons/fa"; // Added for cashback icon
+import { FiGift } from "react-icons/fi";
+
 import "./Sidebar.scss";
 import headerLogo from "../../assets/header-logo.png";
 import iconDashboard from "../../assets/icon-dashboard.png";
@@ -107,7 +110,7 @@ const Sidebar = () => {
       <div
         className={`sidebar ${
           isMobileMenuOpen ? "block  fixed top-0 left-0" : "hidden"
-        } lg:block h-full z-30`}
+        } lg:block h-full z-30 overflow-y-hidden`}
       >
         {/* Close button inside sidebar - only visible on mobile */}
         {isMobileMenuOpen && (
@@ -158,6 +161,13 @@ const Sidebar = () => {
             <li>
               <RiCoupon2Line className="w-5 h-5" />
               Generated Coupons
+            </li>
+          </Link>
+
+          <Link to={`/services-dashboard/${id}/cashback`}>
+            <li>
+              <FiGift className="w-5 h-5" />
+              Cashback Deals
             </li>
           </Link>
 
