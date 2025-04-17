@@ -16,6 +16,7 @@ const WebsiteEditPages = () => {
     registerBusiness: false,
     onlineShops: false,
     supportMaast: false,
+    cashbackDeals: false,
   });
   const [selectedComponent, setSelectedComponent] = useState(null);
   const [pageData, setPageData] = useState({
@@ -27,6 +28,7 @@ const WebsiteEditPages = () => {
     story: "",
     onlineShopsBanners: [],
     supportMaastBanners: [],
+    cashbackDealsBanners: [],
   });
   const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0); // Add refresh key
@@ -50,6 +52,7 @@ const WebsiteEditPages = () => {
         storyDoc,
         onlineShopsBanners,
         supportMaastBanners,
+        cashbackDealsBanners
       ] = await Promise.all([
         fetchContent("homeBanners"),
         fetchContent("homeVideos"),
@@ -59,6 +62,7 @@ const WebsiteEditPages = () => {
         getDoc(doc(db, "content", "story")),
         fetchContent("onlineshopsBanners"),
         fetchContent("supportmaastBanners"),
+        fetchContent("cashbackdealsBanners"),
       ]);
 
       setPageData({
@@ -70,6 +74,7 @@ const WebsiteEditPages = () => {
         story: storyDoc.exists() ? storyDoc.data().content : "",
         onlineShopsBanners,
         supportMaastBanners,
+        cashbackDealsBanners
       });
     } catch (error) {
       console.error("Error fetching website data:", error);
@@ -190,6 +195,14 @@ const WebsiteEditPages = () => {
           deleteBanner={(id) => deleteArrayItem("supportMaastBanners", id)}
           refreshData={() => setRefreshKey((prev) => prev + 1)}
           section="Support Maast"
+        />
+      ),
+      UploadCashbackDealsBanner: (
+        <UploadBanner
+          banners={pageData.cashbackDealsBanners}
+          deleteBanner={(id) => deleteArrayItem("cashbackDealsBanners", id)}
+          refreshData={() => setRefreshKey((prev) => prev + 1)}
+          section="Cashback Deals"
         />
       ),
       // Video components
@@ -421,6 +434,32 @@ const WebsiteEditPages = () => {
                 onClick={() => handleItemClick({ type: "UploadSupportMaastBanner" })}
               >
                 <AiOutlinePlus className="mr-2" /> Upload Support Maast Banner
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Cashback Deals Section */}
+        <div className="border rounded-lg overflow-hidden">
+          <div
+            className="flex justify-between items-center p-4 cursor-pointer"
+            onClick={() => toggleSection("cashbackDeals")}
+          >
+            <h2 className="text-lg font-medium">Cashback Deals</h2>
+            <div className="flex items-center space-x-2">
+              <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                {pageData.cashbackDealsBanners.length} banners
+              </span>
+              {openSections.cashbackDeals ? <AiOutlineMinus /> : <AiOutlinePlus />}
+            </div>
+          </div>
+          {openSections.cashbackDeals && (
+            <div className="p-4 border-t space-y-2">
+              <div
+                className="cursor-pointer text-blue-600 hover:text-blue-800 flex items-center"
+                onClick={() => handleItemClick({ type: "UploadCashbackDealsBanner" })}
+              >
+                <AiOutlinePlus className="mr-2" /> Upload Cashback Deals Banners
               </div>
             </div>
           )}

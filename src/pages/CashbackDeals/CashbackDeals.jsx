@@ -1,43 +1,57 @@
 import { useState, useEffect } from "react";
 import Carousel from "../../Components/Carousel/Carousel";
-import carousel1 from "../../assets/RegisterBusiness/carousel1.png";
 import { MdOutlineArrowRightAlt, MdStorefront } from "react-icons/md";
 import { FaShoppingCart } from "react-icons/fa";
 import { BsShop } from "react-icons/bs";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, doc, getDoc } from "firebase/firestore";
 import { db } from "../../../firebase";
 
 const CashbackDeals = () => {
   const [cashbackDeals, setCashbackDeals] = useState([]);
   const [offlineDeals, setOfflineDeals] = useState([]);
   const [onlineDeals, setOnlineDeals] = useState([]);
+  const [carouselImages, setCarouselImages] = useState([]);
   const [showAllOffline, setShowAllOffline] = useState(false);
   const [showAllOnline, setShowAllOnline] = useState(false);
 
   useEffect(() => {
-    const fetchDeals = async () => {
+    const fetchData = async () => {
       try {
+        // Fetch carousel images from db
+        const contentDocRef = doc(db, "content", "cashbackdealsBanners");
+        const contentDocSnap = await getDoc(contentDocRef);
+
+        if (contentDocSnap.exists()) {
+          const contentDocData = contentDocSnap.data() || {};
+          const sortedBanners = Object.values(contentDocData).sort((a, b) => {
+            return new Date(a.createdAt) - new Date(b.createdAt);
+          });                          
+
+          const topThreeBanners = sortedBanners[0].slice(0, 3).map(banner => banner.url);
+          setCarouselImages(topThreeBanners);
+        }
+
         const cashbackDealsRef = collection(db, "cashbackDeals");
         const querySnapshot = await getDocs(cashbackDealsRef);
-        
+
         const dealsData = querySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         }));
-        
+
         setCashbackDeals(dealsData);
-        
+
         const offline = dealsData.filter(deal => deal.shopMode === "Offline");
         const online = dealsData.filter(deal => deal.shopMode === "Online");
-        
+
         setOfflineDeals(offline);
         setOnlineDeals(online);
       } catch (error) {
-        console.error("Error fetching cashback deals:", error);
+        console.error("Error fetching data:", error);
       }
     };
 
-    fetchDeals();
+    fetchData();
   }, []);
 
   // Function to toggle showing all offline deals
@@ -79,7 +93,19 @@ const CashbackDeals = () => {
       <div className="flex flex-col gap-12">
         {/* Carousel Section */}
         <div className="w-full">
-          <Carousel img1={carousel1} img2={carousel1} img3={carousel1} />
+          {carouselImages.length > 0 ? (
+            <Carousel
+              img1={carouselImages[0]}
+              img2={carouselImages[1] || carouselImages[0]}
+              img3={carouselImages[2] || carouselImages[0]}
+              autoRotate={true}
+              rotationInterval={5000}
+            />
+          ) : (
+            <div className="w-full h-64 bg-gray-200 flex items-center justify-center rounded-lg">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+          )}
         </div>
 
         {/* Offline Deals Section */}
@@ -89,11 +115,11 @@ const CashbackDeals = () => {
               <BsShop className="text-blue-600 text-2xl" />
               <h2 className="text-xl font-semibold text-gray-800">Top Offline Deals</h2>
             </div>
-            <div 
+            <div
               className="flex items-center gap-2 text-blue-600 font-medium text-sm cursor-pointer hover:text-blue-700 transition-colors"
               onClick={toggleOfflineDeals}
             >
-              {showAllOffline ? "Show Less" : "View More"} 
+              {showAllOffline ? "Show Less" : "View More"}
               <MdOutlineArrowRightAlt className={`text-xl transition-transform duration-300 ${showAllOffline ? "rotate-90" : ""}`} />
             </div>
           </div>
@@ -103,15 +129,15 @@ const CashbackDeals = () => {
               {displayedOfflineDeals.map((deal, index) => (
                 <div key={index} className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 flex flex-col h-full">
                   <div className="relative h-52">
-                    <img 
-                      src={deal.productImage} 
-                      alt={deal.name} 
+                    <img
+                      src={deal.productImage}
+                      alt={deal.name}
                       className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                     />
                     <div className="absolute bottom-2 right-2 bg-white rounded-full w-10 h-10 flex items-center justify-center shadow-md">
-                      <img 
-                        src={deal.shopBanner} 
-                        alt={deal.shopName} 
+                      <img
+                        src={deal.shopBanner}
+                        alt={deal.shopName}
                         className="w-8 h-8 rounded-full object-cover"
                       />
                     </div>
@@ -155,11 +181,11 @@ const CashbackDeals = () => {
               <FaShoppingCart className="text-blue-600 text-xl" />
               <h2 className="text-xl font-semibold text-gray-800">Best Online Store Offers</h2>
             </div>
-            <div 
+            <div
               className="flex items-center gap-2 text-blue-600 font-medium text-sm cursor-pointer hover:text-blue-700 transition-colors"
               onClick={toggleOnlineDeals}
             >
-              {showAllOnline ? "Show Less" : "View More"} 
+              {showAllOnline ? "Show Less" : "View More"}
               <MdOutlineArrowRightAlt className={`text-xl transition-transform duration-300 ${showAllOnline ? "rotate-90" : ""}`} />
             </div>
           </div>
@@ -169,15 +195,15 @@ const CashbackDeals = () => {
               {displayedOnlineDeals.map((deal, index) => (
                 <div key={index} className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 flex flex-col h-full">
                   <div className="relative h-52">
-                    <img 
-                      src={deal.productImage} 
-                      alt={deal.name} 
+                    <img
+                      src={deal.productImage}
+                      alt={deal.name}
                       className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                     />
                     <div className="absolute bottom-2 right-2 bg-white rounded-full w-10 h-10 flex items-center justify-center shadow-md">
-                      <img 
-                        src={deal.shopBanner} 
-                        alt={deal.shopName} 
+                      <img
+                        src={deal.shopBanner}
+                        alt={deal.shopName}
                         className="w-8 h-8 rounded-full object-cover"
                       />
                     </div>
