@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CashbackForm from "../../Components/Chashback&Giveback/CashbackForm";
 import "./CashbackGiveback.scss";
 import GiveBackForm from "../../Components/Chashback&Giveback/GiveBackForm";
@@ -7,9 +7,12 @@ import CashbackRequests from "../../Components/Chashback&Giveback/CashbackReques
 import GiveBackHistory from "../../Components/Chashback&Giveback/GiveBackHistory";
 import WithdrawalForm from "../../Components/Chashback&Giveback/WithdrawalForm";
 import WithdrawlRequests from "../../Components/Chashback&Giveback/WithdrawlRequests";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import DisputeForm from "../../Components/Chashback&Giveback/DisputeForm";
 import DisputeRequest from "../../Components/Chashback&Giveback/DisputeRequest";
+import { collection, query, where, getDocs, doc, updateDoc } from "firebase/firestore";
+import { db } from "../../../firebase";
+import { userExist } from "../../redux/reducer/userReducer";
 
 const CashbackGiveback = () => {
   const [activeTab, setActiveTab] = useState("claim");
@@ -17,10 +20,111 @@ const CashbackGiveback = () => {
   const [showGiveBackHistory, setShowGiveBackHistory] = useState(false);
   const [showWithdrawalRequests, setShowWithdrawalRequests] = useState(false);
   const [showDisputeRequests, setShowDisputeRequests] = useState(false);
+  const [inrDealsCommission, setInrDealsCommission] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
   const { user } = useSelector((state) => state.userReducer);
+  const dispatch = useDispatch();
+  
   const handleTabClick = (tabValue) => {
     setActiveTab(tabValue);
   };
+
+  // Fetch INRDeals commission data from transactions
+  useEffect(() => {
+    const fetchINRDealsCommission = async () => {
+      if (!user?.uid) return;
+      
+      try {
+        setIsLoading(true);
+        const transactionsRef = collection(db, "transactions");
+        const q = query(
+          transactionsRef,
+          where("userId", "==", user.uid),
+          where("status", "==", "verified")
+        );
+        
+        const querySnapshot = await getDocs(q);
+        let totalCommission = 0;
+        
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          // Check different possible locations for commission
+          let commission = 0;
+          
+          if (data.inrdeals && typeof data.inrdeals.commission === 'number') {
+            commission = data.inrdeals.commission;
+          } else if (typeof data.commission === 'number') {
+            commission = data.commission;
+          } else if (typeof data.inrdealsCommission === 'number') {
+            commission = data.inrdealsCommission;
+          }
+          
+          totalCommission += commission;
+        });
+        
+        setInrDealsCommission(totalCommission);
+      } catch (error) {
+        console.error("Error fetching INRDeals commission:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchINRDealsCommission();
+  }, [user?.uid]);
+
+  // Fetch withdrawal requests and update pendingInrDealsCashback accordingly
+  useEffect(() => {
+    const checkWithdrawalRequests = async () => {
+      if (!user?.uid) return;
+      
+      try {
+        // Query WithdrawCashback collection for INRDeals withdrawal requests
+        const withdrawalRef = collection(db, "WithdrawCashback");
+        const q = query(
+          withdrawalRef,
+          where("userId", "==", user.uid),
+          where("cashbackType", "==", "INRDeals")
+        );
+        
+        const querySnapshot = await getDocs(q);
+        let pendingAmount = 0;
+        let hasCompletedWithdrawal = false;
+        
+        // Calculate pending amount from requests with "Pending" status
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          if (data.status === "Pending") {
+            pendingAmount += data.amount;
+          } else if (data.status === "Completed") {
+            hasCompletedWithdrawal = true;
+          }
+        });
+        
+        // If the current pendingInrDealsCashback doesn't match what we calculated
+        // or if there's a completed withdrawal but pendingInrDealsCashback isn't zero
+        if (user.pendingInrDealsCashback !== pendingAmount || 
+            (hasCompletedWithdrawal && user.pendingInrDealsCashback > 0 && pendingAmount === 0)) {
+          
+          // Update Firestore first
+          const userDocRef = doc(db, "users", user.uid);
+          await updateDoc(userDocRef, {
+            pendingInrDealsCashback: pendingAmount
+          });
+          
+          const updatedUser = {
+            ...user,
+            pendingInrDealsCashback: pendingAmount
+          };
+          dispatch(userExist(updatedUser));
+        }
+      } catch (error) {
+        console.error("Error checking withdrawal requests:", error);
+      }
+    };
+
+    checkWithdrawalRequests();
+  }, [user?.uid, user?.pendingInrDealsCashback, dispatch]);
 
   if (showCashbackRequests) {
     return (
@@ -127,6 +231,13 @@ const CashbackGiveback = () => {
           // link="View Details"
         />
         <CashbackCard
+          title="INRDeals Cash backs"
+          amount={inrDealsCommission}
+          pendingAmount={user?.pendingInrDealsCashback || 0}
+          isPendingInrDeals={true}
+          // link="View Details"
+        />
+        <CashbackCard
           title="Withdraw"
           amount={user?.withdrawAmount || 0}
           // link="View Details"
@@ -201,6 +312,7 @@ const CashbackCard = ({
   amount,
   pendingAmount,
   pendingGivebackAmount,
+  isPendingInrDeals = false,
   link,
 }) => {
   const isLoading = amount === undefined || amount === null;
@@ -231,7 +343,9 @@ const CashbackCard = ({
             {isPendingLoading ? (
               <div className="animate-pulse h-4 w-16 bg-amber-200 rounded"></div>
             ) : (
-              <>Pending Withdrawal: ₹{pendingAmount}</>
+              <>
+                Pending {isPendingInrDeals ? "INRDeals " : ""}Withdrawal: ₹{pendingAmount}
+              </>
             )}
           </div>
         )}
@@ -250,11 +364,13 @@ const CashbackCard = ({
       </div>
 
       {/* Link */}
-      <div className="mt-3">
-        <a href="#" className="text-blue-600 text-sm hover:underline">
-          {link}
-        </a>
-      </div>
+      {link && (
+        <div className="mt-3">
+          <a href="#" className="text-blue-600 text-sm hover:underline">
+            {link}
+          </a>
+        </div>
+      )}
     </div>
   );
 };

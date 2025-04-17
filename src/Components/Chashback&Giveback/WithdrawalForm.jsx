@@ -1,12 +1,4 @@
-import {
-  addDoc,
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  updateDoc,
-  increment,
-} from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, getDocs, updateDoc, increment, query, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { db } from "../../../firebase";
 import { useSelector } from "react-redux";
@@ -15,6 +7,7 @@ import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { userExist } from "../../redux/reducer/userReducer";
 import { BiLoaderAlt } from "react-icons/bi";
+
 const WithdrawalForm = () => {
   const [showPaymentSelection, setShowPaymentSelection] = useState(false);
   const [existingPayments, setExistingPayments] = useState({
@@ -27,8 +20,10 @@ const WithdrawalForm = () => {
   const [amount, setAmount] = useState("");
   const [isProcessingWithdrawal, setIsProcessingWithdrawal] = useState(false);
   const [loadingPayment, setLoadingPayment] = useState(true);
+  const [cashbackType, setCashbackType] = useState("shops"); // Default to shops
   const { userId } = useParams();
   const dispatch = useDispatch();
+
   useEffect(() => {
     const fetchAllPaymentMethods = async () => {
       if (!user?.uid) return;
@@ -118,70 +113,204 @@ const WithdrawalForm = () => {
       return;
     }
 
-    const docRef = doc(db, "users", userId);
-    const docSnap = await getDoc(docRef);
-
-    if (!docSnap.exists()) {
-      toast.error("Error fetching user data");
-      setIsProcessingWithdrawal(false);
-      return;
-    }
-
-    const userData = docSnap.data();
-    const availableCashback = userData.collectedCashback || 0;
-
-    if (Number(amount) > availableCashback) {
-      toast.error("Insufficient cashback balance");
-      setIsProcessingWithdrawal(false);
-      return;
-    }
-
     try {
-      // Store the withdrawal request with status "Pending"
-      await addDoc(collection(db, "WithdrawCashback"), {
-        userId,
-        userName: user.fname + " " + user.lname,
-        userEmail: user.email,
-        amount: Number(amount),
-        selectedPayment,
-        status: "Pending",
-        requestedAt: new Date().toISOString(),
-      });
-
       const numAmount = Number(amount);
 
-      // Update Firestore
-      await updateDoc(docRef, {
-        collectedCashback: increment(-numAmount),
-        pendingCashback: increment(numAmount),
-      });
-      // Add notification to adminNotifications collection
-      await addDoc(collection(db, "adminNotifications"), {
-      message: `New Withdrawal request from ${user.fname} ${user.lname} for amount ${numAmount} .`,
-      createdAt: new Date().toISOString(),
-      read: false,
-    });
-      // Update Redux state immediately
-      const updatedUser = {
-        ...user,
-        collectedCashback: (user.collectedCashback || 0) - numAmount,
-        pendingCashback: (user.pendingCashback || 0) + numAmount,
-      };
-      dispatch(userExist(updatedUser));
+      if (cashbackType === "INRDeals") {
+        // Process INRDeals cashback withdrawal
+        await processINRDealsWithdrawal(numAmount);
+      } else {
+        // Process regular shop cashback withdrawal
+        await processRegularWithdrawal(numAmount);
+      }
 
       toast.success("Withdrawal request submitted successfully!");
       setAmount("");
     } catch (error) {
       console.error("Error processing withdrawal:", error);
-      toast.error("Something went wrong");
+      toast.error(error.message || "Something went wrong");
     } finally {
       setIsProcessingWithdrawal(false);
     }
   };
 
+  const processRegularWithdrawal = async (numAmount) => {
+    const docRef = doc(db, "users", userId);
+    const docSnap = await getDoc(docRef);
+
+    if (!docSnap.exists()) {
+      throw new Error("Error fetching user data");
+    }
+
+    const userData = docSnap.data();
+    const availableCashback = userData.collectedCashback || 0;
+
+    if (numAmount > availableCashback) {
+      throw new Error("Insufficient cashback balance");
+    }
+
+    // Store the withdrawal request with status "Pending"
+    await addDoc(collection(db, "WithdrawCashback"), {
+      userId,
+      userName: user.fname + " " + user.lname,
+      userEmail: user.email,
+      amount: numAmount,
+      selectedPayment,
+      status: "Pending",
+      cashbackType: "shops",
+      requestedAt: new Date().toISOString(),
+    });
+
+    // Update Firestore
+    await updateDoc(docRef, {
+      collectedCashback: increment(-numAmount),
+      pendingCashback: increment(numAmount),
+    });
+
+    // Add notification to adminNotifications collection
+    await addDoc(collection(db, "adminNotifications"), {
+      message: `New Withdrawal request from ${user.fname} ${user.lname} for amount ${numAmount}.`,
+      createdAt: new Date().toISOString(),
+      read: false,
+    });
+
+    // Update Redux state immediately
+    const updatedUser = {
+      ...user,
+      collectedCashback: (user.collectedCashback || 0) - numAmount,
+      pendingCashback: (user.pendingCashback || 0) + numAmount,
+    };
+    dispatch(userExist(updatedUser));
+  };
+
+  const processINRDealsWithdrawal = async (numAmount) => {
+    // Query transactions collection for verified INRDeals transactions
+    const transactionsRef = collection(db, "transactions");
+    const q = query(
+      transactionsRef,
+      where("userId", "==", user.uid),
+      where("status", "==", "verified")
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      throw new Error("No verified INRDeals transactions found");
+    }
+
+    // Get all transactions with commission and sort by commission amount
+    const transactions = [];
+    let totalAvailableCommission = 0;
+
+    querySnapshot.forEach((doc) => {
+      const transaction = doc.data();
+      let commission = 0;
+      
+      // Check for commission in different possible locations
+      if (transaction.inrdeals && typeof transaction.inrdeals.commission === 'number') {
+        commission = transaction.inrdeals.commission;
+      } else if (typeof transaction.commission === 'number') {
+        commission = transaction.commission;
+      } else if (typeof transaction.inrdealsCommission === 'number') {
+        commission = transaction.inrdealsCommission;
+      }
+
+      if (commission > 0) {
+        totalAvailableCommission += commission;
+        transactions.push({
+          id: doc.id,
+          commission: commission,
+          data: transaction
+        });
+      }
+    });
+
+    if (numAmount > totalAvailableCommission) {
+      throw new Error(`Insufficient INRDeals cashback balance. Available: ${totalAvailableCommission}, Requested: ${numAmount}`);
+    }
+
+    // Store the withdrawal request with status "Pending"
+    await addDoc(collection(db, "WithdrawCashback"), {
+      userId,
+      userName: user.fname + " " + user.lname,
+      userEmail: user.email,
+      amount: numAmount,
+      selectedPayment,
+      status: "Pending",
+      cashbackType: "INRDeals",
+      requestedAt: new Date().toISOString(),
+    });
+
+    // Update user document to track pending INRDeals cashback separately
+    const userDocRef = doc(db, "users", userId);
+    await updateDoc(userDocRef, {
+      pendingInrDealsCashback: increment(numAmount),
+    });
+
+    // Deduct the amount from transaction commissions, spreading across multiple transactions if needed
+    let remainingAmount = numAmount;
+    
+    // Sort transactions by commission amount (descending)
+    transactions.sort((a, b) => b.commission - a.commission);
+    
+    for (const transaction of transactions) {
+      if (remainingAmount <= 0) break;
+      
+      const transactionRef = doc(db, "transactions", transaction.id);
+      const amountToDeduct = Math.min(remainingAmount, transaction.commission);
+      
+      // Determine which field to update based on where the commission is stored
+      const data = transaction.data;
+      if (data.inrdeals && typeof data.inrdeals.commission === 'number') {
+        await updateDoc(transactionRef, {
+          "inrdeals.commission": increment(-amountToDeduct),
+          "inrdeals.withdrawnCommission": increment(amountToDeduct)
+        });
+      } else if (typeof data.commission === 'number') {
+        await updateDoc(transactionRef, {
+          "commission": increment(-amountToDeduct),
+          "withdrawnCommission": increment(amountToDeduct)
+        });
+      } else if (typeof data.inrdealsCommission === 'number') {
+        await updateDoc(transactionRef, {
+          "inrdealsCommission": increment(-amountToDeduct),
+          "withdrawnInrdealsCommission": increment(amountToDeduct)
+        });
+      }
+      
+      remainingAmount -= amountToDeduct;
+    }
+
+    // Add notification to adminNotifications collection
+    await addDoc(collection(db, "adminNotifications"), {
+      message: `New INRDeals Withdrawal request from ${user.fname} ${user.lname} for amount ${numAmount}.`,
+      createdAt: new Date().toISOString(),
+      read: false,
+    });
+
+    // Update Redux state immediately with the new pending INRDeals cashback
+    const updatedUser = {
+      ...user,
+      pendingInrDealsCashback: (user.pendingInrDealsCashback || 0) + numAmount,
+    };
+    dispatch(userExist(updatedUser));
+  };
+
   return (
     <div className="relative">
       <form className="space-y-4 max-w-md" onSubmit={handleSubmit}>
+        <div>
+          <label className="block text-sm mb-2">Cashback Type</label>
+          <select
+            className="w-full bg-gray-200 rounded p-2 text-sm border-0"
+            value={cashbackType}
+            onChange={(e) => setCashbackType(e.target.value)}
+          >
+            <option value="shops">Shops</option>
+            <option value="INRDeals">INRDeals</option>
+          </select>
+        </div>
+
         <div>
           <label className="block text-sm mb-2">Enter Amount</label>
           <input
@@ -238,9 +367,8 @@ const WithdrawalForm = () => {
                     className="flex justify-between items-center p-2 hover:bg-gray-100 rounded cursor-pointer"
                     onClick={() => handlePaymentSelection(card)}
                   >
-                    <span className="text-sm">{`${
-                      card.cardHolder
-                    } - XXXX${card.cardNumber.slice(-4)}`}</span>
+                    <span className="text-sm">{`${card.cardHolder
+                      } - XXXX${card.cardNumber.slice(-4)}`}</span>
                   </div>
                 ))}
               </div>
@@ -268,7 +396,6 @@ const WithdrawalForm = () => {
           disabled={isProcessingWithdrawal}
           className="w-full flex justify-center items-center gap-3 bg-blue-700 text-white rounded py-2 text-md mt-6"
         >
-          {" "}
           {isProcessingWithdrawal ? (
             <>
               <BiLoaderAlt className="w-5 h-5 animate-spin" />
