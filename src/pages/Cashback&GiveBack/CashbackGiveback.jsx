@@ -231,7 +231,7 @@ const CashbackGiveback = () => {
           // link="View Details"
         />
         <CashbackCard
-          title="INRDeals Cash backs"
+          title="Deals Cash backs"
           amount={inrDealsCommission}
           pendingAmount={user?.pendingInrDealsCashback || 0}
           isPendingInrDeals={true}
@@ -344,7 +344,7 @@ const CashbackCard = ({
               <div className="animate-pulse h-4 w-16 bg-amber-200 rounded"></div>
             ) : (
               <>
-                Pending {isPendingInrDeals ? "INRDeals " : ""}Withdrawal: ₹{pendingAmount}
+                Pending {isPendingInrDeals ? "Deals " : ""}Withdrawal: ₹{pendingAmount}
               </>
             )}
           </div>

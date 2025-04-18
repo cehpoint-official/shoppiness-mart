@@ -283,7 +283,7 @@ const WithdrawalForm = () => {
 
     // Add notification to adminNotifications collection
     await addDoc(collection(db, "adminNotifications"), {
-      message: `New INRDeals Withdrawal request from ${user.fname} ${user.lname} for amount ${numAmount}.`,
+      message: `New Deals Withdrawal request from ${user.fname} ${user.lname} for amount ${numAmount}.`,
       createdAt: new Date().toISOString(),
       read: false,
     });
@@ -307,7 +307,7 @@ const WithdrawalForm = () => {
             onChange={(e) => setCashbackType(e.target.value)}
           >
             <option value="shops">Shops</option>
-            <option value="INRDeals">INRDeals</option>
+            <option value="INRDeals">Deals</option>
           </select>
         </div>
 

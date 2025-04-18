@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 // import shopcard from "../assets/Shop/shopcard.png";
 // import onlineShopHeader from "../assets/onlineShopHeader.png";
 import Loader from "../Components/Loader/Loader";
+import Carousel from "../Components/Carousel/Carousel";
 import { FiSearch } from "react-icons/fi";
 import { Link, useParams } from "react-router-dom";
 import { collection, getDocs, addDoc, query, where, onSnapshot, serverTimestamp, doc, getDoc } from "firebase/firestore";
@@ -16,18 +17,23 @@ const OnlineShop = () => {
   const [serviceSearchTerm, setServiceSearchTerm] = useState("");
   const { userId } = useParams();
   const [transactions, setTransactions] = useState([]);
-  const [bannerImage, setBannerImage] = useState(null);
+  const [carouselImages, setCarouselImages] = useState([]);
 
   useEffect(() => {
     const fetchBannerImage = async () => {
       try {
-        const docRef = doc(db, "content", "onlineshopsBanners");
-        const docSnap = await getDoc(docRef);
-        
-        if (docSnap.exists() && docSnap.data().items && docSnap.data().items.length > 0) {
-          setBannerImage(docSnap.data().items[0].url);
-        } else {
-          console.error("No banner images found or document doesn't exist");
+        // Fetch carousel images from db
+        const contentDocRef = doc(db, "content", "onlineshopsBanners");
+        const contentDocSnap = await getDoc(contentDocRef);
+
+        if (contentDocSnap.exists()) {
+          const contentDocData = contentDocSnap.data() || {};
+          const sortedBanners = Object.values(contentDocData).sort((a, b) => {
+            return new Date(a.createdAt) - new Date(b.createdAt);
+          });
+
+          const topThreeBanners = sortedBanners[0].slice(0, 3).map(banner => banner.url);
+          setCarouselImages(topThreeBanners);
         }
       } catch (error) {
         console.error("Error fetching banner image:", error);
@@ -206,13 +212,22 @@ const OnlineShop = () => {
   return loading ? (
     <Loader />
   ) : (
-    <div className="overflow-hidde px-4">
-      <div>
-        <img
-          src={bannerImage}
-          alt="Loading..."
-          className="w-full h-auto px-0"
-        />
+    <div className="overflow-hidden px-4">
+      {/* Carousel Section */}
+      <div className="w-full">
+        {carouselImages.length > 0 ? (
+          <Carousel
+            img1={carouselImages[0]}
+            img2={carouselImages[1] || carouselImages[0]}
+            img3={carouselImages[2] || carouselImages[0]}
+            autoRotate={true}
+            rotationInterval={5000}
+          />
+        ) : (
+          <div className="w-full h-64 bg-gray-200 flex items-center justify-center rounded-lg">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          </div>
+        )}
       </div>
       <div className="flex flex-col md:flex-row items-center justify-between py-4 bg-white shadow-sm">
         <div className="flex flex-wrap items-center gap-2 mb-4 md:mb-0">

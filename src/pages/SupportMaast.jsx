@@ -5,6 +5,7 @@ import PopularCauses from "../Components/PopularCauses/PopularCauses";
 import page2 from "../assets/SupportMaast/page2.png";
 import page3 from "../assets/SupportMaast/page3.png";
 import { useState, useEffect } from "react";
+import Carousel from "../Components/Carousel/Carousel";
 import DonationDialog from "../Components/DonationDialog";
 import { collection, getDocs, doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase";
@@ -15,18 +16,23 @@ const SupportMasst = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [bannerImage, setBannerImage] = useState(null);
+  const [carouselImages, setCarouselImages] = useState([]);
 
   useEffect(() => {
     const fetchBannerImage = async () => {
       try {
-        const docRef = doc(db, "content", "supportmaastBanners");
-        const docSnap = await getDoc(docRef);
-        
-        if (docSnap.exists() && docSnap.data().items && docSnap.data().items.length > 0) {
-          setBannerImage(docSnap.data().items[0].url);
-        } else {
-          console.error("No banner images found or document doesn't exist");
+        // Fetch carousel images from db
+        const contentDocRef = doc(db, "content", "supportmaastBanners");
+        const contentDocSnap = await getDoc(contentDocRef);
+
+        if (contentDocSnap.exists()) {
+          const contentDocData = contentDocSnap.data() || {};
+          const sortedBanners = Object.values(contentDocData).sort((a, b) => {
+            return new Date(a.createdAt) - new Date(b.createdAt);
+          });
+
+          const topThreeBanners = sortedBanners[0].slice(0, 3).map(banner => banner.url);
+          setCarouselImages(topThreeBanners);
         }
       } catch (error) {
         console.error("Error fetching banner image:", error);
@@ -48,19 +54,14 @@ const SupportMasst = () => {
         }));
         
         // Sort events by displayDate (earlier dates first)
-        // This assumes displayDate is in a format that can be compared lexicographically
-        // If displayDate is not in a sortable format, you may need to parse it to Date objects
         const sortedEvents = eventsList.sort((a, b) => {
-          // Try to parse dates if they're in a standard format
           const dateA = new Date(a.displayDate);
           const dateB = new Date(b.displayDate);
           
-          // If both dates are valid, compare them
           if (!isNaN(dateA) && !isNaN(dateB)) {
             return dateA - dateB;
           }
           
-          // Fallback to string comparison if parsing fails
           return a.displayDate.localeCompare(b.displayDate);
         });
         
@@ -82,9 +83,21 @@ const SupportMasst = () => {
   
   return (
     <div className="overflow-hidden">
-      {/* { 1st page } */}
-      <div>
-        <img src={bannerImage} alt="Loading..." className="w-full h-auto"/>
+      {/* Carousel Section */}
+      <div className="w-full">
+        {carouselImages.length > 0 ? (
+          <Carousel
+            img1={carouselImages[0]}
+            img2={carouselImages[1] || carouselImages[0]}
+            img3={carouselImages[2] || carouselImages[0]}
+            autoRotate={true}
+            rotationInterval={5000}
+          />
+        ) : (
+          <div className="w-full h-64 bg-gray-200 flex items-center justify-center rounded-lg">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          </div>
+        )}
       </div>
 
       {/* { what is maast } */}
