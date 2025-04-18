@@ -248,6 +248,12 @@ const UserDashboardNav = ({ profilePic, userId }) => {
             Online Shops
           </Link>
           <Link
+            to={`/user-dashboard/${userId}/cashback-deals`}
+            className="text-white text-lg font-poppins"
+          >
+            Cashback Deals
+          </Link>
+          <Link
             to={`/user-dashboard/${userId}/howitworks`}
             className="text-white text-lg font-poppins"
           >

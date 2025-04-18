@@ -229,7 +229,13 @@ const ProductDetails = () => {
             <div className="space-y-2 flex items-center gap-4">
               <p className="text-gray-700">Get cashback by generating Coupon</p>
               <button
-                onClick={() => setShowDialog(true)}
+                onClick={() => {
+                  if (user) {
+                    setShowDialog(true);
+                  } else {
+                    toast.error("Please login as user to generate coupon");
+                  }
+                }}
                 className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-colors"
               >
                 Generate Coupon

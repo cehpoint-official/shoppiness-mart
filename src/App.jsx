@@ -103,6 +103,7 @@ const HowItWorks = lazy(() => import("./pages/HowItWorks/HowItWorks"));
 const Cashback = lazy(() => import("./pages/Cashback"));
 const Shop = lazy(() => import("./pages/Shop"));
 const CashbackDeals = lazy(() => import("./pages/CashbackDeals/CashbackDeals"));
+const CashbackDealsDetails = lazy(() => import("./pages/CashbackDeals/CashbackDealsDetails"));
 const BusinessForm = lazy(() => import("./pages/BusinessForm/BusinessForm"));
 const CauseForm = lazy(() => import("./pages/CauseForm/CauseForm"));
 const ContactUs = lazy(() => import("./pages/ContactUs"));
@@ -264,6 +265,7 @@ const router = createBrowserRouter([
           { path: "/howitworks", element: <HowItWorks /> },
           { path: "/cashback-charity", element: <Cashback /> },
           { path: "/cashback-deals", element: <CashbackDeals /> },
+          { path: "/cashback-deals/:category/:businessId", element: <CashbackDealsDetails /> },
           { path: "/offline-shop", element: <OfflineShop /> },
           { path: "/offline-shop/:category", element: <CatagoryBasedShops /> },
           {
@@ -322,6 +324,13 @@ const router = createBrowserRouter([
           {
             path: "/user-dashboard/:userId/offline-shop",
             element: <OfflineShop />,
+          },
+          { 
+            path: "/user-dashboard/:userId/cashback-deals", 
+            element: <CashbackDeals /> },
+          { 
+            path: "/user-dashboard/:userId/cashback-deals/:category/:businessId", 
+            element: <CashbackDealsDetails /> 
           },
           {
             path: "/user-dashboard/:userId/offline-shop/:category",

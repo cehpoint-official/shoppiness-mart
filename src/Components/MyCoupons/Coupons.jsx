@@ -41,8 +41,10 @@ const Coupons = () => {
   };
 
   const getOfferText = (coupon) => {
-    if (coupon.productDiscount) {
+    if (coupon.productDiscount && coupon.businessRate) {
       return `Enjoy ${coupon.productDiscount}% Off In-Store ${coupon.productName} Purchase + ${coupon.userCashback}% Cashback at Shoppiness Mart!`;
+    } else if (coupon.productDiscount) {
+      return `Enjoy ${coupon.productDiscount}% Off In-Store ${coupon.productName} Purchase at Shoppiness Mart!`;
     }
     return `For all purchase from ${coupon.businessName} you will get ${coupon.userCashback}% Cashback at Shoppiness Mart!`;
   };

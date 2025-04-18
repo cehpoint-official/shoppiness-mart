@@ -1,12 +1,18 @@
 import { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import Carousel from "../../Components/Carousel/Carousel";
 import { MdOutlineArrowRightAlt, MdStorefront } from "react-icons/md";
 import { FaShoppingCart } from "react-icons/fa";
 import { BsShop } from "react-icons/bs";
 import { collection, getDocs, doc, getDoc } from "firebase/firestore";
 import { db } from "../../../firebase";
+import { useSelector } from "react-redux";
 
 const CashbackDeals = () => {
+  const location = useLocation();
+  const { user } = useSelector((state) => state.userReducer);
+  const userId = user?.uid || "";
+
   const [cashbackDeals, setCashbackDeals] = useState([]);
   const [offlineDeals, setOfflineDeals] = useState([]);
   const [onlineDeals, setOnlineDeals] = useState([]);
@@ -160,9 +166,16 @@ const CashbackDeals = () => {
                         {formatCashback(deal.cashbackAmount, deal.cashbackType)}
                       </div>
                     </div>
-                    <button className="w-full py-2 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition-colors text-lg">
+                    <Link
+                      to={
+                        location.pathname.includes("/user-dashboard")
+                          ? `/user-dashboard/${userId}/cashback-deals/${deal.productCategory}/${deal.businessId}`
+                          : `/cashback-deals/${deal.productCategory}/${deal.businessId}`
+                      }
+                      className="w-full py-2 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition-colors text-lg flex items-center justify-center"
+                    >
                       View Deal
-                    </button>
+                    </Link>
                   </div>
                 </div>
               ))}
@@ -226,9 +239,16 @@ const CashbackDeals = () => {
                         {formatCashback(deal.cashbackAmount, deal.cashbackType)}
                       </div>
                     </div>
-                    <button className="w-full py-2 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition-colors text-lg">
+                    <Link
+                      to={
+                        location.pathname.includes("/user-dashboard")
+                          ? `/user-dashboard/${userId}/cashback-deals/${deal.productCategory}/${deal.businessId}`
+                          : `/cashback-deals/${deal.productCategory}/${deal.businessId}`
+                      }
+                      className="w-full py-2 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition-colors text-lg flex items-center justify-center"
+                    >
                       Shop Now
-                    </button>
+                    </Link>
                   </div>
                 </div>
               ))}

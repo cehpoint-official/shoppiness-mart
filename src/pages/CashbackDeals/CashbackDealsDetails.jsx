@@ -1,0 +1,616 @@
+import { doc, getDoc, collection, getDocs, addDoc, where, query} from "firebase/firestore";
+import { useEffect, useState } from "react";
+import { useLocation, useParams } from "react-router-dom";
+import { db } from "../../../firebase";
+import toast from "react-hot-toast";
+import Loader from "../../Components/Loader/Loader";
+import { AiOutlineLoading3Quarters, AiOutlineCopy, AiOutlineSave, AiOutlinePercentage, AiOutlineShop, AiOutlineDollar } from "react-icons/ai";
+import { useSelector } from "react-redux";
+
+const CashbackDealsDetails = () => {
+	const location = useLocation();
+	const { user } = useSelector((state) => state.userReducer);
+	const userId = user?.uid || "";
+	const { category, businessId } = useParams();
+
+	const [loading, setLoading] = useState(true);
+	const [cashbackDeal, setCashbackDeal] = useState(null);
+	const [business, setBusiness] = useState(null);
+	const [showDialog, setShowDialog] = useState(false);
+	const [showCouponDialog, setShowCouponDialog] = useState(false);
+	const [generatingCoupon, setGeneratingCoupon] = useState(false);
+	const [savingCoupon, setSavingCoupon] = useState(false);
+	const [generatedCouponCode, setGeneratedCouponCode] = useState("");
+	const [relatedDeals, setRelatedDeals] = useState([]);
+
+	// Get state data
+	const causeData = location.state || {};
+
+	const [formData, setFormData] = useState({
+		fullName: "",
+		email: "",
+		phoneNumber: "",
+	});
+
+	const handleInputChange = (e) => {
+		const { name, value } = e.target;
+		setFormData((prev) => ({
+			...prev,
+			[name]: value,
+		}));
+	};
+
+	const generateUniqueCouponCode = async (shopName) => {
+		const specialChars = ["#", "@", "$", "&", "*"];
+		const randomSpecialChar =
+			specialChars[Math.floor(Math.random() * specialChars.length)];
+		const randomDigits = Math.floor(Math.random() * 90000) + 10000; // 5 digit number
+		const cleanShopName = shopName
+			.replace(/[^a-zA-Z0-9]/g, "")
+			.toUpperCase()
+			.substring(0, 5);
+		const couponCode = `${randomSpecialChar}${cleanShopName}${randomDigits}`;
+
+		// Check if the coupon code already exists in the database
+		const couponQuery = await getDocs(
+			query(collection(db, "coupons"), where("code", "==", couponCode))
+		);
+		if (!couponQuery.empty) {
+			// If the code exists, recursively generate a new one
+			return generateUniqueCouponCode(shopName);
+		}
+
+		return couponCode;
+	};
+
+	const validateForm = () => {
+		const { fullName, email, phoneNumber } = formData;
+		if (!fullName || !email || !phoneNumber) {
+			toast.error("All fields are required");
+			return false;
+		}
+		if (!/^\d{10}$/.test(phoneNumber)) {
+			toast.error("Phone number must be 10 digits");
+			return false;
+		}
+		if (!/\S+@\S+\.\S+/.test(email)) {
+			toast.error("Invalid email address");
+			return false;
+		}
+		return true;
+	};
+
+	const handleSubmit = async (e) => {
+		e.preventDefault();
+		if (!validateForm()) return;
+
+		setGeneratingCoupon(true);
+		try {
+			const couponCode = await generateUniqueCouponCode(cashbackDeal.shopName);
+			setGeneratedCouponCode(couponCode);
+			setShowDialog(false);
+			setShowCouponDialog(true);
+		} catch (error) {
+			toast.error("Failed to generate coupon");
+			console.error("Error generating coupon:", error);
+		} finally {
+			setGeneratingCoupon(false);
+		}
+	};
+
+	const handleCouponButtonClick = () => {
+		if (!user) {
+			toast.error("Please login as user to generate coupon");
+			return;
+		}
+		setShowDialog(true);
+	};
+
+	const handleCopyCode = () => {
+		navigator.clipboard.writeText(generatedCouponCode);
+		toast.success("Coupon code copied to clipboard!");
+	};
+
+	const handleSaveCoupon = async () => {
+		setSavingCoupon(true);
+
+		try {
+			if (!businessId || !userId || !generatedCouponCode) {
+				toast.error("Missing required data to save coupon");
+				return;
+			}
+
+			// Prepare the coupon data object
+			const couponData = {
+				...formData,
+				businessId,
+				userId,
+				createdAt: new Date().toLocaleDateString("en-GB", {
+					day: "numeric",
+					month: "short",
+					year: "numeric",
+				}),
+				productDiscount: cashbackDeal.cashbackAmount,
+				// userCashback: parseInt(cashbackDeal.cashbackAmount) / 2,
+				// platformEarnings: parseInt(cashbackDeal.cashbackAmount) / 2,
+				code: generatedCouponCode,
+				businessName: cashbackDeal.shopName,
+				productId: cashbackDeal.productId,
+				productName: cashbackDeal.productName,
+				productImage: cashbackDeal.productImage,
+				productPrice: cashbackDeal.productPrice,
+				userProfilePic: user.profilePic || "",
+				status: "Pending",
+			};
+
+			// Add cause data if it exists
+			if (Object.keys(causeData).length > 0) {
+				couponData.causeData = {
+					causeName: causeData.causeName || "",
+					causeId: causeData.causeId || "",
+					paymentDetails: causeData.paymentDetails || null,
+				};
+			}
+
+			// Save to coupons collection
+			await addDoc(collection(db, "coupons"), couponData);
+
+			// Add notification to business notifications
+			await addDoc(collection(db, "businessNotifications"), {
+				businessId: businessId,
+				message: `New coupon generated by ${formData.fullName} for ${cashbackDeal.productName}. Coupon Code: ${generatedCouponCode}`,
+				createdAt: new Date().toISOString(),
+				read: false,
+			});
+
+			toast.success("Coupon saved successfully!");
+			setShowCouponDialog(false);
+			setFormData({
+				fullName: "",
+				email: "",
+				phoneNumber: "",
+			});
+		} catch (error) {
+			toast.error("Failed to save coupon");
+			console.error("Error saving coupon:", error);
+		} finally {
+			setSavingCoupon(false);
+		}
+	};
+
+	const fetchCashbackDealDetails = async () => {
+		setLoading(true);
+		try {
+			const querySnapshot = await getDocs(collection(db, "cashbackDeals"));
+			let deal = null;
+
+			querySnapshot.forEach((doc) => {
+				const data = doc.data();
+				if (data.businessId === businessId && data.productCategory === category) {
+					deal = { id: doc.id, ...data };
+				}
+			});
+
+			if (deal) {
+				setCashbackDeal(deal);
+				fetchBusinessDetails(deal.businessId);
+				fetchRelatedDeals(deal.productCategory, deal.id);
+			} else {
+				toast.error("Cashback deal not found");
+				setLoading(false);
+			}
+		} catch (error) {
+			console.error("Error getting cashback deal details: ", error);
+			toast.error("Failed to load cashback deal details");
+			setLoading(false);
+		}
+	};
+
+	const fetchBusinessDetails = async (id) => {
+		try {
+			const businessRef = doc(db, "businessDetails", id);
+			const businessDoc = await getDoc(businessRef);
+
+			if (businessDoc.exists()) {
+				setBusiness({ id: businessDoc.id, ...businessDoc.data() });
+			} else {
+				toast.error("Business details not found");
+			}
+			setLoading(false);
+		} catch (error) {
+			console.error("Error getting business details: ", error);
+			toast.error("Failed to load business details");
+			setLoading(false);
+		}
+	};
+
+	const fetchRelatedDeals = async (dealCategory, currentDealId) => {
+		try {
+			const querySnapshot = await getDocs(collection(db, "cashbackDeals"));
+			const deals = [];
+			querySnapshot.forEach((doc) => {
+				const data = doc.data();
+				if (data.productCategory === dealCategory && doc.id !== currentDealId) {
+					deals.push({ id: doc.id, ...data });
+				}
+			});
+			setRelatedDeals(deals.slice(0, 3)); // Limit to 3 related deals
+		} catch (error) {
+			console.error("Error getting related deals: ", error);
+		}
+	};
+
+	useEffect(() => {
+		if (businessId && category) {
+			fetchCashbackDealDetails();
+		}
+	}, [businessId, category]);
+
+	if (loading) {
+		return <Loader />;
+	}
+
+	if (!cashbackDeal) {
+		return (
+			<div className="max-w-7xl mx-auto px-4 py-8 text-center">
+				<h2 className="text-2xl font-semibold text-gray-800">Deal not found</h2>
+				<p className="text-gray-600 mt-2">The cashback deal you're looking for doesn't exist or has been removed.</p>
+			</div>
+		);
+	}
+
+	return (
+		<div className="max-w-7xl mx-auto px-4 py-8">
+			{/* Hero Section */}
+			<div className="relative rounded-2xl overflow-hidden mb-8 shadow-lg">
+				<div className="absolute inset-0">
+					<img
+						src={cashbackDeal.shopBanner}
+						alt={cashbackDeal.shopName}
+						className="w-full h-full object-cover"
+					/>
+					<div className="absolute inset-0 bg-gradient-to-b from-black/70 to-black/30"></div>
+				</div>
+
+				<div className="relative z-10 p-8 md:p-12 flex flex-col md:flex-row items-center">
+					<div className="w-full md:w-1/2 flex flex-col items-center md:items-start text-center md:text-left">
+						<span className="bg-blue-600 text-white px-4 py-1 rounded-full text-sm mb-4">
+							{cashbackDeal.shopMode} Deal
+						</span>
+						<h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
+							{cashbackDeal.productName}
+						</h1>
+						<div className="text-white/90 text-lg mb-6">
+							From <span className="font-semibold">{cashbackDeal.shopName}</span>
+						</div>
+
+						<div className="flex flex-wrap gap-4 mb-6">
+							<div className="bg-white/20 backdrop-blur-sm rounded-lg p-3 text-white">
+								<div className="text-sm opacity-80">Price</div>
+								<div className="font-bold">₹{cashbackDeal.productPrice}</div>
+							</div>
+
+							<div className="bg-green-500/80 backdrop-blur-sm rounded-lg p-3 text-white">
+								<div className="text-sm opacity-90">Cashback</div>
+								<div className="font-bold flex items-center">
+									{cashbackDeal.cashbackAmount}
+									{cashbackDeal.cashbackType === "percentage" ? "%" : "₹"}
+								</div>
+							</div>
+						</div>
+
+						<button
+							onClick={handleCouponButtonClick}
+							className="bg-white text-blue-600 hover:bg-blue-50 px-8 py-3 rounded-full font-semibold transition-all transform hover:scale-105 active:scale-95 shadow-lg"
+						>
+							Generate Coupon
+						</button>
+					</div>
+
+					<div className="w-full md:w-1/2 mt-8 md:mt-0">
+						<div className="bg-white rounded-xl overflow-hidden shadow-xl transform rotate-2 hover:rotate-0 transition-transform duration-300 max-w-sm mx-auto">
+							<img
+								src={cashbackDeal.productImage}
+								alt={cashbackDeal.productName}
+								className="w-full h-64 object-cover"
+							/>
+							<div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50">
+								<div className="flex justify-between items-center">
+									<span className="text-gray-800 font-medium">{cashbackDeal.productName}</span>
+									<span className="text-green-600 font-bold">
+										{cashbackDeal.cashbackAmount}
+										{cashbackDeal.cashbackType === "percentage" ? "%" : "₹"} Cashback
+									</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			{/* Shop & Deal Details Section */}
+			<div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+				{/* Shop Info */}
+				<div className="bg-white rounded-xl shadow-md overflow-hidden">
+					<div className="p-6">
+						<h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+							<AiOutlineShop className="text-blue-600" /> Shop Details
+						</h2>
+
+						<div className="flex items-center mb-4">
+							{business && business.logoUrl ? (
+								<img
+									src={business.logoUrl}
+									alt={cashbackDeal.shopName}
+									className="w-14 h-14 rounded-full mr-4 object-cover"
+								/>
+							) : (
+								<div className="w-14 h-14 rounded-full mr-4 bg-gray-200 flex items-center justify-center">
+									<AiOutlineShop className="text-gray-500 text-2xl" />
+								</div>
+							)}
+							<div>
+								<h3 className="font-medium">{cashbackDeal.shopName}</h3>
+								<span className="text-sm text-gray-500">{cashbackDeal.shopMode} Shop</span>
+							</div>
+						</div>
+
+						{business && (
+							<>
+								<div className="text-gray-600 mb-4">{business.location || "Location not available"}</div>
+								<div className="text-gray-600 text-sm leading-relaxed mb-4">
+									{business.shortDesc || "No description available"}
+								</div>
+							</>
+						)}
+
+						{/* <div className="mt-4 pt-4 border-t border-gray-100">
+							<button
+								onClick={handleCouponButtonClick}
+								className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+							>
+								Get Coupon & Cashback
+							</button>
+						</div> */}
+					</div>
+				</div>
+
+				{/* Deal Details */}
+				<div className="bg-white rounded-xl shadow-md overflow-hidden md:col-span-2">
+					<div className="p-6">
+						<h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+							<AiOutlinePercentage className="text-blue-600" /> Cashback Deal Details
+						</h2>
+
+						<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+							<div className="aspect-square md:aspect-auto">
+								<img
+									src={cashbackDeal.productImage}
+									alt={cashbackDeal.productName}
+									className="w-full h-full object-contain rounded-lg"
+								/>
+							</div>
+
+							<div>
+								<h3 className="text-xl font-medium mb-2">{cashbackDeal.productName}</h3>
+								<div className="flex items-center gap-2 mb-4">
+									<AiOutlineDollar className="text-green-600" />
+									<span className="text-gray-800 font-medium">₹{cashbackDeal.productPrice}</span>
+								</div>
+
+								<div className="bg-green-50 rounded-lg p-4 mb-4">
+									<h4 className="font-medium text-green-800 mb-2">Cashback Details</h4>
+									<div className="text-green-700">
+										<p className="mb-1">
+											<span className="font-semibold">{cashbackDeal.cashbackAmount}{cashbackDeal.cashbackType === "percentage" ? "%" : "₹"}</span> cashback
+										</p>
+										<p className="text-sm">
+											{cashbackDeal.cashbackType === "percentage"
+												? `That's approximately ₹${Math.round((parseInt(cashbackDeal.productPrice) * parseInt(cashbackDeal.cashbackAmount)) / 100)} on this purchase`
+												: `Flat cashback amount`}
+										</p>
+									</div>
+								</div>
+
+								<div className="mb-4">
+									<h4 className="font-medium text-gray-800 mb-2">Product Category</h4>
+									<div className="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+										{cashbackDeal.productCategory}
+									</div>
+								</div>
+
+								<button
+									onClick={handleCouponButtonClick}
+									className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 mt-4"
+								>
+									Generate Coupon
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			{/* Related Deals Section */}
+			{relatedDeals.length > 0 && (
+				<div className="mb-12">
+					<h2 className="text-2xl font-semibold mb-6">Related Deals</h2>
+					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+						{relatedDeals.map((deal) => (
+							<div key={deal.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+								<div className="aspect-[4/3] relative">
+									<img
+										src={deal.productImage}
+										alt={deal.productName}
+										className="w-full h-full object-cover"
+									/>
+									<div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm">
+										{deal.cashbackAmount}{deal.cashbackType === "percentage" ? "%" : "₹"} Cashback
+									</div>
+								</div>
+								<div className="p-4">
+									<h3 className="font-medium mb-2">{deal.productName}</h3>
+									<div className="flex items-center justify-between">
+										<span className="text-gray-700">₹{deal.productPrice}</span>
+										<span className="text-sm text-gray-500">{deal.shopName}</span>
+									</div>
+								</div>
+							</div>
+						))}
+					</div>
+				</div>
+			)}
+
+			{/* Form Dialog */}
+			{showDialog && (
+				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+					<div className="bg-white rounded-2xl p-6 w-full max-w-md relative">
+						<button
+							onClick={() => setShowDialog(false)}
+							className="absolute text-3xl top-2 right-2 text-gray-500 hover:text-gray-700"
+						>
+							×
+						</button>
+
+						<h2 className="text-center font-semibold text-lg mb-6">
+							GET YOUR COUPON CODE & {cashbackDeal.cashbackAmount}{cashbackDeal.cashbackType === "percentage" ? "%" : "₹"} CASHBACK
+						</h2>
+
+						<form onSubmit={handleSubmit} className="space-y-4">
+							<div>
+								<label className="block text-sm text-gray-600 mb-1">
+									Full name
+								</label>
+								<input
+									type="text"
+									name="fullName"
+									value={formData.fullName}
+									onChange={handleInputChange}
+									className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+									required
+								/>
+							</div>
+
+							<div>
+								<label className="block text-sm text-gray-600 mb-1">
+									Email
+								</label>
+								<input
+									type="email"
+									name="email"
+									value={formData.email}
+									onChange={handleInputChange}
+									className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+									required
+								/>
+							</div>
+
+							<div>
+								<label className="block text-sm text-gray-600 mb-1">
+									Phone number
+								</label>
+								<input
+									type="tel"
+									name="phoneNumber"
+									value={formData.phoneNumber}
+									onChange={handleInputChange}
+									className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+									required
+								/>
+							</div>
+
+							<button
+								type="submit"
+								disabled={generatingCoupon}
+								className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+							>
+								{generatingCoupon ? (
+									<>
+										<AiOutlineLoading3Quarters className="w-4 h-4 animate-spin" />
+										Generating...
+									</>
+								) : (
+									"Generate Coupon"
+								)}
+							</button>
+						</form>
+					</div>
+				</div>
+			)}
+
+			{/* Coupon Dialog */}
+			{showCouponDialog && (
+				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+					<div className="bg-white rounded-3xl p-8 w-full max-w-md relative overflow-hidden">
+						<button
+							onClick={() => setShowCouponDialog(false)}
+							className="absolute text-3xl top-4 right-4 z-20 w-8 h-8 flex items-center justify-center rounded-full bg-white/10 text-gray-600 hover:text-gray-800 transition-colors"
+						>
+							×
+						</button>
+						<div className="absolute inset-0 bg-gradient-to-b from-blue-50 to-white z-10">
+							<div className="absolute top-0 left-0 w-24 h-24 bg-blue-100 rounded-full -translate-x-1/2 -translate-y-1/2" />
+							<div className="absolute bottom-0 right-0 w-24 h-24 bg-blue-100 rounded-full translate-x-1/2 translate-y-1/2" />
+						</div>
+
+						<div className="relative z-20 flex flex-col items-center">
+							<div className="mb-4">
+								<img
+									src={cashbackDeal.productImage}
+									alt={cashbackDeal.productName}
+									className="w-20 h-20 object-cover rounded-lg shadow-md"
+								/>
+							</div>
+
+							<div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 rounded-xl w-64 relative mb-6">
+								<div className="text-center">
+									<div className="text-lg opacity-90 mb-2">
+										{cashbackDeal.cashbackAmount}{cashbackDeal.cashbackType === "percentage" ? "%" : "₹"}
+										<br />
+										Cashback from ShoppinessSmart
+									</div>
+									<div className="bg-white/10 rounded-lg p-2 flex items-center justify-between">
+										<span className="text-lg font-bold text-[#FFDE50]">
+											{generatedCouponCode}
+										</span>
+										<button
+											onClick={handleCopyCode}
+											className="text-white hover:text-white/80"
+										>
+											<AiOutlineCopy className="w-4 h-4" />
+										</button>
+									</div>
+								</div>
+							</div>
+
+							<div className="text-center mb-6">
+								<h3 className="font-medium text-gray-800">{cashbackDeal.productName}</h3>
+								<p className="text-gray-500 text-sm">from {cashbackDeal.shopName}</p>
+							</div>
+
+							<button
+								onClick={handleSaveCoupon}
+								disabled={savingCoupon}
+								className="bg-green-500 text-white px-8 py-2 rounded-full hover:bg-green-600 transition-colors flex items-center gap-2 shadow-lg"
+							>
+								{savingCoupon ? (
+									<>
+										<AiOutlineLoading3Quarters className="w-4 h-4 animate-spin" />
+										Saving...
+									</>
+								) : (
+									<>
+										<AiOutlineSave className="w-4 h-4" />
+										Save Coupon
+									</>
+								)}
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
+		</div>
+	);
+};
+
+export default CashbackDealsDetails;
