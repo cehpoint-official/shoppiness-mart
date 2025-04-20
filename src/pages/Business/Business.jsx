@@ -113,7 +113,7 @@ const Business = () => {
             </p>
             <Link to="/business-form">Sign Up</Link>
           </div>
-          <div className="right relative">
+          <div className="right relative top-5 md:top-20">
             {loading.video ? (
               <div className="w-full h-[225px] md:h-[281px] bg-gray-200 rounded-lg flex items-center justify-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-teal-500"></div>

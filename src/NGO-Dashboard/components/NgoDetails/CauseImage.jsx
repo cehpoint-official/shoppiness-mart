@@ -99,7 +99,7 @@ const CauseImage = () => {
   };
 
   return (
-    <div className="space-y-6 max-w-lg">
+    <div className="space-y-6 max-w-lg mb-4">
       {/* Logo Upload Section */}
       <div>
         <h3 className="text-sm font-medium text-gray-700 mb-4">

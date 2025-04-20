@@ -106,7 +106,7 @@ const SupportMasst = () => {
           <h1 className="md:text-4xl text-3xl font-semibold font-slab mb-4">
             What is MAAST?
           </h1>
-          <p className="text-parapgraphColor">
+          <p className="text-parapgraphColor text-justify">
             MAAST is an initiative designed to create a positive impact on
             society by supporting various charitable causes. Through the MAAST
             program, users can contribute to meaningful projects that focus on
@@ -148,7 +148,7 @@ const SupportMasst = () => {
           <h1 className="md:text-4xl text-3xl font-semibold font-slab mb-4">
             Support MAAST and Other Charities
           </h1>
-          <p className="text-parapgraphColor">
+          <p className="text-parapgraphColor text-justify">
             ShoppinessMart is committed to making a difference by turning
             everyday online shopping into a powerful force for good. Through our
             platform, you can support a variety of charities, including the
@@ -177,7 +177,7 @@ const SupportMasst = () => {
           <h1 className="md:text-5xl text-4xl font-bold mb-4 font-slab text-gray-800">
             Upcoming Events
           </h1>
-          <p className="text-lg text-parapgraphColor max-w-2xl mx-auto">
+          <p className="text-lg text-parapgraphColor max-w-2xl mx-4 md:mx-auto">
             Join us in making a difference. Explore our upcoming events and be part of the change.
           </p>
         </div>

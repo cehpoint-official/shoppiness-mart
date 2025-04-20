@@ -183,9 +183,9 @@ const HowItWorks = () => {
 
         <div className="secThree">
           <div className="left">
-            <h5>How it works</h5>
+            {/* <h5>How it works</h5> */}
             <h1>
-              Online Offline Shopping With Cashback,Deals for you,help to others
+              Online & Offline Shopping with Cashback, Exciting Deals for You, and Help for Others
             </h1>
             <p>
               When you shop through our platform, whether online or offline, you

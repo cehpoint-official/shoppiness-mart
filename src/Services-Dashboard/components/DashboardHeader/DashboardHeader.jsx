@@ -155,10 +155,10 @@ const DashboardHeader = () => {
         <h1>Welcome {user?.firstName}🤚</h1>
       </div>
       <div className="profile-sec">
-        <div className="search-bar">
+        {/* <div className="search-bar">
           <CiSearch />
           <input type="text" placeholder="Search Here" />
-        </div>
+        </div> */}
         <div className="notifications relative">
           <div
             className="cursor-pointer relative"

@@ -18,9 +18,9 @@ const RoundedCards = ({color,data}) => {
       <div className="lowerSec">
         {data.map((e) => (
           <div className="lowerCard" key={e.id}>
-            <img src={e.img} alt="card" />
+            <img className="p-4" src={e.img} alt="card" />
             <h4>{e.title}</h4>
-            <p>
+            <p className="text-justify mx-4">
               {e.desc}
             </p>
           </div>

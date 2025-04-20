@@ -382,16 +382,16 @@ const Home = () => {
         }}
       >
         <div className="md:w-[550px] md:mt-6">
-          <p className="text-xl mb-2">How it works</p>
+          {/* <p className="text-xl mb-2">How it works</p> */}
           <h1 className="md:text-4xl text-3xl font-semibold font-slab mb-4">
             Cashback Deals for you to help others.
           </h1>
           <p className="text-parapgraphColor text-sm md:text-lg">
             Collaborate with established cashback platforms or create an
-            in-house cashback system. Cashback Determine a suitable cashback
+            in-house cashback system. Determine a suitable cashback
             percentage or reward system based on purchase amounts, categories,
-            or partner stores. Redemption Offer flexible redemption options,
-            such as cash transfers, gift cards, or donations to charity.Clearly
+            or partner stores. Offer flexible redemption options,
+            such as cash transfers, gift cards, or donations to charity. Clearly
             communicate cashback offers through marketing channels and user
             interfaces.
           </p>
@@ -406,11 +406,11 @@ const Home = () => {
 
         <div className="mt-6">
           {loading.video ? (
-            <div className="w-[400px] h-[225px] md:w-[500px] md:h-[281px] bg-gray-200 rounded-lg flex items-center justify-center">
+            <div className="w-full h-[225px] md:h-[281px] bg-gray-200 rounded-lg flex items-center justify-center">
               <Loader />
             </div>
           ) : data.homeVideo?.url ? (
-            <div className="w-[400px] h-[225px] md:w-[500px] md:h-[281px] bg-black rounded-lg overflow-hidden">
+            <div className="w-full h-[225px] md:h-[281px] bg-black rounded-lg overflow-hidden">
               <video
                 ref={videoRef}
                 muted // Important: muted videos can autoplay without user interaction

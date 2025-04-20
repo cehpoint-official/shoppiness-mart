@@ -71,7 +71,7 @@ const EditProfileDialog = ({ userData, onClose, onSave }) => {
               />
             ) : (
               <div className="w-24 h-24 bg-gray-200 rounded-full mx-auto flex items-center justify-center text-gray-500">
-                Add Profile Pic
+                <span className="text-center">Add <br /> Profile Pic</span>
               </div>
             )}
             <input

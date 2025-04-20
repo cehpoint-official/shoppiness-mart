@@ -115,7 +115,7 @@ const CashbackDeals = () => {
         </div>
 
         {/* Offline Deals Section */}
-        <div className="bg-gradient-to-br from-white to-blue-50 rounded-2xl p-6 shadow-md transition-all duration-300 hover:shadow-lg mx-10">
+        <div className="bg-gradient-to-br from-white to-blue-50 rounded-2xl p-6 shadow-md transition-all duration-300 hover:shadow-lg mx-4 md:mx-10">
           <div className="flex justify-between items-center mb-6 pb-3 border-b border-gray-100">
             <div className="flex items-center gap-3">
               <BsShop className="text-blue-600 text-2xl" />
@@ -148,7 +148,7 @@ const CashbackDeals = () => {
                       />
                     </div>
                   </div>
-                  <div className="p-5 flex flex-col flex-grow">
+                  <div className="py-5 px-3 md:px-5 flex flex-col flex-grow">
                     <h3 className="text-lg font-semibold text-gray-600 mb-2 line-clamp-1">{deal.shopName}</h3>
                     <div className="flex justify-between items-center mt-auto mb-4">
                       {deal.cashbackType === "percentage" ? (
@@ -162,7 +162,7 @@ const CashbackDeals = () => {
                           <span className="text-xs md:text-sm text-gray-400 line-through">₹ {Number(deal.productPrice).toFixed(2)}</span>
                         </div>
                       )}
-                      <div className="bg-red-50 text-red-600 px-1 md:px-3 py-1 rounded text-xs md:text-sm font-semibold">
+                      <div className="bg-red-50 text-red-600 px-1 md:px-3 py-1 rounded text-xs md:text-sm font-semibold text-center">
                         {formatCashback(deal.cashbackAmount, deal.cashbackType)}
                       </div>
                     </div>
@@ -188,7 +188,7 @@ const CashbackDeals = () => {
         </div>
 
         {/* Online Deals Section */}
-        <div className="bg-gradient-to-br from-white to-purple-50 rounded-2xl p-6 shadow-md transition-all duration-300 hover:shadow-lg mx-10">
+        <div className="bg-gradient-to-br from-white to-purple-50 rounded-2xl p-6 shadow-md transition-all duration-300 hover:shadow-lg mx-4 md:mx-10">
           <div className="flex justify-between items-center mb-6 pb-3 border-b border-gray-100">
             <div className="flex items-center gap-3">
               <FaShoppingCart className="text-blue-600 text-xl" />
@@ -221,7 +221,7 @@ const CashbackDeals = () => {
                       />
                     </div>
                   </div>
-                  <div className="p-5 flex flex-col flex-grow">
+                  <div className="py-5 px-3 flex flex-col flex-grow">
                     <h3 className="text-lg font-semibold text-gray-600 mb-2 line-clamp-2">{deal.shopName}</h3>
                     <div className="flex justify-between items-center mt-auto mb-4">
                       {deal.cashbackType === "percentage" ? (
@@ -235,7 +235,7 @@ const CashbackDeals = () => {
                           <span className="text-xs md:text-sm text-gray-400 line-through">₹ {Number(deal.productPrice).toFixed(2)}</span>
                         </div>
                       )}
-                      <div className="bg-red-50 text-red-600 px-1 md:px-3 py-1 rounded text-xs md:text-sm font-semibold">
+                      <div className="bg-red-50 text-red-600 px-1 md:px-3 py-1 rounded text-xs md:text-sm font-semibold text-center">
                         {formatCashback(deal.cashbackAmount, deal.cashbackType)}
                       </div>
                     </div>

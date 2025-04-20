@@ -76,10 +76,10 @@ const SupportACause = () => {
   return (
     <div className="overflow-hidden">
       {/* Search Section */}
-      <div className="flex flex-wrap justify-evenly py-16 px-3">
+      <div className="flex flex-wrap justify-evenly py-10 px-3">
         {!searching && !searchResults ? (
           <>
-            <div className="pt-10">
+            <div className="md:pt-10 text-center md:text-left">
               <h3 className="md:text-4xl text-2xl font-bold font-slab">
                 Explore our list of good causes and
               </h3>
@@ -87,7 +87,7 @@ const SupportACause = () => {
                 NGOs that need your support.
               </h3>
               <p className="text-sm">Choose the one you want to support</p>
-              <div className="py-5">
+              <div className="py-5 space-y-4">
                 <input
                   className="md:w-[80%] w-[70%] border-2 border-grey-500 text-sm ps-3 py-2.5 rounded-md"
                   type="text"

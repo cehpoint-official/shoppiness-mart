@@ -10,10 +10,10 @@ const OurEfforts = () => {
           <h1 className="text-3xl md:text-4xl font-medium mb-2 font-slab ">
             Our efforts
           </h1>
-          <p className="text-sm text-parapgraphColor">
+          <p className="text-sm text-parapgraphColor px-4">
             Our efforts focus on supporting numerous charity projects and
           </p>
-          <p className="text-sm text-parapgraphColor">
+          <p className="text-sm text-parapgraphColor px-4">
             fostering a community of giving through seamless and effortless
             actions.
           </p>
@@ -29,7 +29,7 @@ const OurEfforts = () => {
               <h3 className="md:text-xl text-lg font-semibold">
                 Mission and vision
               </h3>
-              <p className="text-parapgraphColor text-sm md:text-basic">
+              <p className="text-parapgraphColor text-sm md:text-basic my-2 mx-2">
                 At ShoppinessMart, our mission is to revolutionize online
                 shopping by integrating effortless giving into every purchase.
                 We envision a world where supporting meaningful causes is a
@@ -48,7 +48,7 @@ const OurEfforts = () => {
               <h3 className="md:text-xl text-lg font-semibold">
                 Charity projects
               </h3>
-              <p className="text-parapgraphColor text-sm md:text-basic">
+              <p className="text-parapgraphColor text-sm md:text-basic my-2 mx-2">
                 We are committed to supporting a wide range of charity projects
                 that make a real difference in people's lives. From providing
                 hunger relief and emergency aid to supporting education and
@@ -68,7 +68,7 @@ const OurEfforts = () => {
               <h3 className="md:text-xl text-lg font-semibold">
                 Foundation and events
               </h3>
-              <p className="text-parapgraphColor text-sm md:text-basic">
+              <p className="text-parapgraphColor text-sm md:text-basic my-2 mx-2">
                 The ShoppinessMart Foundation organizes and participates in
                 numerous events to raise awareness and funds for important
                 causes. Through charity drives, community events, and special

@@ -230,26 +230,26 @@ const OnlineShop = () => {
         )}
       </div>
       <div className="flex flex-col md:flex-row items-center justify-between py-4 bg-white shadow-sm">
-        <div className="flex flex-wrap items-center gap-2 mb-4 md:mb-0">
-          <div className="bg-black text-white text-sm py-2 px-4 rounded cursor-pointer">
+        <div className="flex flex-row md:flex-wrap items-center gap-6 md:gap-2 mb-4 md:mb-0 mt-4">
+          <div className="hidden md:block bg-black text-white text-sm py-2 px-4 rounded cursor-pointer">
             SAVINGS MODE &rarr;
           </div>
           <div
-            className={`py-2 px-4 rounded cursor-pointer text-sm ${activeTab === "store" ? "bg-teal-500 text-white" : ""
+            className={`text-center py-2 px-2 md:px-4 rounded cursor-pointer text-sm ${activeTab === "store" ? "bg-teal-500 text-white" : ""
               }`}
             onClick={() => setActiveTab("store")}
           >
             Savings by Store
           </div>
           <div
-            className={`py-2 px-4 rounded cursor-pointer text-sm border-2 border-500-red ${activeTab === "services" ? "bg-teal-500 text-white" : ""
+            className={`text-center py-2 px-2 md:px-4 rounded cursor-pointer text-sm border-2 border-500-red ${activeTab === "services" ? "bg-teal-500 text-white" : ""
               }`}
             onClick={() => setActiveTab("services")}
           >
             Savings by Services
           </div>
         </div>
-        <div className="flex items-center w-full md:w-auto">
+        <div className="flex items-center w-full md:w-auto mt-4">
           <div className="relative w-full">
             <FiSearch className="absolute top-2.5 left-3 text-gray-400" />
             <input

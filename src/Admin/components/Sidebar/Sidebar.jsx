@@ -165,13 +165,13 @@ const Sidebar = ({ userId, sidebarOpen, setSidebarOpen }) => {
               </div>
               {openSections.maast && (
                 <div className="flex flex-col pl-6 bg-teal-700/20">
-                  <Link
+                  {/* <Link
                     to={`/admin/${userId}/shoppiness/maast/edit`}
                     className="py-2 px-6 hover:bg-teal-600 transition-colors"
                     onClick={() => isMobile && setSidebarOpen(false)}
                   >
                     Edit Page
-                  </Link>
+                  </Link> */}
                   <Link
                     to={`/admin/${userId}/shoppiness/maast/donations`}
                     className="py-2 px-6 hover:bg-teal-600 transition-colors"
@@ -243,13 +243,13 @@ const Sidebar = ({ userId, sidebarOpen, setSidebarOpen }) => {
                   >
                     Add Categories
                   </Link> */}
-                  <Link
+                  {/* <Link
                     to={`/admin/${userId}/shoppiness/services/cashback-tracking`}
                     className="py-2 px-6 hover:bg-teal-600 transition-colors"
                     onClick={() => isMobile && setSidebarOpen(false)}
                   >
                     Cashback Tracking
-                  </Link>
+                  </Link> */}
                 </div>
               )}
             </div>

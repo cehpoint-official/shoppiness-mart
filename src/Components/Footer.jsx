@@ -178,9 +178,9 @@ const Footer = () => {
                 {latestBlogs.length > 0 ? (
                   latestBlogs.map((blog, index) => (
                     <li key={blog.id}>
-                      <a href="/blogs" className={`mb-2 inline-block text-base text-white ${index > 0 ? 'mt-2' : ''}`}>
+                      <Link to={`/blogs/${blog.id}`} className={`mb-2 inline-block text-base text-white ${index > 0 ? 'mt-2' : ''}`}>
                         {blog.title}
-                      </a>
+                      </Link>
                       <p className="text-[#FFD705] mb-4">{formatDate(blog.date)}</p>
                     </li>
                   ))
@@ -198,7 +198,7 @@ const Footer = () => {
             </div>
           </div>
           <div className="w-full px-8 sm:w-1/2 lg:w-2/12">
-            <div className="mb-10 w-full -mt-10">
+            <div className="mb-10 w-full md:-mt-10">
               <h4 className="mb-9 text-3xl font-semibold text-white">Links</h4>
               <ul>
                 <li>
