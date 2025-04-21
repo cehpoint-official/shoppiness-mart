@@ -1,11 +1,6 @@
 import { useState, useEffect } from "react";
 import { addDoc, collection, doc, getDoc, updateDoc } from "firebase/firestore";
-import {
-  FaArrowLeft,
-  FaSpinner,
-  FaCheckCircle,
-  FaDonate,
-} from "react-icons/fa";
+import { FaArrowLeft, FaSpinner, FaCheckCircle, FaDonate } from "react-icons/fa";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -256,54 +251,54 @@ const ViewPaymentDetails = () => {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-8 mx-4 my-6 md:mx-10 md:my-10">
+    <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 md:p-8 mx-2 sm:mx-4 md:mx-10 my-4 sm:my-6 md:my-10">
       <button
         onClick={() => navigate(-1)}
-        className="flex items-center text-blue-600 hover:text-blue-800 mb-8"
+        className="flex items-center text-blue-600 hover:text-blue-800 mb-4 sm:mb-8"
       >
         <FaArrowLeft className="mr-2" /> Back
       </button>
 
-      <h2 className="text-2xl font-bold text-gray-800 mb-8">Payment Details</h2>
+      <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-8">Payment Details</h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
         {/* Business Information */}
-        <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
-          <h3 className="text-xl font-semibold text-gray-700 mb-4">
+        <div className="bg-gray-50 p-4 sm:p-6 rounded-lg shadow-sm">
+          <h3 className="text-lg sm:text-xl font-semibold text-gray-700 mb-3 sm:mb-4">
             Business Information
           </h3>
-          <div className="space-y-4">
-            <p>
+          <div className="space-y-3 sm:space-y-4">
+            <p className="text-sm sm:text-base">
               <strong className="text-gray-600">Business Name:</strong>{" "}
-              <span className="text-gray-800">{request.businessName}</span>
+              <span className="text-gray-800 break-words">{request.businessName}</span>
             </p>
-            <p>
+            <p className="text-sm sm:text-base">
               <strong className="text-gray-600">Business Email:</strong>{" "}
-              <span className="text-gray-800">{request.businessEmail}</span>
+              <span className="text-gray-800 break-words">{request.businessEmail}</span>
             </p>
           </div>
         </div>
 
         {/* Payment Information */}
-        <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
-          <h3 className="text-xl font-semibold text-gray-700 mb-4">
+        <div className="bg-gray-50 p-4 sm:p-6 rounded-lg shadow-sm">
+          <h3 className="text-lg sm:text-xl font-semibold text-gray-700 mb-3 sm:mb-4">
             Payment Information
           </h3>
-          <div className="space-y-4">
-            <p>
+          <div className="space-y-3 sm:space-y-4">
+            <p className="text-sm sm:text-base">
               <strong className="text-gray-600">Invoice ID:</strong>{" "}
-              <span className="text-gray-800">{request.invoiceId}</span>
+              <span className="text-gray-800 break-words">{request.invoiceId}</span>
             </p>
-            <p>
+            <p className="text-sm sm:text-base">
               <strong className="text-gray-600">Amount:</strong>{" "}
               <span className="text-green-600 font-bold">
                 ₹{request.amount?.toLocaleString()}
               </span>
             </p>
-            <p>
+            <p className="text-sm sm:text-base">
               <strong className="text-gray-600">Status:</strong>{" "}
               <span
-                className={`px-2 py-1 rounded-full text-sm font-medium ${
+                className={`px-2 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-medium ${
                   request.status === "Checking"
                     ? "bg-blue-100 text-blue-800"
                     : "bg-green-100 text-green-800"
@@ -312,12 +307,12 @@ const ViewPaymentDetails = () => {
                 {request.status}
               </span>
             </p>
-            <p>
+            <p className="text-sm sm:text-base">
               <strong className="text-gray-600">Request Date:</strong>{" "}
               <span className="text-gray-800">{request.requestDate}</span>
             </p>
             {request.receiptUrl && (
-              <p>
+              <p className="text-sm sm:text-base">
                 <strong className="text-gray-600">Receipt:</strong>{" "}
                 <Link
                   to={request.receiptUrl}
@@ -333,11 +328,11 @@ const ViewPaymentDetails = () => {
 
       {/* Verify Button (Only for "Checking" status) */}
       {request.status === "Checking" && (
-        <div className="mt-8 flex justify-center">
+        <div className="mt-6 sm:mt-8 flex justify-center">
           <button
             onClick={handleVerification}
             disabled={verifying}
-            className={`flex items-center justify-center bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg font-medium transition-all ${
+            className={`flex items-center justify-center bg-green-600 hover:bg-green-700 text-white py-2 sm:py-3 px-4 sm:px-6 rounded-lg font-medium transition-all text-sm sm:text-base ${
               verifying ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
@@ -356,36 +351,36 @@ const ViewPaymentDetails = () => {
 
       {/* NGO/Cause Donation Section - Only show if causeData exists */}
       {request.causeData && (
-        <div className="mt-10 bg-blue-50 p-6 rounded-lg shadow-sm">
-          <h3 className="text-xl font-semibold text-blue-800 mb-4 flex items-center">
+        <div className="mt-6 sm:mt-10 bg-blue-50 p-4 sm:p-6 rounded-lg shadow-sm">
+          <h3 className="text-lg sm:text-xl font-semibold text-blue-800 mb-3 sm:mb-4 flex items-center">
             <FaDonate className="mr-2" />{" "}
             {donationSent
               ? "Money Sent to Selected NGO/Cause"
               : "Send Money to Selected NGO/Cause"}
           </h3>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 md:gap-8 mb-4 sm:mb-6">
             {/* Cause Information */}
             <div>
-              <h4 className="font-medium text-blue-700 mb-3">
+              <h4 className="font-medium text-blue-700 mb-2 sm:mb-3 text-sm sm:text-base">
                 Cause Information
               </h4>
-              <div className="space-y-4">
-                <p>
+              <div className="space-y-2 sm:space-y-4">
+                <p className="text-sm sm:text-base">
                   <strong className="text-gray-600">Cause Name:</strong>{" "}
-                  <span className="text-gray-800">
+                  <span className="text-gray-800 break-words">
                     {request.causeData.causeName}
                   </span>
                 </p>
-                <p>
+                <p className="text-sm sm:text-base">
                   <strong className="text-gray-600">Customer Name:</strong>{" "}
-                  <span className="text-gray-800">{request.customerName}</span>
+                  <span className="text-gray-800 break-words">{request.customerName}</span>
                 </p>
-                <p>
+                <p className="text-sm sm:text-base">
                   <strong className="text-gray-600">Customer Email:</strong>{" "}
-                  <span className="text-gray-800">{request.customerEmail}</span>
+                  <span className="text-gray-800 break-words">{request.customerEmail}</span>
                 </p>
-                <p>
+                <p className="text-sm sm:text-base">
                   <strong className="text-gray-600">Amount Received:</strong>{" "}
                   <span className="text-green-600 font-bold">
                     ₹{request.amount?.toLocaleString()}
@@ -396,15 +391,15 @@ const ViewPaymentDetails = () => {
 
             {/* Payment Details */}
             <div>
-              <h4 className="font-medium text-blue-700 mb-3">
+              <h4 className="font-medium text-blue-700 mb-2 sm:mb-3 text-sm sm:text-base">
                 Payment Details
               </h4>
-              <div className="space-y-4">
+              <div className="space-y-2 sm:space-y-4">
                 {request.causeData.paymentDetails.upiDetails &&
                   request.causeData.paymentDetails.upiDetails.length > 0 && (
-                    <p>
+                    <p className="text-sm sm:text-base">
                       <strong className="text-gray-600">UPI ID:</strong>{" "}
-                      <span className="text-gray-800">
+                      <span className="text-gray-800 break-all">
                         {request.causeData.paymentDetails.upiDetails[0].upiId}
                       </span>
                     </p>
@@ -413,9 +408,9 @@ const ViewPaymentDetails = () => {
                 {request.causeData.paymentDetails.bankAccounts &&
                   request.causeData.paymentDetails.bankAccounts.length > 0 && (
                     <div>
-                      <p>
+                      <p className="text-sm sm:text-base">
                         <strong className="text-gray-600">Bank Account:</strong>{" "}
-                        <span className="text-gray-800">
+                        <span className="text-gray-800 break-all">
                           {
                             request.causeData.paymentDetails.bankAccounts[0]
                               .accountNumber
@@ -427,9 +422,9 @@ const ViewPaymentDetails = () => {
 
                 {request.causeData.paymentDetails.cardDetails &&
                   request.causeData.paymentDetails.cardDetails.length > 0 && (
-                    <p>
+                    <p className="text-sm sm:text-base">
                       <strong className="text-gray-600">Card Details:</strong>{" "}
-                      <span className="text-gray-800">
+                      <span className="text-gray-800 break-all">
                         {
                           request.causeData.paymentDetails.cardDetails[0]
                             .cardNumber
@@ -443,12 +438,12 @@ const ViewPaymentDetails = () => {
 
           {/* Show either the donation form or the completed donation details */}
           {donationSent ? (
-            <div className="mt-6 bg-green-50 p-4 rounded-lg border border-green-200">
-              <h4 className="font-medium text-green-700 mb-3">
+            <div className="mt-4 sm:mt-6 bg-green-50 p-3 sm:p-4 rounded-lg border border-green-200">
+              <h4 className="font-medium text-green-700 mb-2 sm:mb-3 text-sm sm:text-base">
                 Donation Completed
               </h4>
-              <div className="space-y-4">
-                <p>
+              <div className="space-y-2 sm:space-y-4">
+                <p className="text-sm sm:text-base">
                   <strong className="text-gray-600">
                     Donation Percentage:
                   </strong>{" "}
@@ -456,20 +451,20 @@ const ViewPaymentDetails = () => {
                     {sentDonationDetails.percentage}%
                   </span>
                 </p>
-                <p>
+                <p className="text-sm sm:text-base">
                   <strong className="text-gray-600">Donation Amount:</strong>{" "}
                   <span className="text-green-600 font-bold">
                     ₹{sentDonationDetails.amount.toFixed(2)}
                   </span>
                 </p>
-                <p>
+                <p className="text-sm sm:text-base">
                   <strong className="text-gray-600">Sent Date:</strong>{" "}
                   <span className="text-gray-800">
                     {sentDonationDetails.date}
                   </span>
                 </p>
-                <div className="flex items-center text-green-700">
-                  <FaCheckCircle className="mr-2" />
+                <div className="flex items-center text-green-700 text-sm sm:text-base">
+                  <FaCheckCircle className="mr-2 flex-shrink-0" />
                   <span>Money has been successfully sent to the cause/NGO</span>
                 </div>
               </div>
@@ -477,14 +472,14 @@ const ViewPaymentDetails = () => {
           ) : (
             <>
               {/* Donation calculation */}
-              <div className="mt-6">
+              <div className="mt-4 sm:mt-6">
                 <label
                   htmlFor="donationPercentage"
-                  className="block text-gray-700 font-medium mb-2"
+                  className="block text-gray-700 font-medium mb-2 text-sm sm:text-base"
                 >
                   Donation Percentage (%)
                 </label>
-                <div className="flex items-center space-x-4">
+                <div className="flex flex-wrap items-center space-x-2 sm:space-x-4">
                   <input
                     type="number"
                     id="donationPercentage"
@@ -494,11 +489,11 @@ const ViewPaymentDetails = () => {
                         Math.max(0, Math.min(100, Number(e.target.value)))
                       )
                     }
-                    className="border border-gray-300 rounded-md px-3 py-2 w-24 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="border border-gray-300 rounded-md px-2 sm:px-3 py-1.5 sm:py-2 w-20 sm:w-24 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
                     min="0"
                     max="100"
                   />
-                  <span className="text-gray-700">
+                  <span className="text-gray-700 text-sm sm:text-base mt-2 sm:mt-0">
                     = ₹{donationAmount.toFixed(2)} of ₹
                     {request.amount?.toLocaleString()}
                   </span>
@@ -506,11 +501,11 @@ const ViewPaymentDetails = () => {
               </div>
 
               {/* Send donation button */}
-              <div className="mt-8 flex justify-center">
+              <div className="mt-6 sm:mt-8 flex justify-center">
                 <button
                   onClick={handleSendDonation}
-                  disabled={sendingDonation} // Removed the donationAmount <= 0 condition
-                  className={`flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-medium transition-all ${
+                  disabled={sendingDonation}
+                  className={`flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white py-2 sm:py-3 px-4 sm:px-6 rounded-lg font-medium transition-all text-sm sm:text-base ${
                     sendingDonation ? "opacity-50 cursor-not-allowed" : ""
                   }`}
                 >

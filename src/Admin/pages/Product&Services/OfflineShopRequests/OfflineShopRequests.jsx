@@ -203,171 +203,178 @@ const OfflineShopRequests = () => {
   };
   if (selectedShop) {
     return (
-      <div className="p-6">
+      <div className="p-3 md:p-6">
         <button
           onClick={() => setSelectedShop(null)}
-          className="flex items-center gap-2 mb-8 hover:text-gray-900"
+          className="flex items-center gap-2 mb-4 md:mb-8 hover:text-gray-900"
         >
           <BsArrowLeft className="w-4 h-4" />
           View request
         </button>
 
-        <div className="grid md:grid-cols-2 gap-8 bg-white p-6">
-          <div>
-            <img
-              src={selectedShop.bannerUrl || "/placeholder.svg"}
-              alt={selectedShop.businessName}
-              className="w-full rounded-lg object-cover aspect-square"
-            />
-          </div>
-
-          <div>
-            <div className="flex items-start gap-4 mb-6">
-              <div>
-                <h1 className="text-2xl font-semibold">
-                  {selectedShop.businessName}
-                </h1>
-                <p className="text-gray-500">{selectedShop.cat}</p>
-              </div>
+        <div className="bg-white p-4 md:p-6">
+          <div className="flex flex-col md:grid md:grid-cols-2 gap-4 md:gap-8">
+            <div>
+              <img
+                src={selectedShop.bannerUrl || "/placeholder.svg"}
+                alt={selectedShop.businessName}
+                className="w-full rounded-lg object-cover aspect-square"
+              />
             </div>
 
-            <div className="space-y-6">
-              <div>
-                <h2 className="font-medium mb-2">Description</h2>
-                <p className="text-gray-600">{selectedShop.shortDesc}</p>
-              </div>
-
-              <div>
-                <h2 className="font-medium mb-2">Location</h2>
-                <p className="text-gray-600">{selectedShop.location}</p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
+            <div>
+              <div className="flex items-start gap-4 mb-4 md:mb-6">
                 <div>
-                  <h2 className="font-medium mb-2">Phone Number</h2>
-                  <p className="text-gray-600">{selectedShop.mobileNumber}</p>
-                </div>
-                <div>
-                  <h2 className="font-medium mb-2">Email ID</h2>
-                  <p className="text-gray-600">{selectedShop.email}</p>
+                  <h1 className="text-xl md:text-2xl font-semibold">
+                    {selectedShop.businessName}
+                  </h1>
+                  <p className="text-gray-500">{selectedShop.cat}</p>
                 </div>
               </div>
-            </div>
 
-            <div className="mt-8">
-              <h2 className="text-xl font-semibold mb-4">SHOP DETAILS</h2>
-              <table className="w-full">
-                <tbody className="divide-y divide-gray-200">
-                  <tr>
-                    <td className="py-3 text-sm text-gray-500">
-                      Business/Services Owner Name
-                    </td>
-                    <td className="py-3 text-sm">{selectedShop.owner}</td>
-                  </tr>
-                  <tr>
-                    <td className="py-3 text-sm text-gray-500">
-                      Business/Services Mode
-                    </td>
-                    <td className="py-3 text-sm">{selectedShop.mode}</td>
-                  </tr>
-                  <tr>
-                    <td className="py-3 text-sm text-gray-500">Email</td>
-                    <td className="py-3 text-sm">{selectedShop.email}</td>
-                  </tr>
-                  <tr>
-                    <td className="py-3 text-sm text-gray-500">
-                      Shop Category
-                    </td>
-                    <td className="py-3 text-sm">{selectedShop.cat}</td>
-                  </tr>
-                  <tr>
-                    <td className="py-3 text-sm text-gray-500">
-                      Commission rate
-                    </td>
-                    <td className="py-3 text-sm flex gap-4 items-center">
-                      {editingRate === selectedShop.id ? (
-                        <input
-                          type="text"
-                          value={tempRate}
-                          onChange={(e) => setTempRate(e.target.value)}
-                          className="border rounded px-2 py-1 w-24"
-                        />
-                      ) : (
-                        selectedShop.rate
-                      )}
-                      <button
-                        onClick={() => handleEditRate(selectedShop)}
-                        className="hover:text-blue-700"
-                      >
-                        <FiEdit className="text-blue-600" />
-                      </button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="py-3 text-sm text-gray-500">
-                      Terms Agreement
-                    </td>
-                    <td className="py-3 text-sm">
-                      <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          selectedShop.termsAgreed
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
-                      >
-                        {selectedShop.termsAgreed ? "Agreed" : "Not Agreed"}
-                      </span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="py-3 text-sm text-gray-500">
-                      Preferred Partner Status
-                    </td>
-                    <td className="py-3 text-sm">
-                      <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          selectedShop.isPreferredPartner
-                            ? "bg-blue-100 text-blue-800"
-                            : "bg-gray-100 text-gray-800"
-                        }`}
-                      >
-                        {selectedShop.isPreferredPartner
-                          ? "Preferred Partner"
-                          : "Standard Partner"}
-                      </span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="py-3 text-sm text-gray-500">LOGO</td>
-                    <td className="py-3">
-                      <img
-                        src={selectedShop.logoUrl || "/placeholder.svg"}
-                        alt="Shop logo"
-                        className="w-24 h-24 object-contain"
-                      />
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+              <div className="space-y-4 md:space-y-6">
+                <div>
+                  <h2 className="font-medium mb-2">Description</h2>
+                  <p className="text-gray-600">{selectedShop.shortDesc}</p>
+                </div>
 
-            <div className="flex gap-4 mt-8">
-              {activeTab === "Pending" && (
+                <div>
+                  <h2 className="font-medium mb-2">Location</h2>
+                  <p className="text-gray-600">{selectedShop.location}</p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <h2 className="font-medium mb-2">Phone Number</h2>
+                    <p className="text-gray-600">{selectedShop.mobileNumber}</p>
+                  </div>
+                  <div>
+                    <h2 className="font-medium mb-2">Email ID</h2>
+                    <p className="text-gray-600 break-words whitespace-normal">{selectedShop.email}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 md:mt-8">
+                <h2 className="text-lg md:text-xl font-semibold mb-3 md:mb-4">SHOP DETAILS</h2>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm md:text-base">
+                    <tbody className="divide-y divide-gray-200">
+                      {/* Modified to use flex layout on small screens */}
+                      <tr className="flex flex-col sm:table-row">
+                        <td className="py-2 md:py-3 text-gray-500 font-medium sm:font-normal">
+                          Business/Services Owner Name
+                        </td>
+                        <td className="py-2 md:py-3 pb-4 sm:pb-3">{selectedShop.owner}</td>
+                      </tr>
+                      <tr className="flex flex-col sm:table-row">
+                        <td className="py-2 md:py-3 text-gray-500 font-medium sm:font-normal">
+                          Business/Services Mode
+                        </td>
+                        <td className="py-2 md:py-3 pb-4 sm:pb-3">{selectedShop.mode}</td>
+                      </tr>
+                      <tr className="flex flex-col sm:table-row">
+                        <td className="py-2 md:py-3 text-gray-500 font-medium sm:font-normal">Email</td>
+                        <td className="py-2 md:py-3 pb-4 sm:pb-3">
+                          <p className="break-all sm:break-normal max-w-full sm:max-w-none">
+                            {selectedShop.email}
+                          </p>
+                        </td>
+                      </tr>
+                      <tr className="flex flex-col sm:table-row">
+                        <td className="py-2 md:py-3 text-gray-500 font-medium sm:font-normal">
+                          Shop Category
+                        </td>
+                        <td className="py-2 md:py-3 pb-4 sm:pb-3">{selectedShop.cat}</td>
+                      </tr>
+                      <tr className="flex flex-col sm:table-row">
+                        <td className="py-2 md:py-3 text-gray-500 font-medium sm:font-normal">
+                          Commission rate
+                        </td>
+                        <td className="py-2 md:py-3 pb-4 sm:pb-3 flex gap-2 md:gap-4 items-center">
+                          {editingRate === selectedShop.id ? (
+                            <input
+                              type="text"
+                              value={tempRate}
+                              onChange={(e) => setTempRate(e.target.value)}
+                              className="border rounded px-2 py-1 w-16 md:w-24"
+                            />
+                          ) : (
+                            selectedShop.rate
+                          )}
+                          <button
+                            onClick={() => handleEditRate(selectedShop)}
+                            className="hover:text-blue-700"
+                          >
+                            <FiEdit className="text-blue-600" />
+                          </button>
+                        </td>
+                      </tr>
+                      <tr className="flex flex-col sm:table-row">
+                        <td className="py-2 md:py-3 text-gray-500 font-medium sm:font-normal">
+                          Terms Agreement
+                        </td>
+                        <td className="py-2 md:py-3 pb-4 sm:pb-3">
+                          <span
+                            className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${selectedShop.termsAgreed
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                              }`}
+                          >
+                            {selectedShop.termsAgreed ? "Agreed" : "Not Agreed"}
+                          </span>
+                        </td>
+                      </tr>
+                      <tr className="flex flex-col sm:table-row">
+                        <td className="py-2 md:py-3 text-gray-500 font-medium sm:font-normal">
+                          Preferred Partner Status
+                        </td>
+                        <td className="py-2 md:py-3 pb-4 sm:pb-3">
+                          <span
+                            className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${selectedShop.isPreferredPartner
+                              ? "bg-blue-100 text-blue-800"
+                              : "bg-gray-100 text-gray-800"
+                              }`}
+                          >
+                            {selectedShop.isPreferredPartner
+                              ? "Preferred Partner"
+                              : "Standard Partner"}
+                          </span>
+                        </td>
+                      </tr>
+                      <tr className="flex flex-col sm:table-row">
+                        <td className="py-2 md:py-3 text-gray-500 font-medium sm:font-normal">LOGO</td>
+                        <td className="py-2 md:py-3 pb-4 sm:pb-3">
+                          <img
+                            src={selectedShop.logoUrl || "/placeholder.svg"}
+                            alt="Shop logo"
+                            className="w-16 h-16 md:w-24 md:h-24 object-contain"
+                          />
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 mt-6 md:mt-8">
+                {activeTab === "Pending" && (
+                  <button
+                    onClick={() => handleRejectRequest(selectedShop)}
+                    className="px-4 py-2 rounded bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors flex items-center justify-center gap-2 w-full sm:w-auto"
+                  >
+                    {rejecting && <FaSpinner className="animate-spin" />}
+                    Reject Request
+                  </button>
+                )}
                 <button
-                  onClick={() => handleRejectRequest(selectedShop)}
-                  className="px-6 py-2 rounded bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors flex items-center gap-2"
+                  onClick={() => handleAcceptRequest(selectedShop)}
+                  className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600 transition-colors flex items-center justify-center gap-2 w-full sm:w-auto"
                 >
-                  {rejecting && <FaSpinner className="animate-spin" />}
-                  Reject Request
+                  {accepting && <FaSpinner className="animate-spin" />}
+                  Accept Request
                 </button>
-              )}
-              <button
-                onClick={() => handleAcceptRequest(selectedShop)}
-                className="px-6 py-2 rounded bg-blue-500 text-white hover:bg-blue-600 transition-colors flex items-center gap-2"
-              >
-                {accepting && <FaSpinner className="animate-spin" />}
-                Accept Request
-              </button>
+              </div>
             </div>
           </div>
         </div>
@@ -376,32 +383,118 @@ const OfflineShopRequests = () => {
   }
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-semibold mb-6">Offline Shop Requests</h1>
-      <div className="bg-white p-6 rounded-xl border shadow-md">
-        <div className="flex gap-4 mb-6">
+    <div className="p-3 md:p-6">
+      <h1 className="text-xl md:text-2xl font-semibold mb-4 md:mb-6">Offline Shop Requests</h1>
+      <div className="bg-white p-3 md:p-6 rounded-xl border shadow-md">
+        <div className="flex flex-col md:flex-row gap-2 md:gap-4 mb-4 md:mb-6">
           <button
-            className={`px-4 py-2 rounded-full text-sm ${
-              activeTab === "Pending"
+            className={`px-3 md:px-4 py-2 rounded-full text-xs md:text-sm ${activeTab === "Pending"
                 ? "bg-[#F7941D] text-white"
                 : "border border-gray-300 text-gray-700"
-            }`}
+              }`}
             onClick={() => setActiveTab("Pending")}
           >
             Product/Service Requests
           </button>
           <button
-            className={`px-4 py-2 rounded-full text-sm ${
-              activeTab === "Rejected"
+            className={`px-3 md:px-4 py-2 rounded-full text-xs md:text-sm ${activeTab === "Rejected"
                 ? "bg-[#F7941D] text-white"
                 : "border border-gray-300 text-gray-700"
-            }`}
+              }`}
             onClick={() => setActiveTab("Rejected")}
           >
-            Rejected Product/Service Requests
+            Rejected Requests
           </button>
         </div>
-        <div className="overflow-x-auto">
+
+        {/* Mobile View List Cards */}
+        <div className="md:hidden">
+          {loading ? (
+            // Mobile skeleton
+            Array.from({ length: 3 }).map((_, index) => (
+              <div key={index} className="border-b py-4">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-16 h-16 bg-gray-200 animate-pulse rounded"></div>
+                  <div>
+                    <div className="h-4 w-32 bg-gray-200 animate-pulse mb-2"></div>
+                    <div className="h-3 w-24 bg-gray-200 animate-pulse"></div>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3 mb-3">
+                  <div>
+                    <div className="h-3 w-full bg-gray-200 animate-pulse mb-1"></div>
+                    <div className="h-2 w-1/2 bg-gray-200 animate-pulse"></div>
+                  </div>
+                  <div>
+                    <div className="h-3 w-full bg-gray-200 animate-pulse mb-1"></div>
+                    <div className="h-2 w-1/2 bg-gray-200 animate-pulse"></div>
+                  </div>
+                </div>
+                <div className="flex justify-end">
+                  <div className="h-8 w-24 bg-gray-200 animate-pulse"></div>
+                </div>
+              </div>
+            ))
+          ) : paginatedData.length === 0 ? (
+            <div className="py-6 text-center text-gray-500">
+              {activeTab === "Pending"
+                ? "There are no pending business requests."
+                : "There are no rejected businesses"}
+            </div>
+          ) : (
+            paginatedData.map((request) => (
+              <div key={request.id} className="border-b py-4">
+                <div className="flex items-center gap-3 mb-3">
+                  <img
+                    src={request.logoUrl || "/placeholder.svg"}
+                    alt={request.businessName}
+                    className="w-16 h-16 rounded object-cover"
+                  />
+                  <div>
+                    <h3 className="font-medium">{request.businessName}</h3>
+                    <p className="text-sm text-gray-500">{request.location}</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 mb-3">
+                  <div>
+                    <p className="text-sm">{request.mobileNumber}</p>
+                    <p className="text-xs text-gray-500">Phone</p>
+                  </div>
+                  <div>
+                    <p className="text-sm truncate">{request.email}</p>
+                    <p className="text-xs text-gray-500">Email</p>
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-sm">{request.createdDate}</p>
+                    <p className="text-xs text-gray-500">Requested Date</p>
+                  </div>
+                  {activeTab === "Rejected" && (
+                    <div>
+                      <p className="text-sm text-red-500">{request.rejectedDate || "N/A"}</p>
+                      <p className="text-xs text-gray-500">Rejected Date</p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex justify-end mt-3">
+                  <button
+                    onClick={() => setSelectedShop(request)}
+                    className="text-blue-500 border border-blue-600 px-2 py-1 text-sm hover:text-blue-600 transition-colors"
+                  >
+                    View Details
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Desktop View Table */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full">
             <tbody>
               {loading ? (
@@ -520,40 +613,49 @@ const OfflineShopRequests = () => {
           </table>
         </div>
 
-        {/* Pagination */}
-        {/* Pagination - Only show if there's data and more than one page */}
+        {/* Pagination - Responsive */}
         {!loading && filteredRequests.length > 0 && (
-          <div className="flex items-center justify-between mt-6">
-            <p className="text-gray-600">
+          <div className="flex flex-col sm:flex-row items-center justify-between mt-6 gap-3">
+            <p className="text-xs md:text-sm text-gray-600 order-2 sm:order-1">
               Showing {startIndex + 1} to{" "}
               {Math.min(startIndex + ITEMS_PER_PAGE, filteredRequests.length)}{" "}
               of {filteredRequests.length}
             </p>
-            <div className="flex gap-2">
+
+            <div className="flex gap-1 md:gap-2 order-1 sm:order-2">
               <button
-                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded disabled:opacity-50"
+                className="px-2 md:px-4 py-1 md:py-2 text-xs md:text-sm text-gray-600 hover:bg-gray-100 rounded disabled:opacity-50"
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage(currentPage - 1)}
               >
-                Previous
+                Prev
               </button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (page) => (
+
+              {/* Show fewer page numbers on mobile */}
+              {Array.from({ length: totalPages }, (_, i) => i + 1)
+                .filter(page => {
+                  // On small screens, show current page and adjacent pages only
+                  const isSmallScreen = window.innerWidth < 640;
+                  if (isSmallScreen) {
+                    return Math.abs(page - currentPage) <= 1 || page === 1 || page === totalPages;
+                  }
+                  return true;
+                })
+                .map((page) => (
                   <button
                     key={page}
-                    className={`w-8 h-8 rounded ${
-                      currentPage === page
+                    className={`w-6 h-6 md:w-8 md:h-8 rounded text-xs md:text-sm ${currentPage === page
                         ? "bg-blue-500 text-white"
                         : "text-gray-600 hover:bg-gray-100"
-                    }`}
+                      }`}
                     onClick={() => setCurrentPage(page)}
                   >
                     {page}
                   </button>
-                )
-              )}
+                ))}
+
               <button
-                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded disabled:opacity-50"
+                className="px-2 md:px-4 py-1 md:py-2 text-xs md:text-sm text-gray-600 hover:bg-gray-100 rounded disabled:opacity-50"
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage(currentPage + 1)}
               >

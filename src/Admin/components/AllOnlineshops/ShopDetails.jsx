@@ -142,14 +142,14 @@ function ShopDetails({ shop, onBack, onListedProducts, onStatusUpdate }) {
   };
 
   return (
-    <div className="min-h-screen p-6">
+    <div className="min-h-screen p-2 sm:p-6">
       <div className="py-4 flex items-center justify-between">
         <button
           onClick={onBack}
           className="flex items-center text-gray-700 hover:text-gray-900"
         >
           <IoArrowBack className="w-5 h-5 mr-2" />
-          View Details
+          <span className="text-sm sm:text-base">View Details</span>
         </button>
         <div className="relative">
           <button
@@ -159,7 +159,7 @@ function ShopDetails({ shop, onBack, onListedProducts, onStatusUpdate }) {
             <IoEllipsisVertical className="w-6 h-6 text-gray-600" />
           </button>
           {showOptions && (
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border py-1">
+            <div className="absolute right-0 z-10 mt-2 w-48 bg-white rounded-lg shadow-lg border py-1">
               <button
                 onClick={() => {
                   onListedProducts(shop.id);
@@ -193,15 +193,15 @@ function ShopDetails({ shop, onBack, onListedProducts, onStatusUpdate }) {
         </div>
       </div>
 
-      <div className="p-6 bg-white rounded-lg shadow-md border">
-        <div className="flex items-start gap-6 mb-8">
+      <div className="p-3 sm:p-6 bg-white rounded-lg shadow-md border">
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 mb-6 sm:mb-8">
           <img
             src={shop.bannerUrl}
             alt={shop.businessName}
-            className="w-48 h-48 object-cover rounded-lg"
+            className="w-full sm:w-48 h-48 object-cover rounded-lg"
           />
-          <div className="flex-grow">
-            <div className="flex items-center gap-2 mb-1">
+          <div className="flex-grow w-full">
+            <div className="flex flex-wrap items-center gap-2 mb-2">
               <img
                 src={shop.logoUrl}
                 alt="Logo"
@@ -216,7 +216,7 @@ function ShopDetails({ shop, onBack, onListedProducts, onStatusUpdate }) {
               )}
             </div>
             <p className="text-gray-600 text-sm">{shop.cat}</p>
-            <div className="mt-6">
+            <div className="mt-4 sm:mt-6">
               <h2 className="font-medium mb-2">Description</h2>
               <p className="text-gray-600">{shop.shortDesc}</p>
             </div>
@@ -224,14 +224,14 @@ function ShopDetails({ shop, onBack, onListedProducts, onStatusUpdate }) {
               <h2 className="font-medium mb-2">Location</h2>
               <p className="text-gray-600">{shop.location}</p>
             </div>
-            <div className="mt-4 grid grid-cols-2 gap-4">
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <h2 className="font-medium mb-2">Phone Number</h2>
-                <p className="text-gray-600">{shop.mobileNumber}</p>
+                <p className="text-gray-600 break-words">{shop.mobileNumber}</p>
               </div>
               <div>
                 <h2 className="font-medium mb-2">Email ID</h2>
-                <p className="text-gray-600">{shop.email}</p>
+                <p className="text-gray-600 break-words">{shop.email}</p>
               </div>
             </div>
           </div>
@@ -239,12 +239,12 @@ function ShopDetails({ shop, onBack, onListedProducts, onStatusUpdate }) {
 
         <div className="border-t pt-6">
           <h2 className="text-lg font-semibold mb-4">SHOP DETAILS</h2>
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div>
               <h3 className="text-sm text-gray-600 mb-1">
                 Business/Services Owner Name
               </h3>
-              <p className="font-medium">{shop.owner}</p>
+              <p className="font-medium break-words">{shop.owner}</p>
             </div>
             <div>
               <h3 className="text-sm text-gray-600 mb-1">Shop Category</h3>
@@ -258,14 +258,14 @@ function ShopDetails({ shop, onBack, onListedProducts, onStatusUpdate }) {
             </div>
             <div>
               <h3 className="text-sm text-gray-600 mb-1">Commission rate</h3>
-              <p className="font-medium flex gap-4 items-center">
+              <p className="font-medium flex flex-wrap gap-2 sm:gap-4 items-center">
                 {editingRate === shop.id && shop.status === "Active" ? (
                   <>
                     <input
                       type="text"
                       value={tempRate}
                       onChange={(e) => setTempRate(e.target.value)}
-                      className="border rounded px-2 py-1 w-24"
+                      className="border rounded px-2 py-1 w-20 sm:w-24"
                     />
                     <button
                       onClick={handleSaveRate}
@@ -294,7 +294,7 @@ function ShopDetails({ shop, onBack, onListedProducts, onStatusUpdate }) {
             </div>
             <div>
               <h3 className="text-sm text-gray-600 mb-1">Email</h3>
-              <p className="font-medium">{shop.businessEmail}</p>
+              <p className="font-medium break-words">{shop.businessEmail}</p>
             </div>
             <div>
               <h3 className="text-sm text-gray-600 mb-1">Terms Agreement</h3>
@@ -327,7 +327,7 @@ function ShopDetails({ shop, onBack, onListedProducts, onStatusUpdate }) {
               <img
                 src={shop.logoUrl}
                 alt="Business Logo"
-                className="w-24 h-24 object-contain"
+                className="w-16 h-16 sm:w-24 sm:h-24 object-contain"
               />
             </div>
           </div>
