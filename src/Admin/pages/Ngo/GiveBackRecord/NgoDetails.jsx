@@ -9,10 +9,9 @@ const NgoDetails = ({ ngoId, onBack }) => {
   const [activeMenu, setActiveMenu] = useState(null);
   const [ngoGivebackDetails, setNgoGivebackDetails] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [totalItems, setTotalItems] = useState(0); // Total number of items
-  const itemsPerPage = 5; // Number of items per page
+  const [totalItems, setTotalItems] = useState(0);
+  const itemsPerPage = 5;
 
-  // Calculate total pages dynamically
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   useEffect(() => {
@@ -29,7 +28,7 @@ const NgoDetails = ({ ngoId, onBack }) => {
           }
         });
         setNgoGivebackDetails(data);
-        setTotalItems(data.length); // Set total items based on fetched data
+        setTotalItems(data.length);
       } catch (error) {
         console.log("Error getting document: ", error);
         toast.error("Failed to fetch NGO details");
@@ -41,31 +40,103 @@ const NgoDetails = ({ ngoId, onBack }) => {
     fetchNgoDetails();
   }, [ngoId]);
 
-  // Handle page change
   const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
+      // Close any open menu when changing pages
+      setActiveMenu(null);
     }
   };
 
-  // Format date
   const formatDate = (dateString) => {
     return dateString ? dateString.split("T")[0] : "-";
   };
 
-  // Toggle menu
   const toggleMenu = (id) => {
     setActiveMenu(activeMenu === id ? null : id);
   };
 
-  // Get paginated data
   const getPaginatedData = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     return ngoGivebackDetails.slice(startIndex, endIndex);
   };
 
-  // Skeleton Loading Rows
+  // Card view for mobile screens
+  const renderMobileCards = () => {
+    return getPaginatedData().map((row) => (
+      <div key={row.id} className="bg-white p-4 rounded-lg shadow-sm mb-4">
+        <div className="flex justify-between items-center mb-2">
+          <h3 className="font-medium">{row.ngoName}</h3>
+          <div className="relative">
+            <button
+              onClick={() => toggleMenu(row.id)}
+              className="hover:bg-gray-100 p-2 rounded-full"
+            >
+              <FiMoreVertical className="w-4 h-4" />
+            </button>
+            {activeMenu === row.id && (
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border z-10">
+                <div className="py-1">
+                  <button className="block w-full text-left px-4 py-2 hover:bg-gray-100">
+                    Edit
+                  </button>
+                  <button className="block w-full text-left px-4 py-2 hover:bg-gray-100">
+                    Delete
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-y-2 text-sm">
+          <div className="text-gray-500">Date:</div>
+          <div>{formatDate(row.paidAt)}</div>
+          
+          <div className="text-gray-500">Name:</div>
+          <div>{row.userName}</div>
+          
+          <div className="text-gray-500">Email:</div>
+          <div className="break-all">{row.userEmail}</div>
+          
+          <div className="text-gray-500">Amount:</div>
+          <div>₹ {row.amount}</div>
+        </div>
+      </div>
+    ));
+  };
+
+  // Skeleton loading for mobile cards
+  const renderMobileSkeletonCards = () => {
+    return Array.from({ length: itemsPerPage }).map((_, index) => (
+      <div key={index} className="bg-white p-4 rounded-lg shadow-sm mb-4">
+        <div className="flex justify-between items-center mb-4">
+          <div className="h-5 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+          <div className="h-8 w-8 bg-gray-200 rounded-full animate-pulse"></div>
+        </div>
+        <div className="space-y-3">
+          <div className="grid grid-cols-2 gap-2">
+            <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+            <div className="h-4 bg-gray-200 rounded w-2/3 animate-pulse"></div>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+            <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="h-4 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/4 animate-pulse"></div>
+          </div>
+        </div>
+      </div>
+    ));
+  };
+
+  // Skeleton Loading Rows for desktop
   const renderSkeletonRows = () => {
     return Array.from({ length: itemsPerPage }).map((_, index) => (
       <tr key={index} className="border-b last:border-b-0">
@@ -92,18 +163,18 @@ const NgoDetails = ({ ngoId, onBack }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
+    <div className="min-h-screen bg-gray-50 p-2 md:p-4">
       {/* Header */}
-      <div className="mb-6 flex items-center gap-2">
+      <div className="mb-4 md:mb-6 flex items-center gap-2">
         <button onClick={onBack} className="hover:bg-gray-100 p-2 rounded-full">
           <FiChevronLeft className="w-5 h-5" />
         </button>
-        <h1 className="text-xl font-medium">Back</h1>
+        <h1 className="text-lg md:text-xl font-medium">Back</h1>
       </div>
 
-      {/* Table Container */}
-      <div className="bg-white rounded-xl shadow-sm overflow-x-auto mb-6">
-        <table className="w-full min-w-[1000px]">
+      {/* Desktop Table (hidden on mobile) */}
+      <div className="hidden md:block bg-white rounded-xl shadow-sm overflow-x-auto mb-6">
+        <table className="w-full">
           <thead>
             <tr className="border-b">
               <th className="text-left p-4 font-medium">NGO/Cause name</th>
@@ -158,37 +229,99 @@ const NgoDetails = ({ ngoId, onBack }) => {
         </table>
       </div>
 
-      {/* Pagination - Now Outside Table */}
-      {ngoGivebackDetails.length > 0 && (
-        <div className="p-4 flex items-center justify-between">
-          <div className="text-sm text-gray-600">
-            Showing {Math.min(itemsPerPage, totalItems)} of {totalItems}
+      {/* Mobile Cards View (shown only on mobile) */}
+      <div className="md:hidden">
+        {loading ? (
+          renderMobileSkeletonCards()
+        ) : ngoGivebackDetails.length === 0 ? (
+          <div className="bg-white p-4 rounded-lg text-center text-gray-500">
+            This NGO has not received any donations yet.
           </div>
-          <div className="flex items-center gap-2">
+        ) : (
+          renderMobileCards()
+        )}
+      </div>
+
+      {/* Responsive Pagination */}
+      {ngoGivebackDetails.length > 0 && (
+        <div className="p-2 md:p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="text-xs md:text-sm text-gray-600 order-2 md:order-1">
+            Showing {(currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems}
+          </div>
+          <div className="flex items-center gap-1 md:gap-2 order-1 md:order-2">
             <button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className="px-3 py-1 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-2 md:px-3 py-1 text-xs md:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Previous
+              Prev
             </button>
-            {Array.from({ length: totalPages }, (_, index) => (
-              <button
-                key={index + 1}
-                onClick={() => handlePageChange(index + 1)}
-                className={`px-3 py-1 rounded ${
-                  currentPage === index + 1
-                    ? "bg-blue-500 text-white"
-                    : "hover:bg-gray-100"
-                }`}
-              >
-                {index + 1}
-              </button>
-            ))}
+            
+            {/* Dynamic pagination that shows fewer buttons on mobile */}
+            {Array.from({ length: totalPages }, (_, index) => {
+              const pageNum = index + 1;
+              
+              // On mobile, only show current page and immediate neighbors
+              if (window.innerWidth < 768) {
+                if (
+                  pageNum === 1 ||
+                  pageNum === totalPages ||
+                  (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)
+                ) {
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => handlePageChange(pageNum)}
+                      className={`px-2 md:px-3 py-1 rounded text-xs md:text-sm ${
+                        currentPage === pageNum
+                          ? "bg-blue-500 text-white"
+                          : "hover:bg-gray-100"
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                } else if (
+                  (pageNum === currentPage - 2 && currentPage > 3) ||
+                  (pageNum === currentPage + 2 && currentPage < totalPages - 2)
+                ) {
+                  return <span key={pageNum}>...</span>;
+                }
+                return null;
+              }
+              
+              // Desktop view - show more page numbers
+              if (
+                pageNum === 1 ||
+                pageNum === totalPages ||
+                (pageNum >= currentPage - 2 && pageNum <= currentPage + 2)
+              ) {
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => handlePageChange(pageNum)}
+                    className={`px-2 md:px-3 py-1 rounded text-xs md:text-sm ${
+                      currentPage === pageNum
+                        ? "bg-blue-500 text-white"
+                        : "hover:bg-gray-100"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              } else if (
+                (pageNum === currentPage - 3 && currentPage > 4) ||
+                (pageNum === currentPage + 3 && currentPage < totalPages - 3)
+              ) {
+                return <span key={pageNum}>...</span>;
+              }
+              return null;
+            })}
+            
             <button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="px-3 py-1 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-2 md:px-3 py-1 text-xs md:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Next
             </button>
