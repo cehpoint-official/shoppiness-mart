@@ -164,8 +164,8 @@ const WebsiteEditPages = () => {
 
   if (loading) {
     return (
-      <div className="p-6 flex justify-center items-center h-[600px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="p-3 md:p-6 flex justify-center items-center h-[400px] md:h-[600px]">
+        <div className="animate-spin rounded-full h-8 w-8 md:h-12 md:w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     );
   }
@@ -243,10 +243,10 @@ const WebsiteEditPages = () => {
     };
 
     return (
-      <div className="p-6">
+      <div className="p-3 md:p-6">
         <button
           onClick={handleBack}
-          className="flex items-center text-gray-600 mb-4"
+          className="flex items-center text-gray-600 mb-3 md:mb-4 text-sm md:text-base"
         >
           ← Back
         </button>
@@ -256,36 +256,36 @@ const WebsiteEditPages = () => {
   }
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-semibold mb-6">Edit Pages</h1>
-      <div className="space-y-4 bg-white h-[600px] rounded-xl border shadow-md py-10 px-6 overflow-y-auto">
+    <div className="p-3 md:p-6">
+      <h1 className="text-xl md:text-2xl font-semibold mb-4 md:mb-6">Edit Pages</h1>
+      <div className="space-y-4 bg-white h-[500px] md:h-[600px] rounded-xl border shadow-md py-6 md:py-10 px-3 md:px-6 overflow-y-auto">
         {/* Home Section */}
         <div className="border rounded-lg overflow-hidden">
           <div
-            className="flex justify-between items-center p-4 cursor-pointer"
+            className="flex flex-wrap justify-between items-center p-3 md:p-4 cursor-pointer"
             onClick={() => toggleSection("home")}
           >
-            <h2 className="text-lg font-medium">Home</h2>
-            <div className="flex items-center space-x-2">
-              <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
+            <h2 className="text-base md:text-lg font-medium mb-1 md:mb-0">Home</h2>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs md:text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
                 {pageData.homeBanners.length} banners  
               </span>
-              <span className="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">
+              <span className="text-xs md:text-sm bg-green-100 text-green-800 px-2 py-1 rounded">
                 {pageData.homeVideos.length} videos
               </span>
               {openSections.home ? <AiOutlineMinus /> : <AiOutlinePlus />}
             </div>
           </div>
           {openSections.home && (
-            <div className="p-4 border-t space-y-2">
+            <div className="p-3 md:p-4 border-t space-y-2">
               <div
-                className="cursor-pointer text-blue-600 hover:text-blue-800 flex items-center"
+                className="cursor-pointer text-blue-600 hover:text-blue-800 flex items-center text-sm md:text-base"
                 onClick={() => handleItemClick({ type: "UploadHomeBanner" })}
               >
                 <AiOutlinePlus className="mr-2" /> Upload Banner image
               </div>
               <div
-                className="cursor-pointer text-blue-600 hover:text-blue-800 flex items-center"
+                className="cursor-pointer text-blue-600 hover:text-blue-800 flex items-center text-sm md:text-base"
                 onClick={() => handleItemClick({ type: "UploadVideoHome" })}
               >
                 <AiOutlinePlus className="mr-2" /> Upload Home Video
@@ -297,21 +297,21 @@ const WebsiteEditPages = () => {
         {/* How it works Section */}
         <div className="border rounded-lg overflow-hidden">
           <div
-            className="flex justify-between items-center p-4 cursor-pointer"
+            className="flex flex-wrap justify-between items-center p-3 md:p-4 cursor-pointer"
             onClick={() => toggleSection("howItWorks")}
           >
-            <h2 className="text-lg font-medium">How it works</h2>
-            <div className="flex items-center">
-              <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded mr-2">
+            <h2 className="text-base md:text-lg font-medium mb-1 md:mb-0">How it works</h2>
+            <div className="flex items-center gap-2">
+              <span className="text-xs md:text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
                 {pageData.howItWorksVideos.length} videos
               </span>
               {openSections.howItWorks ? <AiOutlineMinus /> : <AiOutlinePlus />}
             </div>
           </div>
           {openSections.howItWorks && (
-            <div className="p-4 border-t">
+            <div className="p-3 md:p-4 border-t">
               <div
-                className="cursor-pointer text-blue-600 hover:text-blue-800 flex items-center"
+                className="cursor-pointer text-blue-600 hover:text-blue-800 flex items-center text-sm md:text-base"
                 onClick={() =>
                   handleItemClick({ type: "UploadVideoHowItWorks" })
                 }
@@ -325,28 +325,28 @@ const WebsiteEditPages = () => {
         {/* About Us Section */}
         <div className="border rounded-lg overflow-hidden">
           <div
-            className="flex justify-between items-center p-4 cursor-pointer"
+            className="flex flex-wrap justify-between items-center p-3 md:p-4 cursor-pointer"
             onClick={() => toggleSection("aboutUs")}
           >
-            <h2 className="text-lg font-medium">About Us</h2>
-            <div className="flex items-center">
-              <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded mr-2">
+            <h2 className="text-base md:text-lg font-medium mb-1 md:mb-0">About Us</h2>
+            <div className="flex items-center gap-2">
+              <span className="text-xs md:text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
                 {pageData.members.length} members
               </span>
               {openSections.aboutUs ? <AiOutlineMinus /> : <AiOutlinePlus />}
             </div>
           </div>
           {openSections.aboutUs && (
-            <div className="p-4 border-t space-y-2">
+            <div className="p-3 md:p-4 border-t space-y-2">
               <div
-                className="cursor-pointer text-blue-600 hover:text-blue-800 flex items-center"
+                className="cursor-pointer text-blue-600 hover:text-blue-800 flex items-center text-sm md:text-base"
                 onClick={() => handleItemClick({ type: "WriteStory" })}
               >
                 <AiOutlinePlus className="mr-2" /> Write the story of this
                 platform
               </div>
               <div
-                className="cursor-pointer text-blue-600 hover:text-blue-800 flex items-center"
+                className="cursor-pointer text-blue-600 hover:text-blue-800 flex items-center text-sm md:text-base"
                 onClick={() => handleItemClick({ type: "UploadMembers" })}
               >
                 <AiOutlinePlus className="mr-2" /> Upload members image
@@ -358,12 +358,12 @@ const WebsiteEditPages = () => {
         {/* Register Business/Service Section */}
         <div className="border rounded-lg overflow-hidden">
           <div
-            className="flex justify-between items-center p-4 cursor-pointer"
+            className="flex flex-wrap justify-between items-center p-3 md:p-4 cursor-pointer"
             onClick={() => toggleSection("registerBusiness")}
           >
-            <h2 className="text-lg font-medium">Register Business/Service</h2>
-            <div className="flex items-center">
-              <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded mr-2">
+            <h2 className="text-base md:text-lg font-medium mb-1 md:mb-0">Register Business/Service</h2>
+            <div className="flex items-center gap-2">
+              <span className="text-xs md:text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
                 {pageData.registerBusinessVideos.length} videos
               </span>
               {openSections.registerBusiness ? (
@@ -374,9 +374,9 @@ const WebsiteEditPages = () => {
             </div>
           </div>
           {openSections.registerBusiness && (
-            <div className="p-4 border-t">
+            <div className="p-3 md:p-4 border-t">
               <div
-                className="cursor-pointer text-blue-600 hover:text-blue-800 flex items-center"
+                className="cursor-pointer text-blue-600 hover:text-blue-800 flex items-center text-sm md:text-base"
                 onClick={() =>
                   handleItemClick({ type: "UploadVideoRegisterBusiness" })
                 }
@@ -390,21 +390,21 @@ const WebsiteEditPages = () => {
         {/* Online Shops Section */}
         <div className="border rounded-lg overflow-hidden">
           <div
-            className="flex justify-between items-center p-4 cursor-pointer"
+            className="flex flex-wrap justify-between items-center p-3 md:p-4 cursor-pointer"
             onClick={() => toggleSection("onlineShops")}
           >
-            <h2 className="text-lg font-medium">Online Shops</h2>
-            <div className="flex items-center space-x-2">
-              <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
+            <h2 className="text-base md:text-lg font-medium mb-1 md:mb-0">Online Shops</h2>
+            <div className="flex items-center gap-2">
+              <span className="text-xs md:text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
                 {pageData.onlineShopsBanners.length} banners
               </span>
               {openSections.onlineShops ? <AiOutlineMinus /> : <AiOutlinePlus />}
             </div>
           </div>
           {openSections.onlineShops && (
-            <div className="p-4 border-t space-y-2">
+            <div className="p-3 md:p-4 border-t space-y-2">
               <div
-                className="cursor-pointer text-blue-600 hover:text-blue-800 flex items-center"
+                className="cursor-pointer text-blue-600 hover:text-blue-800 flex items-center text-sm md:text-base"
                 onClick={() => handleItemClick({ type: "UploadOnlineShopsBanner" })}
               >
                 <AiOutlinePlus className="mr-2" /> Upload Online Shops Banner
@@ -416,21 +416,21 @@ const WebsiteEditPages = () => {
         {/* Support Maast Section */}
         <div className="border rounded-lg overflow-hidden">
           <div
-            className="flex justify-between items-center p-4 cursor-pointer"
+            className="flex flex-wrap justify-between items-center p-3 md:p-4 cursor-pointer"
             onClick={() => toggleSection("supportMaast")}
           >
-            <h2 className="text-lg font-medium">Support Maast</h2>
-            <div className="flex items-center space-x-2">
-              <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
+            <h2 className="text-base md:text-lg font-medium mb-1 md:mb-0">Support Maast</h2>
+            <div className="flex items-center gap-2">
+              <span className="text-xs md:text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
                 {pageData.supportMaastBanners.length} banners
               </span>
               {openSections.supportMaast ? <AiOutlineMinus /> : <AiOutlinePlus />}
             </div>
           </div>
           {openSections.supportMaast && (
-            <div className="p-4 border-t space-y-2">
+            <div className="p-3 md:p-4 border-t space-y-2">
               <div
-                className="cursor-pointer text-blue-600 hover:text-blue-800 flex items-center"
+                className="cursor-pointer text-blue-600 hover:text-blue-800 flex items-center text-sm md:text-base"
                 onClick={() => handleItemClick({ type: "UploadSupportMaastBanner" })}
               >
                 <AiOutlinePlus className="mr-2" /> Upload Support Maast Banner
@@ -442,21 +442,21 @@ const WebsiteEditPages = () => {
         {/* Cashback Deals Section */}
         <div className="border rounded-lg overflow-hidden">
           <div
-            className="flex justify-between items-center p-4 cursor-pointer"
+            className="flex flex-wrap justify-between items-center p-3 md:p-4 cursor-pointer"
             onClick={() => toggleSection("cashbackDeals")}
           >
-            <h2 className="text-lg font-medium">Cashback Deals</h2>
-            <div className="flex items-center space-x-2">
-              <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
+            <h2 className="text-base md:text-lg font-medium mb-1 md:mb-0">Cashback Deals</h2>
+            <div className="flex items-center gap-2">
+              <span className="text-xs md:text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
                 {pageData.cashbackDealsBanners.length} banners
               </span>
               {openSections.cashbackDeals ? <AiOutlineMinus /> : <AiOutlinePlus />}
             </div>
           </div>
           {openSections.cashbackDeals && (
-            <div className="p-4 border-t space-y-2">
+            <div className="p-3 md:p-4 border-t space-y-2">
               <div
-                className="cursor-pointer text-blue-600 hover:text-blue-800 flex items-center"
+                className="cursor-pointer text-blue-600 hover:text-blue-800 flex items-center text-sm md:text-base"
                 onClick={() => handleItemClick({ type: "UploadCashbackDealsBanner" })}
               >
                 <AiOutlinePlus className="mr-2" /> Upload Cashback Deals Banners

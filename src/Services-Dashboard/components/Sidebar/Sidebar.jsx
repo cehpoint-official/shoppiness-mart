@@ -109,7 +109,7 @@ const Sidebar = () => {
 
       {/* Sidebar - Hidden on small screens, shown when menu is toggled */}
       <div
-        className={`sidebar ${isMobileMenuOpen ? "block  fixed top-0 left-0" : "hidden"
+        className={`sidebar ${isMobileMenuOpen ? "block fixed top-0 left-0" : "hidden"
           } lg:block h-full z-30 overflow-y-hidden`}
       >
         {/* Close button inside sidebar - only visible on mobile */}

@@ -4,8 +4,8 @@ import { useParams } from "react-router-dom";
 import { storage } from "../../../../firebase";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { FaSpinner, FaImage } from "react-icons/fa";
-import { doc, updateDoc } from "firebase/firestore"; // Import Firestore functions
-import { db } from "../../../../firebase"; // Import your Firestore instance
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "../../../../firebase";
 import { useDispatch, useSelector } from "react-redux";
 import { businessUserExist } from "../../../redux/reducer/businessUserReducer";
 

@@ -105,16 +105,17 @@ function AllEvents({ onBackClick, onEditEvent }) {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
-        <button
-          onClick={onBackClick}
-          className="text-gray-600 hover:text-gray-800 flex items-center gap-1"
-        >
-          <span>←</span> Back to Create Event
-        </button>
-        
-        <h1 className="text-2xl font-normal">All Events</h1>
-      </div>
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
+  <button
+    onClick={onBackClick}
+    className="text-gray-600 hover:text-gray-800 flex items-center gap-1"
+  >
+    <span>←</span> Back to Create Event
+  </button>
+
+  <h1 className="text-2xl font-normal">All Events</h1>
+</div>
+
 
       {error && (
         <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">

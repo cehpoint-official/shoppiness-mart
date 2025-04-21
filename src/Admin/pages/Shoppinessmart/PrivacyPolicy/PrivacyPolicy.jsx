@@ -76,15 +76,15 @@ const PrivacyPolicy = () => {
   return (
     <div className="flex min-h-screen">
       <div className="flex-1 flex flex-col">
-        <div className="p-6 bg-gray-100 flex-1">
+        <div className="p-4 md:p-6 bg-gray-100 flex-1">
           <div className="max-w-7xl mx-auto">
             <div className="bg-white shadow-md rounded-lg p-4 mb-6">
-              <div className="flex justify-between items-center mb-4">
-                <h1 className="text-xl font-bold">Privacy Policies</h1>
+              <div className="flex flex-col space-y-4 sm:flex-row sm:justify-between sm:items-center mb-4">
+                <h1 className="text-lg sm:text-xl font-bold">Privacy Policies</h1>
 
                 <button
                   onClick={() => setCurrentView("addPrivacy")}
-                  className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors"
+                  className="bg-green-500 text-white px-3 py-2 sm:px-4 rounded-lg hover:bg-green-600 transition-colors text-sm sm:text-base"
                 >
                   + ADD NEW POLICY
                 </button>
@@ -106,19 +106,19 @@ const PrivacyPolicy = () => {
                   {policies.map((policy) => (
                     <div
                       key={policy.id}
-                      className="flex justify-between items-center bg-gray-50 px-4 py-3 rounded-lg shadow-sm hover:bg-gray-100 transition-colors"
+                      className="flex flex-col sm:flex-row sm:justify-between sm:items-center bg-gray-50 px-4 py-3 rounded-lg shadow-sm hover:bg-gray-100 transition-colors space-y-2 sm:space-y-0"
                     >
-                      <span className="font-medium">{policy.title}</span>
-                      <div className="flex space-x-2">
+                      <span className="font-medium text-sm sm:text-base break-words">{policy.title}</span>
+                      <div className="flex space-x-3 sm:space-x-2">
                         <button 
                           onClick={() => handleEditClick(policy)}
-                          className="text-blue-500 hover:text-blue-700 transition-colors flex items-center"
+                          className="text-blue-500 hover:text-blue-700 transition-colors flex items-center text-sm sm:text-base"
                         >
                           <AiOutlineEdit className="mr-1" /> Edit
                         </button>
                         <button 
                           onClick={() => handleDeletePolicy(policy.id)}
-                          className="text-red-500 hover:text-red-700 transition-colors flex items-center"
+                          className="text-red-500 hover:text-red-700 transition-colors flex items-center text-sm sm:text-base"
                         >
                           <AiOutlineDelete className="mr-1" /> Delete
                         </button>
@@ -207,23 +207,23 @@ const AddPrivacyPolicy = ({ onBack, onPolicyAdded, editPolicy }) => {
   return (
     <div>
       <div className="flex-1">
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-          <div className="bg-white shadow-md rounded-lg p-8 w-full max-w-3xl">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
+          <div className="bg-white shadow-md rounded-lg p-4 sm:p-6 md:p-8 w-full max-w-3xl">
             <button
               onClick={onBack}
-              className="flex items-center gap-2 text-2xl hover:text-gray-700 mb-6"
+              className="flex items-center gap-2 text-lg sm:text-xl md:text-2xl hover:text-gray-700 mb-4 sm:mb-6"
               disabled={submitting}
             >
               ← Back
             </button>
 
-            <h2 className="text-xl font-bold mb-6">
+            <h2 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6">
               {editPolicy ? "Edit Privacy Policy" : "Add New Privacy Policy"}
             </h2>
 
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
-                <label htmlFor="title" className="block text-gray-700 mb-2">
+                <label htmlFor="title" className="block text-gray-700 mb-2 text-sm sm:text-base">
                   Policy Title
                 </label>
                 <input
@@ -233,17 +233,17 @@ const AddPrivacyPolicy = ({ onBack, onPolicyAdded, editPolicy }) => {
                   onChange={(e) => setTitle(e.target.value)}
                   className={`shadow appearance-none border ${
                     validationErrors.title ? "border-red-500" : ""
-                  } rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                  } rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base`}
                   placeholder="Add title"
                   disabled={submitting}
                 />
                 {validationErrors.title && (
-                  <p className="text-red-500 text-sm mt-1">{validationErrors.title}</p>
+                  <p className="text-red-500 text-xs sm:text-sm mt-1">{validationErrors.title}</p>
                 )}
               </div>
               
               <div className="mb-6">
-                <label htmlFor="content" className="block text-gray-700 mb-2">
+                <label htmlFor="content" className="block text-gray-700 mb-2 text-sm sm:text-base">
                   Policy Content
                 </label>
                 <textarea
@@ -252,20 +252,20 @@ const AddPrivacyPolicy = ({ onBack, onPolicyAdded, editPolicy }) => {
                   onChange={(e) => setContent(e.target.value)}
                   className={`shadow appearance-none border ${
                     validationErrors.content ? "border-red-500" : ""
-                  } rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-64`}
+                  } rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-40 sm:min-h-60 md:min-h-64 text-sm sm:text-base`}
                   placeholder="Write policy"
                   disabled={submitting}
                 ></textarea>
                 {validationErrors.content && (
-                  <p className="text-red-500 text-sm mt-1">{validationErrors.content}</p>
+                  <p className="text-red-500 text-xs sm:text-sm mt-1">{validationErrors.content}</p>
                 )}
               </div>
               
-              <div className="flex justify-end space-x-3 mt-4">
+              <div className="flex flex-col space-y-2 sm:flex-row sm:justify-end sm:space-y-0 sm:space-x-3 mt-4">
                 <button
                   type="button"
                   onClick={handleClear}
-                  className="px-4 py-2 bg-red-100 text-red-700 rounded-md hover:bg-red-200"
+                  className="px-4 py-2 bg-red-100 text-red-700 rounded-md hover:bg-red-200 text-sm sm:text-base"
                   disabled={submitting || (!title.trim() && !content.trim())}
                 >
                   Clear
@@ -273,14 +273,14 @@ const AddPrivacyPolicy = ({ onBack, onPolicyAdded, editPolicy }) => {
                 <button
                   type="button"
                   onClick={onBack}
-                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
+                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 text-sm sm:text-base"
                   disabled={submitting}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 flex items-center justify-center min-w-[100px]"
+                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 flex items-center justify-center min-w-[100px] text-sm sm:text-base"
                   disabled={submitting}
                 >
                   {submitting ? (

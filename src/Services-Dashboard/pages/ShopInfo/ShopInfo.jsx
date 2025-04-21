@@ -93,21 +93,21 @@ const ShopInfo = () => {
     );
   }
   return (
-    <div className="min-h-screen p-8">
-      <div className=" bg-white rounded-xl p-6">
+    <div className="min-h-screen p-4 sm:p-6 md:p-8">
+      <div className="bg-white rounded-xl p-4 sm:p-6">
         {/* SHOP Info */}
         <div>
-          <div className="flex items-start gap-6">
+          <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
             <img
               src={user.bannerUrl}
               alt={user.businessName}
-              className="w-1/3 h-48 rounded-lg object-fit"
+              className="w-full sm:w-1/3 h-40 sm:h-48 rounded-lg object-cover"
             />
-            <div className="flex-1">
-              <div className="flex items-start justify-between mb-4">
+            <div className="flex-1 w-full">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-4">
                 <div>
-                  <div className="flex items-center justify-center py-1 rounded-full bg-green-200 gap-2 mb-1">
-                    <span className="text-md text-green-600 text-verified">
+                  <div className="inline-flex items-center justify-center px-2 py-1 rounded-full bg-green-200 gap-2 mb-1">
+                    <span className="text-xs sm:text-sm text-green-600 text-verified">
                       Verified
                     </span>
                   </div>
@@ -115,46 +115,46 @@ const ShopInfo = () => {
                     <img
                       src={user.logoUrl}
                       alt="Shop Logo"
-                      className="w-10 h-10 rounded-full"
+                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-full"
                     />
                     <div>
-                      <h1 className="text-xl font-semibold text-textPrimary">
+                      <h1 className="text-lg sm:text-xl font-semibold text-textPrimary">
                         {user.businessName}
                       </h1>
-                      <p className="text-sm text-textSecondary">{user.cat}</p>
+                      <p className="text-xs sm:text-sm text-textSecondary">{user.cat}</p>
                     </div>
                   </div>
                 </div>
-                <div>
-                  <p className="text-sm text-textSecondary mb-1">Shop ID</p>
+                <div className="mt-2 sm:mt-0">
+                  <p className="text-xs sm:text-sm text-textSecondary mb-1">Shop ID</p>
                   <p className="text-blue-700 font-semibold">{id}</p>
                 </div>
               </div>
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 <div>
-                  <h2 className="text-sm font-medium text-textSecondary mb-1">
+                  <h2 className="text-xs sm:text-sm font-medium text-textSecondary mb-1">
                     Description
                   </h2>
-                  <p className="text-textPrimary">{user.shortDesc}</p>
+                  <p className="text-sm sm:text-base text-textPrimary">{user.shortDesc}</p>
                 </div>
                 <div>
-                  <h2 className="text-sm font-medium text-textSecondary mb-1">
+                  <h2 className="text-xs sm:text-sm font-medium text-textSecondary mb-1">
                     Location
                   </h2>
-                  <p className="text-textPrimary">{user.location}</p>
+                  <p className="text-sm sm:text-base text-textPrimary">{user.location}</p>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
-                    <h2 className="text-sm font-medium text-textSecondary mb-1">
+                    <h2 className="text-xs sm:text-sm font-medium text-textSecondary mb-1">
                       Phone Number
                     </h2>
-                    <p className="text-textPrimary">{user.mobileNumber}</p>
+                    <p className="text-sm sm:text-base text-textPrimary">{user.mobileNumber}</p>
                   </div>
                   <div>
-                    <h2 className="text-sm font-medium text-textSecondary mb-1">
+                    <h2 className="text-xs sm:text-sm font-medium text-textSecondary mb-1">
                       Email ID
                     </h2>
-                    <p className="text-textPrimary">{user.email}</p>
+                    <p className="text-sm sm:text-base text-textPrimary">{user.email}</p>
                   </div>
                 </div>
               </div>
@@ -163,68 +163,68 @@ const ShopInfo = () => {
         </div>
 
         {/* SHOP DETAILS */}
-        <div>
-          <h2 className="text-lg font-semibold text-textPrimary mb-6">
+        <div className="mt-6 sm:mt-8">
+          <h2 className="text-base sm:text-lg font-semibold text-textPrimary mb-4 sm:mb-6">
             SHOP DETAILS
           </h2>
-          <div className="flex flex-col lg:flex-row gap-6">
+          <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
             {/* Left side - Input fields */}
             <div className="flex-1">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 <div>
-                  <h3 className="text-sm text-textSecondary mb-2">
+                  <h3 className="text-xs sm:text-sm text-textSecondary mb-1 sm:mb-2">
                     Business/Services Owner Name
                   </h3>
-                  <div className="bg-gray-50 p-3 rounded-md text-textPrimary">
+                  <div className="bg-gray-50 p-2 sm:p-3 rounded-md text-sm sm:text-base text-textPrimary">
                     {user.owner}
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-sm text-textSecondary mb-2">
+                  <h3 className="text-xs sm:text-sm text-textSecondary mb-1 sm:mb-2">
                     Business/Services type
                   </h3>
-                  <div className="bg-gray-50 p-3 rounded-md text-textPrimary">
+                  <div className="bg-gray-50 p-2 sm:p-3 rounded-md text-sm sm:text-base text-textPrimary">
                     {user.cat}
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-sm text-textSecondary mb-2">Email</h3>
-                  <div className="bg-gray-50 p-3 rounded-md text-textPrimary">
+                  <h3 className="text-xs sm:text-sm text-textSecondary mb-1 sm:mb-2">Email</h3>
+                  <div className="bg-gray-50 p-2 sm:p-3 rounded-md text-sm sm:text-base text-textPrimary">
                     {user.email}
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-sm text-textSecondary mb-2">
+                  <h3 className="text-xs sm:text-sm text-textSecondary mb-1 sm:mb-2">
                     Shop Category
                   </h3>
-                  <div className="bg-gray-50 p-3 rounded-md text-textPrimary">
+                  <div className="bg-gray-50 p-2 sm:p-3 rounded-md text-sm sm:text-base text-textPrimary">
                     {user.cat}
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-sm text-textSecondary mb-2">
+                  <h3 className="text-xs sm:text-sm text-textSecondary mb-1 sm:mb-2">
                     Commission rate
                   </h3>
-                  <div className="bg-gray-50 p-3 rounded-md text-textPrimary">
+                  <div className="bg-gray-50 p-2 sm:p-3 rounded-md text-sm sm:text-base text-textPrimary">
                     {user.rate}%
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-sm text-textSecondary mb-2">Password</h3>
-                  <div className="bg-gray-50 p-3 rounded-md flex justify-between items-center">
-                    <span className="text-textPrimary">
+                  <h3 className="text-xs sm:text-sm text-textSecondary mb-1 sm:mb-2">Password</h3>
+                  <div className="bg-gray-50 p-2 sm:p-3 rounded-md flex justify-between items-center">
+                    <span className="text-sm sm:text-base text-textPrimary">
                       {showPassword ? user.password : "••••••••"}
                     </span>
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => setShowPassword(!showPassword)}
-                        className="text-primary text-blue-500 text-sm flex items-center gap-1"
+                        className="text-primary text-blue-500 text-xs sm:text-sm flex items-center gap-1"
                       >
                         {showPassword ? <MdVisibilityOff /> : <MdVisibility />}
                       </button>
                       <button
                         onClick={() => setShowPasswordModal(true)}
-                        className="text-primary text-blue-500 text-sm"
+                        className="text-primary text-blue-500 text-xs sm:text-sm"
                       >
                         Change
                       </button>
@@ -234,21 +234,21 @@ const ShopInfo = () => {
               </div>
             </div>
             {/* Right side - Logo */}
-            <div className="lg:w-64">
-              <h3 className="text-sm text-textSecondary mb-2">Logo</h3>
-              <div className="flex items-center justify-center ">
+            <div className="w-full lg:w-64 mt-4 lg:mt-0">
+              <h3 className="text-xs sm:text-sm text-textSecondary mb-1 sm:mb-2">Logo</h3>
+              <div className="flex items-center justify-center">
                 <img
                   src={user.logoUrl}
                   alt="Shop Logo"
-                  className="max-w-full h-48 object-contain"
+                  className="max-w-full h-32 sm:h-48 object-contain"
                 />
               </div>
             </div>
           </div>
-          <div className="flex justify-end mt-6">
+          <div className="flex justify-center sm:justify-end mt-6">
             <button
               onClick={() => setCurrentView("shopInfoUpdate")}
-              className="flex bg-blue-600 items-center gap-2 bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-hover transition-colors"
+              className="flex bg-blue-600 items-center gap-2 bg-primary text-white px-3 py-2 sm:px-4 sm:py-2 rounded-md hover:bg-primary-hover transition-colors text-sm sm:text-base"
             >
               <MdModeEdit className="w-4 h-4" />
               Edit Shop Details
@@ -258,25 +258,25 @@ const ShopInfo = () => {
       </div>
       {/* Custom Password Change Modal */}
       {showPasswordModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg w-full max-w-md mx-4 overflow-hidden">
-            <div className="p-6">
-              <h2 className="text-xl font-semibold text-gray-900">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg w-full max-w-md overflow-hidden">
+            <div className="p-4 sm:p-6">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
                 Change Password
               </h2>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-xs sm:text-sm text-gray-500 mt-1">
                 Make your new password strong!
               </p>
 
-              <form onSubmit={handlePasswordSubmit} className="mt-6 space-y-4">
+              <form onSubmit={handlePasswordSubmit} className="mt-4 sm:mt-6 space-y-3 sm:space-y-4">
                 {error && (
-                  <div className="bg-red-50 text-red-600 px-4 py-2 rounded-md text-sm">
+                  <div className="bg-red-50 text-red-600 px-3 py-2 rounded-md text-xs sm:text-sm">
                     {error}
                   </div>
                 )}
 
-                <div className="space-y-2">
-                  <label className="text-sm text-gray-600" htmlFor="current">
+                <div className="space-y-1 sm:space-y-2">
+                  <label className="text-xs sm:text-sm text-gray-600" htmlFor="current">
                     Current Password
                   </label>
                   <input
@@ -285,13 +285,13 @@ const ShopInfo = () => {
                     type="password"
                     value={passwords.current}
                     onChange={handlePasswordChange}
-                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                     placeholder="Enter current password"
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm text-gray-600" htmlFor="new">
+                <div className="space-y-1 sm:space-y-2">
+                  <label className="text-xs sm:text-sm text-gray-600" htmlFor="new">
                     New Password
                   </label>
                   <input
@@ -300,13 +300,13 @@ const ShopInfo = () => {
                     type="password"
                     value={passwords.new}
                     onChange={handlePasswordChange}
-                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                     placeholder="Enter new password"
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm text-gray-600" htmlFor="confirm">
+                <div className="space-y-1 sm:space-y-2">
+                  <label className="text-xs sm:text-sm text-gray-600" htmlFor="confirm">
                     Confirm Password
                   </label>
                   <input
@@ -315,12 +315,12 @@ const ShopInfo = () => {
                     type="password"
                     value={passwords.confirm}
                     onChange={handlePasswordChange}
-                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                     placeholder="Confirm new password"
                   />
                 </div>
 
-                <div className="flex justify-end gap-2 mt-6">
+                <div className="flex justify-end gap-2 mt-4 sm:mt-6">
                   <button
                     type="button"
                     onClick={() => {
@@ -328,13 +328,13 @@ const ShopInfo = () => {
                       setPasswords({ current: "", new: "", confirm: "" });
                       setError("");
                     }}
-                    className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800"
+                    className="px-3 py-2 text-xs sm:text-sm text-gray-600 hover:text-gray-800"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    className="px-3 py-2 text-xs sm:text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                   >
                     Change Password
                   </button>

@@ -1,16 +1,6 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
-import { 
-  collection, 
-  getDocs, 
-  addDoc, 
-  doc, 
-  deleteDoc, 
-  updateDoc,
-  query,
-  orderBy,
-  where
-} from "firebase/firestore";
+import { collection, getDocs, addDoc, doc, deleteDoc, updateDoc, query, orderBy, where } from "firebase/firestore";
 import { db } from "../../../../../firebase";
 
 const Newsletter = () => {
@@ -303,7 +293,7 @@ const Newsletter = () => {
     };
     
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
         <div className="bg-white rounded-lg p-6 w-full max-w-md">
           <h2 className="text-xl font-bold mb-4">
             {subscriber ? "Edit Subscriber" : "Add New Subscriber"}
@@ -373,7 +363,7 @@ const Newsletter = () => {
 
   // Delete confirmation modal
   const DeleteConfirmModal = ({ subscriber, onCancel, onConfirm }) => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg p-6 w-full max-w-md">
         <h2 className="text-xl font-bold mb-4">Confirm Deletion</h2>
         <p className="mb-6">
@@ -399,12 +389,44 @@ const Newsletter = () => {
     </div>
   );
 
+  // Mobile Card View for Subscribers
+  const SubscriberCard = ({ subscriber }) => (
+    <div className="bg-white rounded-lg shadow p-4 mb-4">
+      <div className="flex justify-between items-start mb-2">
+        <div>
+          <h3 className="font-bold text-lg">{subscriber.name}</h3>
+          <p className="text-gray-600 text-sm">{subscriber.date}</p>
+        </div>
+        <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">
+          #{subscriber.displayIndex}
+        </span>
+      </div>
+      <a href={`mailto:${subscriber.email}`} className="text-blue-500 hover:underline text-sm break-all">
+        {subscriber.email}
+      </a>
+      <div className="mt-3 flex justify-end space-x-2">
+        <button
+          onClick={() => setEditingSubscriber(subscriber)}
+          className="text-blue-500 hover:text-blue-700 text-sm font-medium"
+        >
+          Edit
+        </button>
+        <button
+          onClick={() => setShowDeleteConfirm(subscriber)}
+          className="text-red-500 hover:text-red-700 text-sm font-medium"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  );
+
   return (
-    <div>
+    <div className="min-h-screen bg-gray-100">
       <div className="flex">
         <div className="flex-1 flex flex-col">
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-6 pb-0">
+          {/* Stats Cards - Now responsive */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4 sm:p-6 pb-0">
             <div className="bg-white rounded-lg shadow p-4">
               <h3 className="text-gray-500 text-sm">Total Subscribers</h3>
               <p className="text-2xl font-bold">{subscriberStats.total}</p>
@@ -413,22 +435,22 @@ const Newsletter = () => {
               <h3 className="text-gray-500 text-sm">New This Month</h3>
               <p className="text-2xl font-bold">{subscriberStats.thisMonth}</p>
             </div>
-            <div className="bg-white rounded-lg shadow p-4">
+            <div className="bg-white rounded-lg shadow p-4 sm:col-span-2 lg:col-span-1">
               <h3 className="text-gray-500 text-sm">New This Week</h3>
               <p className="text-2xl font-bold">{subscriberStats.thisWeek}</p>
             </div>
           </div>
 
           {/* Newsletter Management */}
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             <div className="bg-white shadow-md rounded-lg p-4">
-              <div className="flex justify-between items-center mb-4">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 space-y-4 sm:space-y-0">
                 <h2 className="text-xl font-bold">Newsletter Subscribers</h2>
-                <div className="flex items-center space-x-2">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
                   <select
                     value={sortOrder}
                     onChange={handleSortChange}
-                    className="bg-gray-200 p-2 rounded"
+                    className="bg-gray-200 p-2 rounded w-full sm:w-auto"
                   >
                     <option value="newest">Newest First</option>
                     <option value="oldest">Oldest First</option>
@@ -436,14 +458,14 @@ const Newsletter = () => {
                   </select>
                   <button 
                     onClick={() => setShowAddModal(true)}
-                    className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition duration-200"
+                    className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition duration-200 w-full sm:w-auto text-center"
                   >
                     + Add New
                   </button>
                 </div>
               </div>
 
-              {/* Subscribers Table */}
+              {/* Subscribers Table/Cards */}
               {isLoading ? (
                 <div className="text-center py-8">
                   <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
@@ -454,48 +476,58 @@ const Newsletter = () => {
                   <p className="text-gray-500">No subscribers found. Add your first subscriber to get started.</p>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="min-w-full bg-white">
-                    <thead>
-                      <tr>
-                        <th className="py-2 px-4 bg-gray-200 text-left">#</th>
-                        <th className="py-2 px-4 bg-gray-200 text-left">Name</th>
-                        <th className="py-2 px-4 bg-gray-200 text-left">Date Added</th>
-                        <th className="py-2 px-4 bg-gray-200 text-left">Email</th>
-                        <th className="py-2 px-4 bg-gray-200 text-center">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {subscribers.map((subscriber) => (
-                        <tr key={subscriber.id} className="border-t hover:bg-gray-50">
-                          <td className="py-2 px-4">{subscriber.displayIndex}.</td>
-                          <td className="py-2 px-4">{subscriber.name}</td>
-                          <td className="py-2 px-4">{subscriber.date}</td>
-                          <td className="py-2 px-4">
-                            <a href={`mailto:${subscriber.email}`} className="text-blue-500 hover:underline">
-                              {subscriber.email}
-                            </a>
-                          </td>
-                          <td className="py-2 px-4 text-center">
-                            <div className="flex justify-center space-x-2">
-                              <button
-                                onClick={() => setEditingSubscriber(subscriber)}
-                                className="text-blue-500 hover:text-blue-700"
-                              >
-                                Edit
-                              </button>
-                              <button
-                                onClick={() => setShowDeleteConfirm(subscriber)}
-                                className="text-red-500 hover:text-red-700"
-                              >
-                                Delete
-                              </button>
-                            </div>
-                          </td>
+                <div className="w-full">
+                  {/* Desktop Table View */}
+                  <div className="hidden md:block overflow-x-auto">
+                    <table className="min-w-full bg-white">
+                      <thead>
+                        <tr>
+                          <th className="py-2 px-4 bg-gray-200 text-left">#</th>
+                          <th className="py-2 px-4 bg-gray-200 text-left">Name</th>
+                          <th className="py-2 px-4 bg-gray-200 text-left">Date Added</th>
+                          <th className="py-2 px-4 bg-gray-200 text-left">Email</th>
+                          <th className="py-2 px-4 bg-gray-200 text-center">Actions</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {subscribers.map((subscriber) => (
+                          <tr key={subscriber.id} className="border-t hover:bg-gray-50">
+                            <td className="py-2 px-4">{subscriber.displayIndex}.</td>
+                            <td className="py-2 px-4">{subscriber.name}</td>
+                            <td className="py-2 px-4">{subscriber.date}</td>
+                            <td className="py-2 px-4">
+                              <a href={`mailto:${subscriber.email}`} className="text-blue-500 hover:underline">
+                                {subscriber.email}
+                              </a>
+                            </td>
+                            <td className="py-2 px-4 text-center">
+                              <div className="flex justify-center space-x-2">
+                                <button
+                                  onClick={() => setEditingSubscriber(subscriber)}
+                                  className="text-blue-500 hover:text-blue-700"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  onClick={() => setShowDeleteConfirm(subscriber)}
+                                  className="text-red-500 hover:text-red-700"
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Mobile Card View */}
+                  <div className="md:hidden">
+                    {subscribers.map((subscriber) => (
+                      <SubscriberCard key={subscriber.id} subscriber={subscriber} />
+                    ))}
+                  </div>
                 </div>
               )}
             </div>

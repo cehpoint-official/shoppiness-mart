@@ -1,19 +1,8 @@
 import { useState, useEffect } from "react";
-import { 
-  collection, 
-  getDocs, 
-  updateDoc, 
-  doc, 
-  onSnapshot, 
-  query, 
-  orderBy, 
-  setDoc,
-  addDoc,
-  serverTimestamp
-} from "firebase/firestore";
+import { collection, getDocs, updateDoc, doc, onSnapshot, query, orderBy, setDoc, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../../../../../firebase";
 import ContactMessage from "./ContactMessage";
-import  toast  from "react-hot-toast";
+import toast from "react-hot-toast";
 
 const ContactInfo = () => {
   const [selectedContact, setSelectedContact] = useState(null);
@@ -267,6 +256,59 @@ const ContactInfo = () => {
     }
   };
 
+  // Render editable field - updated for better mobile responsiveness
+  const renderEditableField = (field, value, isTextarea = false) => {
+    return editingField === field ? (
+      <div className="flex flex-col sm:flex-row">
+        {isTextarea ? (
+          <textarea
+            className="w-full px-3 py-2 border rounded-md mb-2 sm:mb-0"
+            value={editValue}
+            onChange={(e) => handleFieldChange(field, e.target.value)}
+            rows={3}
+          />
+        ) : (
+          <input
+            type={field === "email" ? "email" : "text"}
+            className="w-full px-3 py-2 border rounded-md mb-2 sm:mb-0"
+            value={editValue}
+            onChange={(e) => handleFieldChange(field, e.target.value)}
+          />
+        )}
+        <div className="flex sm:flex-col sm:ml-2">
+          <button 
+            className="bg-green-500 text-white px-3 py-1 rounded-md mr-2 sm:mr-0 sm:mb-2"
+            onClick={() => {
+              updateContactInfoField(field);
+              setHasUnsavedChanges(true);
+              setContactInfo({...contactInfo, [field]: editValue});
+            }}
+          >
+            Save
+          </button>
+          <button 
+            className="bg-gray-500 text-white px-3 py-1 rounded-md"
+            onClick={() => setEditingField(null)}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    ) : (
+      <div className="flex flex-col sm:flex-row sm:items-center">
+        <span className="w-full px-3 py-2 border rounded-md mb-2 sm:mb-0 break-words">
+          {value}
+        </span>
+        <button 
+          className="bg-blue-500 text-white px-3 py-1 rounded-md sm:ml-2 self-start"
+          onClick={() => startEditing(field, value)}
+        >
+          Edit
+        </button>
+      </div>
+    );
+  };
+
   // If a contact is selected, show the ContactMessage component
   if (selectedContact) {
     return (
@@ -280,198 +322,47 @@ const ContactInfo = () => {
 
   // Otherwise, show the ContactInfo component
   return (
-    <div className="flex">
+    <div className="flex flex-col">
       <div className="flex-1 flex flex-col">
-        <div className="p-6 bg-gray-100 min-h-screen">
-          <h1 className="text-2xl font-bold mb-6">Contact Info</h1>
-          <div className="flex flex-col md:flex-row gap-6">
-            <div className="p-6 bg-white rounded-lg shadow-md w-full md:w-1/2">
+        <div className="p-4 sm:p-6 bg-gray-100 min-h-screen">
+          <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Contact Info</h1>
+          <div className="flex flex-col gap-4 sm:gap-6">
+            {/* Edit Contact Info Section */}
+            <div className="p-4 sm:p-6 bg-white rounded-lg shadow-md w-full">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold">Edit Contact Info</h2>
+                <h2 className="text-lg sm:text-xl font-bold">Edit Contact Info</h2>
               </div>
               
               {/* Email Field */}
               <div className="mb-4">
-                <label className="block text-gray-700">Email:</label>
-                {editingField === "email" ? (
-                  <div className="flex">
-                    <input
-                      type="email"
-                      className="w-full px-3 py-2 border rounded-md"
-                      value={editValue}
-                      onChange={(e) => handleFieldChange("email", e.target.value)}
-                    />
-                    <button 
-                      className="ml-2 bg-green-500 text-white px-3 py-1 rounded-md"
-                      onClick={() => {
-                        updateContactInfoField("email");
-                        setHasUnsavedChanges(true);
-                        setContactInfo({...contactInfo, email: editValue});
-                      }}
-                    >
-                      Save
-                    </button>
-                    <button 
-                      className="ml-2 bg-gray-500 text-white px-3 py-1 rounded-md"
-                      onClick={() => setEditingField(null)}
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex items-center">
-                    <span className="w-full px-3 py-2 border rounded-md">
-                      {contactInfo.email}
-                    </span>
-                    <button 
-                      className="ml-2 text-blue-500"
-                      onClick={() => startEditing("email", contactInfo.email)}
-                    >
-                      ✏️
-                    </button>
-                  </div>
-                )}
+                <label className="block text-gray-700 mb-1">Email:</label>
+                {renderEditableField("email", contactInfo.email)}
               </div>
               
               {/* Phone Field */}
               <div className="mb-4">
-                <label className="block text-gray-700">Phone number:</label>
-                {editingField === "phone" ? (
-                  <div className="flex">
-                    <input
-                      type="text"
-                      className="w-full px-3 py-2 border rounded-md"
-                      value={editValue}
-                      onChange={(e) => handleFieldChange("phone", e.target.value)}
-                    />
-                    <button 
-                      className="ml-2 bg-green-500 text-white px-3 py-1 rounded-md"
-                      onClick={() => {
-                        updateContactInfoField("phone");
-                        setHasUnsavedChanges(true);
-                        setContactInfo({...contactInfo, phone: editValue});
-                      }}
-                    >
-                      Save
-                    </button>
-                    <button 
-                      className="ml-2 bg-gray-500 text-white px-3 py-1 rounded-md"
-                      onClick={() => setEditingField(null)}
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex items-center">
-                    <span className="w-full px-3 py-2 border rounded-md">
-                      {contactInfo.phone}
-                    </span>
-                    <button 
-                      className="ml-2 text-blue-500"
-                      onClick={() => startEditing("phone", contactInfo.phone)}
-                    >
-                      ✏️
-                    </button>
-                  </div>
-                )}
+                <label className="block text-gray-700 mb-1">Phone number:</label>
+                {renderEditableField("phone", contactInfo.phone)}
               </div>
               
               {/* Location Field */}
               <div className="mb-4">
-                <label className="block text-gray-700">Add location Details:</label>
-                {editingField === "location" ? (
-                  <div className="flex">
-                    <textarea
-                      className="w-full px-3 py-2 border rounded-md"
-                      value={editValue}
-                      onChange={(e) => handleFieldChange("location", e.target.value)}
-                      rows={3}
-                    />
-                    <div className="flex flex-col ml-2">
-                      <button 
-                        className="bg-green-500 text-white px-3 py-1 rounded-md mb-2"
-                        onClick={() => {
-                          updateContactInfoField("location");
-                          setHasUnsavedChanges(true);
-                          setContactInfo({...contactInfo, location: editValue});
-                        }}
-                      >
-                        Save
-                      </button>
-                      <button 
-                        className="bg-gray-500 text-white px-3 py-1 rounded-md"
-                        onClick={() => setEditingField(null)}
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex items-center">
-                    <span className="w-full px-3 py-2 border rounded-md">
-                      {contactInfo.location}
-                    </span>
-                    <button 
-                      className="ml-2 text-blue-500"
-                      onClick={() => startEditing("location", contactInfo.location)}
-                    >
-                      ✏️
-                    </button>
-                  </div>
-                )}
+                <label className="block text-gray-700 mb-1">Add location Details:</label>
+                {renderEditableField("location", contactInfo.location, true)}
               </div>
               
               {/* Description Field */}
               <div>
-                <label className="block text-gray-700">Short description:</label>
-                {editingField === "description" ? (
-                  <div className="flex">
-                    <textarea
-                      className="w-full px-3 py-2 border rounded-md"
-                      value={editValue}
-                      onChange={(e) => handleFieldChange("description", e.target.value)}
-                      rows={3}
-                    />
-                    <div className="flex flex-col ml-2">
-                      <button 
-                        className="bg-green-500 text-white px-3 py-1 rounded-md mb-2"
-                        onClick={() => {
-                          updateContactInfoField("description");
-                          setHasUnsavedChanges(true);
-                          setContactInfo({...contactInfo, description: editValue});
-                        }}
-                      >
-                        Save
-                      </button>
-                      <button 
-                        className="bg-gray-500 text-white px-3 py-1 rounded-md"
-                        onClick={() => setEditingField(null)}
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex items-center">
-                    <span className="w-full px-3 py-2 border rounded-md">
-                      {contactInfo.description}
-                    </span>
-                    <button 
-                      className="ml-2 text-blue-500"
-                      onClick={() => startEditing("description", contactInfo.description)}
-                    >
-                      ✏️
-                    </button>
-                  </div>
-                )}
+                <label className="block text-gray-700 mb-1">Short description:</label>
+                {renderEditableField("description", contactInfo.description, true)}
               </div>
             </div>
             
             {/* Messages Section */}
-            <div className="p-6 bg-white rounded-lg shadow-md w-full md:w-1/2">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold">All Messages</h2>
-                <div className="flex space-x-2">
+            <div className="p-4 sm:p-6 bg-white rounded-lg shadow-md w-full">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
+                <h2 className="text-lg sm:text-xl font-bold">All Messages</h2>
+                <div className="flex flex-wrap gap-2">
                   <button 
                     className="bg-blue-500 text-white p-2 rounded text-sm"
                     onClick={addTestContact}
@@ -482,7 +373,7 @@ const ContactInfo = () => {
                     className="bg-gray-200 p-2 rounded flex items-center"
                     onClick={toggleSortOrder}
                   >
-                    Sort by: {sortOrder === "newest" ? "Newest" : "Oldest"}
+                    Sort: {sortOrder === "newest" ? "Newest" : "Oldest"}
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
@@ -495,39 +386,67 @@ const ContactInfo = () => {
               ) : contacts.length === 0 ? (
                 <div className="text-center py-4">No messages received yet</div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="min-w-full bg-white">
-                    <thead>
-                      <tr>
-                        <th className="py-2 px-4 bg-gray-200">Name</th>
-                        <th className="py-2 px-4 bg-gray-200">Email</th>
-                        <th className="py-2 px-4 bg-gray-200">Phone No.</th>
-                        <th className="py-2 px-4 bg-gray-200">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {contacts.map((contact) => (
-                        <tr key={contact.id} className="border-t hover:bg-gray-50">
-                          <td className="py-2 px-4">
+                <div className="overflow-x-auto -mx-4 sm:mx-0">
+                  <div className="block sm:hidden">
+                    {contacts.map((contact) => (
+                      <div key={contact.id} className="border-t p-4 hover:bg-gray-50">
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="font-medium flex items-center">
                             {contact.name}
                             {!contact.read && (
                               <span className="ml-2 inline-block w-2 h-2 bg-blue-500 rounded-full"></span>
                             )}
-                          </td>
-                          <td className="py-2 px-4">{contact.email}</td>
-                          <td className="py-2 px-4">{contact.phone}</td>
-                          <td className="py-2 px-4">
-                            <button
-                              className="text-blue-500 hover:underline"
-                              onClick={() => setSelectedContact(contact)}
-                            >
-                              View
-                            </button>
-                          </td>
+                          </div>
+                          <button
+                            className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
+                            onClick={() => setSelectedContact(contact)}
+                          >
+                            View
+                          </button>
+                        </div>
+                        <div className="text-sm text-gray-600 mb-1">
+                          <span className="font-medium">Email:</span> {contact.email}
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          <span className="font-medium">Phone:</span> {contact.phone}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="hidden sm:block">
+                    <table className="min-w-full bg-white">
+                      <thead>
+                        <tr>
+                          <th className="py-2 px-4 bg-gray-200">Name</th>
+                          <th className="py-2 px-4 bg-gray-200">Email</th>
+                          <th className="py-2 px-4 bg-gray-200">Phone No.</th>
+                          <th className="py-2 px-4 bg-gray-200">Action</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {contacts.map((contact) => (
+                          <tr key={contact.id} className="border-t hover:bg-gray-50">
+                            <td className="py-2 px-4">
+                              {contact.name}
+                              {!contact.read && (
+                                <span className="ml-2 inline-block w-2 h-2 bg-blue-500 rounded-full"></span>
+                              )}
+                            </td>
+                            <td className="py-2 px-4">{contact.email}</td>
+                            <td className="py-2 px-4">{contact.phone}</td>
+                            <td className="py-2 px-4">
+                              <button
+                                className="text-blue-500 hover:underline"
+                                onClick={() => setSelectedContact(contact)}
+                              >
+                                View
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               )}
             </div>

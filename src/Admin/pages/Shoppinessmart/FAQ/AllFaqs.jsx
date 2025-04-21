@@ -1,15 +1,6 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
-import { 
-  collection, 
-  getDocs, 
-  addDoc, 
-  doc, 
-  deleteDoc, 
-  updateDoc, 
-  getDoc,
-  setDoc
-} from "firebase/firestore";
+import { collection, getDocs, addDoc, doc, deleteDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../../../../firebase";
 
 // Main FAQ Management Component
@@ -165,15 +156,15 @@ const AllFaqs = () => {
     <div className="flex min-h-screen">
       <div className="flex-1 flex flex-col">
         {/* FAQ QUES  */}
-        <div className="p-6 bg-gray-100 flex-1">
+        <div className="p-4 sm:p-6 bg-gray-100 flex-1">
           <div>
             <div className="bg-white shadow-md rounded-lg p-4 mb-6">
-              <div className="flex justify-between items-center mb-4">
-                <h1 className="text-xl font-bold">FAQs</h1>
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
+                <h1 className="text-lg sm:text-xl font-bold">FAQs</h1>
 
                 <button
                   onClick={() => setCurrentView("addFaq")}
-                  className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition duration-200"
+                  className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition duration-200 w-full sm:w-auto text-sm sm:text-base"
                 >
                   + ADD NEW FAQ
                 </button>
@@ -193,22 +184,22 @@ const AllFaqs = () => {
                   {faqs.map((faq) => (
                     <div
                       key={faq.id}
-                      className="flex justify-between items-center bg-gray-50 px-4 py-3 rounded-lg shadow-sm"
+                      className="flex flex-col sm:flex-row sm:justify-between sm:items-center bg-gray-50 px-4 py-3 rounded-lg shadow-sm gap-2 sm:gap-4"
                     >
                       <div className="flex-1">
-                        <h3 className="font-medium">{faq.question}</h3>
-                        <p className="text-gray-500 text-sm mt-1 line-clamp-1">{faq.answer}</p>
+                        <h3 className="font-medium break-words">{faq.question}</h3>
+                        <p className="text-gray-500 text-sm mt-1 line-clamp-2 sm:line-clamp-1">{faq.answer}</p>
                       </div>
-                      <div className="flex gap-3">
+                      <div className="flex gap-3 justify-end">
                         <button 
                           onClick={() => handleEdit(faq)}
-                          className="text-blue-500 hover:text-blue-700"
+                          className="text-blue-500 hover:text-blue-700 text-sm sm:text-base"
                         >
                           Edit
                         </button>
                         <button 
                           onClick={() => deleteFaq(faq.id)}
-                          className="text-red-500 hover:text-red-700"
+                          className="text-red-500 hover:text-red-700 text-sm sm:text-base"
                         >
                           Delete
                         </button>
@@ -290,15 +281,15 @@ const AddFaq = ({ onBack, onSubmit }) => {
     <div>
       <div className="flex">
         <div className="flex-1 flex flex-col">
-          <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-            <div className="bg-white shadow-md rounded-lg p-8 w-7/12">
+          <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
+            <div className="bg-white shadow-md rounded-lg p-4 sm:p-6 md:p-8 w-full max-w-2xl">
               <button
                 onClick={onBack}
-                className="flex items-center gap-2 text-2xl hover:text-gray-700 mb-4"
+                className="flex items-center gap-2 text-lg sm:text-2xl hover:text-gray-700 mb-4"
               >
                 ← Back
               </button>
-              <h2 className="text-2xl font-bold text-center mb-6">ADD FAQ</h2>
+              <h2 className="text-xl sm:text-2xl font-bold text-center mb-6">ADD FAQ</h2>
               <form onSubmit={handleSubmit}>
                 <div className="mb-4">
                   <label
@@ -332,7 +323,7 @@ const AddFaq = ({ onBack, onSubmit }) => {
                     id="answer"
                     value={formData.answer}
                     onChange={handleChange}
-                    className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-24 ${
+                    className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-32 sm:h-24 ${
                       errors.answer ? 'border-red-500' : ''
                     }`}
                     placeholder="Type your answer here"
@@ -345,7 +336,7 @@ const AddFaq = ({ onBack, onSubmit }) => {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className={`bg-green-500 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${
+                    className={`bg-green-500 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full sm:w-auto ${
                       isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-600'
                     }`}
                   >
@@ -427,15 +418,15 @@ const EditFaq = ({ faq, onBack, onSubmit }) => {
     <div>
       <div className="flex">
         <div className="flex-1 flex flex-col">
-          <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-            <div className="bg-white shadow-md rounded-lg p-8 w-7/12">
+          <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
+            <div className="bg-white shadow-md rounded-lg p-4 sm:p-6 md:p-8 w-full max-w-2xl">
               <button
                 onClick={onBack}
-                className="flex items-center gap-2 text-2xl hover:text-gray-700 mb-4"
+                className="flex items-center gap-2 text-lg sm:text-2xl hover:text-gray-700 mb-4"
               >
                 ← Back
               </button>
-              <h2 className="text-2xl font-bold text-center mb-6">EDIT FAQ</h2>
+              <h2 className="text-xl sm:text-2xl font-bold text-center mb-6">EDIT FAQ</h2>
               <form onSubmit={handleSubmit}>
                 <div className="mb-4">
                   <label
@@ -469,7 +460,7 @@ const EditFaq = ({ faq, onBack, onSubmit }) => {
                     id="answer"
                     value={formData.answer}
                     onChange={handleChange}
-                    className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-24 ${
+                    className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-32 sm:h-24 ${
                       errors.answer ? 'border-red-500' : ''
                     }`}
                     placeholder="Type your answer here"
@@ -482,7 +473,7 @@ const EditFaq = ({ faq, onBack, onSubmit }) => {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className={`bg-blue-500 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${
+                    className={`bg-blue-500 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full sm:w-auto ${
                       isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'
                     }`}
                   >
