@@ -57,26 +57,27 @@ const Sidebar = () => {
         console.error("Logout failed:", error);
       }
     };
+
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-6 w-80 shadow-lg">
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-xs sm:w-80 shadow-lg">
           <div className="flex flex-col items-center">
-            <div className="h-12 w-12 rounded-full bg-[#F95151] flex items-center justify-center mb-4">
-              <IoLogOutOutline className="w-6 h-6 text-white" />
+            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-[#F95151] flex items-center justify-center mb-3 sm:mb-4">
+              <IoLogOutOutline className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
-            <h3 className="text-lg font-medium mb-4">
-              Are you sure you want to log out?
+            <h3 className="text-base sm:text-lg font-medium mb-3 sm:mb-4 text-center">
+              Are you sure! You want to log out
             </h3>
-            <div className="flex gap-4">
+            <div className="flex gap-3 sm:gap-4 w-full justify-center">
               <button
                 onClick={() => setShowLogoutDialog(false)}
-                className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition-colors"
+                className="px-3 sm:px-4 py-1.5 sm:py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition-colors text-sm sm:text-base"
               >
                 Cancel
               </button>
               <button
                 onClick={handleLogout}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                className="px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-sm sm:text-base"
               >
                 Log out
               </button>
@@ -108,9 +109,8 @@ const Sidebar = () => {
 
       {/* Sidebar - Hidden on small screens, shown when menu is toggled */}
       <div
-        className={`sidebar ${
-          isMobileMenuOpen ? "block  fixed top-0 left-0" : "hidden"
-        } lg:block h-full z-30 overflow-y-hidden`}
+        className={`sidebar ${isMobileMenuOpen ? "block  fixed top-0 left-0" : "hidden"
+          } lg:block h-full z-30 overflow-y-hidden`}
       >
         {/* Close button inside sidebar - only visible on mobile */}
         {isMobileMenuOpen && (

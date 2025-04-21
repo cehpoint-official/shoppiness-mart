@@ -23,7 +23,7 @@ const AdminDashboard = () => {
   })
   const [isLoadingDonations, setIsLoadingDonations] = useState(true)
   const [isLoadingShops, setIsLoadingShops] = useState(true)
-  
+
   // Stats states
   const [totalNGOs, setTotalNGOs] = useState(0)
   const [totalShops, setTotalShops] = useState(0)
@@ -31,7 +31,7 @@ const AdminDashboard = () => {
   const [totalCashbackRequests, setTotalCashbackRequests] = useState(0)
   const [totalCoupons, setTotalCoupons] = useState(0)
   const [isLoadingStats, setIsLoadingStats] = useState(true)
-  
+
   // Add date range state
   const [startDate, setStartDate] = useState(new Date(new Date().getFullYear() - 1, 0, 1))
   const [endDate, setEndDate] = useState(new Date())
@@ -55,48 +55,48 @@ const AdminDashboard = () => {
     const fetchStats = async () => {
       try {
         setIsLoadingStats(true)
-        
+
         // Fetch total NGOs from causeDetails collection
         const ngosSnapshot = await getDocs(collection(db, "causeDetails"))
         setTotalNGOs(ngosSnapshot.size)
-        
+
         // Fetch shops from businessDetails collection
         const shopsSnapshot = await getDocs(collection(db, "businessDetails"))
         let validShopsCount = 0
         let onlineShopsCount = 0
-        
+
         shopsSnapshot.forEach((doc) => {
           const shopData = doc.data()
-          
+
           // Only count shops with status "Active" or "Inactive"
           if (shopData.status === "Active" || shopData.status === "Inactive") {
             validShopsCount++
-            
+
             // Count online shops with valid status
             if (shopData.mode === "Online") {
               onlineShopsCount++
             }
           }
         })
-        
+
         setTotalShops(validShopsCount)
         setTotalOnlineShops(onlineShopsCount)
-        
+
         // Fetch cashback requests from userTransactions collection
         const cashbackSnapshot = await getDocs(collection(db, "userTransactions"))
         setTotalCashbackRequests(cashbackSnapshot.size)
-        
+
         // Fetch generated coupons from coupons collection
         const couponsSnapshot = await getDocs(collection(db, "coupons"))
         setTotalCoupons(couponsSnapshot.size)
-        
+
       } catch (error) {
         console.error("Error fetching stats:", error)
       } finally {
         setIsLoadingStats(false)
       }
     }
-    
+
     fetchStats()
   }, [])
 
@@ -105,29 +105,29 @@ const AdminDashboard = () => {
     const fetchDonations = async () => {
       try {
         setIsLoadingDonations(true)
-        
+
         // Format dates for query
         const startDateStr = formatDateForQuery(startDate)
         const endDateStr = formatDateForQuery(endDate)
-        
+
         // Create a query against the directDonationRequests collection with date range filter
         const q = query(
-          collection(db, "directDonationRequests"), 
+          collection(db, "directDonationRequests"),
           where("status", "==", "verified"),
           where("createdAt", ">=", startDateStr),
           where("createdAt", "<=", endDateStr)
         )
-        
+
         // Get the documents that match the query
         const querySnapshot = await getDocs(q)
-        
+
         // Map the documents to the required format
         const donations = querySnapshot.docs.map((doc, index) => {
           const data = doc.data()
-          
+
           // Generate a color based on index to keep it visually consistent
           const colors = ["#8b5cf6", "#f59e0b", "#3b82f6", "#ef4444", "#10b981"]
-          
+
           return {
             id: doc.id,
             name: data.name || "Anonymous Donor",
@@ -137,7 +137,7 @@ const AdminDashboard = () => {
             date: data.createdAt || 'Unknown date'
           }
         })
-        
+
         // Sort by amount (highest first)
         const sortedDonations = donations.sort((a, b) => {
           // Extract numeric values from the amount strings
@@ -145,7 +145,7 @@ const AdminDashboard = () => {
           const amountB = parseFloat(b.amount.replace('Rs.', ''))
           return amountB - amountA
         })
-        
+
         // Take only the top 3 donations
         setDonationData(sortedDonations.slice(0, 3))
       } catch (error) {
@@ -165,14 +165,14 @@ const AdminDashboard = () => {
     const fetchShops = async () => {
       try {
         setIsLoadingShops(true)
-        
+
         // Fetch all shops from businessDetails collection - no date filtering
         const shopsSnapshot = await getDocs(collection(db, "businessDetails"))
-        
+
         // Initialize counters
         let activeCount = 0
         let inactiveCount = 0
-        
+
         shopsSnapshot.forEach((doc) => {
           const shopData = doc.data()
           // Count active and inactive shops based on status
@@ -182,13 +182,13 @@ const AdminDashboard = () => {
             inactiveCount++
           }
         })
-        
+
         const totalShops = activeCount + inactiveCount
-        
+
         // Calculate percentages
         const activePercentage = totalShops > 0 ? Math.round((activeCount / totalShops) * 100) : 0
         const inactivePercentage = totalShops > 0 ? 100 - activePercentage : 0
-        
+
         setShopData({
           active: activeCount,
           inactive: inactiveCount,
@@ -210,7 +210,7 @@ const AdminDashboard = () => {
         setIsLoadingShops(false)
       }
     }
-    
+
     fetchShops()
   }, [])
 
@@ -224,19 +224,19 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div>
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Dashboard</h1>
-          <div className="relative">
-            <button 
-              className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm"
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 mb-4 sm:mb-6">
+          <h1 className="text-xl sm:text-2xl font-bold">Dashboard</h1>
+          <div className="relative w-full sm:w-auto">
+            <button
+              className="flex items-center gap-2 bg-white px-3 sm:px-4 py-2 rounded-lg shadow-sm text-sm sm:text-base w-full sm:w-auto justify-between sm:justify-start"
               onClick={() => setShowDatePicker(!showDatePicker)}
             >
               <BsCalendar4 className="text-blue-600" />
-              <span>{formatDateRange()}</span>
+              <span className="truncate max-w-[200px]">{formatDateRange()}</span>
             </button>
-            
+
             {showDatePicker && (
-              <div className="absolute right-0 mt-2 bg-white p-4 rounded-lg shadow-lg z-10">
+              <div className="absolute right-0 mt-2 bg-white p-4 rounded-lg shadow-lg z-10 w-full md:w-auto">
                 <div className="flex flex-col space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
@@ -248,7 +248,9 @@ const AdminDashboard = () => {
                       endDate={endDate}
                       className="w-full p-2 border rounded"
                       dateFormat="d MMM yyyy"
+                      maxDate={new Date(endDate.getTime() - (86400000 * 30))} // At least 30 days before end date
                     />
+                    <div className="text-xs text-gray-500 mt-1">Maximum range: 4 months</div>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
@@ -259,18 +261,19 @@ const AdminDashboard = () => {
                       startDate={startDate}
                       endDate={endDate}
                       minDate={startDate}
+                      maxDate={new Date(startDate.getTime() + (86400000 * 120))} // Max 120 days (4 months) after start date
                       className="w-full p-2 border rounded"
                       dateFormat="d MMM yyyy"
                     />
                   </div>
-                  <div className="flex justify-end space-x-2">
-                    <button 
+                  <div className="flex justify-center space-x-2">
+                    <button
                       className="px-3 py-1 bg-gray-200 rounded text-sm"
                       onClick={() => setShowDatePicker(false)}
                     >
                       Cancel
                     </button>
-                    <button 
+                    <button
                       className="px-3 py-1 bg-blue-600 text-white rounded text-sm"
                       onClick={() => handleDateRangeApply(startDate, endDate)}
                     >
@@ -313,21 +316,21 @@ const AdminDashboard = () => {
         {/* Charts Grid - Pass date range to components */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {/* Currently it is showing the data for the current month, week and day and not the selected date range */}
-          <GeneratedCoupons 
-            startDate={formatDateForQuery(startDate)} 
-            endDate={formatDateForQuery(endDate)} 
+          <GeneratedCoupons
+            startDate={formatDateForQuery(startDate)}
+            endDate={formatDateForQuery(endDate)}
           />
-          <ListedShops 
-            startDate={formatDateForQuery(startDate)} 
-            endDate={formatDateForQuery(endDate)} 
+          <ListedShops
+            startDate={formatDateForQuery(startDate)}
+            endDate={formatDateForQuery(endDate)}
           />
         </div>
 
         {/* Transactions Section - Pass date range */}
         <div className="mb-6">
-          <AdminTransactions 
-            // startDate={formatDateForQuery(startDate)} 
-            // endDate={formatDateForQuery(endDate)} 
+          <AdminTransactions
+          // startDate={formatDateForQuery(startDate)} 
+          // endDate={formatDateForQuery(endDate)} 
           />
         </div>
 
@@ -350,8 +353,8 @@ const AdminDashboard = () => {
                       <span>{shopData.active} ({shopData.activePercentage}%)</span>
                     </div>
                     <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-orange-500 rounded-full" 
+                      <div
+                        className="h-full bg-orange-500 rounded-full"
                         style={{ width: `${shopData.activePercentage}%` }}
                       />
                     </div>
@@ -365,8 +368,8 @@ const AdminDashboard = () => {
                       <span>{shopData.inactive} ({shopData.inactivePercentage}%)</span>
                     </div>
                     <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-orange-500 rounded-full" 
+                      <div
+                        className="h-full bg-orange-500 rounded-full"
                         style={{ width: `${shopData.inactivePercentage}%` }}
                       />
                     </div>

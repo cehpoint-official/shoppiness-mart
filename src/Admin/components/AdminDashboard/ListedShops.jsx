@@ -1,13 +1,6 @@
 import { useState, useEffect } from "react";
-import {
-  AreaChart,
-  Area,
-  ResponsiveContainer,
-  XAxis,
-  YAxis,
-  Tooltip,
-} from "recharts";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
+import { collection, query, getDocs } from "firebase/firestore";
 import { db } from "../../../../firebase";
 
 const ListedShops = ({ startDate, endDate }) => {
@@ -224,20 +217,20 @@ const ListedShops = ({ startDate, endDate }) => {
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-3 shadow-lg rounded-lg">
-          <p className="text-gray-600 mb-2">{label}</p>
+        <div className="bg-white p-2 sm:p-3 shadow-lg rounded-lg text-xs sm:text-sm">
+          <p className="text-gray-600 mb-1 sm:mb-2">{label}</p>
           <div className="space-y-1">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2">
               <div className="w-2 h-2 bg-green-400 rounded-full" />
               <span>Offline Shops</span>
-              <span className="ml-2 font-semibold">
+              <span className="ml-1 sm:ml-2 font-semibold">
                 {payload[0] ? payload[0].value : 0}
               </span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2">
               <div className="w-2 h-2 bg-yellow-400 rounded-full" />
               <span>Online Shops</span>
-              <span className="ml-2 font-semibold">
+              <span className="ml-1 sm:ml-2 font-semibold">
                 {payload[1] ? payload[1].value : 0}
               </span>
             </div>
@@ -249,28 +242,35 @@ const ListedShops = ({ startDate, endDate }) => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-3xl">
-      <h2 className="text-2xl font-semibold mb-6">Listed Shops</h2>
-      <div className="text-sm text-gray-500 mb-4">
-        {startDate} - {endDate}
+    <div className="bg-white p-3 sm:p-6 rounded-xl sm:rounded-3xl">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6">
+        <h2 className="text-xl sm:text-2xl font-semibold">Listed Shops</h2>
+        <div className="text-xs sm:text-sm text-gray-500 mt-1 sm:mt-0">
+          {startDate} - {endDate}
+        </div>
       </div>
 
       <TabGroup activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      <div className="mt-6 h-[400px]">
+      <div className="mt-4 sm:mt-6 h-[250px] sm:h-[400px]">
         {isLoading ? (
           <div className="flex items-center justify-center h-full">
             <p>Loading data...</p>
           </div>
         ) : chartData.length === 0 ? (
           <div className="flex items-center justify-center h-full">
-            <p>No shops found in the selected date range</p>
+            <p className="text-sm sm:text-base">No shops found in the selected date range</p>
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart
               data={chartData}
-              margin={{ top: 20, right: 30, left: 0, bottom: 30 }}
+              margin={{ 
+                top: 20, 
+                right: 5, 
+                left: -20, 
+                bottom: 30 
+              }}
             >
               <defs>
                 <linearGradient id="colorOffline" x1="0" y1="0" x2="0" y2="1">
@@ -286,15 +286,24 @@ const ListedShops = ({ startDate, endDate }) => {
                 dataKey="month"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "#666" }}
+                tick={{ fill: "#666", fontSize: '10px' }}
+                interval="preserveStartEnd"
+                tickFormatter={(value) => {
+                  // For mobile screens, abbreviate month names further if needed
+                  if (window.innerWidth < 640 && value.length > 10) {
+                    return value.substring(0, 8) + '...';
+                  }
+                  return value;
+                }}
               />
               <YAxis
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "#666" }}
+                tick={{ fill: "#666", fontSize: '10px' }}
                 tickFormatter={(value) =>
                   value === 0 ? "0" : value < 1000 ? value : `${value / 1000}K`
                 }
+                width={30}
               />
               <Tooltip content={<CustomTooltip />} />
               <Area
@@ -316,13 +325,13 @@ const ListedShops = ({ startDate, endDate }) => {
         )}
       </div>
 
-      <div className="flex gap-6 mt-4">
+      <div className="flex flex-col xs:flex-row gap-3 xs:gap-6 mt-4 text-sm">
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 bg-green-400 rounded" />
+          <div className="w-3 h-3 sm:w-4 sm:h-4 bg-green-400 rounded" />
           <span>Offline Shops</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 bg-yellow-400 rounded" />
+          <div className="w-3 h-3 sm:w-4 sm:h-4 bg-yellow-400 rounded" />
           <span>Online Shops</span>
         </div>
       </div>
@@ -333,12 +342,12 @@ const ListedShops = ({ startDate, endDate }) => {
 export default ListedShops;
 
 const TabGroup = ({ activeTab, setActiveTab }) => (
-  <div className="inline-flex bg-gray-100 rounded-full p-1">
+  <div className="inline-flex bg-gray-100 rounded-full p-1 overflow-x-auto max-w-full">
     {["Monthly", "Weekly", "Today"].map((tab) => (
       <button
         key={tab}
         onClick={() => setActiveTab(tab)}
-        className={`px-4 py-1 rounded-full text-sm ${
+        className={`px-2 sm:px-4 py-1 rounded-full text-xs sm:text-sm whitespace-nowrap ${
           activeTab === tab ? "bg-white text-black shadow-sm" : "text-blue-500"
         }`}
       >

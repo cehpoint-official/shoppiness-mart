@@ -11,7 +11,7 @@ const AdminTransactions = () => {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all"); // "all", "pending", "verified", "rejected"
   const [userNames, setUserNames] = useState({});
-  
+
   // Date picker states
   const [startDate, setStartDate] = useState(new Date(new Date().setMonth(new Date().getMonth() - 4))); // Default to 4 months ago
   const [endDate, setEndDate] = useState(new Date());
@@ -35,7 +35,7 @@ const AdminTransactions = () => {
     // Calculate the maximum allowed start date (4 months before end date)
     const maxStartDate = new Date(endDate);
     maxStartDate.setMonth(maxStartDate.getMonth() - 4);
-    
+
     // If selected date is earlier than max allowed start date, set it to max allowed
     if (date < maxStartDate) {
       setStartDate(maxStartDate);
@@ -48,7 +48,7 @@ const AdminTransactions = () => {
     // Calculate the minimum allowed end date (4 months after start date)
     const minEndDate = new Date(startDate);
     minEndDate.setMonth(minEndDate.getMonth() + 4);
-    
+
     // If selected date is later than min allowed end date, set it to min allowed
     if (date > minEndDate) {
       setEndDate(minEndDate);
@@ -209,23 +209,44 @@ const AdminTransactions = () => {
     }
   };
 
+  // Format date for display in transaction cards/rows
+  const formatTransactionDate = (timestamp) => {
+    if (!timestamp) return 'N/A';
+    return new Date(timestamp.seconds * 1000).toLocaleString(undefined, {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  // Get status color class
+  const getStatusColorClass = (status) => {
+    switch (status) {
+      case 'verified': return 'text-green-600';
+      case 'rejected': return 'text-red-600';
+      default: return 'text-yellow-600';
+    }
+  };
+
   return (
-    <div className="container mx-auto p-4">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Transaction Management</h1>
-        <div className="flex gap-4">
+    <div className="container mx-auto px-4 py-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+        <h1 className="text-xl md:text-2xl font-bold">Transaction Management</h1>
+        <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
           {/* Date picker section */}
-          <div className="relative">
-            <button 
-              className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm border"
+          <div className="relative w-full md:w-auto">
+            <button
+              className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm border w-full md:w-auto justify-between md:justify-start"
               onClick={() => setShowDatePicker(!showDatePicker)}
             >
               <BsCalendar4 className="text-blue-600" />
-              <span>{formatDateRange()}</span>
+              <span className="text-sm md:text-base truncate">{formatDateRange()}</span>
             </button>
-            
+
             {showDatePicker && (
-              <div className="absolute right-0 mt-2 bg-white p-4 rounded-lg shadow-lg z-10">
+              <div className="absolute right-0 mt-2 bg-white p-4 rounded-lg shadow-lg z-10 w-full md:w-auto">
                 <div className="flex flex-col space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
@@ -255,14 +276,14 @@ const AdminTransactions = () => {
                       dateFormat="d MMM yyyy"
                     />
                   </div>
-                  <div className="flex justify-end space-x-2">
-                    <button 
+                  <div className="flex justify-center space-x-2">
+                    <button
                       className="px-3 py-1 bg-gray-200 rounded text-sm"
                       onClick={() => setShowDatePicker(false)}
                     >
                       Cancel
                     </button>
-                    <button 
+                    <button
                       className="px-3 py-1 bg-blue-600 text-white rounded text-sm"
                       onClick={handleDateRangeApply}
                     >
@@ -275,7 +296,7 @@ const AdminTransactions = () => {
           </div>
 
           <select
-            className="border rounded p-2"
+            className="border rounded p-2 w-full md:w-auto"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
           >
@@ -284,8 +305,9 @@ const AdminTransactions = () => {
             <option value="verified">Verified</option>
             <option value="rejected">Rejected</option>
           </select>
+
           <button
-            className="bg-blue-500 text-white px-4 py-2 rounded"
+            className="bg-blue-500 text-white px-4 py-2 rounded w-full md:w-auto"
             onClick={refreshTransactionsFromAPI}
             disabled={loading}
           >
@@ -297,92 +319,116 @@ const AdminTransactions = () => {
       {loading ? (
         <Loader />
       ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border table-fixed">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="py-2 px-4 border w-24">User ID</th>
-                <th className="py-2 px-4 border w-32">User Name</th>
-                <th className="py-2 px-4 border w-32">Store</th>
-                <th className="py-2 px-4 border w-24">Amount</th>
-                <th className="py-2 px-4 border w-24">Commission</th>
-                <th className="py-2 px-4 border w-24">Status</th>
-                <th className="py-2 px-4 border w-32">Sale Date</th>
-                <th className="py-2 px-4 border w-32">Last Updated</th>
-                <th className="py-2 px-4 border w-28">Transaction ID</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredTransactions.length === 0 ? (
+        <>
+          {/* Desktop View (Table) - Hidden on small screens */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="min-w-full bg-white border table-fixed">
+              <thead className="bg-gray-100">
                 <tr>
-                  <td colSpan="9" className="py-4 px-4 text-center">
-                    No transactions found
-                  </td>
+                  <th className="py-2 px-4 border w-24">User ID</th>
+                  <th className="py-2 px-4 border w-32">User Name</th>
+                  <th className="py-2 px-4 border w-32">Store</th>
+                  <th className="py-2 px-4 border w-24">Amount</th>
+                  <th className="py-2 px-4 border w-24">Commission</th>
+                  <th className="py-2 px-4 border w-24">Status</th>
+                  <th className="py-2 px-4 border w-32">Sale Date</th>
+                  <th className="py-2 px-4 border w-32">Last Updated</th>
+                  <th className="py-2 px-4 border w-28">Transaction ID</th>
                 </tr>
-              ) : (
-                filteredTransactions.map((transaction) => (
-                  <tr key={transaction.id}>
-                    <td className="py-2 px-4 border truncate" title={transaction.userId}>
-                      <div className="max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
-                        {formatUserId(transaction.userId)}
-                      </div>
-                    </td>
-                    <td className="py-2 px-4 border truncate">
-                      {userNames[transaction.userId] || "Unknown"}
-                    </td>
-                    <td className="py-2 px-4 border truncate" title={transaction.storeName}>
-                      {transaction.storeName}
-                    </td>
-                    <td className="py-2 px-4 border text-right">
-                      ₹{transaction.saleAmount?.toFixed(2) || '0.00'}
-                    </td>
-                    <td className="py-2 px-4 border text-right">
-                      ₹{transaction.commission?.toFixed(2) || '0.00'}
-                    </td>
-                    <td className={`py-2 px-4 border text-center ${transaction.status === 'verified'
-                        ? 'text-green-600'
-                        : transaction.status === 'rejected'
-                          ? 'text-red-600'
-                          : 'text-yellow-600'
-                      }`}>
-                      {transaction.status}
-                    </td>
-                    <td className="py-2 px-4 border text-sm">
-                      {transaction.saleDate ? 
-                        new Date(transaction.saleDate.seconds * 1000).toLocaleString(undefined, {
-                          year: 'numeric',
-                          month: '2-digit',
-                          day: '2-digit',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        }) : 
-                        transaction.clickDate ? 
-                          new Date(transaction.clickDate.seconds * 1000).toLocaleString(undefined, {
-                            year: 'numeric',
-                            month: '2-digit',
-                            day: '2-digit',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          }) : 'N/A'}
-                    </td>
-                    <td className="py-2 px-4 border text-sm">
-                      {transaction.lastUpdated ? new Date(transaction.lastUpdated.seconds * 1000).toLocaleString(undefined, {
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      }) : 'N/A'}
-                    </td>
-                    <td className="py-2 px-4 border truncate" title={transaction.transactionId || ''}>
-                      {transaction.transactionId || 'Not assigned'}
+              </thead>
+              <tbody>
+                {filteredTransactions.length === 0 ? (
+                  <tr>
+                    <td colSpan="9" className="py-4 px-4 text-center">
+                      No transactions found
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+                ) : (
+                  filteredTransactions.map((transaction) => (
+                    <tr key={transaction.id}>
+                      <td className="py-2 px-4 border truncate" title={transaction.userId}>
+                        <div className="max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
+                          {formatUserId(transaction.userId)}
+                        </div>
+                      </td>
+                      <td className="py-2 px-4 border truncate">
+                        {userNames[transaction.userId] || "Unknown"}
+                      </td>
+                      <td className="py-2 px-4 border truncate" title={transaction.storeName}>
+                        {transaction.storeName}
+                      </td>
+                      <td className="py-2 px-4 border text-right">
+                        ₹{transaction.saleAmount?.toFixed(2) || '0.00'}
+                      </td>
+                      <td className="py-2 px-4 border text-right">
+                        ₹{transaction.commission?.toFixed(2) || '0.00'}
+                      </td>
+                      <td className={`py-2 px-4 border text-center ${getStatusColorClass(transaction.status)}`}>
+                        {transaction.status}
+                      </td>
+                      <td className="py-2 px-4 border text-sm">
+                        {formatTransactionDate(transaction.saleDate || transaction.clickDate)}
+                      </td>
+                      <td className="py-2 px-4 border text-sm">
+                        {formatTransactionDate(transaction.lastUpdated)}
+                      </td>
+                      <td className="py-2 px-4 border truncate" title={transaction.transactionId || ''}>
+                        {transaction.transactionId || 'Not assigned'}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile View (Cards) - Shown only on small screens */}
+          <div className="md:hidden">
+            {filteredTransactions.length === 0 ? (
+              <div className="bg-white p-4 text-center rounded shadow">
+                No transactions found
+              </div>
+            ) : (
+              <div className="flex flex-col gap-4">
+                {filteredTransactions.map((transaction) => (
+                  <div key={transaction.id} className="bg-white p-4 rounded shadow">
+                    <div className="flex flex-col sm:flex-row justify-between mb-2">
+                      <div className="font-medium mb-1 sm:mb-0 pr-4">{userNames[transaction.userId] || "Unknown"}</div>
+                      <div className={`px-2 py-1 rounded-full text-xs ${getStatusColorClass(transaction.status)} bg-opacity-20 font-medium uppercase self-start`}>
+                        {transaction.status}
+                      </div>
+                    </div>
+                    <div className="mb-2 text-sm text-gray-700 truncate">
+                      <span className="font-medium">Store:</span> {transaction.storeName}
+                    </div>
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-700">
+                      <div>
+                        <span className="font-medium">Amount:</span> ₹{transaction.saleAmount?.toFixed(2) || '0.00'}
+                      </div>
+                      <div>
+                        <span className="font-medium">Commission:</span> ₹{transaction.commission?.toFixed(2) || '0.00'}
+                      </div>
+                    </div>
+                    <div className="mt-2 text-xs text-gray-500">
+                      <div>
+                        <span className="font-medium">Sale Date:</span> {formatTransactionDate(transaction.saleDate || transaction.clickDate)}
+                      </div>
+                      <div className="mt-1">
+                        <span className="font-medium">Updated:</span> {formatTransactionDate(transaction.lastUpdated)}
+                      </div>
+                      <div className="mt-1 truncate">
+                        <span className="font-medium">ID:</span> {transaction.transactionId || 'Not assigned'}
+                      </div>
+                      <div className="mt-1 truncate" title={transaction.userId}>
+                        <span className="font-medium">User ID:</span> {formatUserId(transaction.userId)}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </>
       )}
     </div>
   );

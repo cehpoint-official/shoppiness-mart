@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { BsChevronRight } from "react-icons/bs";
-import { collection, query, getDocs, orderBy, where } from "firebase/firestore";
+import { collection, query, getDocs, orderBy } from "firebase/firestore";
 import { db } from "../../../../firebase";
 
 const GeneratedCoupons = ({ startDate, endDate }) => {
@@ -23,8 +23,8 @@ const GeneratedCoupons = ({ startDate, endDate }) => {
   const filterCouponsByTimeFrame = (allCoupons) => {
     const now = new Date();
     let startDate = new Date();
-    
-    switch(activeTab) {
+
+    switch (activeTab) {
       case "Today":
         startDate = new Date(now.setHours(0, 0, 0, 0));
         break;
@@ -36,11 +36,11 @@ const GeneratedCoupons = ({ startDate, endDate }) => {
         startDate = new Date(now.setMonth(now.getMonth() - 1));
         break;
     }
-    
+
     // Filter coupons based on createdAt date
     return allCoupons.filter(coupon => {
       if (!coupon.createdAt) return false;
-      
+
       // Handle different timestamp formats
       let couponDate;
       if (coupon.createdAt.toDate) {
@@ -56,7 +56,7 @@ const GeneratedCoupons = ({ startDate, endDate }) => {
         // Fallback - use current date
         couponDate = new Date();
       }
-      
+
       return couponDate >= startDate;
     });
   };
@@ -66,33 +66,33 @@ const GeneratedCoupons = ({ startDate, endDate }) => {
     const fetchAllCoupons = async () => {
       try {
         setLoading(true);
-        
+
         // Fetch all coupons, sorted by creation date
         const q = query(
           collection(db, "coupons"),
           orderBy("createdAt", "desc")
         );
-        
+
         const querySnapshot = await getDocs(q);
         const allCouponsList = [];
-        
+
         querySnapshot.forEach((doc) => {
           allCouponsList.push({
             id: doc.id,
             ...doc.data()
           });
         });
-        
+
         // Store all coupons
         setCoupons(allCouponsList);
-        
+
         // Apply time filter
         const filteredCoupons = filterCouponsByTimeFrame(allCouponsList);
-        
+
         // Count stats for filtered coupons
         let pendingCount = 0;
         let claimedCount = 0;
-        
+
         filteredCoupons.forEach((coupon) => {
           if (coupon.status === "Claimed") {
             claimedCount++;
@@ -100,18 +100,18 @@ const GeneratedCoupons = ({ startDate, endDate }) => {
             pendingCount++;
           }
         });
-        
+
         const totalCount = filteredCoupons.length;
-        
+
         // Calculate percentages
-        const claimedPercentage = totalCount > 0 
-          ? Math.round((claimedCount / totalCount) * 100) 
+        const claimedPercentage = totalCount > 0
+          ? Math.round((claimedCount / totalCount) * 100)
           : 0;
-        
-        const pendingPercentage = totalCount > 0 
-          ? Math.round((pendingCount / totalCount) * 100) 
+
+        const pendingPercentage = totalCount > 0
+          ? Math.round((pendingCount / totalCount) * 100)
           : 0;
-        
+
         setStats({
           total: totalCount,
           pending: pendingCount,
@@ -125,7 +125,7 @@ const GeneratedCoupons = ({ startDate, endDate }) => {
         setLoading(false);
       }
     };
-    
+
     fetchAllCoupons();
   }, [activeTab]);
 
@@ -136,49 +136,51 @@ const GeneratedCoupons = ({ startDate, endDate }) => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-3xl">
-      <h2 className="text-2xl font-semibold mb-6">Generated Coupons</h2>
+    <div className="bg-white p-4 sm:p-6 rounded-3xl">
+      <h2 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6">Generated Coupons</h2>
 
-      <TabGroup activeTab={activeTab} setActiveTab={setActiveTab} />
+      <div className="flex justify-center sm:justify-start mb-4">
+        <TabGroup activeTab={activeTab} setActiveTab={setActiveTab} />
+      </div>
 
-      <div className="mt-6 bg-green-50 rounded-xl p-4 flex justify-between items-center">
-        <div className="flex items-center gap-3">
-          <div className="bg-green-500 text-white text-xl font-bold w-12 h-12 rounded-xl flex items-center justify-center">
+      <div className="mt-4 sm:mt-6 bg-green-50 rounded-xl p-3 sm:p-4 flex flex-col sm:flex-row justify-between items-center">
+        <div className="flex items-center gap-3 mb-2 sm:mb-0">
+          <div className="bg-green-500 text-white text-lg sm:text-xl font-bold w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center">
             {loading ? "..." : coupons.length}
           </div>
-          <span className="text-lg">All Coupons</span>
+          <span className="text-base sm:text-lg">All Coupons</span>
         </div>
-        <button 
-          className="text-green-500 flex items-center gap-1"
+        <button
+          className="text-green-500 flex items-center gap-1 text-sm sm:text-base"
           onClick={handleViewAll}
         >
           View All <BsChevronRight />
         </button>
       </div>
 
-      <div className="grid grid-cols-3 gap-6 mt-6">
-        <div className="bg-gray-50 p-4 rounded-xl">
-          <div className="text-3xl font-bold">{loading ? "..." : stats.total}</div>
-          <div className="text-gray-500">Total</div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6 mt-4 sm:mt-6">
+        <div className="bg-gray-50 p-3 sm:p-4 rounded-xl">
+          <div className="text-xl sm:text-3xl font-bold">{loading ? "..." : stats.total}</div>
+          <div className="text-sm sm:text-base text-gray-500">Total</div>
         </div>
-        <div className="bg-gray-50 p-4 rounded-xl">
-          <div className="text-3xl font-bold">{loading ? "..." : stats.pending}</div>
-          <div className="text-gray-500">Pending</div>
+        <div className="bg-gray-50 p-3 sm:p-4 rounded-xl">
+          <div className="text-xl sm:text-3xl font-bold">{loading ? "..." : stats.pending}</div>
+          <div className="text-sm sm:text-base text-gray-500">Pending</div>
         </div>
-        <div className="bg-gray-50 p-4 rounded-xl">
-          <div className="text-3xl font-bold">{loading ? "..." : stats.claimed}</div>
-          <div className="text-gray-500">Claimed</div>
+        <div className="bg-gray-50 p-3 sm:p-4 rounded-xl">
+          <div className="text-xl sm:text-3xl font-bold">{loading ? "..." : stats.claimed}</div>
+          <div className="text-sm sm:text-base text-gray-500">Claimed</div>
         </div>
       </div>
 
-      <div className="mt-8">
+      <div className="mt-6 sm:mt-8">
         {loading ? (
-          <div className="h-48 flex items-center justify-center">
+          <div className="h-36 sm:h-48 flex items-center justify-center">
             <p>Loading chart data...</p>
           </div>
         ) : (
           <>
-            <div className="relative w-48 h-48 mx-auto">
+            <div className="relative w-36 h-36 sm:w-48 sm:h-48 mx-auto">
               <svg className="w-full h-full" viewBox="0 0 100 100">
                 {/* Background circle */}
                 <circle
@@ -212,35 +214,35 @@ const GeneratedCoupons = ({ startDate, endDate }) => {
                   transform={`rotate(${stats.pendingPercentage * 3.6 - 90} 50 50)`}
                 />
               </svg>
-              
+
               {/* Add center text with total count */}
               <div className="absolute inset-0 flex items-center justify-center flex-col">
-                <div className="text-2xl font-bold">{stats.total}</div>
+                <div className="text-xl sm:text-2xl font-bold">{stats.total}</div>
                 <div className="text-xs text-gray-500">Total</div>
               </div>
             </div>
 
-            <div className="space-y-3 mt-6">
+            <div className="space-y-3 mt-4 sm:mt-6">
               <div>
-                <div className="flex justify-between mb-1">
+                <div className="flex justify-between mb-1 text-sm sm:text-base">
                   <span>Pending ({stats.pending})</span>
                   <span>{stats.pendingPercentage}%</span>
                 </div>
                 <div className="h-2 bg-gray-100 rounded-full">
-                  <div 
-                    className="h-full bg-blue-500 rounded-full" 
+                  <div
+                    className="h-full bg-blue-500 rounded-full"
                     style={{ width: `${stats.pendingPercentage}%` }}
                   />
                 </div>
               </div>
               <div>
-                <div className="flex justify-between mb-1">
+                <div className="flex justify-between mb-1 text-sm sm:text-base">
                   <span>Claimed ({stats.claimed})</span>
                   <span>{stats.claimedPercentage}%</span>
                 </div>
                 <div className="h-2 bg-gray-100 rounded-full">
-                  <div 
-                    className="h-full bg-[#ff7f7f] rounded-full" 
+                  <div
+                    className="h-full bg-[#ff7f7f] rounded-full"
                     style={{ width: `${stats.claimedPercentage}%` }}
                   />
                 </div>
@@ -261,9 +263,8 @@ const TabGroup = ({ activeTab, setActiveTab }) => (
       <button
         key={tab}
         onClick={() => setActiveTab(tab)}
-        className={`px-4 py-1 rounded-full text-sm ${
-          activeTab === tab ? "bg-white text-black shadow-sm" : "text-blue-500"
-        }`}
+        className={`px-2 sm:px-4 py-1 rounded-full text-xs sm:text-sm ${activeTab === tab ? "bg-white text-black shadow-sm" : "text-blue-500"
+          }`}
       >
         {tab}
       </button>

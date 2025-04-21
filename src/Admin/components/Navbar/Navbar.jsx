@@ -1,12 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { FiBell } from "react-icons/fi";
-import {
-  collection,
-  getDocs,
-  updateDoc,
-  doc,
-  getDoc,
-} from "firebase/firestore";
+import { IoLogOutOutline } from "react-icons/io5";
+import { collection, getDocs, updateDoc, doc, getDoc } from "firebase/firestore";
 import { db } from "../../../../firebase";
 import { useDispatch } from "react-redux";
 import { userNotExist } from "../../../redux/reducer/userReducer";
@@ -19,8 +14,23 @@ const Navbar = ({ userId }) => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [profilePic, setProfilePic] = useState("");
   const [name, setName] = useState("");
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isNotificationOpen && !event.target.closest(".notification-container")) {
+        setIsNotificationOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isNotificationOpen]);
 
   // Fetch profile picture from user document
   useEffect(() => {
@@ -115,140 +125,173 @@ const Navbar = ({ userId }) => {
     return new Date(isoString).toLocaleString();
   };
 
-  // Handle logout functionality
-  const handleLogout = async () => {
-    // Clear user from Redux
-    dispatch(userNotExist());
-
-    // Clear localStorage
-    localStorage.removeItem("userRole");
-    await persistor.purge();
-    // Navigate to login page
-    navigate("/login/user");
+  // Toggle notification
+  const toggleNotification = () => {
+    setIsNotificationOpen(!isNotificationOpen);
   };
 
-  return (
-    <div className="bg-white shadow-md sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16 items-center">
-          <div className="flex items-center space-x-4">
-            <span className="text-base lg:text-lg font-bold">
-              Welcome {name} 👋
-            </span>
-          </div>
-          <div className="flex items-center space-x-4">
-            {/* <div className="relative mr-4">
-              <input
-                type="text"
-                className="block w-full pl-10 pr-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-600"
-                placeholder="Search here"
-              />
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <svg
-                  className="w-5 h-5 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  ></path>
-                </svg>
-              </div>
-            </div> */}
-            <div className="relative">
-              <button
-                className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 focus:outline-none"
-                onClick={() => setIsNotificationOpen(!isNotificationOpen)}
-              >
-                <FiBell className="w-5 lg:w-6 h-5 lg:h-6 text-gray-600" />
-                {unreadCount > 0 && (
-                  <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">
-                    {unreadCount}
-                  </span>
-                )}
-              </button>
+  // Logout Dialog Component
+  const LogoutDialog = () => {
+    if (!showLogoutDialog) return null;
 
-              {isNotificationOpen && (
-                <div className="absolute right-0 mt-2 w-96 bg-white rounded-2xl shadow-2xl border border-green-50 z-50 max-h-[500px] overflow-y-auto">
-                  <div className="p-5">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-sm md:text-xl font-bold text-green-800 flex items-center gap-2">
-                        Notifications
-                      </h3>
-                      <span className="text-sm text-green-600 font-medium">
-                        {unreadCount} New
-                      </span>
-                    </div>
-                    {notifications.length === 0 ? (
-                      <div className="text-center py-6 bg-green-50 rounded-xl">
-                        <p className="text-green-600 font-medium">
-                          No new notifications
-                        </p>
-                        <p className="text-xs text-green-500 mt-1">
-                          You're all caught up!
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="space-y-3">
-                        {notifications.map((notif) => (
-                          <div
-                            key={notif.id}
-                            className={`transition-all duration-300 ease-in-out transform hover:scale-[1.02] ${
-                              notif.read ? "" : ""
-                            } border-y-2 py-2`}
-                          >
-                            <div className="flex items-start gap-3">
-                              <div className="flex-grow">
-                                <p
-                                  className={`text-xs ${
-                                    notif.read
-                                      ? "text-gray-700"
-                                      : "text-green-800 font-semibold"
-                                  }`}
-                                >
-                                  {notif.message}
-                                </p>
-                                <p className="text-xs text-gray-500 mt-1">
-                                  {formatDate(notif.createdAt)}
-                                </p>
-                              </div>
-                              {!notif.read && (
-                                <button
-                                  onClick={() => handleMarkAsRead(notif.id)}
-                                  className="bg-green-500 text-white text-xs rounded p-1 hover:bg-green-600 transition-colors duration-200"
-                                >
-                                  Mark as Read
-                                </button>
-                              )}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
+    const handleLogout = async () => {
+      try {
+        // Clear user from Redux
+        dispatch(userNotExist());
+        // Clear localStorage
+        localStorage.removeItem("userRole");
+        // Purge persistor
+        await persistor.purge().then(() => {
+          // Navigate to login page
+          navigate("/login/user");
+        });
+      } catch (error) {
+        console.error("Logout failed:", error);
+      }
+    };
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-xs sm:w-80 shadow-lg">
+          <div className="flex flex-col items-center">
+            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-[#F95151] flex items-center justify-center mb-3 sm:mb-4">
+              <IoLogOutOutline className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
-            <button
-              onClick={handleLogout}
-              className="text-blue-600 text-base lg:text-lg font-medium hover:text-blue-800 transition-colors pr-4"
-            >
-              Logout
-            </button>
-            <img
-              className="h-10 w-10 rounded-full"
-              src={profilePic}
-              alt="Profile"
-            />
+            <h3 className="text-base sm:text-lg font-medium mb-3 sm:mb-4 text-center">
+              Are you sure! You want to log out
+            </h3>
+            <div className="flex gap-3 sm:gap-4 w-full justify-center">
+              <button
+                onClick={() => setShowLogoutDialog(false)}
+                className="px-3 sm:px-4 py-1.5 sm:py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition-colors text-sm sm:text-base"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleLogout}
+                className="px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-sm sm:text-base"
+              >
+                Log out
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    );
+  };
+
+  return (
+    <>
+      <div className="bg-white shadow-md sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex flex-wrap md:flex-nowrap md:items-center justify-between h-auto min-h-16 py-2">
+            {/* Left side - Welcome message */}
+            <div className="flex items-center space-x-2 order-1 w-full md:w-auto md:mr-auto mb-2 md:mb-0">
+              <span className="text-sm sm:text-base lg:text-lg font-bold truncate">
+                Welcome {name} 👋
+              </span>
+            </div>
+
+            {/* Right side - Actions */}
+            <div className="flex items-center justify-between md:justify-end space-x-3 w-full md:w-auto order-3 md:order-2">
+              {/* Notification Button */}
+              <div className="relative notification-container">
+                <button
+                  className="p-1 sm:p-2 rounded-full bg-gray-100 hover:bg-gray-200 focus:outline-none"
+                  onClick={toggleNotification}
+                >
+                  <FiBell className="w-5 h-5 text-gray-600" />
+                  {unreadCount > 0 && (
+                    <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1 py-0.5 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">
+                      {unreadCount}
+                    </span>
+                  )}
+                </button>
+
+                {/* Notification Panel */}
+                {isNotificationOpen && (
+                  <div className="absolute right-0 mt-2 w-screen xs:w-72 sm:w-80 md:w-96 bg-white rounded-lg shadow-xl border border-green-50 z-50 max-h-[80vh] overflow-y-auto"
+                    style={{ maxWidth: "calc(100vw - 20px)" }}>
+                    <div className="p-3 sm:p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="text-sm font-bold text-green-800">
+                          Notifications
+                        </h3>
+                        <span className="text-xs text-green-600 font-medium">
+                          {unreadCount} New
+                        </span>
+                      </div>
+                      {notifications.length === 0 ? (
+                        <div className="text-center py-4 bg-green-50 rounded-lg">
+                          <p className="text-green-600 font-medium text-sm">
+                            No new notifications
+                          </p>
+                          <p className="text-xs text-green-500 mt-1">
+                            You're all caught up!
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          {notifications.map((notif) => (
+                            <div
+                              key={notif.id}
+                              className={`transition-all duration-300 ease-in-out ${notif.read ? "" : ""
+                                } border-y py-2`}
+                            >
+                              <div className="flex items-start gap-2">
+                                <div className="flex-grow">
+                                  <p
+                                    className={`text-xs ${notif.read
+                                      ? "text-gray-700"
+                                      : "text-green-800 font-semibold"
+                                      }`}
+                                  >
+                                    {notif.message}
+                                  </p>
+                                  <p className="text-xs text-gray-500 mt-1">
+                                    {formatDate(notif.createdAt)}
+                                  </p>
+                                </div>
+                                {!notif.read && (
+                                  <button
+                                    onClick={() => handleMarkAsRead(notif.id)}
+                                    className="bg-green-500 text-white text-xs rounded p-1 hover:bg-green-600 transition-colors duration-200 whitespace-nowrap"
+                                  >
+                                    Mark Read
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Logout Button */}
+              <button
+                onClick={() => setShowLogoutDialog(true)}
+                className="text-blue-600 text-base sm:text-base font-medium hover:text-blue-800 transition-colors"
+              >
+                Logout
+              </button>
+
+              {/* Profile Picture */}
+              <img
+                className="h-8 w-8 sm:h-10 sm:w-10 rounded-full"
+                src={profilePic}
+                alt="Profile"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Render Logout Dialog */}
+      <LogoutDialog />
+    </>
   );
 };
 
