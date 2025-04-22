@@ -68,20 +68,64 @@ const Coupons = () => {
     }[activeTab];
   };
 
-  return (
-    <div className="p-6">
-      <h1 className="text-2xl font-normal mb-8">Coupons</h1>
+  // Determine if we're on a mobile device
+  const [isMobile, setIsMobile] = useState(false);
 
-      <div className="bg-white rounded-lg border shadow-lg p-6">
-        {/* Tabs and Search Bar */}
-        <div className="flex justify-between items-center mb-8">
-          <div className="flex gap-4">
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    // Initial check
+    checkIfMobile();
+
+    // Add event listener
+    window.addEventListener("resize", checkIfMobile);
+
+    // Clean up
+    return () => window.removeEventListener("resize", checkIfMobile);
+  }, []);
+
+  // Mobile card view for table rows
+  const renderMobileCard = (coupon, index) => (
+    <div key={coupon.id} className="bg-white p-4 rounded-lg shadow-sm mb-4 border">
+      <div className="flex flex-col sm:flex-row justify-start sm:justify-between mb-2">
+        <span className="font-medium">{startIndex + index + 1}. {coupon.code}</span>
+        <span className={`${coupon.status === "Pending" ? "text-[#F59E0B]" : "text-[#22C55E]"
+          }`}>
+          {coupon.status}
+        </span>
+      </div>
+      <div className="space-y-1 text-sm">
+        <p><span className="text-gray-500">Shop:</span> {coupon.businessName}</p>
+        <p className="text-sm break-all truncate"><span className="text-gray-500">Email:</span> {coupon.email}</p>
+        <p><span className="text-gray-500">Name:</span> {coupon.fullName}</p>
+        <p><span className="text-gray-500">Created:</span> {coupon.createdAt}</p>
+        {activeTab === "claimed" && (
+          <p><span className="text-gray-500">Claimed:</span> {coupon.claimedAt}</p>
+        )}
+      </div>
+      <div className="mt-2 flex justify-end">
+        <button className="p-1 hover:bg-gray-100 rounded-full">
+          <FiMoreVertical className="w-5 h-5 text-gray-500" />
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="p-3 md:p-6">
+      <h1 className="text-xl md:text-2xl font-normal mb-4 md:mb-8">Coupons</h1>
+
+      <div className="bg-white rounded-lg border shadow-lg p-3 md:p-6">
+        {/* Tabs and Search Bar - Responsive Layout */}
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
+          <div className="flex flex-wrap gap-2 md:gap-4">
             <button
-              className={`px-4 py-2 rounded-full ${
-                activeTab === "generated"
+              className={`px-3 py-1.5 md:px-4 md:py-2 text-sm md:text-base rounded-full flex-grow md:flex-grow-0 ${activeTab === "generated"
                   ? "bg-[#F59E0B] text-white"
                   : "border border-black text-gray-600"
-              }`}
+                }`}
               onClick={() => {
                 setActiveTab("generated");
                 setCurrentPage(1);
@@ -90,11 +134,10 @@ const Coupons = () => {
               Generated coupons
             </button>
             <button
-              className={`px-4 py-2 rounded-full ${
-                activeTab === "claimed"
+              className={`px-3 py-1.5 md:px-4 md:py-2 text-sm md:text-base rounded-full flex-grow md:flex-grow-0 ${activeTab === "claimed"
                   ? "bg-[#F59E0B] text-white"
                   : "border border-black text-gray-600"
-              }`}
+                }`}
               onClick={() => {
                 setActiveTab("claimed");
                 setCurrentPage(1);
@@ -103,130 +146,226 @@ const Coupons = () => {
               Claimed coupons
             </button>
           </div>
-          <div className="relative">
+          <div className="relative w-full md:w-auto">
             <input
               type="text"
               placeholder="Search by coupon code..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#F59E0B] focus:border-transparent"
+              className="w-full md:w-auto pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#F59E0B] focus:border-transparent"
             />
             <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
           </div>
         </div>
 
-        {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="text-left font-medium">
-                <th className="pb-4 text-gray-500">#</th>
-                <th className="pb-4 text-gray-500">Code</th>
-                <th className="pb-4 text-gray-500">Shop Name</th>
-                <th className="pb-4 text-gray-500">Email</th>
-                <th className="pb-4 text-gray-500">Name</th>
-                <th className="pb-4 text-gray-500">Created Date</th>
-                {activeTab === "claimed" && (
-                  <th className="pb-4 text-gray-500">Claimed Date</th>
-                )}
-                <th className="pb-4 text-gray-500">Status</th>
-                <th className="pb-4 text-gray-500">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                Array.from({ length: itemsPerPage }).map((_, index) => (
-                  <tr key={index} className="border-t animate-pulse">
-                    <td className="py-4">
-                      <div className="h-4 bg-gray-200 rounded w-6"></div>
-                    </td>
-                    {/* ... other loading placeholders ... */}
-                  </tr>
-                ))
-              ) : displayedCoupons.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={activeTab === "claimed" ? 9 : 8}
-                    className="py-12 text-center"
-                  >
-                    <div className="flex flex-col items-center justify-center space-y-2">
-                      <h3 className="text-lg font-medium text-gray-900">
-                        {getNoDataMessage()?.title}
-                      </h3>
-                      <p className="text-sm text-gray-500 max-w-sm">
-                        {getNoDataMessage()?.description}
-                      </p>
-                    </div>
-                  </td>
+        {/* Table for desktop / Cards for mobile */}
+        {!isMobile ? (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="text-left font-medium">
+                  <th className="pb-4 text-gray-500">#</th>
+                  <th className="pb-4 text-gray-500">Code</th>
+                  <th className="pb-4 text-gray-500">Shop Name</th>
+                  <th className="pb-4 text-gray-500">Email</th>
+                  <th className="pb-4 text-gray-500">Name</th>
+                  <th className="pb-4 text-gray-500">Created Date</th>
+                  {activeTab === "claimed" && (
+                    <th className="pb-4 text-gray-500">Claimed Date</th>
+                  )}
+                  <th className="pb-4 text-gray-500">Status</th>
+                  <th className="pb-4 text-gray-500">Action</th>
                 </tr>
-              ) : (
-                displayedCoupons.map((coupon, index) => (
-                  <tr key={coupon.id} className="border-t">
-                    <td className="py-4">{startIndex + index + 1}.</td>
-                    <td className="py-4">{coupon.code}</td>
-                    <td className="py-4">{coupon.businessName}</td>
-                    <td className="py-4">{coupon.email}</td>
-                    <td className="py-4">{coupon.fullName}</td>
-                    <td className="py-4">{coupon.createdAt}</td>
-                    {activeTab === "claimed" && (
-                      <td className="py-4">{coupon.claimedAt}</td>
-                    )}
-                    <td className="py-4">
-                      <span
-                        className={`${
-                          coupon.status === "Pending"
-                            ? "text-[#F59E0B]"
-                            : "text-[#22C55E]"
-                        }`}
-                      >
-                        {coupon.status}
-                      </span>
-                    </td>
-                    <td className="py-4 relative">
-                      <button 
-                        className="p-1 hover:bg-gray-100 rounded-full"
-                      >
-                        <FiMoreVertical className="w-5 h-5 text-gray-500" />
-                      </button>
+              </thead>
+              <tbody>
+                {loading ? (
+                  Array.from({ length: itemsPerPage }).map((_, index) => (
+                    <tr key={index} className="border-t animate-pulse">
+                      <td className="py-4">
+                        <div className="h-4 bg-gray-200 rounded w-6"></div>
+                      </td>
+                      <td className="py-4">
+                        <div className="h-4 bg-gray-200 rounded w-24"></div>
+                      </td>
+                      <td className="py-4">
+                        <div className="h-4 bg-gray-200 rounded w-32"></div>
+                      </td>
+                      <td className="py-4">
+                        <div className="h-4 bg-gray-200 rounded w-40"></div>
+                      </td>
+                      <td className="py-4">
+                        <div className="h-4 bg-gray-200 rounded w-24"></div>
+                      </td>
+                      <td className="py-4">
+                        <div className="h-4 bg-gray-200 rounded w-24"></div>
+                      </td>
+                      {activeTab === "claimed" && (
+                        <td className="py-4">
+                          <div className="h-4 bg-gray-200 rounded w-24"></div>
+                        </td>
+                      )}
+                      <td className="py-4">
+                        <div className="h-4 bg-gray-200 rounded w-16"></div>
+                      </td>
+                      <td className="py-4">
+                        <div className="h-4 bg-gray-200 rounded w-6"></div>
+                      </td>
+                    </tr>
+                  ))
+                ) : displayedCoupons.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={activeTab === "claimed" ? 9 : 8}
+                      className="py-12 text-center"
+                    >
+                      <div className="flex flex-col items-center justify-center space-y-2">
+                        <h3 className="text-lg font-medium text-gray-900">
+                          {getNoDataMessage()?.title}
+                        </h3>
+                        <p className="text-sm text-gray-500 max-w-sm">
+                          {getNoDataMessage()?.description}
+                        </p>
+                      </div>
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+                ) : (
+                  displayedCoupons.map((coupon, index) => (
+                    <tr key={coupon.id} className="border-t">
+                      <td className="py-4">{startIndex + index + 1}.</td>
+                      <td className="py-4">{coupon.code}</td>
+                      <td className="py-4">{coupon.businessName}</td>
+                      <td className="py-4">{coupon.email}</td>
+                      <td className="py-4">{coupon.fullName}</td>
+                      <td className="py-4">{coupon.createdAt}</td>
+                      {activeTab === "claimed" && (
+                        <td className="py-4">{coupon.claimedAt}</td>
+                      )}
+                      <td className="py-4">
+                        <span
+                          className={`${coupon.status === "Pending"
+                              ? "text-[#F59E0B]"
+                              : "text-[#22C55E]"
+                            }`}
+                        >
+                          {coupon.status}
+                        </span>
+                      </td>
+                      <td className="py-4 relative">
+                        <button className="p-1 hover:bg-gray-100 rounded-full">
+                          <FiMoreVertical className="w-5 h-5 text-gray-500" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          // Mobile card view
+          <div className="space-y-2">
+            {loading ? (
+              Array.from({ length: itemsPerPage }).map((_, index) => (
+                <div key={index} className="bg-white p-4 rounded-lg shadow-sm mb-4 border animate-pulse">
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="h-4 bg-gray-200 rounded w-24"></div>
+                    <div className="h-4 bg-gray-200 rounded w-16"></div>
+                  </div>
+                  <div className="space-y-2">
+                    {Array.from({ length: 4 }).map((_, i) => (
+                      <div key={i} className="h-4 bg-gray-200 rounded w-full"></div>
+                    ))}
+                  </div>
+                </div>
+              ))
+            ) : displayedCoupons.length === 0 ? (
+              <div className="py-12 text-center">
+                <div className="flex flex-col items-center justify-center space-y-2">
+                  <h3 className="text-lg font-medium text-gray-900">
+                    {getNoDataMessage()?.title}
+                  </h3>
+                  <p className="text-sm text-gray-500 max-w-sm px-4">
+                    {getNoDataMessage()?.description}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              displayedCoupons.map((coupon, index) => renderMobileCard(coupon, index))
+            )}
+          </div>
+        )}
 
-        {/* Pagination */}
+        {/* Pagination - Responsive */}
         {displayedCoupons.length > 0 && (
-          <div className="mt-6 flex items-center justify-between">
-            <div className="text-sm text-gray-500">
+          <div className="mt-6 flex flex-col md:flex-row gap-2 items-center justify-between">
+            <div className="text-xs md:text-sm text-gray-500 order-2 md:order-1">
               Showing {startIndex + 1} -{" "}
               {Math.min(startIndex + itemsPerPage, filteredCoupons.length)} of{" "}
               {filteredCoupons.length}
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center justify-center gap-1 md:gap-2 order-1 md:order-2">
               <button
-                className="px-4 py-2 text-sm disabled:opacity-50"
+                className="px-1 md:px-4 py-1 md:py-2 text-xs md:text-sm disabled:opacity-50"
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage(currentPage - 1)}
               >
-                Previous
+                Prev
               </button>
-              {[...Array(totalPages)].map((_, i) => (
-                <button
-                  key={i + 1}
-                  className={`w-8 h-8 rounded-sm text-sm ${
-                    currentPage === i + 1
-                      ? "bg-[#F59E0B] text-white"
-                      : "hover:bg-gray-100"
-                  }`}
-                  onClick={() => setCurrentPage(i + 1)}
-                >
-                  {i + 1}
-                </button>
-              ))}
+              {totalPages <= 3 ? (
+                // Show all pages if 3 or fewer
+                [...Array(totalPages)].map((_, i) => (
+                  <button
+                    key={i + 1}
+                    className={`w-6 h-6 md:w-8 md:h-8 rounded-sm text-xs md:text-sm ${currentPage === i + 1
+                        ? "bg-[#F59E0B] text-white"
+                        : "hover:bg-gray-100"
+                      }`}
+                    onClick={() => setCurrentPage(i + 1)}
+                  >
+                    {i + 1}
+                  </button>
+                ))
+              ) : (
+                // Very compact pagination for mobile
+                <>
+                  {/* Always show first page */}
+                  <button
+                    className={`w-6 h-6 md:w-8 md:h-8 rounded-sm text-xs md:text-sm ${currentPage === 1 ? "bg-[#F59E0B] text-white" : "hover:bg-gray-100"
+                      }`}
+                    onClick={() => setCurrentPage(1)}
+                  >
+                    1
+                  </button>
+
+                  {/* Show ellipsis if current page is more than 2 */}
+                  {currentPage > 2 && <span className="text-gray-500 text-xs">...</span>}
+
+                  {/* Show current page if not first or last */}
+                  {currentPage !== 1 && currentPage !== totalPages && (
+                    <button
+                      className="w-6 h-6 md:w-8 md:h-8 rounded-sm text-xs md:text-sm bg-[#F59E0B] text-white"
+                    >
+                      {currentPage}
+                    </button>
+                  )}
+
+                  {/* Show ellipsis if current page is less than totalPages - 1 */}
+                  {currentPage < totalPages - 1 && <span className="text-gray-500 text-xs">...</span>}
+
+                  {/* Always show last page */}
+                  {totalPages > 1 && (
+                    <button
+                      className={`w-6 h-6 md:w-8 md:h-8 rounded-sm text-xs md:text-sm ${currentPage === totalPages ? "bg-[#F59E0B] text-white" : "hover:bg-gray-100"
+                        }`}
+                      onClick={() => setCurrentPage(totalPages)}
+                    >
+                      {totalPages}
+                    </button>
+                  )}
+                </>
+              )}
               <button
-                className="px-4 py-2 text-sm disabled:opacity-50"
+                className="px-1 md:px-4 py-1 md:py-2 text-xs md:text-sm disabled:opacity-50"
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage(currentPage + 1)}
               >

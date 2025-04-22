@@ -404,8 +404,9 @@ const ContactInfo = () => {
                             View
                           </button>
                         </div>
-                        <div className="text-sm text-gray-600 mb-1">
-                          <span className="font-medium">Email:</span> {contact.email}
+                        <div className="text-sm flex flex-col sm:flex-row text-gray-600 mb-1">
+                          <span className="font-medium">Email:</span> 
+                          <span className="break-all">{contact.email}</span>
                         </div>
                         <div className="text-sm text-gray-600">
                           <span className="font-medium">Phone:</span> {contact.phone}
