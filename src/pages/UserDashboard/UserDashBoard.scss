@@ -152,6 +152,94 @@ $breakpoint2: 736px;
             width: 25%;
             text-align: left;
             gap: 30px;
+            padding: 20px;
+          }
+
+          // Additional mobile-first breakpoints
+          @media (max-width: 480px) {
+            padding: 12px;
+            gap: 15px;
+          }
+
+          h2 {
+            font-size: 22px;
+            font-weight: 600;
+
+            @media (min-width: $breakpoint) {
+              font-size: 30px;
+            }
+
+            @media (max-width: 480px) {
+              font-size: 20px;
+            }
+          }
+
+          .links {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+
+            @media (min-width: $breakpoint) {
+              padding: 0px 10px;
+              align-items: flex-start;
+            }
+
+            .link {
+              border: 2px solid #0059de;
+              padding: 6px 15px;
+              border-radius: 10px;
+              color: #0059de;
+              font-size: 16px;
+              font-weight: 500;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              gap: 10px;
+              width: 100%;
+              max-width: 210px;
+              transition: all 0.3s ease;
+
+              @media (min-width: $breakpoint) {
+                font-size: 18px;
+                padding: 8px 20px;
+              }
+
+              @media (max-width: 480px) {
+                font-size: 15px;
+                padding: 5px 12px;
+              }
+
+              &:hover {
+                background-color: #0059de;
+                color: white;
+              }
+
+              svg {
+                font-size: 18px;
+
+                @media (min-width: $breakpoint) {
+                  font-size: 20px;
+                }
+              }
+            }
+          }
+        }
+        .right {
+          width: 100%;
+          padding: 15px;
+          box-shadow: 0px 1px 15px 0px #0000002e;
+          border-radius: 10px;
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+          text-align: center;
+
+          @media (min-width: $breakpoint) {
+            width: 25%;
+            text-align: left;
+            gap: 30px;
           }
 
           h2 {
@@ -185,7 +273,7 @@ $breakpoint2: 736px;
               align-items: center;
               justify-content: center;
               gap: 10px;
-              width: 210px;
+              width: 100%;
 
               @media (min-width: $breakpoint) {
                 font-size: 18px;
@@ -236,8 +324,6 @@ $breakpoint2: 736px;
     }
   }
 
-
-
   .welcomeSec {
     width: 100%;
     box-shadow: 0px 1px 15px 0px #0000002e;
@@ -268,7 +354,7 @@ $breakpoint2: 736px;
     button {
       background-color: #04b455;
       padding: 15px 20px;
-      width: max-content;
+      width: 100%;
       border-radius: 15px;
       color: white;
     }
@@ -293,8 +379,6 @@ $breakpoint2: 736px;
     }
 
     .featuresSecLowerSection {
-   
-
       .featuresSecItem {
         display: flex;
         flex-direction: column;
@@ -521,7 +605,7 @@ $breakpoint2: 736px;
             }
           }
 
-          >p {
+          > p {
             font-size: 18px;
             line-height: 30px;
             color: $gray;

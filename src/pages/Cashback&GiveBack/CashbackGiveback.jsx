@@ -10,7 +10,14 @@ import WithdrawlRequests from "../../Components/Chashback&Giveback/WithdrawlRequ
 import { useSelector, useDispatch } from "react-redux";
 import DisputeForm from "../../Components/Chashback&Giveback/DisputeForm";
 import DisputeRequest from "../../Components/Chashback&Giveback/DisputeRequest";
-import { collection, query, where, getDocs, doc, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
 import { db } from "../../../firebase";
 import { userExist } from "../../redux/reducer/userReducer";
 
@@ -24,7 +31,7 @@ const CashbackGiveback = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useSelector((state) => state.userReducer);
   const dispatch = useDispatch();
-  
+
   const handleTabClick = (tabValue) => {
     setActiveTab(tabValue);
   };
@@ -33,7 +40,7 @@ const CashbackGiveback = () => {
   useEffect(() => {
     const fetchINRDealsCommission = async () => {
       if (!user?.uid) return;
-      
+
       try {
         setIsLoading(true);
         const transactionsRef = collection(db, "transactions");
@@ -42,26 +49,26 @@ const CashbackGiveback = () => {
           where("userId", "==", user.uid),
           where("status", "==", "verified")
         );
-        
+
         const querySnapshot = await getDocs(q);
         let totalCommission = 0;
-        
+
         querySnapshot.forEach((doc) => {
           const data = doc.data();
           // Check different possible locations for commission
           let commission = 0;
-          
-          if (data.inrdeals && typeof data.inrdeals.commission === 'number') {
+
+          if (data.inrdeals && typeof data.inrdeals.commission === "number") {
             commission = data.inrdeals.commission;
-          } else if (typeof data.commission === 'number') {
+          } else if (typeof data.commission === "number") {
             commission = data.commission;
-          } else if (typeof data.inrdealsCommission === 'number') {
+          } else if (typeof data.inrdealsCommission === "number") {
             commission = data.inrdealsCommission;
           }
-          
+
           totalCommission += commission;
         });
-        
+
         setInrDealsCommission(totalCommission);
       } catch (error) {
         console.error("Error fetching INRDeals commission:", error);
@@ -77,7 +84,7 @@ const CashbackGiveback = () => {
   useEffect(() => {
     const checkWithdrawalRequests = async () => {
       if (!user?.uid) return;
-      
+
       try {
         // Query WithdrawCashback collection for INRDeals withdrawal requests
         const withdrawalRef = collection(db, "WithdrawCashback");
@@ -86,11 +93,11 @@ const CashbackGiveback = () => {
           where("userId", "==", user.uid),
           where("cashbackType", "==", "INRDeals")
         );
-        
+
         const querySnapshot = await getDocs(q);
         let pendingAmount = 0;
         let hasCompletedWithdrawal = false;
-        
+
         // Calculate pending amount from requests with "Pending" status
         querySnapshot.forEach((doc) => {
           const data = doc.data();
@@ -100,21 +107,24 @@ const CashbackGiveback = () => {
             hasCompletedWithdrawal = true;
           }
         });
-        
+
         // If the current pendingInrDealsCashback doesn't match what we calculated
         // or if there's a completed withdrawal but pendingInrDealsCashback isn't zero
-        if (user.pendingInrDealsCashback !== pendingAmount || 
-            (hasCompletedWithdrawal && user.pendingInrDealsCashback > 0 && pendingAmount === 0)) {
-          
+        if (
+          user.pendingInrDealsCashback !== pendingAmount ||
+          (hasCompletedWithdrawal &&
+            user.pendingInrDealsCashback > 0 &&
+            pendingAmount === 0)
+        ) {
           // Update Firestore first
           const userDocRef = doc(db, "users", user.uid);
           await updateDoc(userDocRef, {
-            pendingInrDealsCashback: pendingAmount
+            pendingInrDealsCashback: pendingAmount,
           });
-          
+
           const updatedUser = {
             ...user,
-            pendingInrDealsCashback: pendingAmount
+            pendingInrDealsCashback: pendingAmount,
           };
           dispatch(userExist(updatedUser));
         }
@@ -226,8 +236,8 @@ const CashbackGiveback = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <CashbackCard
           title="Collected Cash backs"
-          amount={user?.collectedCashback || 0}
-          pendingAmount={user?.pendingCashback || 0}
+          amount={Number(user?.collectedCashback || 0).toFixed(1)}
+          pendingAmount={Number(user?.pendingCashback || 0).toFixed(1)}
           // link="View Details"
         />
         <CashbackCard
@@ -344,7 +354,8 @@ const CashbackCard = ({
               <div className="animate-pulse h-4 w-16 bg-amber-200 rounded"></div>
             ) : (
               <>
-                Pending {isPendingInrDeals ? "Deals " : ""}Withdrawal: ₹{pendingAmount}
+                Pending {isPendingInrDeals ? "Deals " : ""}Withdrawal: ₹
+                {pendingAmount}
               </>
             )}
           </div>

@@ -37,7 +37,7 @@ $font: "Roboto Slab";
         display: none;
       }
 
-      > a {
+      > a, > button {
         background-color: $primary;
         border: 2px solid white;
         padding: 8px 20px;
@@ -49,11 +49,16 @@ $font: "Roboto Slab";
         font-weight: 500;
         font-size: 18px;
         color: white;
+        cursor: pointer;
 
         &.register {
           background-color: white;
           color: $primary;
         }
+      }
+      
+      .relative {
+        position: relative;
       }
     }
 
@@ -81,6 +86,7 @@ $font: "Roboto Slab";
     font-weight: 700;
     font-size: 18px;
     width: 100%;
+    overflow-x: auto; // Allow scrolling on smaller screens
 
     @media (max-width: 978px) {
       display: none;
@@ -91,6 +97,7 @@ $font: "Roboto Slab";
       text-decoration: none;
       color: black;
       transition: color 0.3s;
+      white-space: nowrap; // Prevent text wrapping
 
       &.active {
         color: $primary;
@@ -116,10 +123,10 @@ $font: "Roboto Slab";
   .menu {
     display: flex;
     flex-direction: column;
-    padding: 30px;
+    padding: 0;
     align-self: flex-end;
-    gap: 20px;
-    width: 50%;
+    width: 100%;
+    max-width: 400px;
     border-radius: 0 0 0 30px;
     font-size: 20px;
     font-family: $font;
@@ -127,8 +134,21 @@ $font: "Roboto Slab";
     background-color: $sec;
     position: absolute;
     top: 84px;
-    transition: 1s all ease-in;
+    right: 0;
+    transition: 0.3s all ease-in;
     z-index: 2000;
+    max-height: calc(100vh - 84px);
+    
+    .menu-scroll-container {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      width: 100%;
+      overflow-y: auto;
+      max-height: calc(100vh - 84px);
+      padding-bottom: 30px; // Extra padding at bottom for better scrolling
+    }
 
     @media (min-width: 978px) {
       display: none;
@@ -136,11 +156,12 @@ $font: "Roboto Slab";
 
     @media (max-width: 650px) {
       width: 100%;
-      border-radius: 0px 0px 60px 60px;
+      max-width: 100%;
+      border-radius: 0;
     }
 
     a {
-      padding: 3px;
+      padding: 10px 5px;
       border-bottom: 1px solid rgba(128, 128, 128, 0.467);
       text-decoration: none;
       color: black;
@@ -149,16 +170,6 @@ $font: "Roboto Slab";
       &.active {
         color: $primary;
         font-weight: bold;
-
-        &::after {
-          content: "";
-          position: absolute;
-          bottom: -10px; // Adjust based on desired distance from text
-          left: 0;
-          width: 100%;
-          height: 2px;
-          background-color: $primary;
-        }
       }
 
       &:hover {
@@ -178,11 +189,16 @@ $font: "Roboto Slab";
       font-weight: 500;
       font-size: 18px;
       color: $primary;
+      text-align: center;
+      margin-top: 10px;
+      cursor: pointer;
+      text-decoration: none;
+      border-bottom: none;
     }
 
     .login {
       background-color: $primary;
-      border: 2px solid white;
+      border: 2px solid $primary;
       padding: 8px 20px;
       border-radius: 6px;
       display: flex;
@@ -192,6 +208,33 @@ $font: "Roboto Slab";
       font-weight: 500;
       font-size: 18px;
       color: white;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    
+    .login-container {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      margin-bottom: 5px;
+    }
+    
+    .mobile-dropdown {
+      position: relative;
+      background-color: white;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 6px;
+      margin-bottom: 15px;
+      
+      a {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        padding: 12px 15px;
+        font-size: 16px;
+        
+        &:last-child {
+          border-bottom: none;
+        }
+      }
     }
   }
 }
