@@ -524,7 +524,7 @@ const UserDashBoard = () => {
 
           {/* New navigation tabs */}
           <div className="dashboard-tabs mt-6 mb-4 border-b">
-            <div className="flex space-x-4">
+            <div className="">
               <button
                 onClick={() => setActiveTab("dashboard")}
                 className={`py-2 px-4 font-medium transition-colors duration-200 ${
