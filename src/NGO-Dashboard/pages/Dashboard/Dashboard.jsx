@@ -6,14 +6,7 @@ import { RiShoppingBagLine } from "react-icons/ri";
 import { FaHandHoldingHeart } from "react-icons/fa"; 
 import { useSelector } from "react-redux";
 import { useCallback, useEffect, useState } from "react";
-import {
-  collection,
-  getDocs,
-  query,
-  where,
-  orderBy,
-  limit,
-} from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../../../firebase";
 import { Link, useParams } from "react-router-dom";
 
@@ -258,7 +251,7 @@ function Dashboard() {
 
         {/* Stats Cards */}
         <div className="space-y-2">
-          <div className="bg-white rounded-lg p-6 shadow-sm flex justify-between items-center">
+          <div className="bg-white rounded-lg p-6 gap-2 shadow-sm flex justify-between items-center">
             <div>
               <p className="text-gray-600">Total Donations</p>
               {loading ? (
@@ -321,8 +314,8 @@ function Dashboard() {
                   />
                   <div>
                     <p className="font-medium">{supporter.name}</p>
-                    <p className="text-sm text-gray-600">{supporter.email}</p>
-                    <span className="text-xs inline-block mt-1 px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
+                    <p className="text-sm text-gray-600 break-all">{supporter.email}</p>
+                    <span className="text-xs inline-block mt-2 px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
                       {supporter.source === "giveback" ? "Giveback Donor" : "Direct Donor"}
                     </span>
                   </div>
@@ -369,8 +362,8 @@ function Dashboard() {
                   className="flex flex-col p-4 border rounded-lg"
                 >
                   {/* Header with transaction type badge */}
-                  <div className="flex justify-between items-center mb-3">
-                    <div className="flex items-center gap-2">
+                  <div className="flex flex-col sm:flex-row space-y-2 sm:gap-4 sm:space-y-0 items-center mb-3">
+                    <div className="flex items-center gap-6 sm:gap-4">
                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center
                         ${transaction.type === "donation" ? "bg-blue-100" : "bg-orange-100"}`}
                       >
@@ -380,13 +373,13 @@ function Dashboard() {
                           <FaHandHoldingHeart className="w-6 h-6 text-orange-500" />
                         )}
                       </div>
-                      <span className={`text-xs font-medium px-2 py-1 rounded-full 
+                      <span className={`text-xs text-center font-medium px-2 py-1 rounded-full 
                         ${transaction.type === "donation" ? "bg-blue-100 text-blue-700" : "bg-orange-100 text-orange-700"}`}
                       >
                         {transaction.type === "donation" ? "Direct Donation" : "Giveback Donation"}
                       </span>
                     </div>
-                    <div className="text-right">
+                    <div className="text-right ml-auto sm:mx-0">
                       <span className={`text-xs font-medium px-2 py-1 rounded-full
                         ${transaction.status === "Completed" ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}
                       >
@@ -407,7 +400,7 @@ function Dashboard() {
                         />
                         <div>
                           <p className="font-medium text-sm">{transaction.userName || "Anonymous"}</p>
-                          <p className="text-xs text-gray-500">{transaction.userEmail || "No email"}</p>
+                          <p className="text-xs text-gray-500 break-all">{transaction.userEmail || "No email"}</p>
                         </div>
                       </div>
                       

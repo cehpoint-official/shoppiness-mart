@@ -481,10 +481,10 @@ const UserDashBoard = () => {
                     />
                   </div>
                   <div className="info">
-                    <div className="name">
-                      <h3>{userData.fname}</h3>
-                      <h3>{userData.lname || ""}</h3>
-                    </div>
+                  <div className="name flex flex-col sm:flex-row sm:items-center">
+  <h3 className="mr-1">{userData.fname}</h3>
+  {userData.lname && <h3>{userData.lname}</h3>}
+</div>
                     <div className="email">
                       <MdOutlineMailOutline />
                       <p>{userData.email}</p>

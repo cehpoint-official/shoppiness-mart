@@ -165,7 +165,7 @@ const Footer = () => {
               </p>
               <p className="flex items-center text-lg mt-4 text-white">
                 <span className="mr-3 text-[#FFD705]">Email Us:</span>
-                <span>{contactInfo.email}</span>
+                <span className="break-all">{contactInfo.email}</span>
               </p>
             </div>
           </div>

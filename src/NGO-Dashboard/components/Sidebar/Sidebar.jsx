@@ -179,7 +179,7 @@ const Sidebar = () => {
             </li>
           </Link>
 
-          <Link to={`/ngo-dashboard/${id}/faqs`}>
+          {/* <Link to={`/ngo-dashboard/${id}/faqs`}>
             <li
               className={
                 activeLink === `/ngo-dashboard/${id}/faqs`
@@ -190,9 +190,9 @@ const Sidebar = () => {
               <img src={iconSales} alt="loading" />
               FAQs
             </li>
-          </Link>
+          </Link> */}
 
-          <Link to={`/ngo-dashboard/${id}/privacy-policy`}>
+          {/* <Link to={`/ngo-dashboard/${id}/privacy-policy`}>
             <li
               className={
                 activeLink === `/ngo-dashboard/${id}/privacy-policy`
@@ -203,7 +203,7 @@ const Sidebar = () => {
               <img src={iconShop} alt="loading" />
               Privacy Policy
             </li>
-          </Link>
+          </Link> */}
 
           <li
             className={
