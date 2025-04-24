@@ -127,12 +127,27 @@ const POS = ({ onGenerateInvoice }) => {
     }
   };
 
-  const getOfferText = (coupon) => {
-    if (coupon.productDiscount) {
-      return `Name: ${coupon.fullName}, Email: ${coupon.email}, Phone No. ${coupon.phoneNumber}, will get  ${coupon.productDiscount}% Off In-Store ${coupon.productName} Purchase + ${coupon.userCashback}% Cashback at Shoppiness Mart!`;
-    }
-    return `For all purchase from your shop  Name: ${coupon.fullName}, Email: ${coupon.email}, Phone No. ${coupon.phoneNumber}, will get ${coupon.userCashback}% Cashback at Shoppiness Mart!`;
+  // Helper function to round numbers to 1 decimal place
+  const roundToOneDecimal = (num) => {
+    return Number(parseFloat(num).toFixed(1));
   };
+
+  const getOfferText = (coupon) => {
+    if (!coupon) return "";
+  
+    const baseText = `Name: ${coupon.fullName || ""}, Email: ${coupon.email || ""}, Phone No. ${coupon.phoneNumber || ""}`;
+  
+    if (coupon.productDiscount) {
+      const discountText = `${roundToOneDecimal(coupon.productDiscount)}% Off In-Store ${coupon.productName || ""} Purchase`;
+      const cashbackText = coupon.userCashback
+        ? ` + ${roundToOneDecimal(coupon.userCashback)}% Cashback at Shoppiness Mart!`
+        : "!";
+  
+      return `${baseText}, will get ${discountText}${cashbackText}`;
+    }
+  
+    return `For all purchase from your shop ${baseText}, will get ${roundToOneDecimal(coupon.userCashback)}% Cashback at Shoppiness Mart!`;
+  };  
 
   const handleGenerateInvoice = () => {
     if (!isFormValid) {
@@ -152,7 +167,7 @@ const POS = ({ onGenerateInvoice }) => {
       time: new Date().toLocaleTimeString(),
       invoiceId: `IN-${Math.floor(Math.random() * 100000)}`,
       couponCode: matchedCoupon?.code || "",
-      userCashback: matchedCoupon?.userCashback || 0,
+      userCashback: Number(matchedCoupon?.userCashback || matchedCoupon?.productDiscount || 0),
       userProfilePic: matchedCoupon?.userProfilePic || "",
       platformEarnings: matchedCoupon?.platformEarnings || 0,
       customerId: matchedCoupon?.userId || "",
@@ -160,7 +175,7 @@ const POS = ({ onGenerateInvoice }) => {
       businessId: id,
     };
     // Add cause data if it exists
-    if (Object.keys(matchedCoupon?.causeData).length > 0) {
+    if (Object.keys(matchedCoupon?.causeData || {}).length > 0) {
       invoiceData.causeData = {
         causeName: matchedCoupon?.causeData.causeName || "",
         causeId: matchedCoupon?.causeData.causeId || "",

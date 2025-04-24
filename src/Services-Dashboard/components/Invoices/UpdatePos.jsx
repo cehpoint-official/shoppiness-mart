@@ -1,4 +1,4 @@
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs, query, where, updateDoc } from "firebase/firestore";
 import { useCallback, useEffect, useState, useMemo } from "react";
 import { db } from "../../../../firebase";
 import { useParams } from "react-router-dom";
@@ -125,11 +125,12 @@ const UpdatePos = ({ invoiceDetails, onBack, onUpdate }) => {
     }, Phone No. ${coupon.phoneNumber || ""}`;
 
     if (coupon.productDiscount) {
-      return `${baseText}, will get ${roundToOneDecimal(
-        coupon.productDiscount
-      )}% Off In-Store ${coupon.productName} Purchase + ${roundToOneDecimal(
-        coupon.userCashback
-      )}% Cashback at Shoppiness Mart!`;
+      const discountText = `${roundToOneDecimal(coupon.productDiscount)}% Off In-Store ${coupon.productName} Purchase`;
+      const cashbackText = coupon.userCashback
+        ? ` + ${roundToOneDecimal(coupon.userCashback)}% Cashback at Shoppiness Mart!`
+        : "!";
+    
+      return `${baseText}, will get ${discountText}${cashbackText}`;
     }
 
     return `For all purchase from your shop ${baseText}, will get ${roundToOneDecimal(
@@ -137,33 +138,59 @@ const UpdatePos = ({ invoiceDetails, onBack, onUpdate }) => {
     )}% Cashback at Shoppiness Mart!`;
   }, []);
 
-  const handleGenerateInvoice = useCallback(() => {
+  const handleGenerateInvoice = useCallback(async () => {
     if (!invoiceDetails?.id) return;
 
-    const invoiceData = {
-      ...customerInfo,
-      ...invoiceDetails,
-      updateTime: new Date().toLocaleTimeString(),
-      couponCode: matchedCoupon?.code || "",
-      userCashback: matchedCoupon?.userCashback || 0,
-      platformEarnings: matchedCoupon?.platformEarnings || 0,
-      customerId: matchedCoupon?.userId || "",
-      couponId: matchedCoupon?.id || "",
-      businessId: id,
-      docId: invoiceDetails.id,
-      totalPrice,
-      taxAmount,
-      grandTotal,
-      dueAmount,
-    };
-    if (Object.keys(matchedCoupon?.causeData).length > 0) {
-      invoiceData.causeData = {
-        causeName: matchedCoupon?.causeData.causeName || "",
-        causeId: matchedCoupon?.causeData.causeId || "",
-        paymentDetails: matchedCoupon?.causeData.paymentDetails || null,
+    try {
+      // Update cashback request status if a coupon is matched
+      if (matchedCoupon?.code) {
+        const cashbackRef = collection(db, "onlineCashbackRequests");
+        const cashbackQuery = query(
+          cashbackRef,
+          where("couponCode", "==", matchedCoupon.code)
+        );
+        
+        const querySnapshot = await getDocs(cashbackQuery);
+        
+        // Update each matching document's status to "Approved"
+        const updatePromises = querySnapshot.docs.map(async (doc) => {
+          const docRef = doc.ref;
+          await updateDoc(docRef, {
+            status: "Approved"
+          });
+        });
+        
+        await Promise.all(updatePromises);
+      }
+      
+      // Continue with the original function logic
+      const invoiceData = {
+        ...customerInfo,
+        ...invoiceDetails,
+        updateTime: new Date().toLocaleTimeString(),
+        couponCode: matchedCoupon?.code || "",
+        userCashback: Number(matchedCoupon?.userCashback || matchedCoupon?.productDiscount || 0),
+        platformEarnings: matchedCoupon?.platformEarnings || 0,
+        customerId: matchedCoupon?.userId || "",
+        couponId: matchedCoupon?.id || "",
+        businessId: id,
+        docId: invoiceDetails.id,
+        totalPrice,
+        taxAmount,
+        grandTotal,
+        dueAmount,
       };
+      if (Object.keys(matchedCoupon?.causeData || {}).length > 0) {
+        invoiceData.causeData = {
+          causeName: matchedCoupon?.causeData.causeName || "",
+          causeId: matchedCoupon?.causeData.causeId || "",
+          paymentDetails: matchedCoupon?.causeData.paymentDetails || null,
+        };
+      }
+      setGenerateInvoice(invoiceData);
+    } catch (error) {
+      console.error("Error updating cashback request status:", error);
     }
-    setGenerateInvoice(invoiceData);
   }, [
     customerInfo,
     invoiceDetails,

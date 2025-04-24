@@ -152,7 +152,7 @@ const Invoice = () => {
                     "Billing Date",
                     "Due Date",
                     "Invoice",
-                    ...(user?.mode === "Offline" ? ["Update Invoice"] : []),
+                    "Update Invoice",
                   ].map((header) => (
                     <th
                       key={header}
@@ -193,7 +193,7 @@ const Invoice = () => {
                         View
                       </Link>
                     </td>
-                    {user?.mode === "Offline" && !invoice.claimedCouponCode && (
+                    {!invoice.claimedCouponCode && (
                       <td className="p-4">
                         <button
                           onClick={() => setSelectedInvoiceUpdate(invoice)}

@@ -4,7 +4,7 @@ import { db } from "../../../../../firebase";
 import { MoreVertical } from "lucide-react";
 
 const CashbackStatus = () => {
-  const [activeTab, setActiveTab] = useState("Approved");
+  const [activeTab, setActiveTab] = useState("New");
   const [currentPage, setCurrentPage] = useState(1);
   const [cashbackRequests, setCashbackRequests] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,10 +16,16 @@ const CashbackStatus = () => {
       try {
         setLoading(true);
         const cashbackRef = collection(db, "onlineCashbackRequests");
-        const cashbackQuery = query(
-          cashbackRef,
-          where("status", "==", activeTab === "Approved" ? "Approved" : "Denied")
-        );
+        
+        // Query based on active tab
+        let cashbackQuery;
+        if (activeTab === "New") {
+          cashbackQuery = query(cashbackRef, where("status", "==", "New"));
+        } else if (activeTab === "Approved") {
+          cashbackQuery = query(cashbackRef, where("status", "==", "Approved"));
+        } else {
+          cashbackQuery = query(cashbackRef, where("status", "==", "Denied"));
+        }
         
         const querySnapshot = await getDocs(cashbackQuery);
         const requestsData = querySnapshot.docs.map((doc) => ({
@@ -60,6 +66,20 @@ const CashbackStatus = () => {
       : amount.toLocaleString('en-IN');
   };
 
+  // Get status color
+  const getStatusColor = (status) => {
+    switch(status) {
+      case "Approved":
+        return "text-green-500";
+      case "Denied":
+        return "text-red-500";
+      case "New":
+        return "text-orange-500";
+      default:
+        return "text-gray-500";
+    }
+  };
+
   return (
     <div className="p-3 md:p-6">
       <h1 className="text-xl md:text-2xl font-normal mb-4 md:mb-8">Cashback Status</h1>
@@ -67,6 +87,16 @@ const CashbackStatus = () => {
       <div className="bg-white rounded-lg border shadow-lg p-3 md:p-6">
         {/* Tabs */}
         <div className="flex flex-col sm:flex-row gap-2 md:gap-4 mb-4 md:mb-8">
+          <button
+            className={`px-3 py-1 md:px-4 md:py-2 text-sm md:text-base rounded-full ${
+              activeTab === "New"
+                ? "bg-[#F59E0B] text-white"
+                : "border border-black text-gray-600"
+            }`}
+            onClick={() => handleTabChange("New")}
+          >
+            New Cashbacks
+          </button>
           <button
             className={`px-3 py-1 md:px-4 md:py-2 text-sm md:text-base rounded-full ${
               activeTab === "Approved"
@@ -124,7 +154,7 @@ const CashbackStatus = () => {
                       <td className="py-4">{request.requestedAt}</td>
                       <td className="py-4">₹{formatAmount(request.paidAmount)}</td>
                       <td className="py-4">
-                        <span className={`${request.status === "Approved" ? "text-green-500" : "text-red-500"}`}>
+                        <span className={getStatusColor(request.status)}>
                           {request.status}
                         </span>
                       </td>
@@ -172,7 +202,7 @@ const CashbackStatus = () => {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-500 font-semibold">Status:</span>
-                      <span className={`${request.status === "Approved" ? "text-green-500" : "text-red-500"}`}>
+                      <span className={getStatusColor(request.status)}>
                         {request.status}
                       </span>
                     </div>

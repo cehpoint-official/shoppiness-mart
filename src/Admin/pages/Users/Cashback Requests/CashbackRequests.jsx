@@ -35,27 +35,27 @@ const CashbackRequests = () => {
     fetchData();
   }, [fetchData]);
 
-  const markCashbackRequestAsRead = async (couponCode) => {
-    try {
-      const snapshot = await getDocs(collection(db, 'onlineCashbackRequests'));
-      const matchingDoc = snapshot.docs.find(doc => doc.data().couponCode === couponCode);
+  // const markCashbackRequestAsRead = async (couponCode) => {
+  //   try {
+  //     const snapshot = await getDocs(collection(db, 'onlineCashbackRequests'));
+  //     const matchingDoc = snapshot.docs.find(doc => doc.data().couponCode === couponCode);
 
-      if (!matchingDoc) {
-        console.error("No document found with couponCode: ", couponCode);
-        return;
-      }
+  //     if (!matchingDoc) {
+  //       console.error("No document found with couponCode: ", couponCode);
+  //       return;
+  //     }
 
-      const docRef = doc(db, 'onlineCashbackRequests', matchingDoc.id);
+  //     const docRef = doc(db, 'onlineCashbackRequests', matchingDoc.id);
 
-      await updateDoc(docRef, {
-        status: 'Approved'
-      });
+  //     await updateDoc(docRef, {
+  //       status: 'Approved'
+  //     });
 
-      console.log("Cashback request marked as approved");
-    } catch (error) {
-      console.error("Error marking cashback request as read: ", error);
-    }
-  };
+  //     console.log("Cashback request marked as approved");
+  //   } catch (error) {
+  //     console.error("Error marking cashback request as read: ", error);
+  //   }
+  // };
 
   const handleCashbackRequest = async (request, action) => {
     try {
@@ -98,7 +98,7 @@ const CashbackRequests = () => {
   };
 
   const handleViewDetails = async (request) => {
-    await markCashbackRequestAsRead(request.couponCode);
+    // await markCashbackRequestAsRead(request.couponCode);
     setSelectedRequest(request);
     await fetchData();
   };
