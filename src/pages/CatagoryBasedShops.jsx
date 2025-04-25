@@ -21,7 +21,7 @@ const CatagoryBasedShops = () => {
           data.push({ id: doc.id, ...shopData });
         }
       });
-      console.log(data);
+      // console.log(data);
 
       setShops(data);
     } catch (error) {

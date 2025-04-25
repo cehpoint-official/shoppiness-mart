@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { FiBell } from "react-icons/fi";
-import { IoLogOutOutline } from "react-icons/io5";
+import { IoLogOutOutline, IoClose } from "react-icons/io5";
 import { collection, getDocs, updateDoc, doc, getDoc } from "firebase/firestore";
 import { db } from "../../../../firebase";
 import { useDispatch } from "react-redux";
@@ -15,13 +15,14 @@ const Navbar = ({ userId }) => {
   const [profilePic, setProfilePic] = useState("");
   const [name, setName] = useState("");
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const notificationRef = useRef(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (isNotificationOpen && !event.target.closest(".notification-container")) {
+      if (isNotificationOpen && notificationRef.current && !notificationRef.current.contains(event.target)) {
         setIsNotificationOpen(false);
       }
     };
@@ -195,7 +196,7 @@ const Navbar = ({ userId }) => {
             {/* Right side - Actions */}
             <div className="flex items-center justify-between md:justify-end space-x-3 w-full md:w-auto order-3 md:order-2">
               {/* Notification Button */}
-              <div className="relative notification-container">
+              <div className="relative notification-container" ref={notificationRef}>
                 <button
                   className="p-1 sm:p-2 rounded-full bg-gray-100 hover:bg-gray-200 focus:outline-none"
                   onClick={toggleNotification}
@@ -208,19 +209,27 @@ const Navbar = ({ userId }) => {
                   )}
                 </button>
 
-                {/* Notification Panel */}
+                {/* Notification Panel - Fixed for mobile responsiveness */}
                 {isNotificationOpen && (
-                  <div className="absolute right-0 mt-2 w-screen xs:w-72 sm:w-80 md:w-96 bg-white rounded-lg shadow-xl border border-green-50 z-50 max-h-[80vh] overflow-y-auto"
-                    style={{ maxWidth: "calc(100vw - 20px)" }}>
-                    <div className="p-3 sm:p-4">
-                      <div className="flex items-center justify-between mb-3">
+                  <div className="fixed sm:absolute top-16 sm:top-auto left-0 sm:left-auto right-0 sm:right-0 sm:mt-2 w-full sm:w-80 md:w-96 bg-white shadow-xl z-50 sm:rounded-lg border-t sm:border sm:border-green-50 max-h-screen sm:max-h-[80vh] overflow-y-auto">
+                    <div className="sticky top-0 bg-white p-3 sm:p-4 border-b flex justify-between items-center">
+                      <div className="flex items-center justify-between w-full">
                         <h3 className="text-sm font-bold text-green-800">
                           Notifications
                         </h3>
-                        <span className="text-xs text-green-600 font-medium">
-                          {unreadCount} New
-                        </span>
+                        <div className="flex items-center gap-3">
+                          <span className="text-xs text-green-600 font-medium">
+                            {unreadCount} New
+                          </span>
+                          <IoClose
+                            className="w-5 h-5 text-gray-600 cursor-pointer sm:hidden"
+                            onClick={() => setIsNotificationOpen(false)}
+                          />
+                        </div>
                       </div>
+                    </div>
+
+                    <div className="p-3 sm:p-4">
                       {notifications.length === 0 ? (
                         <div className="text-center py-4 bg-green-50 rounded-lg">
                           <p className="text-green-600 font-medium text-sm">

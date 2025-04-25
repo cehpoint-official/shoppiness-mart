@@ -174,31 +174,33 @@ const OfflineShop = () => {
   }
 
   return (
-    <div>
+    <div className="w-full">
       {/* Search Section */}
-      <div className="container mx-auto py-6 px-4 md:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row items-center p-2 bg-white rounded-md shadow-md max-w-full">
+      <div className="container mx-auto py-4 px-3 md:px-6 lg:px-8">
+        <div className="flex flex-col p-2 bg-white rounded-md shadow-md w-full">
           <LocationSelector onLocationSelect={handleLocationSelect} />
-          <input
-            type="text"
-            className="flex-grow p-2 w-full sm:w-auto focus:outline-none"
-            placeholder="Search name of Shop, Store, brand, Product"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <button className="p-2 mt-2 sm:mt-0">
-            <FaSearch className="text-gray-500" />
-          </button>
+          <div className="flex w-full mt-2">
+            <input
+              type="text"
+              className="flex-grow p-2 focus:outline-none w-full"
+              placeholder="Search shop, brand, product"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <button className="p-2">
+              <FaSearch className="text-gray-500" />
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Categories Section with Selection */}
-      <div className="flex justify-center p-11 w-full flex-wrap gap-3">
+      <div className="flex justify-center py-4 px-2 md:p-8 w-full flex-wrap gap-2 md:gap-3">
         {categories.map((category) => (
           <div
             key={category.name}
             onClick={() => toggleCategory(category.name)}
-            className={`flex flex-col items-center w-1/2 sm:w-1/4 md:w-1/4 lg:w-1/6 p-2 cursor-pointer transition-colors duration-200 
+            className={`flex flex-col items-center w-[22%] sm:w-[22%] md:w-1/5 lg:w-1/6 p-2 cursor-pointer transition-colors duration-200 
               ${
                 selectedCategories.includes(category.name)
                   ? "bg-orange-100 rounded-lg"
@@ -208,35 +210,35 @@ const OfflineShop = () => {
             <img
               src={category.icon}
               alt={category.name}
-              className="w-20 h-20 mb-2 bg-[#F7F7F7] rounded-full p-2"
+              className="w-12 h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 mb-1 bg-[#F7F7F7] rounded-full p-2"
             />
-            <span className="text-gray-700 text-center">{category.name}</span>
+            <span className="text-gray-700 text-center text-xs md:text-sm">{category.name}</span>
           </div>
         ))}
       </div>
 
       {/* Features Section */}
-      <div className="p-8">
-        <h2 className="text-center text-2xl font-bold mb-12">
+      <div className="px-3 py-6 md:p-8">
+        <h2 className="text-center text-lg md:text-xl lg:text-2xl font-bold mb-6 md:mb-12 px-2">
           How do you get happiness with{" "}
           <span className="text-orange-500">Shoppiness Mart</span>
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-8">
           {features.map((feature, index) => (
-            <div key={index} className="flex flex-col items-center text-center">
+            <div key={index} className="flex flex-col items-center text-center px-1">
               <img
                 src={feature.image}
                 alt="Feature"
-                className="w-20 h-20 mb-4"
+                className="w-12 h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 mb-2 md:mb-4"
               />
-              <p>{feature.text}</p>
+              <p className="text-xs md:text-sm">{feature.text}</p>
             </div>
           ))}
         </div>
       </div>
 
       {/* Shop Images Section */}
-      <div className="bg-[#FFE0CF] px-10 gap-4 py-4 my-12 flex justify-around items-center flex-wrap">
+      <div className="bg-[#FFE0CF] px-3 py-4 my-6 md:my-12 flex justify-around items-center flex-wrap gap-2 md:px-10 md:gap-4">
         {[
           imaoffshop,
           imaoffshop1,
@@ -252,7 +254,7 @@ const OfflineShop = () => {
           imaoffshop11,
         ].map((img, index) => (
           <div key={index}>
-            <img src={img} alt="" className="w-16" />
+            <img src={img} alt="" className="w-8 md:w-12 lg:w-16" />
           </div>
         ))}
       </div>
@@ -261,14 +263,14 @@ const OfflineShop = () => {
       {loading ? (
         <Loader />
       ) : (
-        <div className="p-8">
+        <div className="p-3 md:p-8">
           {Object.entries(groupedShops).map(([category, categoryShops]) => (
-            <div key={category} className="my-10">
-              <h2 className="text-2xl font-bold my-8 text-center">
+            <div key={category} className="my-6 md:my-10">
+              <h2 className="text-lg md:text-xl lg:text-2xl font-bold my-4 md:my-8 text-center px-2">
                 Popular <span className="text-orange-500">{category}</span>{" "}
                 Shops close to you
               </h2>
-              <div className="flex overflow-x-auto space-x-4 w-full justify-around p-10">
+              <div className="flex overflow-x-auto pb-4 space-x-3 md:space-x-4 w-full px-2 md:px-10">
                 {categoryShops.map((shop) => (
                   <Link
                     to={
@@ -277,16 +279,16 @@ const OfflineShop = () => {
                         : `/offline-shop/${category}/${shop.id}`
                     }
                     key={shop.id}
-                    className="flex-none bg-white shadow-md rounded-2xl overflow-hidden w-72"
+                    className="flex-none bg-white shadow-md rounded-2xl overflow-hidden w-48 sm:w-56 md:w-64 lg:w-72"
                   >
                     <img
                       src={shop.bannerUrl}
                       alt={shop.businessName}
-                      className="w-full h-32 object-cover"
+                      className="w-full h-24 md:h-32 object-cover"
                     />
-                    <div className="p-4">
-                      <h3 className="text-lg font-bold">{shop.businessName}</h3>
-                      <p className="text-gray-600">{shop.location}</p>
+                    <div className="p-3 md:p-4">
+                      <h3 className="text-base md:text-lg font-bold">{shop.businessName}</h3>
+                      <p className="text-gray-600 text-sm md:text-base">{shop.location}</p>
                       <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 mt-2 rounded">
                         {shop.rate}% Cashback
                       </span>
@@ -299,9 +301,9 @@ const OfflineShop = () => {
                       ? `/user-dashboard/${userId}/offline-shop/${category}`
                       : `/offline-shop/${category}`
                   }
-                  className="flex-none flex flex-col justify-center items-center bg-gray-100 shadow-md rounded-2xl w-28 cursor-pointer"
+                  className="flex-none flex flex-col justify-center items-center bg-gray-100 shadow-md rounded-2xl w-24 md:w-28 cursor-pointer min-h-[100px]"
                 >
-                  <p className="text-orange-500 font-bold">View More</p>
+                  <p className="text-orange-500 font-bold text-sm md:text-base">View More</p>
                   <FaArrowRight className="text-orange-500 mt-2" />
                 </Link>
               </div>

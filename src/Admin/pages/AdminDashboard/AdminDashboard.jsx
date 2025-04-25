@@ -393,8 +393,8 @@ const AdminDashboard = () => {
             ) : (
               <div className="space-y-4">
                 {donationData.map((donor) => (
-                  <div key={donor.id} className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
+                  <div key={donor.id} className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
+                    <div className="flex flex-col sm:flex-row items-center text-center sm:text-left gap-3">
                       <div
                         className="w-10 h-10 rounded-full flex items-center justify-center text-white"
                         style={{ backgroundColor: donor.color }}
@@ -403,7 +403,7 @@ const AdminDashboard = () => {
                       </div>
                       <div>
                         <div className="font-medium">{donor.name}</div>
-                        <div className="text-sm text-gray-500">{donor.email}</div>
+                        <div className="text-sm text-gray-500 break-all">{donor.email}</div>
                         <div className="text-xs text-gray-400">{donor.date}</div>
                       </div>
                     </div>

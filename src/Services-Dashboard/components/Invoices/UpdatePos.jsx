@@ -216,7 +216,7 @@ const UpdatePos = ({ invoiceDetails, onBack, onUpdate }) => {
     );
   }
   return (
-    <div className="flex flex-col gap-6 p-10">
+    <div className="flex flex-col gap-4 p-4 md:gap-6 md:p-10">
       <button
         onClick={onBack}
         className="text-lg flex items-center gap-2"
@@ -224,9 +224,9 @@ const UpdatePos = ({ invoiceDetails, onBack, onUpdate }) => {
       >
         ← Back
       </button>
-      <div className="bg-white shadow-md rounded-xl p-6">
-        <div className="flex justify-between">
-          <div className="w-[550px]">
+      <div className="bg-white shadow-md rounded-xl p-4 md:p-6">
+        <div className="flex flex-col md:flex-row md:justify-between gap-4">
+          <div className="w-full md:w-[550px]">
             <h2 className="text-md mb-2">Verify coupon</h2>
             <div className="relative w-full">
               <input
@@ -245,7 +245,7 @@ const UpdatePos = ({ invoiceDetails, onBack, onUpdate }) => {
               </button>
             </div>
           </div>
-          <div className="bg-[#00639A26] text-[#0E2744] w-1/2 p-4">
+          <div className="bg-[#00639A26] text-[#0E2744] w-full md:w-1/2 p-4">
             {matchedCoupon ? (
               <p>{getOfferText(matchedCoupon)}</p>
             ) : (
@@ -259,9 +259,9 @@ const UpdatePos = ({ invoiceDetails, onBack, onUpdate }) => {
         </div>
 
         {/* Customer Info Form (Disabled) */}
-        <form className="space-y-4 mt-10">
-          <div className="grid grid-cols-3 gap-4 text-black font-medium">
-            <div className="flex flex-col gap-3">
+        <form className="space-y-4 mt-6 md:mt-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-black font-medium">
+            <div className="flex flex-col gap-2 md:gap-3">
               <span>Customer Name:</span>
               <input
                 type="text"
@@ -270,7 +270,7 @@ const UpdatePos = ({ invoiceDetails, onBack, onUpdate }) => {
                 className="bg-gray-50 rounded px-2 py-2"
               />
             </div>
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2 md:gap-3">
               <span>Phone No.:</span>
               <input
                 type="text"
@@ -279,7 +279,7 @@ const UpdatePos = ({ invoiceDetails, onBack, onUpdate }) => {
                 className="bg-gray-50 rounded px-2 py-2"
               />
             </div>
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2 md:gap-3">
               <span>Email:</span>
               <input
                 type="text"
@@ -289,9 +289,9 @@ const UpdatePos = ({ invoiceDetails, onBack, onUpdate }) => {
               />
             </div>
           </div>
-          <div className="mt-6 space-y-4">
-            <div className="grid grid-cols-3 gap-4 text-black font-medium">
-              <div className="flex flex-col gap-3">
+          <div className="mt-4 md:mt-6 space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-black font-medium">
+              <div className="flex flex-col gap-2 md:gap-3">
                 <span>Biller Name:</span>
                 <input
                   type="text"
@@ -300,7 +300,7 @@ const UpdatePos = ({ invoiceDetails, onBack, onUpdate }) => {
                   className="bg-gray-50 rounded px-2 py-2"
                 />
               </div>
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-2 md:gap-3">
                 <span>Billing Date:</span>
                 <input
                   type="date"
@@ -309,7 +309,7 @@ const UpdatePos = ({ invoiceDetails, onBack, onUpdate }) => {
                   className="bg-gray-50 rounded px-2 py-2"
                 />
               </div>
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-2 md:gap-3">
                 <span>Due Date:</span>
                 <input
                   type="date"
@@ -324,9 +324,9 @@ const UpdatePos = ({ invoiceDetails, onBack, onUpdate }) => {
       </div>
 
       {/* Selected Products Table */}
-      <div className="flex gap-4 bg-white shadow-md rounded-xl p-6">
-        <div className="bg-gray-50 w-[500px] p-6 rounded-lg shadow-md ">
-          <h2 className="text-2xl font-bold mb-4">Add Product</h2>
+      <div className="flex flex-col lg:flex-row gap-4 bg-white shadow-md rounded-xl p-4 md:p-6">
+        <div className="bg-gray-50 w-full lg:w-[500px] p-4 md:p-6 rounded-lg shadow-md">
+          <h2 className="text-xl md:text-2xl font-bold mb-4">Add Product</h2>
           <form>
             <div className="relative mb-4">
               <label
@@ -425,27 +425,27 @@ const UpdatePos = ({ invoiceDetails, onBack, onUpdate }) => {
             </button>
           </form>
         </div>
-        <div className="max-w-5xl mx-auto p-6 bg-white">
-          <h1 className="text-xl font-bold mb-6">SELECTED PRODUCTS</h1>
+        <div className="w-full p-4 md:p-6 bg-white">
+          <h1 className="text-lg md:text-xl font-bold mb-4 md:mb-6">SELECTED PRODUCTS</h1>
           <div className="w-full overflow-x-auto">
-            <table className="w-full min-w-[800px]">
+            <table className="w-full min-w-[600px]">
               <thead>
                 <tr className="border-b">
-                  <th className="text-left py-4 font-semibold">PRODUCT</th>
-                  <th className="text-left py-4 font-semibold">PRICE</th>
-                  <th className="text-left py-4 font-semibold">QUANTITY</th>
-                  <th className="text-left py-4 font-semibold">DISCOUNT</th>
-                  <th className="text-left py-4 font-semibold">SUBTOTAL</th>
+                  <th className="text-left py-3 md:py-4 font-semibold">PRODUCT</th>
+                  <th className="text-left py-3 md:py-4 font-semibold">PRICE</th>
+                  <th className="text-left py-3 md:py-4 font-semibold">QTY</th>
+                  <th className="text-left py-3 md:py-4 font-semibold">DISC.</th>
+                  <th className="text-left py-3 md:py-4 font-semibold">SUBTOTAL</th>
                 </tr>
               </thead>
               <tbody>
                 {products.map((product) => (
                   <tr key={product.id} className="border-b">
-                    <td className="py-4">{product.name}</td>
-                    <td className="py-4">Rs. {product.price}</td>
-                    <td className="py-4">{product.quantity}X</td>
-                    <td className="py-4">{product.discount}%</td>
-                    <td className="py-4">Rs. {product.subtotal}</td>
+                    <td className="py-3 md:py-4">{product.name}</td>
+                    <td className="py-3 md:py-4">Rs. {product.price}</td>
+                    <td className="py-3 md:py-4">{product.quantity}X</td>
+                    <td className="py-3 md:py-4">{product.discount}%</td>
+                    <td className="py-3 md:py-4">Rs. {product.subtotal}</td>
                   </tr>
                 ))}
               </tbody>
@@ -453,38 +453,38 @@ const UpdatePos = ({ invoiceDetails, onBack, onUpdate }) => {
           </div>
 
           {/* Summary Section */}
-          <div className="mt-8 bg-gray-50 p-6 rounded-lg">
-            <div className="grid grid-cols-2 md:grid-cols-6 gap-6">
+          <div className="mt-6 md:mt-8 bg-gray-50 p-4 md:p-6 rounded-lg">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
               <div>
-                <p className="text-gray-600 mb-1">Total Items</p>
-                <p className="text-xl font-semibold">{totalItems}</p>
+                <p className="text-gray-600 text-sm mb-1">Total Items</p>
+                <p className="text-lg md:text-xl font-semibold">{totalItems}</p>
               </div>
               <div>
-                <p className="text-gray-600 mb-1">Total Price:</p>
-                <p className="text-xl font-semibold">Rs. {totalPrice}</p>
+                <p className="text-gray-600 text-sm mb-1">Total Price:</p>
+                <p className="text-lg md:text-xl font-semibold">Rs. {totalPrice}</p>
               </div>
               <div>
-                <p className="text-gray-600 mb-1">Tax:</p>
-                <p className="text-xl font-semibold">Rs. {taxAmount}</p>
+                <p className="text-gray-600 text-sm mb-1">Tax:</p>
+                <p className="text-lg md:text-xl font-semibold">Rs. {taxAmount}</p>
               </div>
               <div>
-                <p className="text-gray-600 mb-1">Cash Collected:</p>
-                <p className="text-xl font-semibold">Rs. {cashCollected}</p>
+                <p className="text-gray-600 text-sm mb-1">Cash Collected:</p>
+                <p className="text-lg md:text-xl font-semibold">Rs. {cashCollected}</p>
               </div>
               <div>
-                <p className="text-gray-600 mb-1">Grand Total:</p>
-                <p className="text-xl font-semibold">Rs. {grandTotal}</p>
+                <p className="text-gray-600 text-sm mb-1">Grand Total:</p>
+                <p className="text-lg md:text-xl font-semibold">Rs. {grandTotal}</p>
               </div>
               <div>
-                <p className="text-gray-600 mb-1">Due Amount:</p>
-                <p className="text-xl font-semibold">Rs. {dueAmount}</p>
+                <p className="text-gray-600 text-sm mb-1">Due Amount:</p>
+                <p className="text-lg md:text-xl font-semibold">Rs. {dueAmount}</p>
               </div>
             </div>
           </div>
 
           <button
             onClick={handleGenerateInvoice}
-            className={`w-full mt-6 py-4 rounded-lg transition-colors ${"bg-blue-500 hover:bg-blue-600 text-white"}`}
+            className="w-full mt-4 md:mt-6 py-3 md:py-4 rounded-lg transition-colors bg-blue-500 hover:bg-blue-600 text-white"
           >
             Generate Invoice
           </button>

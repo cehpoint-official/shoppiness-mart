@@ -120,8 +120,8 @@ const AllMoneySendToPlatform = () => {
           activeTab === "pending"
             ? "Pending"
             : activeTab === "completed"
-            ? "Completed"
-            : "Checking"
+              ? "Completed"
+              : "Checking"
         )
       );
 
@@ -150,8 +150,8 @@ const AllMoneySendToPlatform = () => {
           activeTab === "pending"
             ? "Pending"
             : activeTab === "completed"
-            ? "Completed"
-            : "Checking"
+              ? "Completed"
+              : "Checking"
         )
       );
 
@@ -231,7 +231,7 @@ const AllMoneySendToPlatform = () => {
           causeName: earning?.causeData.causeName || "",
           causeId: earning?.causeData.causeId || "",
           paymentDetails: earning?.causeData.paymentDetails || null,
-          donationTransactionId : earning?.causeData.donationTransactionId || null,
+          donationTransactionId: earning?.causeData.donationTransactionId || null,
         };
       }
       await addDoc(collection(db, "paymentByBusiness"), paymentRequest);
@@ -260,9 +260,8 @@ const AllMoneySendToPlatform = () => {
       }
       // Add notification to adminNotifications collection
       await addDoc(collection(db, "adminNotifications"), {
-        message: `New payment verification request from ${
-          user.businessName || businessDetails?.businessName
-        } for invoice ${earning.invoiceId}.`,
+        message: `New payment verification request from ${user.businessName || businessDetails?.businessName
+          } for invoice ${earning.invoiceId}.`,
         createdAt: new Date().toISOString(),
         read: false,
       });
@@ -280,17 +279,16 @@ const AllMoneySendToPlatform = () => {
             
             <div style="background-color: #f9f9f9; padding: 15px; border-radius: 8px; margin-top: 20px;">
               <h3 style="color: #555; margin-bottom: 10px;">Payment Details</h3>
-              <p><strong>Business Name:</strong> ${
-                businessDetails.businessName
-              }</p>
+              <p><strong>Business Name:</strong> ${businessDetails.businessName
+          }</p>
               <p><strong>Invoice ID:</strong> ${earning.invoiceId}</p>
               <p><strong>Amount:</strong> Rs. ${earning.amountEarned?.toLocaleString()}</p>
               <p><strong>Payment Status:</strong> ${earning.paymentStatus}</p>
               <p><strong>Receipt Uploaded:</strong> <a href="${receiptUrl}" target="_blank" style="color: #1a73e8; text-decoration: none;">View Receipt</a></p>
               <p><strong>Submitted On:</strong> ${new Date().toLocaleDateString(
-                "en-GB",
-                { day: "numeric", month: "short", year: "numeric" }
-              )}</p>
+            "en-GB",
+            { day: "numeric", month: "short", year: "numeric" }
+          )}</p>
             </div>
             
             <p>Please review the payment details on the admin dashboard and verify the payment accordingly.</p>
@@ -367,8 +365,8 @@ const AllMoneySendToPlatform = () => {
             activeTab === "pending"
               ? "Pending"
               : activeTab === "completed"
-              ? "Completed"
-              : "Checking"
+                ? "Completed"
+                : "Checking"
           )
         );
 
@@ -662,11 +660,10 @@ const AllMoneySendToPlatform = () => {
               <button
                 onClick={() => uploadReceiptAndSubmitPayment(selectedEarning)}
                 disabled={processing || !paymentReceipt}
-                className={`w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-md font-medium flex items-center justify-center mx-auto ${
-                  !paymentReceipt || processing
-                    ? "opacity-50 cursor-not-allowed"
-                    : ""
-                }`}
+                className={`w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-md font-medium flex items-center justify-center mx-auto ${!paymentReceipt || processing
+                  ? "opacity-50 cursor-not-allowed"
+                  : ""
+                  }`}
               >
                 {processing ? (
                   <>
@@ -747,11 +744,10 @@ const AllMoneySendToPlatform = () => {
       {/* Tabs */}
       <div className="flex border-b mb-6 flex-wrap">
         <button
-          className={`py-2 px-4 font-medium ${
-            activeTab === "pending"
-              ? "text-blue-600 border-b-2 border-blue-600"
-              : "text-gray-500 hover:text-gray-700"
-          }`}
+          className={`py-2 px-4 font-medium ${activeTab === "pending"
+            ? "text-blue-600 border-b-2 border-blue-600"
+            : "text-gray-500 hover:text-gray-700"
+            }`}
           onClick={() => setActiveTab("pending")}
         >
           <div className="flex items-center">
@@ -760,11 +756,10 @@ const AllMoneySendToPlatform = () => {
           </div>
         </button>
         <button
-          className={`py-2 px-4 font-medium ${
-            activeTab === "checking"
-              ? "text-orange-600 border-b-2 border-orange-600"
-              : "text-gray-500 hover:text-gray-700"
-          }`}
+          className={`py-2 px-4 font-medium ${activeTab === "checking"
+            ? "text-orange-600 border-b-2 border-orange-600"
+            : "text-gray-500 hover:text-gray-700"
+            }`}
           onClick={() => setActiveTab("checking")}
         >
           <div className="flex items-center">
@@ -773,11 +768,10 @@ const AllMoneySendToPlatform = () => {
           </div>
         </button>
         <button
-          className={`py-2 px-4 font-medium ${
-            activeTab === "completed"
-              ? "text-green-600 border-b-2 border-green-600"
-              : "text-gray-500 hover:text-gray-700"
-          }`}
+          className={`py-2 px-4 font-medium ${activeTab === "completed"
+            ? "text-green-600 border-b-2 border-green-600"
+            : "text-gray-500 hover:text-gray-700"
+            }`}
           onClick={() => setActiveTab("completed")}
         >
           <div className="flex items-center">
@@ -818,234 +812,323 @@ const AllMoneySendToPlatform = () => {
           </span>
         </div>
       </div>
-      {/* Table */}
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Invoice ID
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Customer
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Amount
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Due Date
-              </th>
-              {activeTab === "checking" && (
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Paid Date
-                </th>
-              )}
-              {activeTab === "completed" && (
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Completed Date
-                </th>
-              )}
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
-              </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {loading ? (
-              <tr>
-                <td colSpan="6">
-                  <SkeletonLoader />
-                </td>
-              </tr>
-            ) : platformEarnings.length > 0 ? (
-              platformEarnings.map((earning) => (
-                <tr key={earning.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
-                      {earning.invoiceId}
+      {/* Table with Responsive Design */}
+      <div className="w-full">
+        {/* Card-based view for small screens */}
+        <div className="block md:hidden">
+          {loading ? (
+            <div className="p-4">
+              <SkeletonLoader />
+            </div>
+          ) : platformEarnings.length > 0 ? (
+            <div className="space-y-4">
+              {platformEarnings.map((earning) => (
+                <div key={earning.id} className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium text-gray-500">Invoice ID</span>
+                    <span className="text-sm font-medium text-gray-900">{earning.invoiceId}</span>
+                  </div>
+
+                  <div className="mb-3">
+                    <span className="text-sm font-medium text-gray-500 block mb-1">Customer</span>
+                    <div className="bg-gray-50 p-2 rounded">
+                      <div className="text-sm font-medium text-gray-900 truncate">
+                        {earning.customerName}
+                      </div>
+                      <div className="text-xs text-gray-500 truncate mt-1">
+                        {earning.customerEmail}
+                      </div>
                     </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      {earning.customerName}
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      {earning.customerEmail}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-green-600">
-                      Rs. {earning.amountEarned?.toLocaleString() || 0}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      {earning.dueDate}
-                    </div>
-                  </td>
+                  </div>
+
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium text-gray-500">Amount</span>
+                    <span className="text-sm font-medium text-green-600">Rs. {earning.amountEarned?.toLocaleString() || 0}</span>
+                  </div>
+
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium text-gray-500">Due Date</span>
+                    <span className="text-sm text-gray-900">{earning.dueDate}</span>
+                  </div>
+
                   {activeTab === "checking" && (
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        {earning.paidAt}
-                      </div>
-                    </td>
-                  )}
-                  {activeTab === "completed" && (
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        {earning.completedAt}
-                      </div>
-                    </td>
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-medium text-gray-500">Paid Date</span>
+                      <span className="text-sm text-gray-900">{earning.paidAt}</span>
+                    </div>
                   )}
 
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                      ${
-                        earning.paymentStatus === "Pending"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : "bg-green-100 text-green-800"
-                      }`}
-                    >
+                  {activeTab === "completed" && (
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-medium text-gray-500">Completed Date</span>
+                      <span className="text-sm text-gray-900">{earning.completedAt}</span>
+                    </div>
+                  )}
+
+                  <div className="flex justify-between items-center mb-3">
+                    <span className="text-sm font-medium text-gray-500">Status</span>
+                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                ${earning.paymentStatus === "Pending" ? "bg-yellow-100 text-yellow-800" : "bg-green-100 text-green-800"}`}>
                       {earning.paymentStatus}
                     </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="flex items-center justify-end space-x-2">
-                      <button
-                        onClick={() => viewEarningDetails(earning)}
-                        className="text-blue-600 hover:text-blue-900 flex items-center"
-                      >
-                        <FaEye className="mr-1" /> View
-                      </button>
-                    </div>
+                  </div>
+
+                  <div className="flex justify-end">
+                    <button
+                      onClick={() => viewEarningDetails(earning)}
+                      className="text-blue-600 hover:text-blue-900 flex items-center text-sm"
+                    >
+                      <FaEye className="mr-1" /> View Details
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="p-4">
+              <EmptyState
+                message={
+                  activeTab === "pending"
+                    ? "No pending platform payments found. All your obligations are up to date!"
+                    : "No completed platform payments found yet."
+                }
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Traditional table for medium screens and up */}
+        <div className="hidden md:block overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Invoice ID
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Customer
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Amount
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Due Date
+                </th>
+                {activeTab === "checking" && (
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Paid Date
+                  </th>
+                )}
+                {activeTab === "completed" && (
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Completed Date
+                  </th>
+                )}
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {loading ? (
+                <tr>
+                  <td colSpan="6">
+                    <SkeletonLoader />
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="6">
-                  <EmptyState
-                    message={
-                      activeTab === "pending"
-                        ? "No pending platform payments found. All your obligations are up to date!"
-                        : "No completed platform payments found yet."
-                    }
-                  />
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Pagination */}
-      {!loading && platformEarnings.length > 0 && (
-        <div className="mt-6 flex items-center justify-between">
-          <div className="text-sm text-gray-500">
-            Showing {startIndex + 1} -{" "}
-            {Math.min(startIndex + itemsPerPage, totalItems)} of {totalItems}
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              className="px-4 py-2 text-sm disabled:opacity-50"
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage(currentPage - 1)}
-            >
-              Previous
-            </button>
-            {totalPages <= 5 ? (
-              // Show all pages if 5 or fewer
-              [...Array(totalPages)].map((_, i) => (
-                <button
-                  key={i + 1}
-                  className={`w-8 h-8 rounded-sm text-sm ${
-                    currentPage === i + 1
-                      ? "bg-[#F59E0B] text-white"
-                      : "hover:bg-gray-100"
-                  }`}
-                  onClick={() => setCurrentPage(i + 1)}
-                >
-                  {i + 1}
-                </button>
-              ))
-            ) : (
-              // Show limited pages with ellipsis for larger page counts
-              <>
-                {/* First page */}
-                <button
-                  className={`w-8 h-8 rounded-sm text-sm ${
-                    currentPage === 1
-                      ? "bg-[#F59E0B] text-white"
-                      : "hover:bg-gray-100"
-                  }`}
-                  onClick={() => setCurrentPage(1)}
-                >
-                  1
-                </button>
-
-                {/* Ellipsis if not near first page */}
-                {currentPage > 3 && <span className="px-2">...</span>}
-
-                {/* Pages around current page */}
-                {[...Array(totalPages)].map((_, i) => {
-                  const pageNum = i + 1;
-                  // Show current page and 1 page before/after
-                  if (
-                    pageNum !== 1 &&
-                    pageNum !== totalPages &&
-                    (pageNum === currentPage ||
-                      pageNum === currentPage - 1 ||
-                      pageNum === currentPage + 1)
-                  ) {
-                    return (
-                      <button
-                        key={pageNum}
-                        className={`w-8 h-8 rounded-sm text-sm ${
-                          currentPage === pageNum
-                            ? "bg-[#F59E0B] text-white"
-                            : "hover:bg-gray-100"
-                        }`}
-                        onClick={() => setCurrentPage(pageNum)}
+              ) : platformEarnings.length > 0 ? (
+                platformEarnings.map((earning) => (
+                  <tr key={earning.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900">
+                        {earning.invoiceId}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">
+                        {earning.customerName}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {earning.customerEmail}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <div className="text-sm font-medium text-green-600">
+                        Rs. {earning.amountEarned?.toLocaleString() || 0}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">
+                        {earning.dueDate}
+                      </div>
+                    </td>
+                    {activeTab === "checking" && (
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">
+                          {earning.paidAt}
+                        </div>
+                      </td>
+                    )}
+                    {activeTab === "completed" && (
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">
+                          {earning.completedAt}
+                        </div>
+                      </td>
+                    )}
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <span
+                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                  ${earning.paymentStatus === "Pending"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : "bg-green-100 text-green-800"
+                          }`}
                       >
-                        {pageNum}
-                      </button>
-                    );
-                  }
-                  return null;
-                })}
+                        {earning.paymentStatus}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+                      <div className="flex items-center justify-end">
+                        <button
+                          onClick={() => viewEarningDetails(earning)}
+                          className="text-blue-600 hover:text-blue-900 flex items-center"
+                        >
+                          <FaEye className="mr-1" /> View
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="6">
+                    <EmptyState
+                      message={
+                        activeTab === "pending"
+                          ? "No pending platform payments found. All your obligations are up to date!"
+                          : "No completed platform payments found yet."
+                      }
+                    />
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
 
-                {/* Ellipsis if not near last page */}
-                {currentPage < totalPages - 2 && (
-                  <span className="px-2">...</span>
-                )}
+        {/* Responsive Pagination */}
+        {!loading && platformEarnings.length > 0 && (
+          <div className="mt-6 flex flex-col sm:flex-row items-center justify-between px-4">
+            <div className="text-sm text-gray-500 mb-4 sm:mb-0">
+              Showing {startIndex + 1} - {Math.min(startIndex + itemsPerPage, totalItems)} of {totalItems}
+            </div>
+            <div className="flex items-center gap-1 sm:gap-2">
+              <button
+                className="px-2 sm:px-4 py-2 text-xs sm:text-sm disabled:opacity-50"
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(currentPage - 1)}
+              >
+                Prev
+              </button>
 
-                {/* Last page */}
-                <button
-                  className={`w-8 h-8 rounded-sm text-sm ${
-                    currentPage === totalPages
+              {totalPages <= 3 ? (
+                // Show all pages if 3 or fewer on mobile
+                [...Array(totalPages)].map((_, i) => (
+                  <button
+                    key={i + 1}
+                    className={`w-6 h-6 sm:w-8 sm:h-8 rounded-sm text-xs sm:text-sm ${currentPage === i + 1
                       ? "bg-[#F59E0B] text-white"
                       : "hover:bg-gray-100"
-                  }`}
-                  onClick={() => setCurrentPage(totalPages)}
-                >
-                  {totalPages}
-                </button>
-              </>
-            )}
-            <button
-              className="px-4 py-2 text-sm disabled:opacity-50"
-              disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage(currentPage + 1)}
-            >
-              Next
-            </button>
+                      }`}
+                    onClick={() => setCurrentPage(i + 1)}
+                  >
+                    {i + 1}
+                  </button>
+                ))
+              ) : (
+                // Show limited pages with ellipsis for larger page counts
+                <>
+                  {/* First page */}
+                  <button
+                    className={`w-6 h-6 sm:w-8 sm:h-8 rounded-sm text-xs sm:text-sm ${currentPage === 1
+                      ? "bg-[#F59E0B] text-white"
+                      : "hover:bg-gray-100"
+                      }`}
+                    onClick={() => setCurrentPage(1)}
+                  >
+                    1
+                  </button>
+
+                  {/* Mobile-optimized ellipsis and page display */}
+                  <div className="hidden sm:block">
+                    {/* Ellipsis if not near first page */}
+                    {currentPage > 3 && <span className="px-1 sm:px-2">...</span>}
+
+                    {/* Pages around current page - only on larger screens */}
+                    {[...Array(totalPages)].map((_, i) => {
+                      const pageNum = i + 1;
+                      // Show current page and 1 page before/after
+                      if (
+                        pageNum !== 1 &&
+                        pageNum !== totalPages &&
+                        (pageNum === currentPage ||
+                          pageNum === currentPage - 1 ||
+                          pageNum === currentPage + 1)
+                      ) {
+                        return (
+                          <button
+                            key={pageNum}
+                            className={`w-8 h-8 rounded-sm text-sm ${currentPage === pageNum
+                              ? "bg-[#F59E0B] text-white"
+                              : "hover:bg-gray-100"
+                              }`}
+                            onClick={() => setCurrentPage(pageNum)}
+                          >
+                            {pageNum}
+                          </button>
+                        );
+                      }
+                      return null;
+                    })}
+
+                    {/* Ellipsis if not near last page */}
+                    {currentPage < totalPages - 2 && (
+                      <span className="px-1 sm:px-2">...</span>
+                    )}
+                  </div>
+
+                  {/* On mobile, just show current page indicator */}
+                  <div className="sm:hidden px-2 text-xs">
+                    {currentPage} / {totalPages}
+                  </div>
+
+                  {/* Last page */}
+                  <button
+                    className={`w-6 h-6 sm:w-8 sm:h-8 rounded-sm text-xs sm:text-sm ${currentPage === totalPages
+                      ? "bg-[#F59E0B] text-white"
+                      : "hover:bg-gray-100"
+                      }`}
+                    onClick={() => setCurrentPage(totalPages)}
+                  >
+                    {totalPages}
+                  </button>
+                </>
+              )}
+
+              <button
+                className="px-2 sm:px-4 py-2 text-xs sm:text-sm disabled:opacity-50"
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage(currentPage + 1)}
+              >
+                Next
+              </button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

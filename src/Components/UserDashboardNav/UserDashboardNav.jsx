@@ -1,19 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import logo from "../../assets/RegisterBusiness/logo.png";
 import { CiSearch, CiLocationOn } from "react-icons/ci";
 import { Link, useNavigate } from "react-router-dom";
 import { IoNotifications, IoMenu, IoClose } from "react-icons/io5";
 import { useDispatch } from "react-redux";
 import { userNotExist } from "../../redux/reducer/userReducer";
-import {
-  collection,
-  query,
-  where,
-  getDoc,
-  getDocs,
-  updateDoc,
-  doc,
-} from "firebase/firestore";
+import { collection, query, where, getDoc, getDocs, updateDoc, doc } from "firebase/firestore";
 import { db } from "../../../firebase";
 import { persistor } from "../../redux/store";
 
@@ -23,6 +15,7 @@ const UserDashboardNav = ({ profilePic, userId }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [showNotificationPopup, setShowNotificationPopup] = useState(false);
+  const notificationRef = useRef(null);
 
   // Fetch notifications on component mount
   useEffect(() => {
@@ -97,6 +90,20 @@ const UserDashboardNav = ({ profilePic, userId }) => {
     fetchNotifications();
   }, [userId]);
 
+  // Close notification popup when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (notificationRef.current && !notificationRef.current.contains(event.target)) {
+        setShowNotificationPopup(false);
+      }
+    }
+    
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [notificationRef]);
+
   // Handle marking a notification as read
   const handleMarkAsRead = async (notificationId) => {
     try {
@@ -124,6 +131,7 @@ const UserDashboardNav = ({ profilePic, userId }) => {
   const toggleNotificationPopup = () => {
     setShowNotificationPopup((prev) => !prev);
   };
+  
   const handleLogout = async () => {
     try {
       // Step 1: Clear the Redux state
@@ -145,27 +153,8 @@ const UserDashboardNav = ({ profilePic, userId }) => {
         <Link to="/">
           <img src={logo} alt="err" className="w-[150px] h-[50px] sm:w-[210px] sm:h-[80px]" />
         </Link>
-        {/* <div className="hidden lg:flex items-center border border-gray-500 h-[45px] px-[50px] rounded-lg">
-          <div className="flex items-center gap-2">
-            <CiLocationOn className="text-2xl" />
-            <input
-              type="text"
-              placeholder="Select Location"
-              className="outline-none"
-            />
-          </div>
-          <hr className="border border-gray-500 h-[30px] mx-2" />
-          <div className="flex items-center gap-2">
-            <CiSearch className="text-xl" />
-            <input
-              type="text"
-              placeholder="Search name of Store, Brand, Product"
-              className="outline-none w-[270px]"
-            />
-          </div>
-        </div> */}
         <div className="flex items-center gap-5">
-          <div className="relative">
+          <div className="relative" ref={notificationRef}>
             <IoNotifications
               className="text-2xl cursor-pointer text-blue-600"
               onClick={toggleNotificationPopup}
@@ -175,56 +164,60 @@ const UserDashboardNav = ({ profilePic, userId }) => {
                 {notifications.filter((n) => !n.read).length}
               </span>
             )}
+            
+            {/* Fixed Notification Popup */}
+            {showNotificationPopup && (
+              <div className="fixed sm:absolute right-0 left-0 sm:left-auto top-0 sm:top-8 w-full sm:w-80 bg-white shadow-lg border border-gray-200 z-50 max-h-screen sm:max-h-96 overflow-y-auto sm:rounded-lg">
+                <div className="sticky top-0 bg-white p-4 border-b flex justify-between items-center">
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    Notifications
+                  </h3>
+                  <IoClose 
+                    className="text-2xl cursor-pointer text-gray-600 sm:hidden" 
+                    onClick={() => setShowNotificationPopup(false)} 
+                  />
+                </div>
+                {notifications.length === 0 ? (
+                  <div className="p-4 text-center text-gray-500">
+                    No notifications
+                  </div>
+                ) : (
+                  notifications.map((notification) => (
+                    <div
+                      key={notification.id}
+                      className={`p-4 border-b ${
+                        !notification.read ? "bg-blue-50" : "bg-white"
+                      } hover:bg-gray-100 transition-colors`}
+                    >
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start">
+                        <div className="mb-2 sm:mb-0">
+                          <p className="text-sm text-gray-800">
+                            {notification.message}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {formatDate(notification.createdAt)}
+                          </p>
+                        </div>
+                        {!notification.read && (
+                          <button
+                            onClick={() => handleMarkAsRead(notification.id)}
+                            className="self-start sm:ml-2 px-2 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600 transition-colors"
+                          >
+                            Mark as Read
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
           </div>
           <button onClick={handleLogout} className="text-blue-600 font-medium">
             Logout
           </button>
         </div>
       </div>
-
-      {/* Notification Popup */}
-      {showNotificationPopup && (
-        <div className="absolute right-[100px] top-[130px] w-80 bg-white shadow-lg rounded-lg border border-gray-200 z-50 max-h-96 overflow-y-auto">
-          <div className="p-4 border-b">
-            <h3 className="text-lg font-semibold text-gray-800">
-              Notifications
-            </h3>
-          </div>
-          {notifications.length === 0 ? (
-            <div className="p-4 text-center text-gray-500">
-              No notifications
-            </div>
-          ) : (
-            notifications.map((notification) => (
-              <div
-                key={notification.id}
-                className={`p-4 border-b ${
-                  !notification.read ? "bg-blue-50" : "bg-white"
-                } hover:bg-gray-100 transition-colors`}
-              >
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="text-sm text-gray-800">
-                      {notification.message}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {formatDate(notification.createdAt)}
-                    </p>
-                  </div>
-                  {!notification.read && (
-                    <button
-                      onClick={() => handleMarkAsRead(notification.id)}
-                      className="ml-2 px-2 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600 transition-colors"
-                    >
-                      Mark as Read
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      )}
 
       {/* Lower Nav */}
       <div className="bg-[#047e72] h-[70px] sm:h-[100px] px-4 sm:px-[100px]  flex items-center gap-[50px] lg:justify-between">

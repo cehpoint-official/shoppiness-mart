@@ -42,7 +42,7 @@ const GiveBackForm = () => {
       console.log("Error getting documents: ", error);
     }
   }, []);
-  console.log(ngos);
+  // console.log(ngos);
 
   useEffect(() => {
     fetchData();

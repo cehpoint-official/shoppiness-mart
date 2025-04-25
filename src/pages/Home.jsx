@@ -445,23 +445,23 @@ const Home = () => {
         <div className="mt-6">
           <img src={img18} alt="Loading..." className="w-[500px]" />
         </div>
-        <div className="md:w-[400px] md:mt-6">
-          <h1 className="md:text-4xl text-3xl font-semibold font-slab mb-4">
+        <div className="md:w-[400px] -mt-10 md:mt-6">
+          <h1 className="md:text-4xl text-3xl font-semibold font-slab mb-4 text-center sm:text-left">
             How online and offline shopping works
           </h1>
-          <p className="text-parapgraphColor text-sm md:text-lg">
+          <p className="text-parapgraphColor text-sm md:text-lg text-center sm:text-left">
             Discover the joy of shopping while making a positive impact.
             Shoppinessmart online shopping allows you to support charities while
             enjoying your favorite online stores.
           </p>
-          <div className="flex gap-2">
+          <div className="flex gap-4 sm:gap-2">
             <Link to="/online-shop">
-              <button className="bg-teal-500 text-white font-medium rounded-md text-sm md:text-base h-[40px] w-[150px] mt-4">
+              <button className="bg-teal-500 text-white font-medium rounded-md text-sm md:text-base h-[40px] w-[120px] sm:w-[150px] mt-4">
                 Online Shopping
               </button>
             </Link>
             <Link to="offline-shop">
-              <button className="bg-[#434343] text-white font-medium rounded-md text-sm md:text-base h-[40px] w-[150px] mt-4">
+              <button className="bg-[#434343] text-white font-medium rounded-md text-sm md:text-base h-[40px] w-[120px] sm:w-[150px] mt-4">
                 Offline Shopping
               </button>
             </Link>

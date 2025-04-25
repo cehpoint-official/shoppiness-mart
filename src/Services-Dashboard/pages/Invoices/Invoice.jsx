@@ -97,8 +97,64 @@ const Invoice = () => {
     );
   }
 
+  // Create mobile card view for each invoice
+  const renderMobileCard = (invoice, index) => (
+    <div key={index} className="bg-white rounded-lg shadow-sm p-4 mb-4 border border-gray-100">
+      <div className="flex justify-between mb-2">
+        <span className="font-medium">Invoice #{invoice.invoiceNum}</span>
+        <span className={`text-sm ${invoice.dueAmount > 0 ? 'text-red-500' : 'text-green-500'}`}>
+          {invoice.dueAmount > 0 ? 'Due' : 'Paid'}
+        </span>
+      </div>
+      <div className="space-y-2 mb-3">
+        <div className="flex justify-between">
+          <span className="text-gray-500 text-sm">Customer:</span>
+          <span className="text-sm">{invoice.customerName || "-"}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-gray-500 text-sm">Amount:</span>
+          <span className="text-sm">{invoice.totalAmount}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-gray-500 text-sm">Paid:</span>
+          <span className="text-sm">{invoice.paidAmount}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-gray-500 text-sm">Due:</span>
+          <span className="text-sm">{invoice.dueAmount}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-gray-500 text-sm">Billing Date:</span>
+          <span className="text-sm">{invoice.billingDate || "-"}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-gray-500 text-sm">Due Date:</span>
+          <span className="text-sm">{invoice.dueAmount > 0 ? invoice.dueDate || "-" : "-"}</span>
+        </div>
+      </div>
+      <div className="flex flex-col sm:flex-row gap-2">
+        <Link
+          to={invoice.pdfUrl}
+          className="inline-flex items-center justify-center px-3 py-2 text-blue-500 border border-blue-500 rounded-md text-sm hover:bg-blue-50 transition-colors"
+        >
+          <AiOutlineEye className="w-4 h-4 mr-1" />
+          View Invoice
+        </Link>
+        {!invoice.claimedCouponCode && (
+          <button
+            onClick={() => setSelectedInvoiceUpdate(invoice)}
+            className="inline-flex items-center justify-center px-3 py-2 text-white bg-blue-500 border rounded-md text-sm hover:bg-blue-600 transition-colors"
+          >
+            <AiOutlineEye className="w-4 h-4 mr-1" />
+            Update Invoice
+          </button>
+        )}
+      </div>
+    </div>
+  );
+
   return (
-<div className="container mx-auto px-4 py-6 md:py-10">
+    <div className="container mx-auto px-4 py-6 md:py-10">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <h1 className="text-xl md:text-2xl font-normal text-gray-900">
@@ -125,14 +181,11 @@ const Invoice = () => {
         </div>
       </div>
 
-      {/* Table Container */}
-      <div className="bg-white rounded-lg shadow-sm overflow-x-auto">
+      {/* Table Container - Only visible on md screens and above */}
+      <div className="hidden md:block bg-white rounded-lg shadow-sm overflow-x-auto">
         {loading ? (
-          <div className="w-full">
-            {/* Loading Skeleton */}
-            <table className="w-full min-w-[640px]">
-              {/* ... (keeping your existing loading skeleton structure) */}
-            </table>
+          <div className="w-full p-6 text-center">
+            <div className="animate-pulse text-gray-500">Loading invoices...</div>
           </div>
         ) : filteredCustomers.length === 0 ? (
           <div className="text-center py-10 text-gray-500">
@@ -187,7 +240,7 @@ const Invoice = () => {
                     <td className="p-4">
                       <Link
                         to={invoice.pdfUrl}
-                        className="inline-flex items-center px-3 py-1 text-blue-500 border border-blue-500 rounded-md text-sm hover:bg-blue-50 transition-colors w-full justify-center md:w-auto"
+                        className="inline-flex items-center px-3 py-1 text-blue-500 border border-blue-500 rounded-md text-sm hover:bg-blue-50 transition-colors justify-center"
                       >
                         <AiOutlineEye className="w-4 h-4 mr-1" />
                         View
@@ -197,7 +250,7 @@ const Invoice = () => {
                       <td className="p-4">
                         <button
                           onClick={() => setSelectedInvoiceUpdate(invoice)}
-                          className="inline-flex items-center px-3 py-1 text-white bg-blue-500 border rounded-md text-sm hover:bg-blue-600 transition-colors w-full justify-center md:w-auto"
+                          className="inline-flex items-center px-3 py-1 text-white bg-blue-500 border rounded-md text-sm hover:bg-blue-600 transition-colors justify-center"
                         >
                           <AiOutlineEye className="w-4 h-4 mr-1" />
                           Update
@@ -208,30 +261,49 @@ const Invoice = () => {
                 ))}
               </tbody>
             </table>
-
-            {/* Pagination */}
-            <div className="flex flex-col sm:flex-row justify-between items-center p-4 gap-4">
-              <button
-                onClick={prevPage}
-                disabled={currentPage === 1}
-                className="w-full sm:w-auto px-4 py-2 border rounded-md disabled:opacity-50 hover:bg-gray-50 transition-colors text-sm"
-              >
-                Previous
-              </button>
-              <span className="text-sm">
-                Page {currentPage} of {totalPages}
-              </span>
-              <button
-                onClick={nextPage}
-                disabled={currentPage === totalPages}
-                className="w-full sm:w-auto px-4 py-2 border rounded-md disabled:opacity-50 hover:bg-gray-50 transition-colors text-sm"
-              >
-                Next
-              </button>
-            </div>
           </>
         )}
       </div>
+
+      {/* Mobile Card View - Only visible on smaller screens */}
+      <div className="md:hidden">
+        {loading ? (
+          <div className="w-full p-6 text-center">
+            <div className="animate-pulse text-gray-500">Loading invoices...</div>
+          </div>
+        ) : filteredCustomers.length === 0 ? (
+          <div className="text-center py-10 text-gray-500">
+            No invoices available
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {currentCustomers.map((invoice, index) => renderMobileCard(invoice, index))}
+          </div>
+        )}
+      </div>
+
+      {/* Pagination - Same for both views */}
+      {!loading && filteredCustomers.length > 0 && (
+        <div className="flex flex-col sm:flex-row justify-between items-center p-4 gap-4 bg-white rounded-lg shadow-sm mt-4">
+          <button
+            onClick={prevPage}
+            disabled={currentPage === 1}
+            className="w-full sm:w-auto px-4 py-2 border rounded-md disabled:opacity-50 hover:bg-gray-50 transition-colors text-sm"
+          >
+            Previous
+          </button>
+          <span className="text-sm">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={nextPage}
+            disabled={currentPage === totalPages || totalPages === 0}
+            className="w-full sm:w-auto px-4 py-2 border rounded-md disabled:opacity-50 hover:bg-gray-50 transition-colors text-sm"
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 };

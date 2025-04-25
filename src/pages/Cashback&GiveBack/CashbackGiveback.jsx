@@ -3,6 +3,7 @@ import CashbackForm from "../../Components/Chashback&Giveback/CashbackForm";
 import "./CashbackGiveback.scss";
 import GiveBackForm from "../../Components/Chashback&Giveback/GiveBackForm";
 import { HiOutlineArrowNarrowLeft } from "react-icons/hi";
+import { HiOutlineMenu } from "react-icons/hi";
 import CashbackRequests from "../../Components/Chashback&Giveback/CashbackRequests";
 import GiveBackHistory from "../../Components/Chashback&Giveback/GiveBackHistory";
 import WithdrawalForm from "../../Components/Chashback&Giveback/WithdrawalForm";
@@ -29,11 +30,13 @@ const CashbackGiveback = () => {
   const [showDisputeRequests, setShowDisputeRequests] = useState(false);
   const [inrDealsCommission, setInrDealsCommission] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const { user } = useSelector((state) => state.userReducer);
   const dispatch = useDispatch();
 
   const handleTabClick = (tabValue) => {
     setActiveTab(tabValue);
+    setShowMobileMenu(false);
   };
 
   // Fetch INRDeals commission data from transactions
@@ -138,7 +141,7 @@ const CashbackGiveback = () => {
 
   if (showCashbackRequests) {
     return (
-      <div className=" p-4 space-y-6">
+      <div className="p-4 space-y-6">
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowCashbackRequests(false)}
@@ -196,13 +199,13 @@ const CashbackGiveback = () => {
     );
   }
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl">Cashback</h1>
+    <div className="px-2 sm:px-4">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-3">
+        <h1 className="text-xl sm:text-2xl">Cashback</h1>
         {activeTab === "claim" && (
           <button
             onClick={() => setShowCashbackRequests(true)}
-            className="text-[#047E72] text-sm border border-[#047E72] rounded px-4 py-1"
+            className="text-[#047E72] text-sm border border-[#047E72] rounded px-2 py-1 w-full sm:w-auto"
           >
             Cashback request
           </button>
@@ -210,7 +213,7 @@ const CashbackGiveback = () => {
         {activeTab === "withdrawal" && (
           <button
             onClick={() => setShowWithdrawalRequests(true)}
-            className="text-[#047E72] text-sm border border-[#047E72] rounded px-4 py-1"
+            className="text-[#047E72] text-sm border border-[#047E72] rounded px-2 py-1 w-full sm:w-auto"
           >
             Withdrawal Request
           </button>
@@ -218,7 +221,7 @@ const CashbackGiveback = () => {
         {activeTab === "giveback" && (
           <button
             onClick={() => setShowGiveBackHistory(true)}
-            className="text-[#047E72] text-sm border border-[#047E72] rounded px-4 py-1"
+            className="text-[#047E72] text-sm border border-[#047E72] rounded px-2 py-1 w-full sm:w-auto"
           >
             Giveback History
           </button>
@@ -226,45 +229,96 @@ const CashbackGiveback = () => {
         {activeTab === "dispute" && (
           <button
             onClick={() => setShowDisputeRequests(true)}
-            className="text-[#047E72] text-sm border border-[#047E72] rounded px-4 py-1"
+            className="text-[#047E72] text-sm border border-[#047E72] rounded px-2 py-1 w-full sm:w-auto"
           >
             Dispute Request
           </button>
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
         <CashbackCard
           title="Collected Cash backs"
           amount={Number(user?.collectedCashback || 0).toFixed(1)}
           pendingAmount={Number(user?.pendingCashback || 0).toFixed(1)}
-          // link="View Details"
         />
         <CashbackCard
           title="Deals Cash backs"
           amount={inrDealsCommission}
           pendingAmount={user?.pendingInrDealsCashback || 0}
           isPendingInrDeals={true}
-          // link="View Details"
         />
         <CashbackCard
           title="Withdraw"
           amount={user?.withdrawAmount || 0}
-          // link="View Details"
         />
         <CashbackCard
           title="Give Back"
           amount={user?.givebackAmount || 0}
           pendingGivebackAmount={user?.pendingGivebackAmount || 0}
-          // link="View Details"
         />
       </div>
 
       <div className="flex flex-col">
-        <div className="flex gap-4 mb-6">
+        {/* Mobile Menu Button */}
+        <div className="block sm:hidden mb-4">
+          <button 
+            onClick={() => setShowMobileMenu(!showMobileMenu)}
+            className="flex items-center justify-between w-full p-2 border rounded"
+          >
+            <span className="text-sm font-medium">
+              {activeTab === "claim" && "Claim Cashback"}
+              {activeTab === "withdrawal" && "Withdraw Cashback"}
+              {activeTab === "giveback" && "Give Back your Cashback"}
+              {activeTab === "dispute" && "Dispute Of your Cashback"}
+            </span>
+            <HiOutlineMenu className="h-5 w-5" />
+          </button>
+          
+          {/* Mobile Dropdown Menu */}
+          {showMobileMenu && (
+            <div className="mt-1 border rounded shadow-lg bg-white z-10 absolute left-0 right-0 mx-2">
+              <button
+                onClick={() => handleTabClick("claim")}
+                className={`w-full text-left p-3 text-sm ${
+                  activeTab === "claim" ? "bg-gray-100 text-[#047E72]" : ""
+                }`}
+              >
+                Claim Cashback
+              </button>
+              <button
+                onClick={() => handleTabClick("withdrawal")}
+                className={`w-full text-left p-3 text-sm ${
+                  activeTab === "withdrawal" ? "bg-gray-100 text-[#047E72]" : ""
+                }`}
+              >
+                Withdraw Cashback
+              </button>
+              <button
+                onClick={() => handleTabClick("giveback")}
+                className={`w-full text-left p-3 text-sm ${
+                  activeTab === "giveback" ? "bg-gray-100 text-[#047E72]" : ""
+                }`}
+              >
+                Give Back your Cashback
+              </button>
+              <button
+                onClick={() => handleTabClick("dispute")}
+                className={`w-full text-left p-3 text-sm ${
+                  activeTab === "dispute" ? "bg-gray-100 text-[#047E72]" : ""
+                }`}
+              >
+                Dispute Of your Cashback
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Desktop tabs - hidden on mobile */}
+        <div className="hidden sm:flex sm:flex-wrap gap-4 mb-6 overflow-x-auto">
           <button
             onClick={() => handleTabClick("claim")}
-            className={`text-sm font-medium pb-2 px-1 transition-all ${
+            className={`text-sm font-medium pb-2 px-1 transition-all whitespace-nowrap ${
               activeTab === "claim"
                 ? "border-b-2 border-[#047E72] text-[#047E72]"
                 : "text-gray-500 hover:text-gray-700"
@@ -274,7 +328,7 @@ const CashbackGiveback = () => {
           </button>
           <button
             onClick={() => handleTabClick("withdrawal")}
-            className={`text-sm font-medium pb-2 px-1 transition-all ${
+            className={`text-sm font-medium pb-2 px-1 transition-all whitespace-nowrap ${
               activeTab === "withdrawal"
                 ? "border-b-2 border-[#047E72] text-[#047E72]"
                 : "text-gray-500 hover:text-gray-700"
@@ -284,7 +338,7 @@ const CashbackGiveback = () => {
           </button>
           <button
             onClick={() => handleTabClick("giveback")}
-            className={`text-sm font-medium pb-2 px-1 transition-all ${
+            className={`text-sm font-medium pb-2 px-1 transition-all whitespace-nowrap ${
               activeTab === "giveback"
                 ? "border-b-2 border-[#047E72] text-[#047E72]"
                 : "text-gray-500 hover:text-gray-700"
@@ -294,7 +348,7 @@ const CashbackGiveback = () => {
           </button>
           <button
             onClick={() => handleTabClick("dispute")}
-            className={`text-sm font-medium pb-2 px-1 transition-all ${
+            className={`text-sm font-medium pb-2 px-1 transition-all whitespace-nowrap ${
               activeTab === "dispute"
                 ? "border-b-2 border-[#047E72] text-[#047E72]"
                 : "text-gray-500 hover:text-gray-700"
@@ -332,11 +386,11 @@ const CashbackCard = ({
     pendingGivebackAmount === undefined || pendingGivebackAmount === null;
 
   return (
-    <div className="bg-white p-4 rounded shadow-md border border-gray-100">
+    <div className="bg-white p-3 sm:p-4 rounded shadow-md border border-gray-100">
       <div className="text-sm text-text-gray mb-2">{title}</div>
 
       {/* Main Amount */}
-      <div className="font-medium text-lg mb-3">
+      <div className="font-medium text-base sm:text-lg mb-3">
         {isLoading ? (
           <div className="animate-pulse h-6 w-20 bg-gray-200 rounded"></div>
         ) : (
@@ -348,8 +402,8 @@ const CashbackCard = ({
       <div className="space-y-2">
         {/* Pending Withdrawal */}
         {pendingAmount > 0 && (
-          <div className="flex items-center text-sm text-amber-600 bg-amber-50 px-2 py-1 rounded">
-            <span className="mr-2">🕒</span>
+          <div className="flex items-center text-xs sm:text-sm text-amber-600 bg-amber-50 px-2 py-1 rounded">
+            <span className="mr-1 sm:mr-2">🕒</span>
             {isPendingLoading ? (
               <div className="animate-pulse h-4 w-16 bg-amber-200 rounded"></div>
             ) : (
@@ -363,8 +417,8 @@ const CashbackCard = ({
 
         {/* Pending Giveback */}
         {pendingGivebackAmount > 0 && (
-          <div className="flex items-center text-sm text-purple-600 bg-purple-50 px-2 py-1 rounded">
-            <span className="mr-2">💝</span>
+          <div className="flex items-center text-xs sm:text-sm text-purple-600 bg-purple-50 px-2 py-1 rounded">
+            <span className="mr-1 sm:mr-2">💝</span>
             {isPendingGivebackLoading ? (
               <div className="animate-pulse h-4 w-16 bg-purple-200 rounded"></div>
             ) : (

@@ -260,7 +260,7 @@ const BusinessDetails = () => {
   if (!business) {
     return <Loader />;
   }
-  console.log(filteredProducts);
+  // console.log(filteredProducts);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">

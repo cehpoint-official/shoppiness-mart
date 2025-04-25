@@ -205,38 +205,71 @@ function StatCardSkeleton() {
 
 function ClaimedCoupons({ customers }) {
   return (
-    <div className="bg-white p-6 rounded-lg shadow-sm col-span-2">
-      <div className="flex items-center gap-2 mb-6">
-        <h2 className="text-lg font-medium">Claimed Coupons</h2>
+    <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm col-span-2">
+      <div className="flex items-center gap-2 mb-4 sm:mb-6">
+        <h2 className="text-base sm:text-lg font-medium">Claimed Coupons</h2>
         <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
           {customers.length > 0 ? customers.length : 0}
         </span>
       </div>
+
       {customers.length > 0 ? (
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="text-left text-sm text-gray-600">
-              <tr>
-                <th className="pb-4">Coupon ID</th>
-                <th className="pb-4">Name</th>
-                <th className="pb-4">Contact</th>
-                <th className="pb-4">Offer</th>
-              </tr>
-            </thead>
-            <tbody className="text-sm">
-              {customers.map((customer, index) => (
-                <tr key={index} className="border-t">
-                  <td className="py-4">{customer.claimedCouponCode}</td>
-                  <td>{customer.claimedCouponCodeUserName}</td>
-                  <td className="whitespace-pre-line">
-                    {customer.customerEmail}
-                  </td>
-                  <td>{customer.discount}%</td>
+        <>
+          {/* Desktop view - Table */}
+          <div className="hidden sm:block overflow-x-auto">
+            <table className="w-full">
+              <thead className="text-left text-sm text-gray-600">
+                <tr>
+                  <th className="pb-4">Coupon ID</th>
+                  <th className="pb-4">Name</th>
+                  <th className="pb-4">Contact</th>
+                  <th className="pb-4">Offer</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="text-sm">
+                {customers.map((customer, index) => (
+                  <tr key={index} className="border-t">
+                    <td className="py-4">{customer.claimedCouponCode}</td>
+                    <td>{customer.claimedCouponCodeUserName}</td>
+                    <td className="whitespace-pre-line">
+                      {customer.customerEmail}
+                    </td>
+                    <td>{customer.discount}%</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile view - Card list */}
+          <div className="sm:hidden space-y-4">
+            {customers.map((customer, index) => (
+              <div key={index} className="border-t pt-4">
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="text-xs text-gray-600">Coupon ID</div>
+                  <div className="text-sm font-medium truncate">
+                    {customer.claimedCouponCode}
+                  </div>
+                  
+                  <div className="text-xs text-gray-600">Name</div>
+                  <div className="text-sm truncate">
+                    {customer.claimedCouponCodeUserName}
+                  </div>
+                  
+                  <div className="text-xs text-gray-600">Contact</div>
+                  <div className="text-sm break-all">
+                    {customer.customerEmail}
+                  </div>
+                  
+                  <div className="text-xs text-gray-600">Offer</div>
+                  <div className="text-sm font-semibold text-green-700">
+                    {customer.discount}%
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       ) : (
         <p className="text-gray-600">No claimed coupons.</p>
       )}
@@ -283,7 +316,7 @@ function NewCustomers({ customers }) {
               />
               <div>
                 <p className="font-medium">{customer.name}</p>
-                <p className="text-sm text-gray-600">{customer.email}</p>
+                <p className="text-sm text-gray-600 break-all">{customer.email}</p>
               </div>
             </div>
           ))}

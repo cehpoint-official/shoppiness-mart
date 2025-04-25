@@ -212,7 +212,7 @@ const Coupons = () => {
 
                       <div className="flex items-center gap-2 whitespace-nowrap">
                         <span className="text-blue-600 text-base sm:text-lg">
-                          Coupon code - {coupon.code}
+                          Coupon code - <br />{coupon.code}
                         </span>
                         <button
                           onClick={() => handleCopy(coupon.code)}
