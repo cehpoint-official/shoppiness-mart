@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 // import shopcard from "../assets/Shop/shopcard.png";
 // import onlineShopHeader from "../assets/onlineShopHeader.png";
 import Loader from "../Components/Loader/Loader";
@@ -8,11 +8,21 @@ import { Link, useParams } from "react-router-dom";
 import { collection, getDocs, addDoc, query, where, onSnapshot, serverTimestamp, doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 
+import foodIcon from "../assets/Shop/food.png";
+import groceryIcon from "../assets/Shop/grocery.png";
+import pharmacyIcon from "../assets/Shop/pharmacy.png";
+import fashionIcon from "../assets/Shop/fashion.png";
+import electronicsIcon from "../assets/Shop/electronics.png";
+import beautyIcon from "../assets/Shop/beauty.png";
+import sportIcon from "../assets/Shop/sport.png";
+import corporateIcon from "../assets/Shop/corporate.png";
+
 const OnlineShop = () => {
   const [loading, setLoading] = useState(true);
   const [stores, setStores] = useState(null);
   const [activeTab, setActiveTab] = useState("store");
   const [shops, setShops] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(""); // Changed to single category selection
   const [storeSearchTerm, setStoreSearchTerm] = useState("");
   const [serviceSearchTerm, setServiceSearchTerm] = useState("");
   const { userId } = useParams();
@@ -66,6 +76,20 @@ const OnlineShop = () => {
     fetchStores();
   }, []);
 
+  const categories = useMemo(
+    () => [
+      { name: "Food", icon: foodIcon, matchTerms: ["Food", "Food & Grocery"] },
+      { name: "Grocery", icon: groceryIcon, matchTerms: ["Grocery", "Food & Grocery"] },
+      { name: "Pharmacy", icon: pharmacyIcon, matchTerms: ["Pharmacy", "Health & Beauty"] },
+      { name: "Fashion", icon: fashionIcon, matchTerms: ["Fashion"] },
+      { name: "Electronics", icon: electronicsIcon, matchTerms: ["Electronics"] },
+      { name: "Beauty", icon: beautyIcon, matchTerms: ["Beauty", "Health & Beauty"] },
+      { name: "Sport", icon: sportIcon, matchTerms: ["Sports", "Sports & Fitness"] },
+      { name: "Corporate", icon: corporateIcon, matchTerms: ["Corporate", "Others"] },
+    ],
+    []
+  );
+
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
@@ -89,11 +113,48 @@ const OnlineShop = () => {
     fetchData();
   }, [fetchData]);
 
-  // Separate filter functions for stores and services
-  const filteredStores =
-    stores?.filter((store) =>
+  // Toggle category selection - now only selects one category at a time
+  const toggleCategory = (categoryName) => {
+    if (selectedCategory === categoryName) {
+      // If clicking on the already selected category, deselect it
+      setSelectedCategory("");
+    } else {
+      // Otherwise, select the new category
+      setSelectedCategory(categoryName);
+    }
+  };
+
+  // Filter stores based on search term and selected category
+  const filteredStores = useMemo(() => {
+    if (!stores) return [];
+
+    let filtered = stores.filter((store) =>
       store.merchant?.toLowerCase().includes(storeSearchTerm.toLowerCase())
-    ) || [];
+    );
+
+    if (selectedCategory) {
+      // Find the category object to get its match terms
+      const categoryObj = categories.find(cat => cat.name === selectedCategory);
+      if (categoryObj) {
+        filtered = filtered.filter(store => {
+          // Check if store has a category property
+          if (!store.category) return false;
+
+          // Split the category string into individual categories
+          const storeCategories = store.category.split(',');
+
+          // Check if any of the store's categories match any of the category's match terms
+          return categoryObj.matchTerms.some(matchTerm =>
+            storeCategories.some(storeCategory =>
+              storeCategory.trim().toLowerCase() === matchTerm.toLowerCase()
+            )
+          );
+        });
+      }
+    }
+
+    return filtered;
+  }, [stores, storeSearchTerm, selectedCategory, categories]);
 
   const filteredShops = shops.filter((shop) =>
     shop.businessName.toLowerCase().includes(serviceSearchTerm.toLowerCase())
@@ -269,10 +330,63 @@ const OnlineShop = () => {
             <Loader />
           ) : (
             <div className="flex flex-wrap items-center justify-center gap-4 p-4 md:p-10">
+              {/* Categories Section with Single Selection */}
+              <div className="w-full flex flex-wrap justify-center gap-2 mb-6">
+                {categories.map((category) => (
+                  <div
+                    key={category.name}
+                    onClick={() => toggleCategory(category.name)}
+                    className={`flex flex-col items-center w-[22%] sm:w-[22%] md:w-1/5 lg:w-1/6 p-2 cursor-pointer transition-all duration-300 
+        ${selectedCategory === category.name
+                        ? "bg-orange-100 rounded-lg shadow-md transform scale-105"
+                        : ""
+                      }`}
+                  >
+                    <div className={`p-2 rounded-full ${selectedCategory === category.name ? "bg-orange-100" : "bg-[#F7F7F7]"}`}>
+                      <img
+                        src={category.icon}
+                        alt={category.name}
+                        className="w-12 h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-full"
+                      />
+                    </div>
+                    <span className="text-gray-700 text-center text-xs md:text-sm font-medium mt-2">
+                      {category.name}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Show category selection info */}
+              {selectedCategory && (
+                <div className="w-full text-center mb-4">
+                  <span className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-medium">
+                    Filtering by: {selectedCategory}
+                    <button
+                      onClick={() => setSelectedCategory("")}
+                      className="ml-2 text-orange-800 hover:text-orange-900"
+                    >
+                      ×
+                    </button>
+                  </span>
+                </div>
+              )}
+
               {filteredStores.length === 0 ? (
-                <div className="text-center">No stores found</div>
+                <div className="text-center w-full py-8">
+                  <p className="text-gray-500">No stores found for {selectedCategory || "your search"}</p>
+                  {selectedCategory && (
+                    <button
+                      onClick={() => setSelectedCategory("")}
+                      className="mt-2 text-blue-500 hover:underline"
+                    >
+                      Clear category filter
+                    </button>
+                  )}
+                </div>
               ) : (
-                filteredStores.map((item) => renderStoreLink(item))
+                <div className="flex flex-wrap justify-center gap-4">
+                  {filteredStores.map((item) => renderStoreLink(item))}
+                </div>
               )}
             </div>
           )}

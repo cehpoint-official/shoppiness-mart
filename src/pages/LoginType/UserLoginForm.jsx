@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Googleicon from "../../assets/googleicon.png";
 import Facebookicon from "../../assets/facebookicon.png";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { auth, db, provider } from "../../../firebase";
 import { doc, setDoc, getDoc } from "firebase/firestore";
@@ -9,13 +10,14 @@ import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { userExist } from "../../redux/reducer/userReducer";
 
-const UserLoginForm = ({userType}) => {
+const UserLoginForm = ({ userType }) => {
   const [userData, setUserData] = useState({
     email: "",
     password: "",
     role: "",
   });
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -29,11 +31,11 @@ const UserLoginForm = ({userType}) => {
         userData.password
       );
       const user = res.user;
-  
+
       // Check if user exists in Firestore
       const userDocRef = doc(db, "users", user.uid);
       const userDocSnap = await getDoc(userDocRef);
-  
+
       let userRole = "user";  // Default role
       if (userDocSnap.exists()) {
         // If user document exists, get the role from Firestore
@@ -50,13 +52,13 @@ const UserLoginForm = ({userType}) => {
 
       // Store user role in localStorage
       localStorage.setItem("userRole", userRole);
-  
+
       // Dispatch user data to Redux
       dispatch(userExist({
         ...user,
         role: userRole
       }));
-  
+
       toast.success("Login successful!");
       setTimeout(() => {
         if (userRole === "admin") {
@@ -82,11 +84,11 @@ const UserLoginForm = ({userType}) => {
     try {
       const res = await signInWithPopup(auth, provider);
       const user = res.user;
-  
+
       // Check if user already exists in Firestore
       const userDocRef = doc(db, "users", user.uid);
       const userDocSnap = await getDoc(userDocRef);
-  
+
       let userRole = "user";  // Default role
       if (!userDocSnap.exists()) {
         // Save user data to Firestore only if it doesn't exist
@@ -104,13 +106,13 @@ const UserLoginForm = ({userType}) => {
 
       // Store user role in localStorage
       localStorage.setItem("userRole", userRole);
-  
+
       // Dispatch user data to Redux
       dispatch(userExist({
         ...user,
         role: userRole
       }));
-  
+
       setLoading(false);
       toast.success("Google sign-in successful!");
       if (userRole === "admin") {
@@ -153,15 +155,23 @@ const UserLoginForm = ({userType}) => {
           <label htmlFor="password" className="block mb-1 text-gray-600">
             Password
           </label>
-          <input
-            required
-            onChange={(e) =>
-              setUserData({ ...userData, password: e.target.value })
-            }
-            type="password"
-            value={userData.password}
-            className="w-full p-2 border border-gray-200 bg-slate-100 rounded"
-          />
+          <div className="relative">
+            <input
+              required
+              onChange={(e) =>
+                setUserData({ ...userData, password: e.target.value })
+              }
+              type={showPassword ? "text" : "password"}
+              value={userData.password}
+              className="w-full p-2 border border-gray-200 bg-slate-100 rounded"
+            />
+            <div
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500 hover:text-gray-700"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+            </div>
+          </div>
         </div>
         <a href={`/forgot-password/${userType}`} className="text-blue-700 text-center">
           Forgot password?

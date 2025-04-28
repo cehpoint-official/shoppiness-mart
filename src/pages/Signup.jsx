@@ -5,6 +5,7 @@ import ShoppingBag2 from "../assets/ShoppingBag2.png";
 import Signupimg from "../assets/signupimg.png";
 import Googleicon from "../assets/googleicon.png";
 import Facebookicon from "../assets/facebookicon.png";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 import { auth, db, provider } from "../../firebase.js";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -26,6 +27,8 @@ const Signup = () => {
   const [cpassword, setcpassword] = useState("");
   const [terms, setTerms] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const submitHandler = async (e) => {
@@ -206,36 +209,46 @@ const Signup = () => {
                   />
                 </div>
                 <div>
-                  <label
-                    htmlFor="password"
-                    className="block mb-1 text-gray-600"
-                  >
+                  <label htmlFor="password" className="block mb-1 text-gray-600">
                     Password
                   </label>
-                  <input
-                    type="password"
-                    required
-                    value={userData.password}
-                    onChange={(e) =>
-                      setUserData({ ...userData, password: e.target.value })
-                    }
-                    className="w-full p-2 border border-gray-200 bg-slate-100 rounded"
-                  />
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      required
+                      value={userData.password}
+                      onChange={(e) =>
+                        setUserData({ ...userData, password: e.target.value })
+                      }
+                      className="w-full p-2 border border-gray-200 bg-slate-100 rounded"
+                    />
+                    <div
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500 hover:text-gray-700"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                    </div>
+                  </div>
                 </div>
                 <div>
-                  <label
-                    htmlFor="password"
-                    className="block mb-1 text-gray-600"
-                  >
+                  <label htmlFor="confirmPassword" className="block mb-1 text-gray-600">
                     Confirm Password
                   </label>
-                  <input
-                    type="password"
-                    required
-                    value={cpassword}
-                    onChange={(e) => setcpassword(e.target.value)}
-                    className="w-full p-2 border border-gray-200 bg-slate-100 rounded"
-                  />
+                  <div className="relative">
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      required
+                      value={cpassword}
+                      onChange={(e) => setcpassword(e.target.value)}
+                      className="w-full p-2 border border-gray-200 bg-slate-100 rounded"
+                    />
+                    <div
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500 hover:text-gray-700"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    >
+                      {showConfirmPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                    </div>
+                  </div>
                 </div>
                 <div className="text-center mt-2">
                   <input
