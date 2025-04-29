@@ -4,9 +4,10 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import Loader from "../Components/Loader/Loader";
 import Carousel from "../Components/Carousel/Carousel";
 import { FiSearch } from "react-icons/fi";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useLocation } from "react-router-dom";
 import { collection, getDocs, addDoc, query, where, onSnapshot, serverTimestamp, doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase";
+import { FiChevronDown, FiChevronUp, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
 import foodIcon from "../assets/Shop/food.png";
 import groceryIcon from "../assets/Shop/grocery.png";
@@ -18,16 +19,52 @@ import sportIcon from "../assets/Shop/sport.png";
 import corporateIcon from "../assets/Shop/corporate.png";
 
 const OnlineShop = () => {
+  const location = useLocation();
+
   const [loading, setLoading] = useState(true);
   const [stores, setStores] = useState(null);
-  const [activeTab, setActiveTab] = useState("store");
   const [shops, setShops] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState(""); // Changed to single category selection
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [showAllStores, setShowAllStores] = useState(false);
   const [storeSearchTerm, setStoreSearchTerm] = useState("");
   const [serviceSearchTerm, setServiceSearchTerm] = useState("");
   const { userId } = useParams();
   const [transactions, setTransactions] = useState([]);
   const [carouselImages, setCarouselImages] = useState([]);
+  
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const storesPerPage = 50;
+
+  const getInitialActiveTab = () => {
+    // First check location.state
+    if (location.state?.activeTab) {
+      // Save to sessionStorage for persistence
+      sessionStorage.setItem('shopActiveTab', location.state.activeTab);
+      return location.state.activeTab;
+    }
+
+    // Then check sessionStorage
+    const savedTab = sessionStorage.getItem('shopActiveTab');
+    if (savedTab) {
+      return savedTab;
+    }
+
+    // Default to "store"
+    return "store";
+  };
+
+  const [activeTab, setActiveTab] = useState(getInitialActiveTab);
+
+  useEffect(() => {
+    sessionStorage.setItem('shopActiveTab', activeTab);
+  }, [activeTab]);
+
+  const handleTabClick = (tab) => {
+    setActiveTab(tab);
+    sessionStorage.setItem('shopActiveTab', tab);
+    setCurrentPage(1); // Reset page when switching tabs
+  };
 
   useEffect(() => {
     const fetchBannerImage = async () => {
@@ -122,6 +159,7 @@ const OnlineShop = () => {
       // Otherwise, select the new category
       setSelectedCategory(categoryName);
     }
+    setCurrentPage(1); // Reset to first page when category changes
   };
 
   // Filter stores based on search term and selected category
@@ -156,9 +194,20 @@ const OnlineShop = () => {
     return filtered;
   }, [stores, storeSearchTerm, selectedCategory, categories]);
 
+  // Calculate pagination for stores
+  const indexOfLastStore = currentPage * storesPerPage;
+  const indexOfFirstStore = indexOfLastStore - storesPerPage;
+  const currentStores = filteredStores.slice(indexOfFirstStore, indexOfLastStore);
+  const totalStorePages = Math.ceil(filteredStores.length / storesPerPage);
+
+  // Filter services based on search term
   const filteredShops = shops.filter((shop) =>
     shop.businessName.toLowerCase().includes(serviceSearchTerm.toLowerCase())
   );
+
+  // Only show 3 services by default
+  const visibleShops = showAllStores ? filteredShops : filteredShops.slice(0, 3);
+  const hasMoreShops = filteredShops.length > 3;
 
   // Handle search term changes based on active tab
   const handleSearchChange = (e) => {
@@ -168,11 +217,24 @@ const OnlineShop = () => {
     } else {
       setServiceSearchTerm(searchValue);
     }
+    setCurrentPage(1); // Reset to first page when search changes
   };
 
   // Get current search term based on active tab
   const getCurrentSearchTerm = () => {
     return activeTab === "store" ? storeSearchTerm : serviceSearchTerm;
+  };
+
+  // Handle page change
+  const changePage = (pageNumber) => {
+    if (pageNumber > 0 && pageNumber <= totalStorePages) {
+      setCurrentPage(pageNumber);
+      // Scroll to top when changing page
+      window.scrollTo({
+        top: document.getElementById('stores-section')?.offsetTop - 100 || 0,
+        behavior: 'smooth'
+      });
+    }
   };
 
   // Function to track a click/purchase
@@ -229,6 +291,107 @@ const OnlineShop = () => {
     }
   }, [userId, fetchTransactions]);
 
+  // Pagination UI component
+  const Pagination = ({ currentPage, totalPages, onPageChange }) => {
+    if (totalPages <= 1) return null;
+
+    const getPageNumbers = () => {
+      const pageNumbers = [];
+      const maxVisiblePages = 5;
+      
+      if (totalPages <= maxVisiblePages) {
+        // If we have 5 or fewer pages, show all page numbers
+        for (let i = 1; i <= totalPages; i++) {
+          pageNumbers.push(i);
+        }
+      } else {
+        // Always show first page
+        pageNumbers.push(1);
+        
+        // Calculate the range of pages to display
+        let startPage = Math.max(2, currentPage - 1);
+        let endPage = Math.min(totalPages - 1, currentPage + 1);
+        
+        // Ensure we always show 3 pages in the middle
+        if (endPage - startPage < 2) {
+          if (currentPage < totalPages / 2) {
+            // Near the start, extend endPage
+            endPage = Math.min(startPage + 2, totalPages - 1);
+          } else {
+            // Near the end, extend startPage
+            startPage = Math.max(endPage - 2, 2);
+          }
+        }
+        
+        // Add ellipsis after page 1 if needed
+        if (startPage > 2) {
+          pageNumbers.push('...');
+        }
+        
+        // Add middle pages
+        for (let i = startPage; i <= endPage; i++) {
+          pageNumbers.push(i);
+        }
+        
+        // Add ellipsis before last page if needed
+        if (endPage < totalPages - 1) {
+          pageNumbers.push('...');
+        }
+        
+        // Always show last page
+        pageNumbers.push(totalPages);
+      }
+      
+      return pageNumbers;
+    };
+
+    return (
+      <div className="flex items-center justify-center space-x-2 my-8">
+        <button
+          onClick={() => onPageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className={`flex items-center px-3 py-1 rounded ${
+            currentPage === 1 
+              ? 'bg-gray-200 text-gray-500 cursor-not-allowed' 
+              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+          }`}
+        >
+          <FiChevronLeft size={16} />
+          <span className="ml-1">Prev</span>
+        </button>
+        
+        {getPageNumbers().map((pageNum, index) => (
+          <button
+            key={index}
+            onClick={() => typeof pageNum === 'number' ? onPageChange(pageNum) : null}
+            className={`w-8 h-8 flex items-center justify-center rounded ${
+              pageNum === currentPage 
+                ? 'bg-teal-500 text-white' 
+                : pageNum === '...' 
+                  ? 'cursor-default' 
+                  : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
+            }`}
+          >
+            {pageNum}
+          </button>
+        ))}
+        
+        <button
+          onClick={() => onPageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className={`flex items-center px-3 py-1 rounded ${
+            currentPage === totalPages 
+              ? 'bg-gray-200 text-gray-500 cursor-not-allowed' 
+              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+          }`}
+        >
+          <span className="mr-1">Next</span>
+          <FiChevronRight size={16} />
+        </button>
+      </div>
+    );
+  };
+
   // Modify the store link rendering to include tracking
   const renderStoreLink = (item) => {
     // Generate a unique click ID
@@ -263,7 +426,7 @@ const OnlineShop = () => {
             {item?.merchant}
           </p>
           <button className="bg-[#0F9B03] text-white rounded-md px-2 m-auto flex">
-            {item?.payout} cashback - All to charity.
+            Earn up to {item?.payout} cashback on each purchase.
           </button>
         </a>
       </div>
@@ -298,14 +461,14 @@ const OnlineShop = () => {
           <div
             className={`text-center py-2 px-2 md:px-4 rounded cursor-pointer text-sm ${activeTab === "store" ? "bg-teal-500 text-white" : ""
               }`}
-            onClick={() => setActiveTab("store")}
+            onClick={() => handleTabClick("store")}
           >
             Savings by Store
           </div>
           <div
             className={`text-center py-2 px-2 md:px-4 rounded cursor-pointer text-sm border-2 border-500-red ${activeTab === "services" ? "bg-teal-500 text-white" : ""
               }`}
-            onClick={() => setActiveTab("services")}
+            onClick={() => handleTabClick("services")}
           >
             Savings by Services
           </div>
@@ -325,19 +488,38 @@ const OnlineShop = () => {
         </div>
       </div>
       {activeTab === "store" ? (
-        <div>
+        <div id="stores-section">
+          <div className="max-w-3xl mx-auto my-6 p-6 border-4 border-yellow-400 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow-lg transform hover:scale-105 transition-transform duration-300">
+            <div className="relative">
+              <div className="absolute -top-10 -left-2">
+                <div className="bg-yellow-400 text-blue-800 font-bold px-4 py-1 rounded-full text-sm animate-pulse">
+                  IMPORTANT
+                </div>
+              </div>
+
+              <h3 className="text-xl font-bold text-blue-800 mb-3 pt-2">Cashback Distribution Policy</h3>
+
+              <p className="text-gray-800 font-medium leading-relaxed">
+                For each transaction, <span className="bg-yellow-200 px-1 font-bold">50% of the cashback earned</span> (up to the percentage mentioned for each store) will be credited to the user, while the <span className="bg-yellow-200 px-1 font-bold">remaining 50% will be retained by ShoppinessMart</span>.
+              </p>
+
+              <div className="mt-4 flex justify-center">
+                <div className="w-12 h-1 bg-yellow-400 rounded-full"></div>
+              </div>
+            </div>
+          </div>
           {stores === null ? (
             <Loader />
           ) : (
             <div className="flex flex-wrap items-center justify-center gap-4 p-4 md:p-10">
               {/* Categories Section with Single Selection */}
-              <div className="w-full flex flex-wrap justify-center gap-2 mb-6">
+              <div className="w-full flex flex-wrap justify-evenly gap-2 mb-6">
                 {categories.map((category) => (
                   <div
                     key={category.name}
                     onClick={() => toggleCategory(category.name)}
-                    className={`flex flex-col items-center w-[22%] sm:w-[22%] md:w-1/5 lg:w-1/6 p-2 cursor-pointer transition-all duration-300 
-        ${selectedCategory === category.name
+                    className={`flex flex-col items-center w-[30%] sm:w-[22%] md:w-1/5 lg:w-1/6 p-2 cursor-pointer transition-all duration-300 
+                    ${selectedCategory === category.name
                         ? "bg-orange-100 rounded-lg shadow-md transform scale-105"
                         : ""
                       }`}
@@ -346,10 +528,10 @@ const OnlineShop = () => {
                       <img
                         src={category.icon}
                         alt={category.name}
-                        className="w-12 h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-full"
+                        className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-full object-cover"
                       />
                     </div>
-                    <span className="text-gray-700 text-center text-xs md:text-sm font-medium mt-2">
+                    <span className="text-gray-700 text-center text-xs sm:text-sm font-medium mt-2 line-clamp-2">
                       {category.name}
                     </span>
                   </div>
@@ -371,6 +553,15 @@ const OnlineShop = () => {
                 </div>
               )}
 
+              {/* Display store count and pagination info */}
+              {filteredStores.length > 0 && (
+                <div className="w-full text-center mb-4">
+                  <p className="text-gray-600">
+                    Showing {indexOfFirstStore + 1}-{Math.min(indexOfLastStore, filteredStores.length)} of {filteredStores.length} stores
+                  </p>
+                </div>
+              )}
+
               {filteredStores.length === 0 ? (
                 <div className="text-center w-full py-8">
                   <p className="text-gray-500">No stores found for {selectedCategory || "your search"}</p>
@@ -384,9 +575,18 @@ const OnlineShop = () => {
                   )}
                 </div>
               ) : (
-                <div className="flex flex-wrap justify-center gap-4">
-                  {filteredStores.map((item) => renderStoreLink(item))}
-                </div>
+                <>
+                  <div className="flex flex-wrap justify-center gap-4">
+                    {currentStores.map((item) => renderStoreLink(item))}
+                  </div>
+                  
+                  {/* Add pagination controls */}
+                  <Pagination 
+                    currentPage={currentPage}
+                    totalPages={totalStorePages}
+                    onPageChange={changePage}
+                  />
+                </>
               )}
             </div>
           )}
@@ -396,37 +596,90 @@ const OnlineShop = () => {
           {loading ? (
             <Loader />
           ) : (
-            <div className="flex flex-wrap justify-center items-center gap-4 md:gap-10 mt-10">
-              {filteredShops.length === 0 ? (
-                <div className="text-center">No services found</div>
-              ) : (
-                filteredShops.map((item) => (
-                  <Link
-                    to={
-                      location.pathname.includes("/user-dashboard")
-                        ? `/user-dashboard/${userId}/online-shop/${item.id}`
-                        : `/online-shop/${item.id}`
-                    }
-                    key={item.id}
-                  >
-                    <div>
-                      <img
-                        src={item.bannerUrl}
-                        alt={item.businessName}
-                        className="w-full md:w-22 rounded-2xl"
-                      />
+            <div className="container mx-auto px-4 py-8">
+              {/* Important Notice - Always at the top */}
+              <div className="max-w-3xl mx-auto mb-10">
+                <div className="p-6 border-4 border-yellow-400 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow-lg">
+                  <div className="relative">
+                    <div className="absolute -top-10 left-0">
+                      <div className="bg-yellow-400 text-blue-800 font-bold px-4 py-1 rounded-full text-sm animate-pulse">
+                        IMPORTANT
+                      </div>
                     </div>
-                    <div className="mt-4">
-                      <p className="font-semibold text-xl">
-                        {item.businessName}
-                      </p>
-                      <p className="my-2 text-lg">{item.location}</p>
-                      <button className="bg-[#0059DE] text-white rounded-lg px-2 py-1 text-sm">
-                        {item.rate}% Cashback
+
+                    <h3 className="text-xl font-bold text-blue-800 mb-3 pt-2">Cashback Distribution Policy</h3>
+
+                    <p className="text-gray-800 font-medium leading-relaxed">
+                      For each transaction, <span className="bg-yellow-200 px-1 font-bold">50% of the cashback earned</span> will be credited to the user, while the <span className="bg-yellow-200 px-1 font-bold">remaining 50% will be retained by ShoppinessMart</span>.
+                    </p>
+
+                    <div className="mt-4 flex justify-center">
+                      <div className="w-12 h-1 bg-yellow-400 rounded-full"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Stores Section */}
+              <h2 className="text-2xl font-bold text-center mb-8">Our Partner Stores</h2>
+
+              {filteredShops.length === 0 ? (
+                <div className="text-center p-8 bg-gray-50 rounded-lg">
+                  <p className="text-lg text-gray-600">No stores found</p>
+                </div>
+              ) : (
+                <>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {visibleShops.map((item) => (
+                      <Link
+                        to={
+                          location.pathname.includes("/user-dashboard")
+                            ? `/user-dashboard/${userId}/online-shop/${item.id}`
+                            : `/online-shop/${item.id}`
+                        }
+                        key={item.id}
+                        state={{ activeTab: "services" }}
+                        className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden"
+                        onClick={() => window.scrollTo(0, 0)}
+                      >
+                        <div className="aspect-video overflow-hidden">
+                          <img
+                            src={item.bannerUrl}
+                            alt={item.businessName}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="p-4">
+                          <p className="font-semibold text-xl text-gray-800">{item.businessName}</p>
+                          <p className="my-2 text-gray-600">{item.location}</p>
+                          <span className="inline-block bg-blue-600 text-white rounded-lg px-3 py-1 text-sm font-medium">
+                            {item.rate}% Cashback
+                          </span>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+
+                  {/* View More / Less Button */}
+                  {hasMoreShops && (
+                    <div className="mt-8 flex justify-center">
+                      <button
+                        onClick={() => setShowAllStores(!showAllStores)}
+                        className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium px-6 py-3 rounded-lg transition-colors duration-200"
+                      >
+                        {showAllStores ? (
+                          <>
+                            Show Less <FiChevronUp size={20} />
+                          </>
+                        ) : (
+                          <>
+                            View More ({filteredShops.length - 3} more stores) <FiChevronDown size={20} />
+                          </>
+                        )}
                       </button>
                     </div>
-                  </Link>
-                ))
+                  )}
+                </>
               )}
             </div>
           )}

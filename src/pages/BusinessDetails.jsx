@@ -8,7 +8,7 @@ import {
   query,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useLocation, useParams, useNavigate } from "react-router-dom";
 import { db } from "../../firebase";
 import toast from "react-hot-toast";
 import Loader from "../Components/Loader/Loader";
@@ -16,11 +16,13 @@ import {
   AiOutlineLoading3Quarters,
   AiOutlineCopy,
   AiOutlineSave,
+  AiOutlineArrowLeft,
 } from "react-icons/ai";
 import { useSelector } from "react-redux";
 
 const BusinessDetails = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { user } = useSelector((state) => state.userReducer);
   const { category, userId, businessId } = useParams();
 
@@ -62,6 +64,11 @@ const BusinessDetails = () => {
       [name]: value,
     }));
   };
+
+  const handleGoBack = () => {
+    navigate(-1);
+  };
+
   const generateUniqueCouponCode = async (businessName) => {
     const specialChars = ["#", "@", "$", "&", "*"];
     const randomSpecialChar =
@@ -264,6 +271,17 @@ const BusinessDetails = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
+      {/* Back Button */}
+      <div className="mb-4">
+        <button
+          onClick={handleGoBack}
+          className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors"
+        >
+          <AiOutlineArrowLeft className="w-5 h-5" />
+          <span>Back</span>
+        </button>
+      </div>
+      
       {/* Header Section */}
       <div className="flex items-start gap-6 mb-8 border p-5 rounded-xl shadow-sm">
         <div className="w-1/2 md:w-1/3">
@@ -501,7 +519,12 @@ const BusinessDetails = () => {
 };
 const ShopLink = ({ userId, category, businessId, productId, children }) => {
   const location = useLocation();
-  const causeData = location.state || {};
+  // Merge causeData with any other state from location, including activeTab if present
+  const stateData = {
+    ...(location.state || {}),
+    // Keep activeTab from state if it exists
+    activeTab: location.state?.activeTab || undefined
+  };
 
   const isOfflineShop = () => {
     return (
@@ -523,17 +546,15 @@ const ShopLink = ({ userId, category, businessId, productId, children }) => {
     ? `/user-dashboard/${userId}/online-shop/${businessId}/${productId}`
     : `/online-shop/${businessId}/${productId}`;
 
-  // Log state data for debugging
-  //console.log("ShopLink passing state:", causeData);
-
   return (
     <Link
       to={pathTo}
-      state={causeData} 
+      state={stateData} 
       className="overflow-hidden"
     >
       {children}
     </Link>
   );
 };
+
 export default BusinessDetails;

@@ -17,6 +17,10 @@ const AdminTransactions = () => {
   const [endDate, setEndDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 7;
+
   // Format date for display in "1 Jan 2024" format
   const formatDateForDisplay = (date) => {
     const day = date.getDate();
@@ -60,6 +64,8 @@ const AdminTransactions = () => {
   // Apply date range and close date picker
   const handleDateRangeApply = () => {
     setShowDatePicker(false);
+    // Reset to first page when filters change
+    setCurrentPage(1);
   };
 
   const fetchTransactions = useCallback(async () => {
@@ -176,6 +182,38 @@ const AdminTransactions = () => {
     return true;
   });
 
+  // Calculate total pages and determine which transactions to display for current page
+  const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentTransactions = filteredTransactions.slice(indexOfFirstItem, indexOfLastItem);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filter, startDate, endDate]);
+  
+  // Calculate pagination display based on screen width
+  const [screenWidth, setScreenWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024);
+  
+  useEffect(() => {
+    const handleResize = () => {
+      setScreenWidth(window.innerWidth);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+  
+  // Determine how many page buttons to show based on screen size
+  const getVisiblePageButtonCount = () => {
+    if (screenWidth < 400) return 1; // Just current page on very small devices
+    if (screenWidth < 640) return 3; // 3 pages on small mobile
+    return 5; // 5 pages on larger screens
+  };
+
   // Function to refresh transactions data from INRDeals API
   const refreshTransactionsFromAPI = async () => {
     setLoading(true);
@@ -227,6 +265,17 @@ const AdminTransactions = () => {
       case 'verified': return 'text-green-600';
       case 'rejected': return 'text-red-600';
       default: return 'text-yellow-600';
+    }
+  };
+
+  // Go to a specific page
+  const goToPage = (pageNumber) => {
+    if (pageNumber < 1) {
+      setCurrentPage(1);
+    } else if (pageNumber > totalPages) {
+      setCurrentPage(totalPages);
+    } else {
+      setCurrentPage(pageNumber);
     }
   };
 
@@ -337,14 +386,14 @@ const AdminTransactions = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredTransactions.length === 0 ? (
+                {currentTransactions.length === 0 ? (
                   <tr>
                     <td colSpan="9" className="py-4 px-4 text-center">
                       No transactions found
                     </td>
                   </tr>
                 ) : (
-                  filteredTransactions.map((transaction) => (
+                  currentTransactions.map((transaction) => (
                     <tr key={transaction.id}>
                       <td className="py-2 px-4 border truncate" title={transaction.userId}>
                         <div className="max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
@@ -384,13 +433,13 @@ const AdminTransactions = () => {
 
           {/* Mobile View (Cards) - Shown only on small screens */}
           <div className="md:hidden">
-            {filteredTransactions.length === 0 ? (
+            {currentTransactions.length === 0 ? (
               <div className="bg-white p-4 text-center rounded shadow">
                 No transactions found
               </div>
             ) : (
               <div className="flex flex-col gap-4">
-                {filteredTransactions.map((transaction) => (
+                {currentTransactions.map((transaction) => (
                   <div key={transaction.id} className="bg-white p-4 rounded shadow">
                     <div className="flex flex-col sm:flex-row justify-between mb-2">
                       <div className="font-medium mb-1 sm:mb-0 pr-4">{userNames[transaction.userId] || "Unknown"}</div>
@@ -428,6 +477,126 @@ const AdminTransactions = () => {
               </div>
             )}
           </div>
+
+          {/* Pagination Controls */}
+          {filteredTransactions.length > 0 && (
+            <div className="flex justify-center mt-6">
+              <nav className="flex flex-wrap items-center justify-center gap-1">
+                {/* First/Prev buttons - hide on smallest screens */}
+                <div className="hidden sm:flex items-center space-x-1">
+                  <button
+                    onClick={() => goToPage(1)}
+                    disabled={currentPage === 1}
+                    className={`px-2 py-1 text-sm rounded ${
+                      currentPage === 1
+                        ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                    }`}
+                  >
+                    First
+                  </button>
+                </div>
+                
+                <button
+                  onClick={() => goToPage(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className={`px-2 py-1 text-sm rounded ${
+                    currentPage === 1
+                      ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  }`}
+                  aria-label="Previous Page"
+                >
+                  &laquo;
+                </button>
+                
+                <div className="flex flex-wrap items-center justify-center gap-1">
+                  {/* Dynamic page buttons - show fewer on mobile */}
+                  {Array.from(
+                    { length: Math.min(getVisiblePageButtonCount(), totalPages) }, 
+                    (_, i) => {
+                      // Calculate which page numbers to show based on current page and screen size
+                      let pageNum;
+                      const maxVisible = getVisiblePageButtonCount();
+                      
+                      if (totalPages <= maxVisible) {
+                        // If we have fewer pages than maxVisible, show all pages
+                        pageNum = i + 1;
+                      } else if (currentPage <= Math.ceil(maxVisible / 2)) {
+                        // If we're near the start
+                        pageNum = i + 1;
+                      } else if (currentPage >= totalPages - Math.floor(maxVisible / 2)) {
+                        // If we're near the end
+                        pageNum = totalPages - (maxVisible - 1) + i;
+                      } else {
+                        // Otherwise show pages around current page
+                        const offset = Math.floor(maxVisible / 2);
+                        pageNum = currentPage - offset + i;
+                      }
+
+                      return (
+                        <button
+                          key={pageNum}
+                          onClick={() => goToPage(pageNum)}
+                          className={`w-8 h-8 flex items-center justify-center rounded text-sm ${
+                            currentPage === pageNum
+                              ? "bg-blue-600 text-white"
+                              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                          }`}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    }
+                  )}
+                </div>
+                
+                <button
+                  onClick={() => goToPage(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className={`px-2 py-1 text-sm rounded ${
+                    currentPage === totalPages
+                      ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  }`}
+                  aria-label="Next Page"
+                >
+                  &raquo;
+                </button>
+                
+                {/* Last button - hide on smallest screens */}
+                <div className="hidden sm:flex items-center space-x-1">
+                  <button
+                    onClick={() => goToPage(totalPages)}
+                    disabled={currentPage === totalPages}
+                    className={`px-2 py-1 text-sm rounded ${
+                      currentPage === totalPages
+                        ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                    }`}
+                  >
+                    Last
+                  </button>
+                </div>
+              </nav>
+            </div>
+          )}
+
+          {/* Pagination Info - Different layouts for mobile/desktop */}
+          {filteredTransactions.length > 0 && (
+            <div className="mt-2 text-gray-600">
+              <div className="text-center text-sm">
+                <span className="inline-block">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <span className="hidden sm:inline-block sm:mx-1">|</span>
+                <span className="block sm:inline-block">
+                  Showing {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, filteredTransactions.length)} 
+                  of {filteredTransactions.length}
+                </span>
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>
