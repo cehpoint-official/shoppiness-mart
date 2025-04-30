@@ -1,6 +1,6 @@
 import { BsArrowLeft } from "react-icons/bs";
 import { useCallback, useEffect, useState } from "react";
-import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
+import { collection, getDocs, updateDoc, doc, addDoc } from "firebase/firestore";
 import { db } from "../../../../../firebase";
 import toast from "react-hot-toast";
 import { FiEdit } from "react-icons/fi";
@@ -124,6 +124,14 @@ const OnlineShopRequests = () => {
         }),
       });
 
+      // Add notification to business notifications
+      await addDoc(collection(db, "businessNotifications"), {
+        businessId: shop.id,
+        message: `🎉 Congratulations! Your shop ${shop.businessName} has been approved and is now live on ShoppinessMart.`,
+        createdAt: new Date().toISOString(),
+        read: false,
+      });
+
       // Show success message and refresh data
       toast.success("Request accepted successfully");
       fetchData();
@@ -183,6 +191,14 @@ const OnlineShopRequests = () => {
           month: "short",
           year: "numeric",
         }),
+      });
+
+      // Add notification to business notifications
+      await addDoc(collection(db, "businessNotifications"), {
+        businessId: shop.id,
+        message: `😔 Your request for shop ${shop.businessName} wasn't approved this time. We appreciate your effort and invite you to review our guidelines and try again soon! 💪`,
+        createdAt: new Date().toISOString(),
+        read: false,
       });
 
       // Show success message and refresh data
@@ -312,8 +328,8 @@ const OnlineShopRequests = () => {
                         <td className="py-2 md:py-3 pb-4 sm:pb-3">
                           <span
                             className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${selectedShop.termsAgreed
-                                ? "bg-green-100 text-green-800"
-                                : "bg-red-100 text-red-800"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
                               }`}
                           >
                             {selectedShop.termsAgreed ? "Agreed" : "Not Agreed"}
@@ -327,8 +343,8 @@ const OnlineShopRequests = () => {
                         <td className="py-2 md:py-3 pb-4 sm:pb-3">
                           <span
                             className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${selectedShop.isPreferredPartner
-                                ? "bg-blue-100 text-blue-800"
-                                : "bg-gray-100 text-gray-800"
+                              ? "bg-blue-100 text-blue-800"
+                              : "bg-gray-100 text-gray-800"
                               }`}
                           >
                             {selectedShop.isPreferredPartner
@@ -385,8 +401,8 @@ const OnlineShopRequests = () => {
         <div className="flex flex-col md:flex-row gap-2 md:gap-4 mb-4 md:mb-6">
           <button
             className={`px-3 md:px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm ${activeTab === "Pending"
-                ? "bg-[#F7941D] text-white"
-                : "border border-gray-300 text-gray-700"
+              ? "bg-[#F7941D] text-white"
+              : "border border-gray-300 text-gray-700"
               }`}
             onClick={() => setActiveTab("Pending")}
           >
@@ -394,8 +410,8 @@ const OnlineShopRequests = () => {
           </button>
           <button
             className={`px-3 md:px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm ${activeTab === "Rejected"
-                ? "bg-[#F7941D] text-white"
-                : "border border-gray-300 text-gray-700"
+              ? "bg-[#F7941D] text-white"
+              : "border border-gray-300 text-gray-700"
               }`}
             onClick={() => setActiveTab("Rejected")}
           >
@@ -554,8 +570,8 @@ const OnlineShopRequests = () => {
                     <button
                       key={page}
                       className={`w-6 h-6 md:w-8 md:h-8 rounded text-xs md:text-sm ${currentPage === page
-                          ? "bg-blue-500 text-white"
-                          : "text-gray-600 hover:bg-gray-100"
+                        ? "bg-blue-500 text-white"
+                        : "text-gray-600 hover:bg-gray-100"
                         }`}
                       onClick={() => setCurrentPage(page)}
                     >

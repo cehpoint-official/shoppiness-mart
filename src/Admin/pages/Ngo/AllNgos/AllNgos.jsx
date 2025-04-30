@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { FaArrowLeft, FaSpinner } from "react-icons/fa";
-import { collection, getDocs, doc, updateDoc } from "firebase/firestore";
+import { collection, getDocs, doc, updateDoc, addDoc } from "firebase/firestore";
 import { db } from "../../../../../firebase";
 import toast from "react-hot-toast";
 import axios from "axios";
@@ -60,18 +60,18 @@ const AllNgos = () => {
         approvedDate:
           status === "Active"
             ? new Date().toLocaleDateString("en-GB", {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              })
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            })
             : null,
         inactiveDate:
           status === "Inactive"
             ? new Date().toLocaleDateString("en-GB", {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              })
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            })
             : null,
       });
 
@@ -145,6 +145,18 @@ const AllNgos = () => {
               ? "Shoppiness Mart - NGO Account Reactivated!"
               : "Shoppiness Mart - NGO Account Deactivated",
           body: emailTemplate,
+        });
+
+        // Set notification message based on status
+        const notificationMessage = isActive
+          ? `🎉 Great news! Your NGO "${selectedNGO.causeName}" has been reactivated and is now visible on ShoppinessMart. Welcome back!`
+          : `⚠️ Your NGO "${selectedNGO.causeName}" has been temporarily deactivated on ShoppinessMart. Please contact support for reactivation or further information.`;
+
+        await addDoc(collection(db, "ngoNotifications"), {
+          ngoId: ngo.id,
+          message: notificationMessage,
+          createdAt: new Date().toISOString(),
+          read: false,
         });
       } catch (emailError) {
         console.error("Failed to send notification email:", emailError);
@@ -301,21 +313,19 @@ const AllNgos = () => {
       <div className="flex flex-col sm:flex-row gap-2 md:gap-4 mb-6 md:mb-8">
         <button
           onClick={() => setActiveTab("Active")}
-          className={`px-4 md:px-6 py-2 rounded-md transition-colors ${
-            activeTab === "Active"
-              ? "bg-[#F7941D] text-white"
-              : "bg-white text-gray-600 border border-gray-200"
-          }`}
+          className={`px-4 md:px-6 py-2 rounded-md transition-colors ${activeTab === "Active"
+            ? "bg-[#F7941D] text-white"
+            : "bg-white text-gray-600 border border-gray-200"
+            }`}
         >
           Active NGOs/Causes
         </button>
         <button
           onClick={() => setActiveTab("Inactive")}
-          className={`px-4 md:px-6 py-2 rounded-md transition-colors ${
-            activeTab === "Inactive"
-              ? "bg-[#F7941D] text-white"
-              : "bg-white text-gray-600 border border-gray-200"
-          }`}
+          className={`px-4 md:px-6 py-2 rounded-md transition-colors ${activeTab === "Inactive"
+            ? "bg-[#F7941D] text-white"
+            : "bg-white text-gray-600 border border-gray-200"
+            }`}
         >
           Inactive NGOs/Causes
         </button>
@@ -400,12 +410,12 @@ const AllNgos = () => {
                 ))}
               </tbody>
             </table>
-            
+
             {/* For mobile screens - card layout */}
             <div className="md:hidden space-y-4">
               {paginatedData.map((ngo) => (
-                <div 
-                  key={ngo.id} 
+                <div
+                  key={ngo.id}
                   className="border rounded-lg p-4 flex flex-col items-center sm:items-start"
                 >
                   <div className="flex flex-col sm:flex-row w-full items-center gap-4 mb-3">
@@ -419,7 +429,7 @@ const AllNgos = () => {
                       <p className="text-gray-500 text-sm">{ngo.location}</p>
                     </div>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 gap-2 w-full mb-3">
                     <div className="flex justify-between">
                       <p className="text-gray-500 text-sm">Phone:</p>
@@ -446,7 +456,7 @@ const AllNgos = () => {
                       </div>
                     )}
                   </div>
-                  
+
                   <button
                     onClick={() => handleViewDetails(ngo)}
                     className="text-blue-500 border border-blue-600 px-4 py-2 hover:text-blue-600 transition-colors w-full sm:w-auto mt-2"
@@ -486,11 +496,10 @@ const AllNgos = () => {
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
               <button
                 key={page}
-                className={`w-6 h-6 sm:w-8 sm:h-8 rounded text-sm ${
-                  currentPage === page
-                    ? "bg-blue-500 text-white"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
+                className={`w-6 h-6 sm:w-8 sm:h-8 rounded text-sm ${currentPage === page
+                  ? "bg-blue-500 text-white"
+                  : "text-gray-600 hover:bg-gray-100"
+                  }`}
                 onClick={() => setCurrentPage(page)}
               >
                 {page}

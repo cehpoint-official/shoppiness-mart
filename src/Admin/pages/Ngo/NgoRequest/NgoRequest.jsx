@@ -1,4 +1,4 @@
-import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
+import { collection, getDocs, updateDoc, doc, addDoc } from "firebase/firestore";
 import { useCallback, useEffect, useState } from "react";
 import { FaArrowLeft, FaSpinner } from "react-icons/fa";
 import { db } from "../../../../../firebase";
@@ -97,6 +97,14 @@ const NgoRequest = () => {
         }),
       });
 
+      // Add notification to ngo notifications
+      await addDoc(collection(db, "ngoNotifications"), {
+        ngoId: ngo.id,
+        message: `🎉 Congratulations! Your NGO ${ngo.causeName} has been approved and is now live on ShoppinessMart.`,
+        createdAt: new Date().toISOString(),
+        read: false,
+      });
+
       toast.success("Request accepted successfully");
       fetchData();
       setViewMode("list");
@@ -151,6 +159,14 @@ const NgoRequest = () => {
           month: "short",
           year: "numeric",
         }),
+      });
+
+      // Add notification to ngo notifications
+      await addDoc(collection(db, "ngoNotifications"), {
+        ngoId: ngo.id,
+        message: "😔 Your NGO request wasn't approved this time. We appreciate your effort and invite you to review our guidelines and try again soon! 💪",
+        createdAt: new Date().toISOString(),
+        read: false,
       });
 
       toast.success("Request rejected successfully");

@@ -55,7 +55,7 @@ const DonationCard = ({ donation, onViewDetails }) => {
 const DonationDetails = ({ donation, onBack, onVerify, isVerifying }) => {
   return (
     <div className="bg-white m-4 md:m-10 rounded-lg shadow-lg p-4 md:p-6 animate-fadeIn">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center mb-6 gap-2">
+      <div className="flex flex-col sm:items-start items-center mb-6 gap-2">
         <button
           onClick={onBack}
           className="flex items-center text-blue-600 hover:text-blue-800 sm:mr-4"
