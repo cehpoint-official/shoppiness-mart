@@ -31,7 +31,7 @@ const OnlineShop = () => {
   const { userId } = useParams();
   const [transactions, setTransactions] = useState([]);
   const [carouselImages, setCarouselImages] = useState([]);
-  
+
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const storesPerPage = 50;
@@ -99,7 +99,9 @@ const OnlineShop = () => {
 
         const data = await response.json();
         if (data.success) {
-          setStores(data.data.stores);
+          // Filter only active stores
+          const activeStores = data.data.stores.filter(store => store.status === "active");
+          setStores(activeStores);
         } else {
           console.error("Failed to fetch stores:", data.message);
         }
@@ -298,7 +300,7 @@ const OnlineShop = () => {
     const getPageNumbers = () => {
       const pageNumbers = [];
       const maxVisiblePages = 5;
-      
+
       if (totalPages <= maxVisiblePages) {
         // If we have 5 or fewer pages, show all page numbers
         for (let i = 1; i <= totalPages; i++) {
@@ -307,11 +309,11 @@ const OnlineShop = () => {
       } else {
         // Always show first page
         pageNumbers.push(1);
-        
+
         // Calculate the range of pages to display
         let startPage = Math.max(2, currentPage - 1);
         let endPage = Math.min(totalPages - 1, currentPage + 1);
-        
+
         // Ensure we always show 3 pages in the middle
         if (endPage - startPage < 2) {
           if (currentPage < totalPages / 2) {
@@ -322,26 +324,26 @@ const OnlineShop = () => {
             startPage = Math.max(endPage - 2, 2);
           }
         }
-        
+
         // Add ellipsis after page 1 if needed
         if (startPage > 2) {
           pageNumbers.push('...');
         }
-        
+
         // Add middle pages
         for (let i = startPage; i <= endPage; i++) {
           pageNumbers.push(i);
         }
-        
+
         // Add ellipsis before last page if needed
         if (endPage < totalPages - 1) {
           pageNumbers.push('...');
         }
-        
+
         // Always show last page
         pageNumbers.push(totalPages);
       }
-      
+
       return pageNumbers;
     };
 
@@ -350,40 +352,37 @@ const OnlineShop = () => {
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className={`flex items-center px-3 py-1 rounded ${
-            currentPage === 1 
-              ? 'bg-gray-200 text-gray-500 cursor-not-allowed' 
+          className={`flex items-center px-3 py-1 rounded ${currentPage === 1
+              ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
               : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-          }`}
+            }`}
         >
           <FiChevronLeft size={16} />
           <span className="ml-1">Prev</span>
         </button>
-        
+
         {getPageNumbers().map((pageNum, index) => (
           <button
             key={index}
             onClick={() => typeof pageNum === 'number' ? onPageChange(pageNum) : null}
-            className={`w-8 h-8 flex items-center justify-center rounded ${
-              pageNum === currentPage 
-                ? 'bg-teal-500 text-white' 
-                : pageNum === '...' 
-                  ? 'cursor-default' 
+            className={`w-8 h-8 flex items-center justify-center rounded ${pageNum === currentPage
+                ? 'bg-teal-500 text-white'
+                : pageNum === '...'
+                  ? 'cursor-default'
                   : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
-            }`}
+              }`}
           >
             {pageNum}
           </button>
         ))}
-        
+
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className={`flex items-center px-3 py-1 rounded ${
-            currentPage === totalPages 
-              ? 'bg-gray-200 text-gray-500 cursor-not-allowed' 
+          className={`flex items-center px-3 py-1 rounded ${currentPage === totalPages
+              ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
               : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-          }`}
+            }`}
         >
           <span className="mr-1">Next</span>
           <FiChevronRight size={16} />
@@ -579,9 +578,9 @@ const OnlineShop = () => {
                   <div className="flex flex-wrap justify-center gap-4">
                     {currentStores.map((item) => renderStoreLink(item))}
                   </div>
-                  
+
                   {/* Add pagination controls */}
-                  <Pagination 
+                  <Pagination
                     currentPage={currentPage}
                     totalPages={totalStorePages}
                     onPageChange={changePage}

@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import Carousel from "../../Components/Carousel/Carousel";
 import { MdOutlineArrowRightAlt, MdStorefront } from "react-icons/md";
-import { FaShoppingCart } from "react-icons/fa";
-import { BsShop } from "react-icons/bs";
+import { FaShoppingCart, FaShoppingBag, FaTag, FaPercentage } from "react-icons/fa";
+import { BsShop, BsArrowLeftRight } from "react-icons/bs";
 import { collection, getDocs, doc, getDoc } from "firebase/firestore";
 import { db } from "../../../firebase";
 import { useSelector } from "react-redux";
@@ -19,6 +19,7 @@ const CashbackDeals = () => {
   const [carouselImages, setCarouselImages] = useState([]);
   const [showAllOffline, setShowAllOffline] = useState(false);
   const [showAllOnline, setShowAllOnline] = useState(false);
+  const [isIframeLoading, setIsIframeLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -58,6 +59,13 @@ const CashbackDeals = () => {
     };
 
     fetchData();
+    
+    // Set a timeout to hide the iframe loading state after 3 seconds
+    const timer = setTimeout(() => {
+      setIsIframeLoading(false);
+    }, 3000);
+    
+    return () => clearTimeout(timer);
   }, []);
 
   // Function to toggle showing all offline deals
@@ -95,7 +103,7 @@ const CashbackDeals = () => {
   const displayedOnlineDeals = showAllOnline ? onlineDeals : onlineDeals.slice(0, 3);
 
   return (
-    <div className="w-full max-w-full mx-auto px-4 pb-8 font-sans overflow-x-hidden">
+    <div className="w-full max-w-full mx-auto px-4 pb-8 font-sans overflow-x-hidden bg-gray-50">
       <div className="flex flex-col gap-12">
         {/* Carousel Section */}
         <div className="w-full">
@@ -112,6 +120,101 @@ const CashbackDeals = () => {
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
             </div>
           )}
+        </div>
+
+        {/* Featured E-Commerce Deals Section with Enhanced iframe */}
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:shadow-2xl mx-4 md:mx-10">
+          {/* Header with gradient background */}
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-5 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="bg-white p-2 rounded-full">
+                <FaTag className="text-blue-600 text-xl" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-white">Featured E-Commerce Deals</h2>
+                <p className="text-blue-100 text-sm mt-1">Exclusive cashback offers from top online stores</p>
+              </div>
+            </div>
+            <div className="hidden md:flex gap-2">
+              <div className="bg-white bg-opacity-20 px-3 py-1 rounded-full flex items-center">
+                <FaPercentage className="text-white mr-1" />
+                <span className="text-white text-sm font-medium">Best Cashback</span>
+              </div>
+              <div className="bg-white bg-opacity-20 px-3 py-1 rounded-full flex items-center">
+                <BsArrowLeftRight className="text-white mr-1" />
+                <span className="text-white text-sm font-medium">Updated Daily</span>
+              </div>
+            </div>
+          </div>
+          
+          {/* iFrame Container with Loading State */}
+          {/* For now, we're using Deals Engine from INR Deals */}
+          <div className="relative p-4 md:p-6">
+            {isIframeLoading && (
+              <div className="absolute inset-0 bg-white bg-opacity-90 flex flex-col items-center justify-center z-10">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500 mb-4"></div>
+                <p className="text-blue-600 font-medium">Loading amazing deals for you...</p>
+              </div>
+            )}
+            
+            <div className="bg-white rounded-xl overflow-hidden border border-gray-100">
+              <div className="px-4 py-3 bg-gradient-to-r from-gray-50 to-blue-50 flex items-center justify-between border-b gap-4 sm:gap-0">
+                <div className="flex items-center gap-2">
+                  <FaShoppingBag className="text-blue-500" />
+                  <span className="font-medium text-gray-700">Exclusive Partner Deals</span>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full">Verified</span>
+                  <span className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-xl">100% Cashback</span>
+                </div>
+              </div>
+              
+              <iframe 
+                src='https://inrdeals.com/embed/deals?user=maa443089855' 
+                width='100%' 
+                height='1140' 
+                frameBorder='0' 
+                allowTransparency='true'
+                title="INR Deals Cashback Offers"
+                className="transition-opacity duration-500"
+                style={{ opacity: isIframeLoading ? '0.3' : '1' }}
+                onLoad={() => setIsIframeLoading(false)}
+              />
+            </div>
+            
+            {/* Information Cards Below iframe */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+              <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg flex items-center gap-3">
+                <div className="bg-blue-500 p-2 rounded-full text-white">
+                  <FaShoppingCart className="text-xl" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-blue-800">Shop & Earn</h3>
+                  <p className="text-sm text-blue-600">Get cashback on every purchase</p>
+                </div>
+              </div>
+              
+              <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg flex items-center gap-3">
+                <div className="bg-purple-500 p-2 rounded-full text-white">
+                  <FaTag className="text-xl" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-purple-800">Exclusive Coupons</h3>
+                  <p className="text-sm text-purple-600">Save extra with special codes</p>
+                </div>
+              </div>
+              
+              <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg flex items-center gap-3">
+                <div className="bg-green-500 p-2 rounded-full text-white">
+                  <MdStorefront className="text-xl" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-green-800">Top Brands</h3>
+                  <p className="text-sm text-green-600">Shop from 500+ popular stores</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Offline Deals Section */}
