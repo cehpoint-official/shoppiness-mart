@@ -8,6 +8,7 @@ import { Link, useParams, useLocation } from "react-router-dom";
 import { collection, getDocs, addDoc, query, where, onSnapshot, serverTimestamp, doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 import { FiChevronDown, FiChevronUp, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import toast from "react-hot-toast";
 
 import foodIcon from "../assets/Shop/food.png";
 import groceryIcon from "../assets/Shop/grocery.png";
@@ -17,6 +18,12 @@ import electronicsIcon from "../assets/Shop/electronics.png";
 import beautyIcon from "../assets/Shop/beauty.png";
 import sportIcon from "../assets/Shop/sport.png";
 import corporateIcon from "../assets/Shop/corporate.png";
+// import Festive from "../assets/Shop/Festive.png";
+// import Health from "../assets/Shop/Health.png";
+import Jewellery from "../assets/Shop/Jewellery.png";
+import Pets from "../assets/Shop/Pets.png";
+import Stationary from "../assets/Shop/Stationary.png";
+// import Toys from "../assets/Shop/Toys.png";
 
 const OnlineShop = () => {
   const location = useLocation();
@@ -101,7 +108,13 @@ const OnlineShop = () => {
         if (data.success) {
           // Filter only active stores
           const activeStores = data.data.stores.filter(store => store.status === "active");
-          setStores(activeStores);
+
+          //Remove the following line after successful onboarding of amazon and flipkart
+          const filteredActiveStores = activeStores.filter(store => 
+            store.merchant !== "Amazon India" && store.merchant !== "Flipkart"
+          );
+
+          setStores(filteredActiveStores);
         } else {
           console.error("Failed to fetch stores:", data.message);
         }
@@ -119,15 +132,21 @@ const OnlineShop = () => {
     () => [
       { name: "Food", icon: foodIcon, matchTerms: ["Food", "Food & Grocery"] },
       { name: "Grocery", icon: groceryIcon, matchTerms: ["Grocery", "Food & Grocery"] },
-      { name: "Pharmacy", icon: pharmacyIcon, matchTerms: ["Pharmacy", "Health & Beauty"] },
       { name: "Fashion", icon: fashionIcon, matchTerms: ["Fashion"] },
       { name: "Electronics", icon: electronicsIcon, matchTerms: ["Electronics"] },
+      { name: "Pharmacy", icon: pharmacyIcon, matchTerms: ["Pharmacy", "Health & Beauty"] },
+      // { name: "Toys & Baby Care", icon: Toys, matchTerms: ["Toys", "Baby Care", "Kids"] },
+      { name: "Books & Stationary", icon: Stationary, matchTerms: ["Books", "Stationary", "Education"] },
+      { name: "Pets & Supplies", icon: Pets, matchTerms: ["Pets", "Pet Care", "Pet Supplies"] },
+      // { name: "Health & Wellness", icon: Health, matchTerms: ["Health", "Wellness", "Healthcare"] },
+      { name: "Jewellery & Accessories", icon: Jewellery, matchTerms: ["Jewellery", "Accessories", "Fashion Accessories"] },
       { name: "Beauty", icon: beautyIcon, matchTerms: ["Beauty", "Health & Beauty"] },
-      { name: "Sport", icon: sportIcon, matchTerms: ["Sports", "Sports & Fitness"] },
+      // { name: "Seasonal & Festive", icon: Festive, matchTerms: ["Festive", "Seasonal", "Holidays", "Celebration"] },
       { name: "Corporate", icon: corporateIcon, matchTerms: ["Corporate", "Others"] },
+      { name: "Sport", icon: sportIcon, matchTerms: ["Sports", "Sports & Fitness"] },
     ],
     []
-  );
+  );  
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -393,12 +412,43 @@ const OnlineShop = () => {
 
   // Modify the store link rendering to include tracking
   const renderStoreLink = (item) => {
+    // Check if userId exists
+    if (!userId) {
+      // Return the component without the redirect functionality
+      return (
+        <div
+          className="p-5 w-full md:w-[200px]"
+          style={{
+            boxShadow:
+              "rgba(17, 17, 26, 0.05) 0px 1px 0px, rgba(17, 17, 26, 0.1) 0px 0px 8px",
+          }}
+          key={item.id}
+        >
+          <div onClick={() => toast.error("Please login as an user to continue")}>
+            <div>
+              <img
+                src={item.logo}
+                alt=""
+                className="w-full h-20 md:w-40"
+              />
+            </div>
+            <p className="text-center font-bold text-base m-2">
+              {item?.merchant}
+            </p>
+            <button className="bg-[#0F9B03] text-white rounded-md px-2 m-auto flex">
+              Earn up to {item?.payout} cashback on each purchase.
+            </button>
+          </div>
+        </div>
+      );
+    }
+  
+    // If userId exists, proceed with the original functionality
     // Generate a unique click ID
     const clickId = `${userId}_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
-
-    // Construct the tracking URL
+  
     const trackingUrl = `https://inr.deals/track?id=${import.meta.env.VITE_INRDEALS_USERNAME}&src=shoppinessmart&url=${item.url}&subid=${clickId}`;
-
+  
     return (
       <div
         className="p-5 w-full md:w-[200px]"

@@ -1,4 +1,4 @@
-import {FaSearch, FaArrowRight } from "react-icons/fa";
+import { FaSearch, FaArrowRight } from "react-icons/fa";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebase";
@@ -19,6 +19,13 @@ import giftImage from "../assets/Shop/gift.png";
 import website from "../assets/Shop/website..png";
 import giftCard from "../assets/Shop/gift-card.png";
 import cashBack from "../assets/Shop/cash-back.png";
+
+// import Festive from "../assets/Shop/Festive.png";
+// import Health from "../assets/Shop/Health.png";
+import Jewellery from "../assets/Shop/Jewellery.png";
+import Pets from "../assets/Shop/Pets.png";
+import Stationary from "../assets/Shop/Stationary.png";
+// import Toys from "../assets/Shop/Toys.png";
 
 import imaoffshop from "../assets/Shop/imaoffshop.png";
 import imaoffshop1 from "../assets/Shop/image 72.png";
@@ -91,7 +98,8 @@ const OfflineShop = () => {
       const searchMatch =
         !searchTerm ||
         shop.businessName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        shop.cat.toLowerCase().includes(searchTerm.toLowerCase());
+        shop.cat.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        shop.location?.toLowerCase().includes(searchTerm.toLowerCase()); // Added location search
 
       const categoryMatch =
         selectedCategories.length === 0 ||
@@ -123,12 +131,18 @@ const OfflineShop = () => {
     () => [
       { name: "Food", icon: foodIcon },
       { name: "Grocery", icon: groceryIcon },
-      { name: "Pharmacy", icon: pharmacyIcon },
       { name: "Fashion", icon: fashionIcon },
       { name: "Electronics", icon: electronicsIcon },
+      { name: "Pharmacy", icon: pharmacyIcon },
+      // { name: "Toys & Baby Care", icon: Toys },
+      { name: "Books & Stationary", icon: Stationary },
+      { name: "Pets & Supplies", icon: Pets },
+      // { name: "Health & Wellness", icon: Health },
+      { name: "Jewellery & Accessories", icon: Jewellery },
       { name: "Beauty", icon: beautyIcon },
-      { name: "Sport", icon: sportIcon },
+      // { name: "Seasonal & Festive", icon: Festive },
       { name: "Corporate", icon: corporateIcon },
+      { name: "Sport", icon: sportIcon },
     ],
     []
   );
@@ -183,7 +197,7 @@ const OfflineShop = () => {
             <input
               type="text"
               className="flex-grow p-2 focus:outline-none w-full"
-              placeholder="Search shop, brand, product"
+              placeholder="Search shop, brand, product or location"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -200,21 +214,43 @@ const OfflineShop = () => {
           <div
             key={category.name}
             onClick={() => toggleCategory(category.name)}
-            className={`flex flex-col items-center w-[22%] sm:w-[22%] md:w-1/5 lg:w-1/6 p-2 cursor-pointer transition-colors duration-200 
-              ${
-                selectedCategories.includes(category.name)
-                  ? "bg-orange-100 rounded-lg"
-                  : ""
+            className={`flex flex-col items-center w-[30%] md:w-1/5 lg:w-1/6 p-2 cursor-pointer transition-all duration-300 
+  ${selectedCategories.includes(category.name)
+                ? "bg-orange-100 rounded-lg shadow-md transform scale-105"
+                : ""
               }`}
           >
-            <img
-              src={category.icon}
-              alt={category.name}
-              className="w-12 h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 mb-1 bg-[#F7F7F7] rounded-full p-2"
-            />
-            <span className="text-gray-700 text-center text-xs md:text-sm">{category.name}</span>
+            <div className={`p-2 rounded-full ${selectedCategories.includes(category.name) ? "bg-orange-100" : "bg-[#F7F7F7]"}`}>
+              <img
+                src={category.icon}
+                alt={category.name}
+                className="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-full object-cover"
+              />
+            </div>
+            <span className="text-gray-700 text-center text-xs md:text-sm font-medium mt-2">
+              {category.name}
+            </span>
           </div>
         ))}
+
+        {/* Show category selection info */}
+        {selectedCategories.length > 0 && (
+          <div className="w-full text-center mb-4">
+            <div className="flex flex-wrap justify-center gap-2">
+              {selectedCategories.map(category => (
+                <span key={category} className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-medium inline-flex items-center">
+                  {category}
+                  <button
+                    onClick={() => toggleCategory(category)}
+                    className="ml-2 text-orange-800 hover:text-orange-900"
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Features Section */}
