@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { collection, getDocs, query, where, limit } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../../firebase";
 
 const PopularCauses = () => {
@@ -12,21 +12,69 @@ const PopularCauses = () => {
     const fetchCauses = async () => {
       try {
         setLoading(true);
-        // Create a query against the causeDetails collection where status is "Active"
         const causesQuery = query(
           collection(db, "causeDetails"),
-          where("status", "==", "Active"),
-          limit(3)
+          where("status", "==", "Active")
         );
 
         const querySnapshot = await getDocs(causesQuery);
-        const activeCauses = [];
+        let allCauses = [];
 
-        querySnapshot.forEach((doc) => {
-          activeCauses.push({ id: doc.id, ...doc.data() });
+        // Process each document in the main collection
+        for (const doc of querySnapshot.docs) {
+          const mainDoc = { id: doc.id, ...doc.data() };
+          
+          const mainDocDate = mainDoc.approvedDate ? 
+            (typeof mainDoc.approvedDate === 'string' ? new Date(mainDoc.approvedDate) : 
+             typeof mainDoc.approvedDate.toDate === 'function' ? mainDoc.approvedDate.toDate() : 
+             mainDoc.approvedDate instanceof Date ? mainDoc.approvedDate : new Date(0)) 
+            : new Date(0);
+          
+          // Add the main cause to our array with normalized sort date
+          allCauses.push({
+            ...mainDoc,
+            sortDate: mainDocDate, 
+            dateString: mainDoc.approvedDate, 
+            dateType: "approvedDate", 
+            isMainCause: true 
+          });
+          
+          // Check if the document has a "causes" array
+          if (mainDoc.causes && Array.isArray(mainDoc.causes)) {
+            const activeNestedCauses = mainDoc.causes
+              .filter(cause => 
+                cause.status && 
+                (cause.status.toLowerCase() === "active")
+              )
+              .map(cause => {
+                const nestedCauseDate = cause.createdDate ? 
+                  (typeof cause.createdDate === 'string' ? new Date(cause.createdDate) : 
+                   typeof cause.createdDate.toDate === 'function' ? cause.createdDate.toDate() : 
+                   cause.createdDate instanceof Date ? cause.createdDate : new Date(0)) 
+                  : new Date(0);
+                  
+                return {
+                  ...cause,
+                  parentCauseId: doc.id,
+                  parentCauseName: mainDoc.causeName,
+                  id: cause.id || `${doc.id}_${Math.random().toString(36).substring(2, 15)}`,
+                  sortDate: nestedCauseDate,
+                  dateString: cause.createdDate,
+                  dateType: "createdDate",
+                  isNestedCause: true 
+                };
+              });
+            
+            allCauses = [...allCauses, ...activeNestedCauses];
+          }
+        }
+
+        // Sort ALL causes by the sortDate field in descending order (newest first)
+        allCauses.sort((a, b) => {
+          return b.sortDate - a.sortDate;
         });
 
-        setCauses(activeCauses);
+        setCauses(allCauses.slice(0, 3));
       } catch (error) {
         console.error("Error fetching causes:", error);
       } finally {
@@ -79,6 +127,12 @@ const PopularCauses = () => {
                 <p className="text-gray-600 mb-4 line-clamp-3">
                   {cause.aboutCause}
                 </p>
+                {cause.parentCauseId && (
+                  <p className="text-xs text-gray-500 mb-2">
+                    Part of: {cause.parentCauseName}
+                  </p>
+                )}
+                
                 <div className="flex justify-end">
                   <Link
                     to={`/support/${cause.id}`}
@@ -116,8 +170,7 @@ const PopularCauses = () => {
           }}
         >
           <span>
-            See all {/* <span className="font-bold">5,000+</span> */}
-            Causes
+            See all Causes
           </span>
           <svg
             xmlns="http://www.w3.org/2000/svg"

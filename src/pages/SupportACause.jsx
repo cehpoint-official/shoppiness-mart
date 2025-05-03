@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../firebase";
 import Loader from "../Components/Loader/Loader";
 import FAQ from "../Components/FAQ";
@@ -7,7 +7,6 @@ import PeopleSaySection from "../Components/PeopleSaySection";
 import PopularCauses from "../Components/PopularCauses/PopularCauses";
 import supportACause from "../assets/supportACause.png";
 import charitiesImg from "../assets/RegisterBusiness/charities.png";
-import supportPage1 from "../assets/supportPage1.png";
 import { MdLocationOn } from "react-icons/md";
 import { Link } from "react-router-dom";
 
@@ -21,21 +20,76 @@ const SupportACause = () => {
   const [showAllCauses, setShowAllCauses] = useState(false);
   const causesPerPage = 6;
 
-  // Fetch data from Firestore
+  // Fetch data from Firestore, including nested causes
   const fetchData = useCallback(async () => {
     try {
-      const querySnapshot = await getDocs(collection(db, "causeDetails"));
-      const data = [];
-      querySnapshot.forEach((doc) => {
-        const shopData = doc.data();
-        if (shopData.status === "Active") {
-          data.push({ id: doc.id, ...shopData });
+      setLoading(true);
+      const causesQuery = query(
+        collection(db, "causeDetails"),
+        where("status", "==", "Active")
+      );
+
+      const querySnapshot = await getDocs(causesQuery);
+      let allCauses = [];
+
+      // Process each document in the main collection
+      for (const doc of querySnapshot.docs) {
+        const mainDoc = { id: doc.id, ...doc.data() };
+        
+        const mainDocDate = mainDoc.approvedDate ? 
+          (typeof mainDoc.approvedDate === 'string' ? new Date(mainDoc.approvedDate) : 
+           typeof mainDoc.approvedDate.toDate === 'function' ? mainDoc.approvedDate.toDate() : 
+           mainDoc.approvedDate instanceof Date ? mainDoc.approvedDate : new Date(0)) 
+          : new Date(0);
+        
+        // Add the main cause to our array with normalized sort date
+        allCauses.push({
+          ...mainDoc,
+          sortDate: mainDocDate, 
+          dateString: mainDoc.approvedDate, 
+          dateType: "approvedDate", 
+          isMainCause: true 
+        });
+        
+        // Check if the document has a "causes" array
+        if (mainDoc.causes && Array.isArray(mainDoc.causes)) {
+          const activeNestedCauses = mainDoc.causes
+            .filter(cause => 
+              cause.status && 
+              (cause.status.toLowerCase() === "active")
+            )
+            .map(cause => {
+              const nestedCauseDate = cause.createdDate ? 
+                (typeof cause.createdDate === 'string' ? new Date(cause.createdDate) : 
+                 typeof cause.createdDate.toDate === 'function' ? cause.createdDate.toDate() : 
+                 cause.createdDate instanceof Date ? cause.createdDate : new Date(0)) 
+                : new Date(0);
+                
+              return {
+                ...cause,
+                parentCauseId: doc.id,
+                parentCauseName: mainDoc.causeName,
+                id: cause.id || `${doc.id}_${Math.random().toString(36).substring(2, 15)}`,
+                sortDate: nestedCauseDate,
+                dateString: cause.createdDate,
+                dateType: "createdDate",
+                isNestedCause: true 
+              };
+            });
+          
+          allCauses = [...allCauses, ...activeNestedCauses];
         }
+      }
+
+      // Sort ALL causes by the sortDate field in descending order (newest first)
+      allCauses.sort((a, b) => {
+        return b.sortDate - a.sortDate;
       });
-      setNgos(data);
+
+      setNgos(allCauses);
       setLoading(false);
     } catch (error) {
-      console.log("Error getting documents: ", error);
+      console.error("Error fetching causes:", error);
       setLoading(false);
     }
   }, []);
@@ -58,6 +112,7 @@ const SupportACause = () => {
       setSearching(false);
     }, 1000);
   };
+
   // Get current causes for pagination
   const indexOfLastCause = currentPage * causesPerPage;
   const indexOfFirstCause = indexOfLastCause - causesPerPage;
@@ -163,6 +218,13 @@ const SupportACause = () => {
                             <MdLocationOn className="text-xl" />
                             <span>{ngo.location}</span>
                           </div>
+                          
+                          {ngo.parentCauseId && (
+                            <div className="text-sm text-gray-600">
+                              Part of: <Link to={`/support/${ngo.parentCauseId}`} className="text-teal-500 hover:underline">{ngo.parentCauseName}</Link>
+                            </div>
+                          )}
+                          
                           <Link
                             to={`/support/${ngo.id}`}
                             className="text-teal-500 hover:text-teal-700 font-medium flex items-center group"
@@ -344,6 +406,12 @@ const SupportACause = () => {
                           <MdLocationOn className="text-xl" />
                           <span>{cause.location}</span>
                         </div>
+                        
+                        {cause.parentCauseId && (
+                          <p className="text-sm text-teal-600 mb-2">
+                            Part of: <Link to={`/support/${cause.parentCauseId}`} className="hover:underline">{cause.parentCauseName}</Link>
+                          </p>
+                        )}
 
                         <p className="text-gray-600 mb-4 line-clamp-3">
                           {cause.aboutCause}
@@ -462,183 +530,7 @@ const SupportACause = () => {
       )}
 
       {/* Rest of the components */}
-      {/* <PopularCauses /> */}
-
-      {/* { 3rd page } */}
-      {/* <div className="my-20">
-        <div className="text-center">
-          <h1 className="text-3xl font-medium mb-2 font-slab">
-            Our Popular NGOs{" "}
-          </h1>
-          <p className="text-sm text-parapgraphColor">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit.
-          </p>
-          <p className="text-sm text-parapgraphColor">
-            Blanditiis,commodi tempora mollitia voluptatem{" "}
-          </p>
-        </div>
-
-        <div className="flex justify-center gap-10 flex-wrap px-10 py-10">
-          <div className="md:w-[400px] w-[250px]   shadow-lg rounded-lg bg-white">
-            <div>
-              <img
-                src={supportPage1}
-                alt="Loading..."
-                className="md:h-[297px] h-[200px]"
-              />
-            </div>
-
-            <div className="text-center p-4">
-              <h3 className="md:text-xl font-semibold">Healthy Food For All</h3>
-              <p className="text-teal-600 text-sm md:text-md">
-                children education{" "}
-              </p>
-              <p className="font-medium py-2 text-sm md:text-md">
-                400 Supports, 5,000000 raised
-              </p>
-              <p className="text-parapgraphColor md:text-md text-sm">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Blanditiis,commodi tempora mollitia voluptatem recusandae
-                impedit totam aperiam nesciunt doloremque magni neque placeat,
-                laborum nisi eum quae voluptatum{" "}
-              </p>
-            </div>
-          </div>
-
-          <div className="md:w-[400px] w-[250px]   shadow-lg rounded-lg bg-white">
-            <div>
-              <img
-                src={supportPage1}
-                alt="Loading..."
-                className="md:h-[297px] h-[200px]"
-              />
-            </div>
-
-            <div className="text-center p-4">
-              <h3 className="md:text-xl font-semibold">Healthy Food For All</h3>
-              <p className="text-teal-600 text-sm md:text-md">
-                children education{" "}
-              </p>
-              <p className="font-medium py-2 text-sm md:text-md">
-                400 Supports, 5,000000 raised
-              </p>
-              <p className="text-parapgraphColor md:text-md text-sm">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Blanditiis,commodi tempora mollitia voluptatem recusandae
-                impedit totam aperiam nesciunt doloremque magni neque placeat,
-                laborum nisi eum quae voluptatum{" "}
-              </p>
-            </div>
-          </div>
-          <div className="md:w-[400px] w-[250px]   shadow-lg rounded-lg bg-white">
-            <div>
-              <img
-                src={supportPage1}
-                alt="Loading..."
-                className="md:h-[297px] h-[200px]"
-              />
-            </div>
-
-            <div className="text-center p-4">
-              <h3 className="md:text-xl font-semibold">Healthy Food For All</h3>
-              <p className="text-teal-600 text-sm md:text-md">
-                children education{" "}
-              </p>
-              <p className="font-medium py-2 text-sm md:text-md">
-                400 Supports, 5,000000 raised
-              </p>
-              <p className="text-parapgraphColor md:text-md text-sm">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Blanditiis,commodi tempora mollitia voluptatem recusandae
-                impedit totam aperiam nesciunt doloremque magni neque placeat,
-                laborum nisi eum quae voluptatum{" "}
-              </p>
-            </div>
-          </div>
-          <div className="md:w-[400px] w-[250px]   shadow-lg rounded-lg bg-white">
-            <div>
-              <img
-                src={supportPage1}
-                alt="Loading..."
-                className="md:h-[297px] h-[200px]"
-              />
-            </div>
-
-            <div className="text-center p-4">
-              <h3 className="md:text-xl font-semibold">Healthy Food For All</h3>
-              <p className="text-teal-600 text-sm md:text-md">
-                children education{" "}
-              </p>
-              <p className="font-medium py-2 text-sm md:text-md">
-                400 Supports, 5,000000 raised
-              </p>
-              <p className="text-parapgraphColor md:text-md text-sm">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Blanditiis,commodi tempora mollitia voluptatem recusandae
-                impedit totam aperiam nesciunt doloremque magni neque placeat,
-                laborum nisi eum quae voluptatum{" "}
-              </p>
-            </div>
-          </div>
-          <div className="md:w-[400px] w-[250px]   shadow-lg rounded-lg bg-white">
-            <div>
-              <img
-                src={supportPage1}
-                alt="Loading..."
-                className="md:h-[297px] h-[200px]"
-              />
-            </div>
-
-            <div className="text-center p-4">
-              <h3 className="md:text-xl font-semibold">Healthy Food For All</h3>
-              <p className="text-teal-600 text-sm md:text-md">
-                children education{" "}
-              </p>
-              <p className="font-medium py-2 text-sm md:text-md">
-                400 Supports, 5,000000 raised
-              </p>
-              <p className="text-parapgraphColor md:text-md text-sm">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Blanditiis,commodi tempora mollitia voluptatem recusandae
-                impedit totam aperiam nesciunt doloremque magni neque placeat,
-                laborum nisi eum quae voluptatum{" "}
-              </p>
-            </div>
-          </div>
-          <div className="md:w-[400px] w-[250px]   shadow-lg rounded-lg bg-white">
-            <div>
-              <img
-                src={supportPage1}
-                alt="Loading..."
-                className="md:h-[297px] h-[200px]"
-              />
-            </div>
-
-            <div className="text-center p-4">
-              <h3 className="md:text-xl font-semibold">Healthy Food For All</h3>
-              <p className="text-teal-600 text-sm md:text-md">
-                children education{" "}
-              </p>
-              <p className="font-medium py-2 text-sm md:text-md">
-                400 Supports, 5,000000 raised
-              </p>
-              <p className="text-parapgraphColor md:text-md text-sm">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Blanditiis,commodi tempora mollitia voluptatem recusandae
-                impedit totam aperiam nesciunt doloremque magni neque placeat,
-                laborum nisi eum quae voluptatum{" "}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="text-center">
-          <p className="text-xl">
-            See all <span className="font-bold">5,000 + </span> Causes{" "}
-            <i className="bi bi-arrow-right"></i>{" "}
-          </p>
-        </div>
-      </div> */}
+      <PopularCauses />
 
       {/* { 4th page } */}
       <div className="bg-backgroundLightYellowColor p-10">
@@ -651,8 +543,10 @@ const SupportACause = () => {
           <img src={charitiesImg} alt="load.." className="w-[1000px]" />
         </div>
       </div>
+      
       {/* { 5th page } */}
       <FAQ />
+      
       {/* { 6th page } */}
       <PeopleSaySection />
     </div>

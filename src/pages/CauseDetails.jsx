@@ -199,20 +199,78 @@ const CauseDetails = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch cause details
+        // console.log("Fetching cause with ID:", id);
+
+        // First try to fetch as a direct cause
         const causeRef = doc(db, "causeDetails", id);
         const causeDoc = await getDoc(causeRef);
 
-        if (!causeDoc.exists()) {
-          console.error("Cause not found");
-          setLoading(false);
-          return; // Exit early if cause doesn't exist
+        // If direct cause exists
+        if (causeDoc.exists()) {
+          // console.log("Direct cause found");
+          const causeData = { id: causeDoc.id, ...causeDoc.data() };
+          // console.log("Cause data:", causeData);
+
+          // Process nested causes if any
+          if (causeData.causes && Array.isArray(causeData.causes)) {
+            // Logic for nested causes...
+          }
+
+          setCause(causeData);
+        }
+        // If not a direct cause, check if it's a nested cause
+        else {
+          // console.log("Direct cause not found, checking if it's a nested cause");
+          const causesQuery = query(collection(db, "causeDetails"));
+          const causesSnapshot = await getDocs(causesQuery);
+
+          let foundNestedCause = null;
+          let parentCauseData = null;
+
+          // Iterate through all causes to find one that contains our nested cause
+          causesSnapshot.forEach((doc) => {
+            const parentData = doc.data();
+
+            if (parentData.causes && Array.isArray(parentData.causes)) {
+              // Check if any nested cause has the ID we're looking for
+              const nestedCause = parentData.causes.find(cause =>
+                cause.id === id ||
+                `${parentData.id}_${cause.id}` === id ||
+                cause.id?.includes(id)
+              );
+
+              if (nestedCause) {
+                foundNestedCause = nestedCause;
+                parentCauseData = { id: doc.id, ...parentData };
+                // console.log("Found nested cause in parent:", parentCauseData.causeName);
+              }
+            }
+          });
+
+          if (foundNestedCause && parentCauseData) {
+            // console.log("Nested cause found:", foundNestedCause);
+
+            const causeData = {
+              ...foundNestedCause,
+              id: id,
+              isNestedCause: true,
+              parentCauseId: parentCauseData.id,
+              parentCauseName: parentCauseData.causeName,
+              parentCause: {
+                id: parentCauseData.id,
+                name: parentCauseData.causeName,
+                logoUrl: parentCauseData.logoUrl
+              }
+            };
+
+            // console.log("Setting cause state with nested cause data:", causeData);
+            setCause(causeData);
+          } else {
+            // console.error("Nested cause not found in any parent");
+            setLoading(false);
+          }
         }
 
-        const causeData = { id: causeDoc.id, ...causeDoc.data() };
-        setCause(causeData);
-
-        // Fetch only active businesses
         const businessQuery = query(
           collection(db, "businessDetails"),
           where("status", "==", "Active")
@@ -225,13 +283,6 @@ const CauseDetails = () => {
         });
 
         setAllShops(shops);
-
-        // Filter shops by distance using Google Maps API
-        if (causeData.location) {
-          const nearby = await filterShopsByDistance(causeData.location, shops);
-          setNearbyShops(nearby);
-          setTotalPages(Math.ceil(nearby.length / SHOPS_PER_PAGE));
-        }
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -241,6 +292,19 @@ const CauseDetails = () => {
 
     fetchData();
   }, [id, navigate]);
+
+  useEffect(() => {
+    const filterShops = async () => {
+      if (cause && cause.location && allShops.length > 0) {
+        // console.log("Filtering shops for cause:", cause.causeName);
+        const nearby = await filterShopsByDistance(cause.location, allShops);
+        setNearbyShops(nearby);
+        setTotalPages(Math.ceil(nearby.length / SHOPS_PER_PAGE));
+      }
+    };
+
+    filterShops();
+  }, [cause, allShops]);
 
   // Fetch tab-specific data when tab changes
   useEffect(() => {
@@ -308,8 +372,11 @@ const CauseDetails = () => {
           <h2 className="text-2xl font-bold text-gray-800 mb-2">
             Cause Not Found
           </h2>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 mb-4">
             The cause you're looking for doesn't exist or has been removed.
+          </p>
+          <p className="text-gray-500 text-sm mb-6">
+            Looking for cause ID: {id}
           </p>
           <Link
             to={

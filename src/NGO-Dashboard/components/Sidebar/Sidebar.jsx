@@ -6,6 +6,7 @@ import { HiMenuAlt2 } from "react-icons/hi";
 import { IoClose } from "react-icons/io5";
 import { TbFlower } from "react-icons/tb";
 import { AiOutlineCalendar } from 'react-icons/ai';
+import { AiOutlinePlus } from 'react-icons/ai';
 import headerLogo from "../../assets/header-logo.png";
 import iconDashboard from "../../assets/icon-dashboard.png";
 import iconProducts from "../../assets/icon-products.png";
@@ -178,6 +179,19 @@ const Sidebar = () => {
             >
               <AiOutlineCalendar size={24} />
               Past Events
+            </li>
+          </Link>
+
+          <Link to={`/ngo-dashboard/${id}/addCause`}>
+            <li
+              className={
+                activeLink === `/ngo-dashboard/${id}/addCause`
+                  ? "bg-[#ffffff33]"
+                  : ""
+              }
+            >
+              <AiOutlinePlus size={24} />
+              Add Cause
             </li>
           </Link>
 

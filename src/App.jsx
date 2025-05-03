@@ -20,6 +20,7 @@ import ProtectedRoute from "./Components/ProtectedRoute";
 import BusinessDetails from "./pages/BusinessDetails"; // Direct import
 import Gallery from "./NGO-Dashboard/pages/Gallery/Gallery";
 import PastEvents from "./NGO-Dashboard/pages/PastEvents/PastEvents";
+import AddCause from "./NGO-Dashboard/pages/AddCause/AddCause";
 const ProductDetails = lazy(() => import("./pages/ProductDetails"));
 const AdminDashboard = lazy(() =>
   import("./Admin/pages/AdminDashboard/AdminDashboard")
@@ -381,6 +382,7 @@ const router = createBrowserRouter([
           { path: "performance", element: <NgoPerformance /> },
           { path: "gallery", element: <Gallery /> },
           { path: "pastEvents", element: <PastEvents /> },
+          { path: "addCause", element: <AddCause /> },
           { path: "support", element: <HelpSupport /> },
           { path: "about-us", element: <About /> },
           { path: "faqs", element: <FAQ /> },

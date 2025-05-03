@@ -1,6 +1,7 @@
 import { useState } from "react";
 import CauseInformation from "../../components/NgoDetails/CauseInformation";
 import CauseImage from "../../components/NgoDetails/CauseImage";
+import CausePaymentInformation from "../../components/NgoDetails/CausePaymentInformation";
 import PaymentInformation from "../../components/NgoDetails/PaymentInformation";
 import TransactionSummary from "../../components/NgoDetails/TransactionSummary";
 import CausePage from "../../components/NgoDetails/CausePage";
@@ -15,6 +16,11 @@ const NgoDetails = () => {
       component: <CauseInformation />,
     },
     { id: "cause-image", label: "Cause Image", component: <CauseImage /> },
+    {
+      id: "cause-payment-info",
+      label: "Cause Payment Information",
+      component: <CausePaymentInformation />,
+    },
     {
       id: "payment-info",
       label: "Payment Information",
