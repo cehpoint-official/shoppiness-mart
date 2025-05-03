@@ -18,6 +18,8 @@ import CauseDetails from "./pages/CauseDetails";
 import { useSelector } from "react-redux";
 import ProtectedRoute from "./Components/ProtectedRoute";
 import BusinessDetails from "./pages/BusinessDetails"; // Direct import
+import Gallery from "./NGO-Dashboard/pages/Gallery/Gallery";
+import PastEvents from "./NGO-Dashboard/pages/PastEvents/PastEvents";
 const ProductDetails = lazy(() => import("./pages/ProductDetails"));
 const AdminDashboard = lazy(() =>
   import("./Admin/pages/AdminDashboard/AdminDashboard")
@@ -193,7 +195,7 @@ const Layout = () => (
 const UserProtectedRoute = ({ children }) => {
   const { user } = useSelector((state) => state.userReducer);
   // Remove or update the debug log to avoid selecting the entire state
-//  console.log("UserProtectedRoute State: user exists:", !!user);
+  //  console.log("UserProtectedRoute State: user exists:", !!user);
   return (
     <ProtectedRoute isAuthenticated={!!user} redirect="/login/user">
       {children}
@@ -325,12 +327,13 @@ const router = createBrowserRouter([
             path: "/user-dashboard/:userId/offline-shop",
             element: <OfflineShop />,
           },
-          { 
-            path: "/user-dashboard/:userId/cashback-deals", 
-            element: <CashbackDeals /> },
-          { 
-            path: "/user-dashboard/:userId/cashback-deals/:category/:businessId", 
-            element: <CashbackDealsDetails /> 
+          {
+            path: "/user-dashboard/:userId/cashback-deals",
+            element: <CashbackDeals />
+          },
+          {
+            path: "/user-dashboard/:userId/cashback-deals/:category/:businessId",
+            element: <CashbackDealsDetails />
           },
           {
             path: "/user-dashboard/:userId/offline-shop/:category",
@@ -376,6 +379,8 @@ const router = createBrowserRouter([
           { path: "dashboard", element: <NgoDashboard /> },
           { path: "details", element: <NgoDetails /> },
           { path: "performance", element: <NgoPerformance /> },
+          { path: "gallery", element: <Gallery /> },
+          { path: "pastEvents", element: <PastEvents /> },
           { path: "support", element: <HelpSupport /> },
           { path: "about-us", element: <About /> },
           { path: "faqs", element: <FAQ /> },

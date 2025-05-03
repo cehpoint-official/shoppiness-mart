@@ -4,6 +4,8 @@ import "./Sidebar.scss";
 import { IoLogOutOutline } from "react-icons/io5";
 import { HiMenuAlt2 } from "react-icons/hi";
 import { IoClose } from "react-icons/io5";
+import { TbFlower } from "react-icons/tb";
+import { AiOutlineCalendar } from 'react-icons/ai';
 import headerLogo from "../../assets/header-logo.png";
 import iconDashboard from "../../assets/icon-dashboard.png";
 import iconProducts from "../../assets/icon-products.png";
@@ -150,6 +152,32 @@ const Sidebar = () => {
             >
               <img src={iconCustomers} alt="loading" />
               Cause/NGO Performance
+            </li>
+          </Link>
+
+          <Link to={`/ngo-dashboard/${id}/gallery`}>
+            <li
+              className={
+                activeLink === `/ngo-dashboard/${id}/gallery`
+                  ? "bg-[#ffffff33]"
+                  : ""
+              }
+            >
+              <TbFlower size={20} />
+              Gallery
+            </li>
+          </Link>
+
+          <Link to={`/ngo-dashboard/${id}/pastEvents`}>
+            <li
+              className={
+                activeLink === `/ngo-dashboard/${id}/pastEvents`
+                  ? "bg-[#ffffff33]"
+                  : ""
+              }
+            >
+              <AiOutlineCalendar size={24} />
+              Past Events
             </li>
           </Link>
 
