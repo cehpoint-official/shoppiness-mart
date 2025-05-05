@@ -511,7 +511,8 @@ const BusinessForm = () => {
         I agree to the <button onClick={handleViewTerms} className="terms-link">Terms and Conditions</button>
       </label>
     </div>
-  );
+  );    
+  //Updated BusinessForm
 
   const pages = [
     {
